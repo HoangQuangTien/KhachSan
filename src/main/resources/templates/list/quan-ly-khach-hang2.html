@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/head :: head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý khách hàng</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
+    <style>
+        .text-success {
+            color: #4CAF50; /* Màu xanh lá cây */
+        }
+
+        .text-danger {
+            color: #f44336; /* Màu đỏ */
+        }
+    </style>
+</head>
+<body class="vertical light">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main class="main-content" role="main">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <h2 class="mb-2 page-title">Quản lý khách hàng</h2>
+                    <p class="card-text"></p>
+                    <div class="row my-4">
+                        <div class="col-md-12">
+
+                            <div class="card shadow">
+                                <div class="card-body">
+                                    <div class="toolbar row mb-3 mt-3">
+                                        <div class="col-md-12">
+                                            <form class="form-inline" id="filterForm"
+                                                  style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                                                <!-- Search -->
+                                                <div class="form-group"
+                                                     style="flex-grow: 1; display: flex; align-items: center;">
+                                                    <label class="mr-2" for="search">Tìm kiếm</label>
+                                                    <input class="form-control" id="search"
+                                                           oninput="searchKhachHang(this.value)"
+                                                           placeholder="Tìm kiếm theo mã hoặc tên" style="flex-grow: 1;"
+                                                           type="text">
+                                                </div>
+
+                                                <!-- Dropdown -->
+
+
+                                                <!-- Reset Button -->
+                                                <div class="form-group"
+                                                     style="flex-grow: 1; display: flex; align-items: center;">
+                                                    <a th:href="@{quan-ly-khach-hang}" class="btn btn-success">Reset</a>
+                                                </div>
+
+                                                <!-- Add Button -->
+                                                <button type="button" class="btn btn-success"
+                                                        data-toggle="modal" data-target="#addModal" style="width: 100px;"
+                                                        data-whatever="@mdo">Thêm <span class="fe fe-plus"></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!--                            Bang-->
+
+                            <!-- Table -->
+                            <div class="card shadow mt-5">
+                                <div class="card-body" id="tableCardBody">
+                                    <table class="table datatables" id="dataTable-1">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Họ và tên</th>
+                                            <th>Email</th>
+                                            <th>SDT</th>
+                                            <th>Ngày tham gia</th>
+                                            <th>Giới tính</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="khachHangTable">
+                                        <tr th:each="khachHang, i : ${page.content}">
+                                            <td th:text="${i.count}"></td>
+                                            <td th:text="${khachHang.hoVaTen}"></td>
+                                            <td th:text="${khachHang.email}"></td>
+                                            <td th:text="${khachHang.soDienThoai}"></td>
+                                            <td th:text="${khachHang.createdAt}"></td>
+                                            <td th:text="${khachHang.gioiTinh == true ? 'Nam' : 'Nữ'}"></td>
+                                            <td style="display: flex">
+                                                <a th:href="@{/quan-ly-khach-hang-detail(id=${khachHang.id})}">
+                                                    <button class="btn mb-2 mr-1 btn-outline-success" type="button">
+                                                        <span class="fe fe-edit-3"></span>
+                                                    </button>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!-- Phân trang -->
+                                    <div class="row justify-content-center mt-4">
+                                        <div class="col-12">
+                                            <nav aria-label="Table Paging" class="mb-0 text-muted">
+                                                <ul class="pagination justify-content-end mb-0">
+                                                    <li th:class="${page.first} ? 'page-item disabled' : 'page-item'">
+                                                        <a class="page-link"
+                                                           th:href="@{/quan-ly-khach-hang(page=0)}">First</a>
+                                                    </li>
+                                                    <li th:class="${page.number == 0} ? 'page-item disabled' : 'page-item'">
+                                                        <a class="page-link"
+                                                           th:href="@{/quan-ly-khach-hang(page=${page.number - 1})}"
+                                                           th:if="${page.hasPrevious()}">Previous</a>
+                                                    </li>
+                                                    <li th:class="${page.number == i} ? 'page-item active' : 'page-item'"
+                                                        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+                                                        <a class="page-link"
+                                                           th:href="@{/quan-ly-khach-hang(page=${i})}"
+                                                           th:text="${i + 1}"></a>
+                                                    </li>
+                                                    <li th:class="${page.number + 1 == page.totalPages} ? 'page-item disabled' : 'page-item'">
+                                                        <a class="page-link"
+                                                           th:href="@{/quan-ly-khach-hang(page=${page.number + 1})}"
+                                                           th:if="${page.hasNext()}">Next</a>
+                                                    </li>
+                                                    <li th:class="${page.last} ? 'page-item disabled' : 'page-item'">
+                                                        <a class="page-link"
+                                                           th:href="@{/quan-ly-khach-hang(page=${page.totalPages - 1})}">Last</a>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div aria-hidden="true" aria-labelledby="addModalLabel" class="modal fade" id="addModal"
+                                 role="dialog" tabindex="-1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addModalLabel">Thêm khách hàng</h5>
+                                            <button aria-label="Close" class="close" data-dismiss="modal"
+                                                    type="button">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="/quan-ly-khach-hang/them" id="addForm" method="post">
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="maKhachHang">Use name</label>
+                                                        <input class="form-control" id="maKhachHang"
+                                                               name="maKhachHang"
+                                                               placeholder="Nhập use name" required
+                                                               type="text">
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="hoVaTen">Họ và tên</label>
+                                                        <input class="form-control" id="hoVaTen" name="hoVaTen"
+                                                               placeholder="Nhập họ và tên" required
+                                                               type="text">
+                                                    </div>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="email">Email</label>
+                                                        <input class="form-control" id="email" name="email"
+                                                               placeholder="Nhập địa chỉ email" required
+                                                               type="email">
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="soDienThoai">Số điện thoại</label>
+                                                        <input class="form-control" id="soDienThoai"
+                                                               name="soDienThoai"
+                                                               placeholder="Nhập số điện thoại"
+                                                               required type="text">
+                                                    </div>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="gioiTinh">Giới tính</label>
+                                                        <select class="form-control" id="gioiTinh"
+                                                                name="gioiTinh" required>
+                                                            <option value="true">Nam</option>
+                                                            <option value="false">Nữ</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="tenDiaChi">Địa chỉ cụ thể</label>
+                                                    <input class="form-control" id="tenDiaChi"
+                                                           name="diaChi[0].diaChiCuThe"
+                                                           placeholder="Nhập địa chỉ cụ thể"
+                                                           required type="text">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="ghiChu">Ghi chú</label>
+                                                    <input class="form-control" id="ghiChu" name="diaChi[0].ghiChu"
+                                                           placeholder="Nhập ghi chú" required
+                                                           type="text">
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-4">
+                                                        <label for="city">Tỉnh thành</label>
+                                                        <select class="form-control" id="city"
+                                                                name="diaChi[0].thanhPho" required>
+                                                            <option selected value="">Chọn tỉnh thành</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="district">Quận huyện</label>
+                                                        <select class="form-control" id="district"
+                                                                name="diaChi[0].quanHuyen" required>
+                                                            <option selected value="">Chọn quận huyện</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="ward">Phường xã</label>
+                                                        <select class="form-control" id="ward"
+                                                                name="diaChi[0].phuongXa" required>
+                                                            <option selected value="">Chọn phường xã</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <button class="btn btn-success" type="submit">Thêm</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<div th:include="fragment/script :: script"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+    var citis = document.getElementById("city");
+    var districts = document.getElementById("district");
+    var wards = document.getElementById("ward");
+    var Parameter = {
+        url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+        method: "GET",
+        responseType: "application/json",
+    };
+    var promise = axios(Parameter);
+    promise.then(function (result) {
+        renderCity(result.data);
+    });
+
+    function renderCity(data) {
+        for (const x of data) {
+            var opt = document.createElement('option');
+            opt.value = x.Name;
+            opt.text = x.Name;
+            opt.setAttribute('data-id', x.Id);
+            citis.options.add(opt);
+        }
+        citis.onchange = function () {
+            districts.length = 1;
+            wards.length = 1;
+            if (this.options[this.selectedIndex].dataset.id !== "") {
+                const result = data.filter(n => n.Id === this.options[this.selectedIndex].dataset.id);
+
+                for (const k of result[0].Districts) {
+                    var opt = document.createElement('option');
+                    opt.value = k.Name;
+                    opt.text = k.Name;
+                    opt.setAttribute('data-id', k.Id);
+                    districts.options.add(opt);
+                }
+            }
+        };
+        districts.onchange = function () {
+            wards.length = 1;
+            const dataCity = data.filter((n) => n.Id === citis.options[citis.selectedIndex].dataset.id);
+            if (this.options[this.selectedIndex].dataset.id !== "") {
+                const dataWards = dataCity[0].Districts.filter(n => n.Id === this.options[this.selectedIndex].dataset.id)[0].Wards;
+
+                for (const w of dataWards) {
+                    var opt = document.createElement('option');
+                    opt.value = w.Name;
+                    opt.text = w.Name;
+                    opt.setAttribute('data-id', w.Id);
+                    wards.options.add(opt);
+                }
+            }
+        };
+    }
+
+    function searchKhachHang() {
+        const searchQuery = document.getElementById('search').value.trim(); // Lấy giá trị từ ô tìm kiếm và loại bỏ khoảng trắng
+        console.log(searchQuery); // Debug: log giá trị searchQuery để kiểm tra
+
+        fetch('/khach-hang/search?query=' + encodeURIComponent(searchQuery), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateTableBody(data); // Gọi hàm cập nhật bảng dữ liệu với dữ liệu trả về từ server
+            })
+            .catch(error => {
+                console.error('Error fetching search results:', error);
+            });
+    }
+
+    // Bắt sự kiện input của ô tìm kiếm
+    document.getElementById('search').addEventListener('input', function (event) {
+        event.preventDefault();
+        searchKhachHang();
+    });
+
+    function updateTableBody(data) {
+        var tableBody = document.getElementById('khachHangTable');
+        tableBody.innerHTML = ''; // Xóa dữ liệu cũ trước khi cập nhật
+
+        data.forEach(function (khachHang, index) {
+            var row = '<tr>' +
+                '<td>' + (index + 1) + '</td>' +
+                '<td>' + khachHang.hoVaTen + '</td>' +
+                '<td>' + khachHang.email + '</td>' +
+                '<td>' + khachHang.soDienThoai + '</td>' +
+                '<td>' + khachHang.createdAt + '</td>' +
+                '<td>' + (khachHang.gioiTinh ? 'Nam' : 'Nữ') + '</td>' +
+                // '<td><span class="' + (khachHang.trangThai === 'active' ? 'text-success' : 'text-danger') + '">' +
+                // (khachHang.trangThai === 'active' ? 'Hoạt động' : 'Không hoạt động') + '</span></td>' +
+                '<td style="display: flex"><a href="/quan-ly-khach-hang-detail?id=' + khachHang.id + '">' +
+                '<button class="btn mb-2 mr-1 btn-outline-success" type="button"><span class="fe fe-edit-3"></span></button>' +
+                '</a></td>' +
+                '</tr>';
+            tableBody.innerHTML += row;
+        });
+    }
+
+
+    function showSuccessToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+            stopOnFocus: true
+        }).showToast();
+    }
+
+    // Hàm hiển thị toast thông báo khi lỗi
+    function showErrorToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+            stopOnFocus: true
+        }).showToast();
+    }
+
+    function filterKhachHang() {
+        const status = document.getElementById('filterStatus').value; // Lấy giá trị của trạng thái từ dropdown
+
+        fetch('/khach-hang/filter?status=' + encodeURIComponent(status), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw new Error('Error fetching filter results: ' + error.message);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateTableBody(data);
+            })
+            .catch(error => {
+                console.error('Error fetching filter results:', error.message);
+            });
+    }
+
+    document.getElementById('filterStatus').addEventListener('change', function (event) {
+        event.preventDefault();
+        filterKhachHang();
+    });
+
+    function updateTableBody(data) {
+        var tableBody = document.getElementById('khachHangTable');
+        tableBody.innerHTML = '';
+
+        data.forEach(function (khachHang, index) {
+            var row = '<tr>' +
+                '<td>' + (index + 1) + '</td>' +
+                '<td>' + khachHang.hoVaTen + '</td>' +
+                '<td>' + khachHang.email + '</td>' +
+                '<td>' + khachHang.soDienThoai + '</td>' +
+                '<td>' + khachHang.createdAt + '</td>' +
+                '<td>' + (khachHang.gioiTinh ? 'Nam' : 'Nữ') + '</td>' +
+                // '<td><span class="' + (khachHang.trangThai === 'active' ? 'text-success' : 'text-danger') + '">' +
+                // (khachHang.trangThai === 'active' ? 'Hoạt động' : 'Không hoạt động') + '</span></td>' +
+                '<td style="display: flex"><a href="/quan-ly-khach-hang-detail?id=' + khachHang.id + '">' +
+                '<button class="btn mb-2 mr-1 btn-outline-success type="button"><span class="fe fe-edit-3"></span></button>' +
+                '</a></td>' +
+                '</tr>';
+            tableBody.innerHTML += row;
+        });
+    }
+
+
+</script>
+</body>
+</html>

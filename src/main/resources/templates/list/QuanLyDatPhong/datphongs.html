@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/head :: head">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+D1qSAA5GFZqKKN16EMOZB+89TgYPd4bkD+BSR4" crossorigin="anonymous">
+
+    <style>
+
+        .form-label {
+            font-weight: 500;
+            font-size: 14px; /* Giảm kích thước chữ */
+        }
+
+        .form-control {
+            padding: 8px; /* Giảm kích thước ô input */
+            font-size: 14px; /* Giảm kích thước chữ ô input */
+        }
+
+        button[type="submit"] {
+            font-size: 16px; /* Giảm kích thước nút */
+            padding: 10px 0; /* Giảm kích thước padding của nút */
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .form-control:disabled {
+            background-color: #e9ecef;
+            opacity: 1;
+        }
+        .text-danger {
+            color: #dc3545;
+        }
+        #paymentForm {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .room-selection {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="vertical light">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+
+        <div class="container py-4">
+            <div class="card shadow-sm border-0 text-start float-start" style="max-width: 400px;">
+                <div class="card-body">
+                    <h4 class="mb-3 text-center">Đặt Phòng</h4>
+                    <!-- Chọn loại phòng -->
+                    <div class="mb-3">
+                        <label for="loaiPhongSelect" class="form-label">Loại Phòng:</label>
+                        <select class="form-select form-select-sm" id="loaiPhongSelect" name="idLoaiPhong">
+                            <option value="" selected>Chọn loại phòng</option>
+                            <th:block th:each="loaiPhong : ${loaiPhongs}">
+                                <option th:value="${loaiPhong.idLoaiPhong}" th:text="${loaiPhong.tenLoaiPhong}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+
+                    <!-- Chọn phòng -->
+                    <div class="mb-3">
+                        <label for="phongSelect" class="form-label">Phòng:</label>
+                        <div id="phongSelect" class="btn-group d-flex flex-wrap">
+                            <!-- Các phòng sẽ được thêm vào đây -->
+                        </div>
+                    </div>
+                    <!-- Form đặt phòng -->
+                    <form id="datPhongForm" method="post" action="/datphongs/create">
+
+
+                        <input type="hidden" name="idKhachHang" id="idKhachHang">
+                        <input type="hidden" name="idLoaiPhong" id="idLoaiPhong">
+                        <input type="hidden" name="idPhong" id="idPhong">
+
+                        <!-- Mã đặt phòng -->
+                        <div class="mb-2">
+                            <label for="maDatPhong" class="form-label">Mã Đặt Phòng:</label>
+                            <input type="text" class="form-control form-control-sm" id="maDatPhong" name="maDatPhong" placeholder="Mã đặt phòng" required>
+                        </div>
+
+                        <!-- Ngày nhận và ngày trả -->
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label for="ngayNhan" class="form-label">Ngày Nhận:</label>
+                                <input type="date" class="form-control form-control-sm" id="ngayNhan" name="ngayNhan" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="ngayTra" class="form-label">Ngày Trả:</label>
+                                <input type="date" class="form-control form-control-sm" id="ngayTra" name="ngayTra" required>
+                            </div>
+                        </div>
+
+                        <!-- CCCD -->
+                        <div class="mb-2">
+                            <label for="cccd" class="form-label">CCCD:</label>
+                            <input type="text" class="form-control form-control-sm" id="cccd" name="cccd" placeholder="CCCD" required>
+                        </div>
+
+                        <!-- Tiền cọc -->
+                        <div class="mb-3">
+                            <label for="tienCoc" class="form-label">Tiền Cọc:</label>
+                            <input type="number" class="form-control form-control-sm" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
+                        </div>
+
+                        <!-- Button Đặt phòng -->
+                        <button type="submit" id="submitDatPhongBtn"  class="btn btn-primary w-100">Đặt Phòng</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Form thông tin khách hàng -->
+            <div  id="customerInfoForm" style="display: none;">
+                <div class="card shadow-sm border-0 text-start">
+                    <div class="card-body">
+                        <h4 class="mb-3 text-center">Thông Tin Khách Hàng</h4>
+                        <form id="customerForm" >
+                            <div class="mb-3">
+                                <label for="maKhachHang" class="form-label">Mã:</label>
+                                <input type="text" class="form-control form-control-sm" id="maKhachHang" name="maKhachHang" placeholder="Mã" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="hoVaTen" class="form-label">Họ và Tên:</label>
+                                <input type="text" class="form-control form-control-sm" id="hoVaTen" name="hoVaTen" placeholder="Họ và tên" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="soDienThoai" class="form-label">Số Điện Thoại:</label>
+                                <input type="text" class="form-control form-control-sm" id="soDienThoai" name="soDienThoai" placeholder="Số điện thoại" required>
+                            </div>
+                            <button type="button" id="confirmCustomerBtn" class="btn btn-primary w-100">Xác Nhận Thông Tin</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Thanh Toán -->
+            <div id="paymentForm" style="display:none;">
+                <form id="paymentFormElement">
+                    <input type="hidden" id="idDatPhong" name="idDatPhong" />
+                    <label for="paymentAmount">Số tiền thanh toán:</label>
+                    <input type="number" id="paymentAmount" name="paymentAmount" required />
+                    <button type="button" id="confirmPaymentBtn">Xác nhận Thanh Toán</button>
+                </form>
+            </div>
+        </div>
+
+
+    </main>
+    <div th:include="fragment/modal :: modal"></div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-7Ma6PSjbFvGJfcQ/E0i1XAfE5jHn1cdCpK2WhCbcMyJgpj5tI4TD/ThUydFm2pwf" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loaiPhongSelect = document.getElementById('loaiPhongSelect');
+        const phongSelectContainer = document.getElementById('phongSelect');
+        const tienCocInput = document.getElementById('tienCoc');
+        const ngayNhanInput = document.getElementById('ngayNhan');
+        const ngayTraInput = document.getElementById('ngayTra');
+        const paymentForm = document.getElementById('paymentForm');
+        const datPhongForm = document.getElementById('datPhongForm');
+        let giaPhongMap = {}; // Để lưu giá phòng theo id phòng
+        function setKhachHangId(id) {
+            const idKhachHangInput = document.getElementById('idKhachHang');
+            if (id && !isNaN(id)) {
+                idKhachHangInput.value = id;
+                console.log('ID khách hàng đã được thiết lập:', id); // Kiểm tra giá trị ID
+            }
+        }
+
+        loaiPhongSelect.addEventListener('change', function () {
+            const loaiPhongId = loaiPhongSelect.value;
+            phongSelectContainer.innerHTML = ''; // Reset danh sách phòng
+            document.getElementById('idLoaiPhong').value = loaiPhongId; // Cập nhật hidden input
+
+            if (loaiPhongId) {
+                fetch(`/datphongs/available-rooms?loaiPhongId=${loaiPhongId}`)
+                    .then(response => response.json())  // Lấy dữ liệu JSON
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            data.forEach(phong => {
+                                const div = document.createElement('div');
+                                div.classList.add('form-check');
+                                div.innerHTML = `
+                                    <input class="form-check-input" type="checkbox" value="${phong.idPhong}" id="phong_${phong.idPhong}">
+                                    <label class="form-check-label" for="phong_${phong.idPhong}">
+                                        ${phong.tenPhong} - Giá: ${phong.gia} VND
+                                    </label>
+                                `;
+                                phongSelectContainer.appendChild(div);
+
+                                // Lưu giá phòng vào map
+                                giaPhongMap[phong.idPhong] = phong.gia;
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi tải dữ liệu phòng:', error);
+                        alert('Đã xảy ra lỗi khi tải danh sách phòng. Vui lòng thử lại sau.');
+                    });
+            }
+        });
+
+        function updateTienCoc() {
+            const selectedPhongIds = Array.from(document.querySelectorAll('#phongSelect .form-check-input:checked'))
+                .map(input => input.value);
+            let totalTienCoc = 0;
+
+            selectedPhongIds.forEach(idPhong => {
+                const giaPhong = giaPhongMap[idPhong];
+                if (giaPhong) {
+                    const ngayNhan = new Date(ngayNhanInput.value);
+                    const ngayTra = new Date(ngayTraInput.value);
+
+                    if (ngayNhan && ngayTra && ngayTra > ngayNhan) {
+                        // Tính số ngày khách ở
+                        const soNgayO = Math.ceil((ngayTra - ngayNhan) / (1000 * 60 * 60 * 24));
+                        const tongTienPhong = giaPhong * soNgayO;
+                        totalTienCoc += tongTienPhong * 0.8; // Tiền cọc 80% tổng tiền phòng
+                    }
+                }
+            });
+
+            tienCocInput.value = totalTienCoc.toFixed(2); // Hiển thị 2 chữ số thập phân
+        }
+
+        function validateDates() {
+            let isValid = true;
+            const today = new Date().toISOString().split('T')[0];
+
+            if (ngayNhanInput.value < today) {
+                alert('Ngày nhận phòng không thể trước ngày hiện tại.');
+                isValid = false;
+            }
+
+            if (ngayTraInput.value <= ngayNhanInput.value) {
+                alert('Ngày trả phòng phải sau ngày nhận phòng.');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+
+
+        document.querySelector('#phongSelect').addEventListener('change', updateTienCoc);
+        ngayNhanInput.addEventListener('change', updateTienCoc);
+        ngayTraInput.addEventListener('change', updateTienCoc);
+
+        function toggleCustomerInfoForm() {
+            const selectedPhongCount = document.querySelectorAll('#phongSelect .form-check-input:checked').length;
+            if (selectedPhongCount > 0) {
+                customerInfoForm.style.display = 'block';
+            } else {
+                customerInfoForm.style.display = 'none';
+            }
+        }
+
+        document.querySelector('#phongSelect').addEventListener('change', function () {
+            updateTienCoc();
+            toggleCustomerInfoForm(); // Hiển thị form thông tin khách hàng nếu có phòng được chọn
+        });
+
+
+
+        document.getElementById('confirmCustomerBtn').addEventListener('click', function () {
+            const customerData = new FormData(document.getElementById('customerForm'));
+
+            fetch('/datphongs/xacnhan', {
+                method: 'POST',
+                body: customerData
+            })
+                .then(response => response.json())
+                .then(result => {
+                    console.log('Server response:', result); // Kiểm tra phản hồi từ server
+
+                    if (result.success) {
+                        const khachHangId = result.khachHangId; // Lấy ID khách hàng từ phản hồi
+                        if (khachHangId) {
+                            setKhachHangId(khachHangId); // Gọi hàm để thiết lập ID khách hàng
+                        } else {
+                            console.error('Không có ID khách hàng trong phản hồi.');
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thông Tin Khách Hàng Được Lưu!',
+                            text: 'Thông tin khách hàng đã được lưu thành công.',
+                            showConfirmButton: true
+                        }).then(() => {
+                            document.getElementById('customerInfoForm').style.display = 'none'; // Ẩn form thông tin khách hàng
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi khi lưu thông tin khách hàng. Vui lòng thử lại sau.',
+                            showConfirmButton: true
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi thông tin khách hàng:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Đã xảy ra lỗi khi gửi thông tin khách hàng. Vui lòng thử lại sau.',
+                        showConfirmButton: true
+                    });
+                });
+        });
+
+        document.getElementById('datPhongForm').addEventListener('submit', function (event) {
+            const selectedPhongIds = Array.from(document.querySelectorAll('#phongSelect .form-check-input:checked'))
+                .map(input => input.value);
+
+            if (selectedPhongIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một phòng.");
+                event.preventDefault(); // Ngăn submit form
+                return;
+            }
+
+            if (!validateDates()) {
+                event.preventDefault(); // Ngăn submit form nếu ngày không hợp lệ
+                return;
+            }
+
+            document.getElementById('idPhong').value = selectedPhongIds[0]; // Gán ID phòng đầu tiên vào hidden input
+
+            if (selectedPhongIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một phòng.");
+                event.preventDefault(); // Ngăn submit form
+                return;
+            }
+
+            if (!validateDates()) {
+                event.preventDefault(); // Ngăn submit form nếu ngày không hợp lệ
+                return;
+            }
+
+            const idKhachHang = document.getElementById('idKhachHang').value;
+            if (!idKhachHang || isNaN(idKhachHang)) {
+                alert("Vui lòng xác nhận thông tin khách hàng.");
+                event.preventDefault(); // Ngăn submit form nếu chưa có ID khách hàng
+                return;
+            }
+
+            // Gửi dữ liệu form bằng fetch
+            const formElement = document.getElementById('datPhongForm');
+            const formData = new FormData(formElement);
+
+            // Kiểm tra nội dung của FormData
+            for (const [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+
+            fetch('/datphongs/create', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Đặt phòng thành công!',
+                            text: result.success,
+                            showConfirmButton: true
+                        }).then(() => {
+                            showPaymentForm(); // Hiển thị form thanh toán sau khi đặt phòng thành công
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: result.error,
+                            showConfirmButton: true
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu đặt phòng:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Đã xảy ra lỗi khi gửi yêu cầu đặt phòng. Vui lòng thử lại sau.',
+                        showConfirmButton: true
+                    });
+                });
+
+            event.preventDefault(); // Ngăn submit form để gửi dữ liệu bằng fetch
+        });
+
+        document.getElementById('confirmPaymentBtn').addEventListener('click', function () {
+            const idDatPhong = document.getElementById('idDatPhong').value;
+            const paymentAmount = document.getElementById('paymentAmount').value;
+
+            fetch('/datphongs/confirm-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idDatPhong, paymentAmount })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thanh Toán Thành Công!',
+                            text: 'Đặt phòng của bạn đã được xác nhận.',
+                            showConfirmButton: true
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: result.error,
+                            showConfirmButton: true
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu thanh toán:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Đã xảy ra lỗi khi gửi yêu cầu thanh toán. Vui lòng thử lại sau.',
+                        showConfirmButton: true
+                    });
+                });
+
+
+        });
+
+        // Gán các sự kiện cho các nút
+        submitDatPhongBtn.addEventListener('click', submitDatPhong);
+        confirmCustomerBtn.addEventListener('click', submitCustomerInfo);
+        confirmPaymentBtn.addEventListener('click', submitPayment);
+
+    });
+
+
+
+
+</script>
+</body>
+<script th:include="fragment/script :: script"></script>
+</html>

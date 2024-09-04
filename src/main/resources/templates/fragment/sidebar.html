@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar</title>
+    <!-- Add your CSS and JS links here -->
+</head>
+<body>
+<div th:fragment="sidebar">
+    <aside class="sidebar-left border-right bg-white shadow" data-simplebar id="leftSidebar">
+        <a class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle" href="#">
+            <i class="fe fe-x"><span class="sr-only">Close Sidebar</span></i>
+        </a>
+        <nav class="vertnav navbar navbar-light">
+            <!-- Brand Logo -->
+            <div class="w-100 d-flex">
+                <a class="navbar-brand mx-auto mt-2 flex-fill text-center" >
+                    <img alt="Logo" class="navbar-brand-img brand-sm" style="width: 140px" th:src="@{/img/logo.jpg}">
+                </a>
+            </div>
+
+            <!-- Main Navigation -->
+            <ul class="navbar-nav flex-fill w-100 mb-3">
+                <li class="nav-item">
+                    <a class="nav-link pl-3" th:href="@{/thongke}">
+                        <i class="fa fa-pie-chart"></i>
+                        <span class="ml-3 item-text">Thống Kê</span>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav flex-fill w-100 mb-3">
+                <li class="nav-item">
+                    <a class="nav-link pl-3" th:href="@{/loaiphongs}">
+                        <i class="fe fe-users"></i>
+                        <span class="ml-3 item-text">Loại Phòng</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Main Navigation -->
+            <ul class="navbar-nav flex-fill w-100 mb-3">
+                <li class="nav-item">
+                    <a class="nav-link pl-3" th:href="@{/phongs}">
+                        <i class='fas fa-door-open'></i>
+                        <span class="ml-3 item-text">Phòng</span>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav flex-fill w-100 mb-3">
+                <li class="nav-item dropdown">
+                    <a class="nav-link pl-3 dropdown-toggle" data-toggle="collapse" href="#account-management1" aria-expanded="false">
+                        <i class="fa fa-calendar"></i>
+                        <span class="ml-3 item-text">Quản lý Đặt Phòng</span>
+                    </a>
+                    <ul class="collapse list-unstyled pl-4 w-100" id="account-management1">
+                        <li class="nav-item">
+                            <a class="nav-link pl-3" th:href="@{/dangLich}">
+                                <i class='far fa-calendar-alt'></i>
+                                <span class="ml-3 item-text">Dạng Lịch</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link pl-3" th:href="@{/datphongs}">
+                                <i class="fa fa-calendar"></i>
+                                <span class="ml-3 item-text">Đặt Phòng</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link pl-3" th:href="@{/danhsach}">
+                                <i class="fa fa-check"></i>
+                                <span class="ml-3 item-text">Check-In</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav flex-fill w-100 mb-3">
+                <li class="nav-item">
+                    <a class="nav-link pl-3" th:href="@{/thanhToan}">
+                        <i class='fas fa-donate'></i>
+                        <span class="ml-3 item-text">Thanh Toán</span>
+                    </a>
+                </li>
+            </ul>
+
+
+            <ul class="navbar-nav flex-fill w-100 mb-3">
+                <li class="nav-item">
+                    <a class="nav-link pl-3" th:href="@{/khuyenMai}">
+                        <i class="fa fa-gift"></i>
+                        <span class="ml-3 item-text">Quản Lý Khuyến Mại</span>
+                    </a>
+                </li>
+            </ul>
+
+
+            <ul class="navbar-nav flex-fill w-100 mb-3">
+                <li class="nav-item">
+                    <a class="nav-link pl-3" th:href="@{/thamSo}">
+                        <i class='fas fa-robot'></i>
+                        <span class="ml-3 item-text">Quản Lý Tham Số</span>
+                    </a>
+                </li>
+            </ul>
+
+
+            <!-- Account Management -->
+            <ul class="navbar-nav flex-fill w-100 mb-3">
+                <li class="nav-item dropdown">
+                    <a class="nav-link pl-3 dropdown-toggle" data-toggle="collapse" href="#account-management" aria-expanded="false">
+                        <i class="fe fe-users"></i>
+                        <span class="ml-3 item-text">Quản lý tài khoản</span>
+                    </a>
+                    <ul class="collapse list-unstyled pl-4 w-100" id="account-management">
+                        <li class="nav-item">
+                            <a class="nav-link pl-3" th:href="@{/quan-ly-khach-hang}">
+                                <i class="fe fe-user"></i>
+                                <span class="ml-1 item-text">Quản lý khách hàng</span>
+                            </a>
+                        </li>
+                        <a aria-expanded="false" class="dropdown-toggle nav-link pl-3" data-toggle="collapse" href="#layouts">
+                            <i class="fas fa-user"></i>
+                            <span class="ml-3 item-text">Quản lý nhân viên</span>
+                        </a>
+                        <ul class="collapse list-unstyled pl-4 w-100" id="layouts">
+                            <li class="nav-item">
+                                <a class="nav-link pl-3" th:href="@{/admin/quan-ly-lich-lam-viec}">
+                                    <span class="ml-1 item-text">Quản lý lịch làm việc</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link pl-3" th:href="@{/admin/quan-ly-nhan-vien}">
+                                    <span class="ml-1 item-text">Quản lý nhân viên</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </ul>
+                </li>
+            </ul>
+
+
+        </nav>
+    </aside>
+</div>
+<!-- Add your JS scripts here -->
+</body>
+</html>

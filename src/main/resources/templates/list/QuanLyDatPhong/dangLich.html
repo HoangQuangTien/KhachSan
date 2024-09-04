@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lịch Đặt Phòng</title>
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css' rel='stylesheet' />
+<head th:include="fragment/head :: head">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 0;
+            color: #495057;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 30px;
+        }
+        #calendar {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .fc-toolbar {
+            background: #007bff;
+            color: #ffffff;
+            border-radius: 8px 8px 0 0;
+            padding: 10px;
+        }
+        .fc-toolbar-title {
+            color: #ffffff;
+            font-size: 18px;
+        }
+        .fc-button-primary {
+            background-color: #0056b3;
+            border: none;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .fc-button-primary:hover {
+            background-color: #004085;
+        }
+        .fc-daygrid-day-number {
+            color: #343a40;
+        }
+        .fc-daygrid-day-top {
+            padding: 5px;
+        }
+        .fc-daygrid-day-bottom {
+            padding: 5px;
+        }
+
+        /* Màu sắc của sự kiện */
+        .fc-event.booked {
+            background-color: #007bff; /* Màu xanh dương cho sự kiện đã đặt */
+        }
+        .fc-event.checked-in {
+            background-color: #fd7e14; /* Màu cam cho sự kiện đang ở */
+        }
+
+    </style>
+</head>
+<body class="vertical light">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <div class="container-fluid py-4">
+            <h2 class="text-center mb-4">Lịch Đặt Phòng</h2>
+            <div class="d-flex justify-content-end align-items-center mb-4">
+                <div class="d-flex align-items-center me-3">
+                    <div class="btn" style="background-color: #007bff; width: 20px; height: 20px; border-radius: 3px;"></div>
+                    <span class="ms-2"><strong>Đã Đặt</strong></span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="btn" style="background-color: #fd7e14; width: 20px; height: 20px; border-radius: 3px;"></div>
+                    <span class="ms-2"><strong>Đã Nhận</strong></span>
+                </div>
+            </div>
+
+            <div id="calendar">
+
+            </div>
+        </div>
+
+    </main>
+    <div th:include="fragment/modal :: modal"></div>
+</div>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/locales/vi.min.js'></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'vi',
+            initialView: 'dayGridMonth',
+            events: function(fetchInfo, successCallback, failureCallback) {
+                fetch('/dangLich/events')
+                    .then(response => response.json())
+                    .then(events => {
+                        var formattedEvents = events.map(event => ({
+                            id: event.id,
+                            title: event.tenKhachHang,
+                            start: event.startDate,
+                            end: event.endDate,
+                            backgroundColor: event.backgroundColor,
+                            borderColor: event.backgroundColor,
+                            extendedProps: {
+                                maDatPhong: event.maDatPhong,
+                                tenPhong: event.tenPhong,
+                                status: event.status // Trạng thái từ EventDTO
+                            }
+                        }));
+                        successCallback(formattedEvents);
+                    })
+                    .catch(error => {
+                        console.error('Có lỗi xảy ra khi tải sự kiện:', error);
+                        failureCallback(error);
+                    });
+            },
+            eventClick: function(info) {
+                var startDate = new Date(info.event.startStr);
+                var endDate = new Date(info.event.endStr);
+                var status = info.event.extendedProps.status;
+
+                if (status === "Đã check-in") {
+                    Swal.fire({
+                        title: 'Thông tin đặt phòng',
+                        html: `<strong>Mã đặt phòng:</strong> ${info.event.extendedProps.maDatPhong}<br>
+                           <strong>Phòng:</strong> ${info.event.extendedProps.tenPhong}<br>
+                           <strong>Ngày nhận phòng:</strong> ${startDate.toLocaleString()}<br>
+                           <strong>Ngày trả phòng:</strong> ${endDate.toLocaleString()}<br>
+                           <strong>Trạng thái:</strong> ${status}<br>
+                           <strong>Thời gian còn lại:</strong> <span id="countdown"></span>`,
+                        icon: 'info',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            title: 'swal-title',
+                            content: 'swal-content'
+                        }
+                    });
+
+                    var countdownElement = document.getElementById('countdown');
+                    var endTime = endDate.getTime();
+
+                    var interval = setInterval(function() {
+                        var now = new Date().getTime();
+                        var distance = endTime - now;
+
+                        if (distance <= 0) {
+                            clearInterval(interval);
+                            countdownElement.innerHTML = "Đã hết hạn!";
+                        } else {
+                            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                            countdownElement.innerHTML = days + " ngày " + hours + " giờ " + minutes + " phút " + seconds + " giây";
+                        }
+                    }, 1000);
+                } else {
+                    Swal.fire({
+                        title: 'Thông tin đặt phòng',
+                        html: `<strong>Mã đặt phòng:</strong> ${info.event.extendedProps.maDatPhong}<br>
+                           <strong>Phòng:</strong> ${info.event.extendedProps.tenPhong}<br>
+                           <strong>Ngày nhận phòng:</strong> ${startDate.toLocaleString()}<br>
+                           <strong>Ngày trả phòng:</strong> ${endDate.toLocaleString()}<br>
+                           <strong>Trạng thái:</strong> ${status}`,
+                        icon: 'info',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            title: 'swal-title',
+                            content: 'swal-content'
+                        }
+                    });
+                }
+            }
+        });
+
+        calendar.render();
+        window.calendar = calendar;
+    });
+
+
+
+</script>
+
+</body>
+<script th:include="fragment/script :: script"></script>
+</html>

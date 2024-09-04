@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Thêm liên kết đến SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #f39c12; /* Màu vàng */
+            padding: 20px;
+            background-color: #fff;
+            border-bottom: 2px solid #f39c12;
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        thead {
+            background-color: #f39c12; /* Màu vàng */
+            color: #fff;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1c40f; /* Màu vàng nhạt */
+        }
+        button {
+            background-color: #f39c12; /* Màu vàng */
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #e67e22; /* Màu cam */
+        }
+    </style>
+    <head th:include="fragment/head :: head"></head>
+</head>
+<body class="vertical light ">
+<div th:include="fragment/navbar :: navbar"></div>
+<div th:include="fragment/sidebar :: sidebar"></div>
+<main role="main" class="main-content">
+    <div class="container-fluid">
+        <h1>Danh sách đặt phòng chưa check-in</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>Mã Đặt Phòng</th>
+                <th>Khách Hàng</th>
+                <th>Số Điện Thoại</th>
+                <th>Phòng</th>
+                <th>Ngày Nhận</th>
+                <th>Ngày Trả</th>
+                <th>Hành Động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Duyệt qua danh sách đặt phòng và hiển thị -->
+            <tr th:each="datPhong : ${datPhongs}" th:id="'datPhong-' + ${datPhong.idDatPhong}">
+                <td th:text="${datPhong.maDatPhong}"></td>
+                <td th:text="${datPhong.khachHang.hoVaTen}"></td>
+                <td th:text="${datPhong.khachHang.soDienThoai}"></td>
+                <td th:text="${datPhong.phong.tenPhong}"></td>
+                <td th:text="${#dates.format(datPhong.ngayNhan, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#dates.format(datPhong.ngayTra, 'dd/MM/yyyy')}"></td>
+                <td>
+                    <button th:onclick="|confirmCheckIn([[${datPhong.idDatPhong}]])|" th:if="${!datPhong.tinhTrang}"> <i class="fa fa-check"></i>Check-in</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<div th:include="fragment/modal :: modal"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmCheckIn(idDatPhong) {
+        // Hiển thị hộp thoại xác nhận bằng SweetAlert2
+        Swal.fire({
+            title: 'Xác nhận check-in',
+            text: 'Bạn có chắc chắn muốn check-in?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true,
+            customClass: {
+                confirmButton: 'btn btn-warning',
+                cancelButton: 'btn btn-secondary'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                checkInDatPhong(idDatPhong);
+            }
+        });
+    }
+
+    function checkInDatPhong(idDatPhong) {
+        fetch(`/danhsach/check-in?idDatPhong=${encodeURIComponent(idDatPhong)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Loại bỏ đặt phòng khỏi danh sách
+                    document.getElementById(`datPhong-${idDatPhong}`).remove();
+
+                    // Cập nhật trang lịch nếu có đối tượng calendar
+                    if (window.calendar) {
+                        window.calendar.refetchEvents();
+                    }
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: 'Check-in thành công!',
+                        icon: 'success',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            confirmButton: 'btn btn-success'
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Có lỗi xảy ra!',
+                        text: data.error || 'Không có thông tin lỗi',
+                        icon: 'error',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            confirmButton: 'btn btn-danger'
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra:', error);
+                Swal.fire({
+                    title: 'Có lỗi xảy ra!',
+                    text: 'Vui lòng thử lại sau.',
+                    icon: 'error',
+                    confirmButtonText: 'Đóng',
+                    customClass: {
+                        confirmButton: 'btn btn-danger'
+                    }
+                });
+            });
+    }
+
+
+</script>
+
+</body>
+</html>

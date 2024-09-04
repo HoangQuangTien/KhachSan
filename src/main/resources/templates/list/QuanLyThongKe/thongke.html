@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:include="fragment/head :: head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê doanh thu</title>
+    <!-- Thêm thư viện Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa; /* Màu nền nhạt */
+            color: #856404; /* Màu chữ cảnh báo */
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #856404; /* Màu tiêu đề cảnh báo */
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin: 0 10px;
+        }
+
+        .chart-container {
+            width: 70%;
+            margin: 0 auto;
+        }
+
+        .revenue-display {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #fd7e14; /* Màu cảnh báo đậm */
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="vertical light">
+<div th:include="fragment/navbar :: navbar"></div>
+<div th:include="fragment/sidebar :: sidebar"></div>
+
+<main role="main" class="main-content">
+    <div class="container-fluid">
+        <h1>Thống kê doanh thu</h1>
+        <div class="button-container">
+            <button class="btn btn-warning" onclick="fetchRevenue('month')">Thống kê theo tháng</button>
+            <button class="btn btn-warning" onclick="fetchRevenue('four-months')">Thống kê theo 4 tháng</button>
+            <button class="btn btn-warning" onclick="fetchRevenue('year')">Thống kê theo năm</button>
+
+        </div>
+        <div id="revenueDisplay" class="revenue-display"></div>
+        <div class="chart-container">
+            <canvas id="revenueChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+</main>
+<div th:include="fragment/modal :: modal"></div>
+
+<script>
+    function fetchRevenue(type) {
+        let url;
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth() + 1;
+
+        if (type === 'month') {
+            url = `/datphongs/month?month=${month}&year=${year}`;
+        } else if (type === 'four-months') {
+            url = `/datphongs/four-months?startMonth=${7}&year=${year}`; // Bắt đầu từ tháng 7
+        } else if (type === 'year') {
+            url = `/datphongs/year?year=${year}`;
+        }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                updateChart(type, data);
+                displayRevenue(data);
+            })
+            .catch(error => console.error('Lỗi khi lấy dữ liệu doanh thu:', error));
+    }
+
+
+    function displayRevenue(amount) {
+        const revenueDisplay = document.getElementById('revenueDisplay');
+        revenueDisplay.innerHTML = `Tổng doanh thu: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)}`;
+    }
+
+    function updateChart(type, data) {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4'], // Ví dụ cho 4 tháng
+                datasets: [{
+                    label: 'Doanh thu',
+                    data: [data], // Sử dụng dữ liệu từ server
+                    backgroundColor: 'rgba(253, 126, 20, 0.5)', // Màu cam nhạt
+                    borderColor: 'rgba(253, 126, 20, 1)', // Màu cam đậm
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+<script th:include="fragment/script :: script"></script>
+</html>

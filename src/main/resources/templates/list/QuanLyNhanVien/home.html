@@ -1,0 +1,726 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/head :: head">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
+
+    <style>
+        .text-success {
+            color: #4CAF50; /* Màu xanh lá cây */
+        }
+
+        .text-danger {
+            color: #f44336; /* Màu đỏ */
+        }
+    </style>
+</head>
+<body class="vertical light">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h2 class="mb-2 page-title text-center">Quản lý nhân viên</h2>
+                    <p class="card-text"></p>
+                    <div class="row my-4">
+                        <div class="col-md-12">
+
+
+                            <div class="card shadow">
+                                <div class="card-body">
+                                    <div class="toolbar row mb-3 mt-3">
+                                        <div class="col-md-12">
+                                            <form class="form-inline" id="filterForm"
+                                                  style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                                                <!-- Search -->
+                                                <div class="form-group"
+                                                     style="flex-grow: 1; display: flex; align-items: center;">
+                                                    <label class="mr-2" for="keyword">Tìm kiếm</label>
+                                                    <input class="form-control" id="keyword"
+                                                           oninput="seacrchNhanVien(this.value)"
+                                                           placeholder="Tìm kiếm theo mã hoặc tên" style="flex-grow: 1;"
+                                                           type="text" name="keyword">
+                                                </div>
+
+                                                <!-- Reset Button -->
+                                                <div class="form-group"
+                                                     style="flex-grow: 1; display: flex; align-items: center;">
+                                                    <button class="btn btn-primary" onclick="resetFilters()"
+                                                            style="width: 100px;margin-left: -150px;"
+                                                            type="button">Reset
+                                                    </button>
+                                                </div>
+
+                                                <!-- Radio buttons for "Trạng thái" -->
+                                                <div class="col-3">
+                                                    <label class="form-label text-center">Trạng thái:</label> <br>
+
+                                                    <label for="detailDangLam">Đang làm</label>
+                                                    <input type="radio" id="detailDangLam" name="trangThai" value="true"
+                                                           th:checked="${trangThai != null && trangThai == true}"
+                                                           onchange="this.form.submit();"/>
+
+                                                    <label for="detailDaNghi">Đã nghỉ</label>
+                                                    <input type="radio" id="detailDaNghi" name="trangThai" value="false"
+                                                           th:checked="${trangThai != null && trangThai == false}"
+                                                           onchange="this.form.submit();"/>
+                                                </div>
+
+                                                <!-- Add Button -->
+                                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                                            data-bs-target="#employeeModal">
+                                                        Thêm
+                                                    </button>
+                                                </div>
+                                            </form>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!--form thêm nhân viên-->
+                            <div class="modal" tabindex="-1" id="employeeModal">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Thêm nhân viên</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div id="modalErrors" class="alert alert-danger"
+                                                 style="display: none;"></div>
+                                            <form id="showForm" th:action="@{/admin/add-employee}" method="post"
+                                                  th:object="${nhanVien}" class="add-employee" autocomplete="off">
+                                                <div class="row g-3">
+
+
+                                                    <div class="col-md-4">
+                                                        <label for="hoTen" class="form-label">Tên nhân viên:</label>
+                                                        <input id="hoTen" name="hoTen" th:field="*{hoTen}" type="text"
+                                                               class="form-control " required
+                                                               oninvalid="this.setCustomValidity('Vui lòng nhập tên nhân viên.')"
+                                                               oninput="setCustomValidity('')">
+                                                        <i th:errors="*{hoTen}" class="text-danger"></i>
+
+
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <label for="ngaySinh" class="form-label">Ngày sinh:</label>
+                                                        <input id="ngaySinh" name="ngaySinh" th:field="*{ngaySinh}"
+                                                               type="date"
+                                                               class="form-control"
+                                                               placeholder="yyyy-MM-dd" required
+                                                               oninvalid="this.setCustomValidity('Vui lòng nhập ngày sinh.')"
+                                                               oninput="setCustomValidity('')">
+                                                        <i th:errors="*{ngaySinh}" style="color: red"></i>
+                                                    </div>
+
+
+                                                    <div class="col-md-4">
+                                                        <label for="soDienThoai" class="form-label">Số điện
+                                                            thoại:</label>
+                                                        <input id="soDienThoai" name="soDienThoai"
+                                                               th:field="*{soDienThoai}" type="text"
+                                                               class="form-control" required
+                                                               oninvalid="this.setCustomValidity('Vui lòng nhâpj số điện thoại.')"
+                                                               oninput="setCustomValidity('')">
+                                                        <i th:errors="*{soDienThoai}" style="color: red"></i>
+                                                    </div>
+                                                    <!-- Add address form and address list -->
+
+                                                    <div class="form-group col-md-4">
+                                                        <label for="city">Tỉnh thành</label>
+                                                        <select id="city" class="form-control" name="thanhPho"
+                                                                required
+                                                                oninvalid="this.setCustomValidity('Vui lòng chọn thành phố.')"
+                                                                oninput="setCustomValidity('')">
+                                                            <option value="" selected>Chọn tỉnh thành
+                                                            </option>
+                                                            <!-- Các option của tỉnh thành -->
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="district">Quận huyện</label>
+                                                        <select id="district" class="form-control"
+                                                                name="quanHuyen" required
+                                                                oninvalid="this.setCustomValidity('Vui lòng chọn quận huyện.')"
+                                                                oninput="setCustomValidity('')">
+                                                            <option value="" selected>Chọn quận huyện
+                                                            </option>
+                                                            <!-- Các option của quận huyện -->
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="ward">Phường xã</label>
+                                                        <select id="ward" class="form-control" name="phuongXa" required
+                                                                oninvalid="this.setCustomValidity('Vui lòng chọn phường xã.')"
+                                                                oninput="setCustomValidity('')">
+                                                            <option value="" selected>Chọn phường xã
+                                                            </option>
+                                                            <!-- Các option của phường xã -->
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <label for="luong" class="form-label">Email:</label>
+                                                        <input id="luong" name="email" th:field="*{email}" type="text"
+                                                               class="form-control" required
+                                                               oninvalid="this.setCustomValidity('Vui lòng nhập địa chỉ email.')"
+                                                               oninput="setCustomValidity('')">
+                                                        <i th:errors="*{email}" style="color: red"></i>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Trạng thái:</label><br>
+                                                        <div class="form-check form-check-inline">
+                                                            <input name="trangThai" type="radio" value="true"
+                                                                   class="form-check-input"
+                                                                   id="trangThaiDangLam"
+                                                                   th:checked="*{trangThai == null ||trangThai == true}"
+                                                                   checked>
+                                                            <label for="trangThaiDangLam" class="form-check-label">Đang
+                                                                làm</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input name="trangThai" type="radio" value="false"
+                                                                   class="form-check-input"
+                                                                   id="trangThaiDaNghi"
+                                                                   th:checked="*{trangThai == false}">
+                                                            <label for="trangThaiDaNghi" class="form-check-label">Đã
+                                                                nghỉ</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Giới tính:</label><br>
+                                                        <div class="form-check form-check-inline">
+                                                            <input name="gioiTinh" type="radio" value="true"
+                                                                   class="form-check-input"
+                                                                   id="gioiTinhNam"
+                                                                   th:checked="${gioiTinh == null || gioiTinh == true}">
+                                                            <label for="gioiTinhNam"
+                                                                   class="form-check-label">Nam</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input name="gioiTinh" type="radio" value="false"
+                                                                   class="form-check-input"
+                                                                   id="gioiTinhNu"
+                                                                   th:checked="${gioiTinh == false}">
+                                                            <label for="gioiTinhNu" class="form-check-label">Nữ</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-12">
+                                                        <button type="submit" class="btn btn-success">Thêm
+                                                        </button>
+                                                        <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Đóng
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--danh sách nhân viên-->
+                            <div class="card shadow" style="margin-top: 15px">
+                                <div class="card-body">
+                                    <div class="toolbar row mb-3 mt-3">
+                                        <div class="col-md-12">
+                                            <h4 class="mb-2 page-title text-center text-success">Danh sách nhân
+                                                viên</h4>
+                                            <table class="table table-hover" id="nhanVienTable">
+                                                <thead>
+                                                <th>#</th>
+                                                <th>Mã nhân viên</th>
+                                                <th>Họ tên</th>
+                                                <th>Ngày sinh</th>
+                                                <th>Giới tính</th>
+                                                <th>Số điện thoại</th>
+                                                <th>Địa chỉ</th>
+                                                <th>Email</th>
+                                                <th>Trang thái</th>
+                                                <th>Thao tác</th>
+                                                </thead>
+                                                <tbody>
+                                                <tr th:each="nv, i : ${list}">
+                                                    <td th:text="${i.index +1}"></td>
+                                                    <td th:text="${nv.maNhanVien}"></td>
+                                                    <td th:text="${nv.hoTen}"></td>
+                                                    <td th:text="${#dates.format(nv.ngaySinh,'yyyy-MM-dd')}"></td>
+                                                    <td th:text="${nv.gioiTinh == true ? 'Nam' : 'Nữ'}"></td>
+                                                    <td th:text="${nv.soDienThoai}"></td>
+                                                    <td th:text="${nv.thanhPho}"></td>
+                                                    <td th:text="${nv.email}"></td>
+                                                    <td th:text="${nv.trangThai == true ? 'Đang làm' : 'Đã nghỉ'}"></td>
+                                                    <td>
+                                                        <a th:href="@{/admin/viewUpdate-employee(idNhanVien=${nv.idNhanVien})}">
+                                                            <button class="btn mb-2 mr-1 btn-outline-success"
+                                                                    type="button">
+                                                                <span class="fe fe-edit-3"></span>
+                                                            </button>
+                                                            <!--                                                            <a th:href="@{/admin/delete(idNhanVien=${nv.idNhanVien})}">-->
+                                                            <!--                                                                <button class="btn mb-2 mr-1 btn-outline-success" type="button">-->
+                                                            <!--                                                                    <span class="fe fe-edit-3">Xóa</span>-->
+                                                            <!--                                                                </button>-->
+                                                    </td>
+                                                </tr>
+
+
+                                                </tbody>
+                                            </table>
+                                            <!-- Phân trang -->
+                                            <div class="pagination">
+                                                <ul class="pagination justify-content-center">
+                                                    <!-- Liên kết đến trang trước -->
+                                                    <li class="page-item"
+                                                        th:if="${currentPage != null and currentPage > 0}">
+                                                        <a class="page-link"
+                                                           th:href="@{/admin/quan-ly-nhan-vien(keyword=${keyword}, page=${currentPage - 1}, trangThai=${trangThai})}"
+                                                           aria-label="Previous">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                        </a>
+                                                    </li>
+
+                                                    <!-- Liên kết đến các trang -->
+                                                    <li th:each="pageNum : ${#numbers.sequence(0, (totalPages != null ? totalPages - 1 : 0))}"
+                                                        th:classappend="${pageNum == currentPage ? ' active' : ''}">
+                                                        <a class="page-link"
+                                                           th:href="@{/admin/quan-ly-nhan-vien(keyword=${keyword}, page=${pageNum}, trangThai=${trangThai})}"
+                                                           th:text="${pageNum + 1}"></a>
+                                                    </li>
+
+                                                    <!-- Liên kết đến trang sau -->
+                                                    <li class="page-item"
+                                                        th:if="${currentPage != null and totalPages != null and currentPage < (totalPages - 1)}">
+                                                        <a class="page-link"
+                                                           th:href="@{/admin//quan-ly-nhan-vien(keyword=${keyword}, page=${currentPage + 1}, trangThai=${trangThai})}"
+                                                           aria-label="Next">
+                                                            <span aria-hidden="true">&raquo;</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div> <!-- end section -->
+                </div> <!-- end row -->
+            </div> <!-- end container-fluid -->
+        </div> <!-- end main content -->
+    </main>
+</div>
+<div th:include="fragment/script :: script"></div>
+
+
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+
+    //Show form update
+    function showDetailForm(idNhanVien, maNhanVien, hoTen, ngaySinh, gioiTinh, diaChi, soDienThoai, email, trangThai) {
+        //Bỏ giấu ""
+        maNhanVien = maNhanVien.replace(/"/g, '');
+        hoTen = hoTen.replace(/"/g, '');
+        ngaySinh = ngaySinh.replace(/"/g, '');
+        // gioiTinh = gioiTinh.replace(/"/g,'');
+        diaChi = diaChi.replace(/"/g, '');
+        soDienThoai = soDienThoai.replace(/"/g, '');
+        email = email.replace(/"/g, '');
+        // trangThai = trangThai.replace(/"/g,'');
+
+        // Lấy các phần tử của form
+        const form = document.getElementById('yourForm');
+        const idNhanVienInput = form.querySelector('input[name="idNhanVien"]');
+        const maNhanVienInput = form.querySelector('input[name="maNhanVien"]');
+        const hoTenInput = form.querySelector('input[name="hoTen"]');
+        const ngaySinhInput = form.querySelector('input[name="ngaySinh"]');
+        const gioiTinhNamCheck = form.querySelector('input[id="gioiTinhNam"]');
+        const gioiTinhNuCheck = form.querySelector('input[id="gioiTinhNu"]');
+        const diaChiSelect = form.querySelector('select[name="diaChi"]');
+        const soDienThoaiInput = form.querySelector('input[name="soDienThoai"]');
+        const emailInput = form.querySelector('input[name="email"]');
+        const trangThaiDangLamCheck = form.querySelector('input[id="trangThaiDangLam"]');
+        const trangThaiDaNghiCheck = form.querySelector('input[id="trangThaiDaNghi"]');
+
+        // Điền dữ liệu vào form
+        idNhanVienInput.value = idNhanVien;
+        maNhanVienInput.value = maNhanVien;
+        hoTenInput.value = hoTen;
+        ngaySinhInput.value = ngaySinh;
+
+        if (gioiTinh === 'true') {
+            gioiTinhNamCheck.checked = true;
+        } else {
+            gioiTinhNuCheck.checked = true;
+        }
+
+        diaChiSelect.value = diaChi;  // Sử dụng biến 'diaChi' truyền từ Thymeleaf
+        soDienThoaiInput.value = soDienThoai;
+        emailInput.value = email;
+
+        if (trangThai === 'true') {
+            trangThaiDangLamCheck.checked = true;
+        } else {
+            trangThaiDaNghiCheck.checked = true;
+        }
+    }
+
+    //show add form
+    function showAddForm(maNhanVien, hoTen, ngaySinh, gioiTinh, soDienThoai, thanhPho, quanHuyen, phuongXa, email, trangThai) {
+        // Gán giá trị vào các input field trong form
+        document.getElementById("idNhanVien").value = idNhanVien;
+        document.getElementById("maNhanVien").value = maNhanVien;
+        document.getElementById("hoTen").value = hoTen;
+        document.getElementById("ngaySinh").value = ngaySinh;
+        document.getElementById("soDienThoai").value = soDienThoai;
+        document.getElementById("thanhPho").value = thanhPho;
+        document.getElementById("quanHuyen").value = quanHuyen;
+        document.getElementById("phuongXa").value = phuongXa;
+        document.getElementById("email").value = email;
+
+        // Gán trạng thái
+        if (trangThai) {
+            document.getElementById("trangThaiDangLam").checked = true;
+        } else {
+            document.getElementById("trangThaiDaNghi").checked = true;
+        }
+
+        // Gán giới tính
+        if (gioiTinh) {
+            document.getElementById("gioiTinhNam").checked = true;
+        } else {
+            document.getElementById("gioiTinhNu").checked = true;
+        }
+
+        // Hiển thị modal
+        var myModal = new bootstrap.Modal(document.getElementById('employeeModal'));
+        myModal.show();
+    }
+
+    // map địa chỉ
+    document.addEventListener("DOMContentLoaded", function () {
+        var citis = document.getElementById("city");
+        var districts = document.getElementById("district");
+        var wards = document.getElementById("ward");
+
+        var Parameter = {
+            url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+            method: "GET",
+            responseType: "application/json",
+        };
+
+        axios(Parameter).then(function (result) {
+            renderCity(result.data);
+        });
+
+        function renderCity(data) {
+            for (const x of data) {
+                var opt = document.createElement('option');
+                opt.value = x.Name;
+                opt.text = x.Name;
+                opt.setAttribute('data-id', x.Id);
+                citis.options.add(opt);
+            }
+
+            citis.onchange = function () {
+                districts.length = 1;
+                wards.length = 1;
+                if (this.options[this.selectedIndex].dataset.id !== "") {
+                    const result = data.filter(n => n.Id === this.options[this.selectedIndex].dataset.id);
+
+                    for (const k of result[0].Districts) {
+                        var opt = document.createElement('option');
+                        opt.value = k.Name;
+                        opt.text = k.Name;
+                        opt.setAttribute('data-id', k.Id);
+                        districts.options.add(opt);
+                    }
+                }
+            };
+
+            districts.onchange = function () {
+                wards.length = 1;
+                const dataCity = data.filter((n) => n.Id === citis.options[citis.selectedIndex].dataset.id);
+                if (this.options[this.selectedIndex].dataset.id !== "") {
+                    const dataWards = dataCity[0].Districts.filter(n => n.Id === this.options[this.selectedIndex].dataset.id)[0].Wards;
+
+                    for (const w of dataWards) {
+                        var opt = document.createElement('option');
+                        opt.value = w.Name;
+                        opt.text = w.Name;
+                        opt.setAttribute('data-id', w.Id);
+                        wards.options.add(opt);
+                    }
+                }
+            };
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var forms = document.querySelectorAll(".update-address-form");
+
+        forms.forEach(function (form) {
+            var index = form.getAttribute("data-index");
+            var citis1 = form.querySelector('.city-select[data-index="' + index + '"]');
+            var districts1 = form.querySelector('.district-select[data-index="' + index + '"]');
+            var wards1 = form.querySelector('.ward-select[data-index="' + index + '"]');
+
+            var Parameter1 = {
+                url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+                method: "GET",
+                responseType: "application/json",
+            };
+
+            axios(Parameter1).then(function (result) {
+                renderCity(result.data, citis1, districts1, wards1);
+            }).catch(function (error) {
+                console.error("Error fetching data:", error);
+            });
+
+            function renderCity(data, citis1, districts1, wards1) {
+                for (const x of data) {
+                    var opt = document.createElement('option');
+                    opt.value = x.Name;
+                    opt.text = x.Name;
+                    opt.setAttribute('data-id', x.Id);
+                    citis1.options.add(opt);
+                }
+
+                citis1.onchange = function () {
+                    districts1.length = 1;
+                    wards1.length = 1;
+                    const selectedCityId = this.options[this.selectedIndex].getAttribute('data-id');
+
+                    if (selectedCityId) {
+                        const city = data.find(n => n.Id === selectedCityId);
+
+                        if (city && city.Districts) {
+                            for (const district of city.Districts) {
+                                var opt = document.createElement('option');
+                                opt.value = district.Name;
+                                opt.text = district.Name;
+                                opt.setAttribute('data-id', district.Id);
+                                districts1.options.add(opt);
+                            }
+                        }
+                    }
+                };
+
+                districts1.onchange = function () {
+                    wards1.length = 1;
+                    const selectedCityId = citis1.options[citis1.selectedIndex].getAttribute('data-id');
+                    const selectedDistrictId = this.options[this.selectedIndex].getAttribute('data-id');
+
+                    if (selectedCityId && selectedDistrictId) {
+                        const city = data.find(n => n.Id === selectedCityId);
+
+                        if (city && city.Districts) {
+                            const district = city.Districts.find(n => n.Id === selectedDistrictId);
+
+                            if (district && district.Wards) {
+                                for (const ward of district.Wards) {
+                                    var opt = document.createElement('option');
+                                    opt.value = ward.Name;
+                                    opt.text = ward.Name;
+                                    opt.setAttribute('data-id', ward.Id);
+                                    wards1.options.add(opt);
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+        });
+    });
+
+
+    // Hàm để loại bỏ dấu tiếng Việt
+    function removeAccents(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+    }
+
+
+    function filterTable() {
+        // Lấy giá trị từ input tìm kiếm và loại bỏ dấu
+        let input = document.getElementById("keyword");
+        let filter = removeAccents(input.value.toLowerCase());
+
+        // Lấy bảng và các hàng của bảng
+        let table = document.getElementById("nhanVienTable");
+        let tr = table.getElementsByTagName("tr");
+
+        // Lặp qua tất cả các hàng (trừ hàng tiêu đề) để ẩn những hàng không phù hợp với từ khóa
+        for (let i = 1; i < tr.length; i++) {
+            let tdName = tr[i].getElementsByTagName("td")[2]; // Cột Họ và tên
+            let tdPhone = tr[i].getElementsByTagName("td")[6]; // Cột SĐT
+
+            if (tdName || tdPhone) {
+                let textValueName = removeAccents(tdName.textContent || tdName.innerText).toLowerCase();
+                let textValuePhone = removeAccents(tdPhone.textContent || tdPhone.innerText).toLowerCase();
+
+                if (textValueName.indexOf(filter) > -1 || textValuePhone.indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    // Gắn sự kiện tìm kiếm vào ô input
+    document.getElementById("keyword").addEventListener("keyup", filterTable);
+
+    //tìm kiếm nhân viên
+    function seacrchNhanVien(query) {
+        // Lấy giá trị tìm kiếm từ input và chuyển thành chữ thường
+        const searchValue = removeAccents(query.trim().toLowerCase());
+
+        // Lấy bảng nhân viên
+        const table = document.getElementById('nhanVienTable');
+
+        // Lấy tất cả các dòng trong tbody
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        // Duyệt qua từng dòng và kiểm tra xem dòng đó có chứa từ khóa tìm kiếm không
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+
+            // Lấy tất cả các ô trong dòng
+            const cells = row.getElementsByTagName('td');
+
+            // Lấy giá trị của cột Mã nhân viên và Họ tên (cột 1 và 2)
+            const maNhanVien = cells[1].textContent.toLowerCase();
+            const hoTen = cells[2].textContent.toLowerCase();
+            const soDienThoai = cells[5].textContent.toLowerCase();
+
+            // Kiểm tra nếu mã nhân viên hoặc họ tên có chứa từ khóa tìm kiếm
+            if (maNhanVien.includes(searchValue) || hoTen.includes(searchValue) || soDienThoai.includes(searchValue)) {
+                row.style.display = ''; // Hiển thị dòng nếu khớp
+            } else {
+                row.style.display = 'none'; // Ẩn dòng nếu không khớp
+            }
+        }
+    }
+
+    // Hàm reset các bộ lọc
+    function resetFilters() {
+        // Đặt giá trị của trường tìm kiếm về rỗng
+        document.getElementById("keyword").value = "";
+
+        // Đặt giá trị của các nút radio về mặc định
+        var radios = document.getElementsByName("trangThai");
+        for (var i = 0; i < radios.length; i++) {
+            radios[i].checked = false;
+        }
+
+        // Gửi form sau khi reset
+        document.getElementById("filterForm").submit();
+    }
+
+
+    function showSuccessToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "#4CAF50",
+            },
+            stopOnFocus: true
+        }).showToast();
+    }
+
+    function showErrorToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "#f44336",
+            },
+            stopOnFocus: true
+        }).showToast();
+    }
+
+    document.getElementById("showForm").addEventListener("submit", function (event) {
+        event.preventDefault(); // Ngăn chặn hành động mặc định của submit form
+
+        // Lấy dữ liệu từ form
+        let formData = new FormData(this);
+
+        // Gửi yêu cầu AJAX để thêm nhân viên
+        fetch('/admin/add-employee', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json' // Yêu cầu server trả về JSON
+            }
+        })
+            .then(response => response.json()) // Chuyển đổi phản hồi thành JSON
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast("Thêm nhân viên thành công!");
+                    this.reset(); // Reset form sau khi thêm thành công
+
+                    // Đợi một khoảng thời gian rồi làm mới trang
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000); // 1000ms = 1 giây (thời gian toast hiển thị)
+                } else {
+                    // Xử lý lỗi từ server và hiển thị modal
+                    showErrorToast(data.errors.join(", ")); // Hiển thị lỗi bằng toast
+                    showErrorInModal(data.errors); // Hiển thị lỗi trong modal
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Xử lý lỗi, ví dụ hiển thị toast lỗi
+                showErrorToast("Đã xảy ra lỗi khi thêm nhân viên");
+            });
+    });
+
+    function showErrorInModal(errors) {
+        const errorList = errors.map(error => `<li>${error}</li>`).join('');
+        const modalErrors = document.getElementById('modalErrors');
+        modalErrors.innerHTML = `<ul>${errorList}</ul>`;
+        modalErrors.style.display = 'block'; // Hiển thị lỗi trong modal
+
+        const employeeModal = new bootstrap.Modal(document.getElementById('employeeModal'));
+        employeeModal.show();
+    }
+
+    //danh sách lỗi
+    document.addEventListener("DOMContentLoaded", function () {
+        var errorMessages = /*[[${errorMessages}]]*/ [];
+        if (errorMessages && errorMessages.length > 0) {
+            showErrorInModal(errorMessages);
+        }
+    });
+
+</script>
+
+</html>

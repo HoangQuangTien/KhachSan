@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Loại Phòng</title>
+    <link rel="stylesheet" href="/css/create.css">
+</head>
+<body>
+<h2>Tạo Loại Phòng Mới</h2>
+<form th:action="@{/loaiphongs/save}" th:object="${loaiPhong}" method="post">
+
+    <label>Mã Loại Phòng:</label>
+    <input type="text" th:field="*{maLoaiPhong}" />
+    <div class="error" th:if="${#fields.hasErrors('maLoaiPhong')}" th:errors="*{maLoaiPhong}"></div><br/>
+
+    <label>Tên Loại Phòng:</label>
+    <input type="text" th:field="*{tenLoaiPhong}" />
+    <div class="error"  th:if="${#fields.hasErrors('tenLoaiPhong')}" th:errors="*{tenLoaiPhong}"></div><br/>
+
+    <label>Mô Tả:</label>
+    <textarea th:field="*{moTa}"></textarea><br/>
+
+    <label>Số Lượng Giường:</label>
+    <input type="number" th:field="*{soLuongGiuong}" />
+    <div class="error"  th:if="${#fields.hasErrors('soLuongGiuong')}" th:errors="*{soLuongGiuong}"></div><br/>
+
+    <label>Số Người Tối Đa:</label>
+    <input type="number" th:field="*{soNguoiToiDa}" />
+    <div class="error"  th:if="${#fields.hasErrors('soNguoiToiDa')}" th:errors="*{soNguoiToiDa}"></div><br/>
+
+    <label>Giá:</label>
+    <input type="number" th:field="*{gia}" step="0.1" />
+    <div class="error"  th:if="${#fields.hasErrors('gia')}" th:errors="*{gia}"></div><br/>
+
+    <div class=" display: flex;">
+        <a href="/loaiphongs"> <button class="background-color: gray" type="button"> Quay lại</button></a>
+        <button class="luu" type="submit">Lưu</button>
+    </div>
+</form>
+
+<!-- Hiển thị thông báo thành công nếu có -->
+<div th:if="${message}" th:text="${message}"></div>
+
+
+<!--<h2>Thêm Loại Phòng</h2>-->
+<!--<form action="/loai-phong/save" method="post">-->
+<!--    <label>Mã Loại Phòng:</label>-->
+<!--    <input type="text" name="maLoaiPhong" required><br>-->
+
+<!--    <label>Tên Loại Phòng:</label>-->
+<!--    <input type="text" name="tenLoaiPhong" required><br>-->
+
+<!--    <label>Mô Tả:</label>-->
+<!--    <textarea name="moTa"></textarea><br>-->
+
+<!--    <label>Số Lượng Giường:</label>-->
+<!--    <input type="number" name="soLuongGiuong"><br>-->
+
+<!--    <label>Số Người Tối Đa:</label>-->
+<!--    <input type="number" name="soNguoiToiDa"><br>-->
+
+<!--    <label>Giá:</label>-->
+<!--    <input type="number" name="gia" step="0.1"><br>-->
+
+<!--    <div class=" display: flex;">-->
+<!--        <a href="/loai-phong"> <button class="background-color: gray" type="button"> Quay lại</button></a>-->
+<!--        <button class="luu" type="submit">Lưu</button>-->
+<!--    </div>-->
+
+<!--</form>-->
+</body>
+</html>

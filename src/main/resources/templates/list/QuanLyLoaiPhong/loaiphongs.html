@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<head th:include="fragment/head :: head">
+
+</head>
+<body class="vertical light">
+
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <form id="searchForm">
+            <input class="in" type="text" name="keyword" id="keyword" placeholder="Nhập mã hoặc tên ">
+            <button type="submit"><i class="bi bi-search"></i> Tìm kiếm</button>
+        </form>
+
+        <div class="mt-5">
+            <a href="/loaiphongs/create">
+                <button type="button" ><i class="bi bi-plus-circle"></i> Thêm Loại Phòng</button>
+            </a>
+        </div>
+        <!--<a id="1" href="/loai-phong/create">Thêm Loại Phòng</a>-->
+        <table id="resultTable">
+            <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Tên</th>
+                <th>Mô Tả</th>
+                <th>Số Giường</th>
+                <th>Số Người</th>
+                <th>Giá</th>
+                <th>Hành Động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="loaiPhong : ${loaiPhongPage.content}">
+                <td th:text="${loaiPhong.maLoaiPhong}"></td>
+                <td th:text="${loaiPhong.tenLoaiPhong}"></td>
+                <td th:text="${loaiPhong.moTa}"></td>
+                <td th:text="${loaiPhong.soLuongGiuong}"></td>
+                <td th:text="${loaiPhong.soNguoiToiDa}"></td>
+                <td th:text="${loaiPhong.gia}"></td>
+                <td>
+                    <a th:href="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pen"></i> Sửa
+                    </a>
+                    <!--            <a th:href="@{/loai-phong/delete/{id}(id=${loaiPhong.idLoaiPhong})}">Xóa</a>-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <a class="prev" th:if="${loaiPhongPage.hasPrevious()}" th:href="@{/loai-phong(page=${loaiPhongPage.number - 1}, size=${loaiPhongPage.size})}">&laquo;</a>
+            <span class="current-page" th:text="${loaiPhongPage.number + 1}"></span>
+            <a class="next" th:if="${loaiPhongPage.hasNext()}" th:href="@{/loai-phong(page=${loaiPhongPage.number + 1}, size=${loaiPhongPage.size})}">&raquo;</a>
+        </div>
+    </main>
+    <div th:include="fragment/modal :: modal"></div>
+</div>
+<!-- Form tìm kiếm -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#searchForm").on("submit", function(event) {
+            event.preventDefault(); // Ngăn chặn gửi form truyền thống
+
+            var keyword = $("#keyword").val(); // Lấy giá trị tìm kiếm
+
+            $.ajax({
+                url: '/loaiphongs/search',
+                method: 'GET',
+                data: { keyword: keyword },
+                success: function(response) {
+                    console.log(response); // Kiểm tra cấu trúc phản hồi
+
+                    var tbody = $("table tbody");
+                    tbody.empty(); // Xóa dữ liệu cũ
+
+                    if (response.content && Array.isArray(response.content)) {
+                        if (response.content.length === 0) {
+                            tbody.append("<tr><td colspan='7'>Không tìm thấy kết quả</td></tr>");
+                        } else {
+                            response.content.forEach(function(item) {
+                                tbody.append(
+                                    `<tr>
+                                        <td>${item.maLoaiPhong}</td>
+                                        <td>${item.tenLoaiPhong}</td>
+                                        <td>${item.moTa}</td>
+                                        <td>${item.soLuongGiuong}</td>
+                                        <td>${item.soNguoiToiDa}</td>
+                                        <td>${item.gia}</td>
+                                        <td>
+                                            <a href="/loaiphongs/edit/${item.idLoaiPhong}" class="btn btn-warning btn-sm">
+                                                <i class="bi bi-pen"></i> Sửa
+                                            </a>
+                                        </td>
+                                    </tr>`
+                                );
+                            });
+                        }
+
+                        // Cập nhật phân trang nếu có
+                        var pagination = $(".pagination");
+                        pagination.empty();
+
+                        if (response.hasPrevious) {
+                            pagination.append(`<a class="prev" href="/loaiphongs?page=${response.number - 1}">&laquo;</a>`);
+                        }
+
+                        pagination.append(`<span class="current-page">${response.number + 1}</span>`);
+
+                        if (response.hasNext) {
+                            pagination.append(`<a class="next" href="/loaiphongs?page=${response.number + 1}">&raquo;</a>`);
+                        }
+                    } else {
+                        console.error("Phản hồi từ server không có thuộc tính 'content' hoặc không phải là mảng.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Tìm kiếm thất bại:", error);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

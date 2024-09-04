@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+<head th:include="fragment/head :: head">
+</head>
+<body class="vertical light">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- Customer information -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-container" id="formKhachHang">
+                                        <h4 class="page-title">Thông tin khách hàng</h4>
+                                        <!--                                        <div class="card-body">-->
+                                        <form th:action="@{/quan-ly-khach-hang/cap-nhat}" method="post"
+                                              class="updateKhachHang" style="margin-top: 70px">
+                                            <input type="hidden" th:name="id" th:value="${khachHang.id}">
+
+                                            <div class="mb-3">
+                                                <label for="maKhachHang" class="form-label">UserName</label>
+                                                <input type="text" class="form-control" id="maKhachHang"
+                                                       name="maKhachHang"
+                                                       th:value="${khachHang.maKhachHang}" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="hoVaTen" class="form-label">Họ và tên</label>
+                                                <input type="text" class="form-control" id="hoVaTen" name="hoVaTen"
+                                                       th:value="${khachHang.hoVaTen}" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                       th:value="${khachHang.email}" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="soDienThoai" class="form-label">Số điện thoại</label>
+                                                <input type="text" class="form-control" id="soDienThoai"
+                                                       name="soDienThoai"
+                                                       th:value="${khachHang.soDienThoai}" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Giới tính</label><br>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" id="gioiTinhNam"
+                                                           name="gioiTinh"
+                                                           value="true" th:checked="${khachHang.gioiTinh == true}">
+                                                    <label class="form-check-label" for="gioiTinhNam">Nam</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" id="gioiTinhNu"
+                                                           name="gioiTinh"
+                                                           value="false" th:checked="${khachHang.gioiTinh == false}">
+                                                    <label class="form-check-label" for="gioiTinhNu">Nữ</label>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="mb-3 text-center">
+                                                <button type="submit" class="btn btn-success">Cập nhật</button>
+                                                <a href="/quan-ly-khach-hang" class="btn btn-primary ms-2">Quay
+                                                    lại</a>
+                                            </div>
+                                        </form>
+                                        <!--                                        </div>-->
+                                    </div>
+                                </div>
+                                <!-- Add address form and address list -->
+                                <div class="col-md-8">
+                                    <div class="form-container" id="formDiaChi">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h4 class="page-title">Danh sách địa chỉ của khách hàng</h4>
+                                            </div>
+                                        </div>
+                                        <div class="accordion" id="accordionAddAddress">
+                                            <div class="accordion-item add-address-item"
+                                                 style="margin-top: 60px; margin-bottom: 70px">
+                                                <h2 class="accordion-header" id="headingAddAddress">
+                                                    <button class="accordion-button add-new-address-button"
+                                                            type="button" data-bs-toggle="collapse"
+                                                            data-bs-target="#collapseAddAddress" aria-expanded="true"
+                                                            aria-controls="collapseAddAddress"
+                                                            style="  background: #f2f2f2;color: #027c03;box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 #bec5cb;">
+                                                        <b>+Tạo địa chỉ mới</b>
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseAddAddress" class="accordion-collapse collapse"
+                                                     aria-labelledby="headingAddAddress"
+                                                     data-bs-parent="#accordionAddAddress">
+                                                    <div class="accordion-body">
+                                                        <form th:action="@{/quan-ly-khach-hang/them-dia-chi}"
+                                                              method="post" class="add-address-form"
+                                                              id="addAddressForm">
+                                                            <input type="hidden" th:name="idKhachHang"
+                                                                   th:value="${khachHang.id}">
+                                                            <div class="form-group">
+                                                                <label for="tenDiaChi">Địa chỉ cụ thể</label>
+                                                                <input type="text" class="form-control" id="tenDiaChi"
+                                                                       name="diaChiCuThe"
+                                                                       placeholder="Nhập địa chỉ cụ thể" required>
+                                                            </div>
+                                                            <div class="form-row">
+                                                                <div class="form-group col-md-4">
+                                                                    <label for="city">Tỉnh thành</label>
+                                                                    <select id="city" class="form-control"
+                                                                            name="thanhPho" required>
+                                                                        <option value="" selected>Chọn tỉnh thành
+                                                                        </option>
+                                                                        <!-- Các option của tỉnh thành -->
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group col-md-4">
+                                                                    <label for="district">Quận huyện</label>
+                                                                    <select id="district" class="form-control"
+                                                                            name="quanHuyen" required>
+                                                                        <option value="" selected>Chọn quận huyện
+                                                                        </option>
+                                                                        <!-- Các option của quận huyện -->
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group col-md-4">
+                                                                    <label for="ward">Phường xã</label>
+                                                                    <select id="ward" class="form-control"
+                                                                            name="phuongXa" required>
+                                                                        <option value="" selected>Chọn phường xã
+                                                                        </option>
+                                                                        <!-- Các option của phường xã -->
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="ghiChu">Ghi chú</label>
+                                                                <input type="text" class="form-control" id="ghiChu"
+                                                                       name="ghiChu" placeholder="Nhập ghi chú"
+                                                                       required>
+                                                            </div>
+                                                            <button type="submit" class="btn btn-success">Thêm</button>
+                                                            <button type="button" class="btn btn-primary"
+                                                                    data-bs-toggle="collapse"
+                                                                    data-bs-target="#collapseAddAddress">Đóng
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Danh sách địa chỉ -->
+                                        <div th:each="diaChi, iterStat : ${diaChiList}">
+                                            <div class="accordion customer-address-accordion"
+                                                 id="accordion[[${iterStat.index}]]">
+                                                <div class="accordion-item" style="margin-top: 20px">
+                                                    <h2 class="accordion-header" id="heading[[${iterStat.index}]]">
+                                                        <button class="accordion-button customer-address-button"
+                                                                type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#collapse[[${iterStat.index}]]"
+                                                                aria-expanded="true"
+                                                                aria-controls="collapse[[${iterStat.index}]]"
+                                                                style="background: #f2f2f2;color: #212529;box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 #bec5cb">
+                                                            <b>Địa chỉ [[${iterStat.index + 1}]]</b>
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapse[[${iterStat.index}]]"
+                                                         class="accordion-collapse collapse show"
+                                                         aria-labelledby="heading[[${iterStat.index}]]"
+                                                         data-bs-parent="#accordion[[${iterStat.index}]]">
+                                                        <div class="accordion-body">
+                                                            <form th:action="@{/quan-ly-khach-hang/cap-nhat-dia-chi}"
+                                                                  method="post" class="update-address-form"
+                                                                  data-index="[[${iterStat.index}]]">
+                                                                <input type="hidden" th:name="id"
+                                                                       th:value="${diaChi.id}">
+                                                                <div class="form-group">
+                                                                    <label for="updateTenDiaChi">Địa chỉ cụ thể</label>
+                                                                    <input type="text" class="form-control"
+                                                                           id="updateTenDiaChi" name="diaChiCuThe"
+                                                                           th:value="${diaChi.diaChiCuThe}" required>
+                                                                </div>
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-4">
+                                                                        <label>Tỉnh thành</label>
+                                                                        <select class="form-control city-select"
+                                                                                name="thanhPho" required
+                                                                                data-index="[[${iterStat.index}]]">
+                                                                            <option th:value="${diaChi.thanhPho}"
+                                                                                    th:text="${diaChi.thanhPho}"
+                                                                                    selected></option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group col-md-4">
+                                                                        <label>Quận huyện</label>
+                                                                        <select class="form-control district-select"
+                                                                                name="quanHuyen" required
+                                                                                data-index="[[${iterStat.index}]]">
+                                                                            <option th:value="${diaChi.quanHuyen}"
+                                                                                    th:text="${diaChi.quanHuyen}"
+                                                                                    selected></option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group col-md-4">
+                                                                        <label>Phường xã</label>
+                                                                        <select class="form-control ward-select"
+                                                                                name="phuongXa" required
+                                                                                data-index="[[${iterStat.index}]]">
+                                                                            <option th:value="${diaChi.phuongXa}"
+                                                                                    th:text="${diaChi.phuongXa}"
+                                                                                    selected></option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="updateGhiChu">Ghi chú</label>
+                                                                    <input type="text" class="form-control"
+                                                                           id="updateGhiChu" name="ghiChu"
+                                                                           th:value="${diaChi.ghiChu}" required>
+                                                                </div>
+                                                                <button type="submit"
+                                                                        class="btn mb-2 mr-1 btn-outline-success float-right">
+                                                                    <span class="fe fe-edit-3"></span></button>
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input default-switch"
+                                                                           type="checkbox"
+                                                                           id="defaultSwitch[[${iterStat.index}]]"
+                                                                           data-index="[[${iterStat.index}]]">
+                                                                    <label class="form-check-label"
+                                                                           for="defaultSwitch[[${iterStat.index}]]">Địa
+                                                                        chỉ mặc định</label>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row justify-content-center mt-4">
+                                            <div class="col-12">
+                                                <nav aria-label="Page navigation example">
+                                                    <ul class="pagination justify-content-center">
+                                                        <li th:class="${currentPage == 0} ? 'page-item disabled' : 'page-item'">
+                                                            <a class="page-link"
+                                                               th:href="@{/quan-ly-khach-hang-detail(id=${id}, page=0, size=${sizeDiaChi})}">First</a>
+                                                        </li>
+                                                        <li th:class="${currentPage == 0} ? 'page-item disabled' : 'page-item'">
+                                                            <a class="page-link" th:if="${currentPage > 0}"
+                                                               th:href="@{/quan-ly-khach-hang-detail(id=${id}, page=${currentPage - 1}, size=${sizeDiaChi})}">Previous</a>
+                                                        </li>
+                                                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                                            th:class="${currentPage == i} ? 'page-item active' : 'page-item'">
+                                                            <a class="page-link"
+                                                               th:href="@{/quan-ly-khach-hang-detail(id=${id}, page=${i}, size=${sizeDiaChi})}"
+                                                               th:text="${i + 1}"></a>
+                                                        </li>
+                                                        <li th:class="${currentPage + 1 == totalPages} ? 'page-item disabled' : 'page-item'">
+                                                            <a class="page-link"
+                                                               th:if="${currentPage + 1 < totalPages}"
+                                                               th:href="@{/quan-ly-khach-hang-detail(id=${id}, page=${currentPage + 1}, size=${sizeDiaChi})}">Next</a>
+                                                        </li>
+                                                        <li th:class="${currentPage + 1 == totalPages} ? 'page-item disabled' : 'page-item'">
+                                                            <a class="page-link"
+                                                               th:href="@{/quan-ly-khach-hang-detail(id=${id}, page=${totalPages - 1}, size=${sizeDiaChi})}">Last</a>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:include="fragment/script :: script"></div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var citis = document.getElementById("city");
+            var districts = document.getElementById("district");
+            var wards = document.getElementById("ward");
+
+            var Parameter = {
+                url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+                method: "GET",
+                responseType: "application/json",
+            };
+
+            axios(Parameter).then(function (result) {
+                renderCity(result.data);
+            });
+
+            function renderCity(data) {
+                for (const x of data) {
+                    var opt = document.createElement('option');
+                    opt.value = x.Name;
+                    opt.text = x.Name;
+                    opt.setAttribute('data-id', x.Id);
+                    citis.options.add(opt);
+                }
+
+                citis.onchange = function () {
+                    districts.length = 1;
+                    wards.length = 1;
+                    if (this.options[this.selectedIndex].dataset.id !== "") {
+                        const result = data.filter(n => n.Id === this.options[this.selectedIndex].dataset.id);
+
+                        for (const k of result[0].Districts) {
+                            var opt = document.createElement('option');
+                            opt.value = k.Name;
+                            opt.text = k.Name;
+                            opt.setAttribute('data-id', k.Id);
+                            districts.options.add(opt);
+                        }
+                    }
+                };
+
+                districts.onchange = function () {
+                    wards.length = 1;
+                    const dataCity = data.filter((n) => n.Id === citis.options[citis.selectedIndex].dataset.id);
+                    if (this.options[this.selectedIndex].dataset.id !== "") {
+                        const dataWards = dataCity[0].Districts.filter(n => n.Id === this.options[this.selectedIndex].dataset.id)[0].Wards;
+
+                        for (const w of dataWards) {
+                            var opt = document.createElement('option');
+                            opt.value = w.Name;
+                            opt.text = w.Name;
+                            opt.setAttribute('data-id', w.Id);
+                            wards.options.add(opt);
+                        }
+                    }
+                };
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var forms = document.querySelectorAll(".update-address-form");
+
+            forms.forEach(function (form) {
+                var index = form.getAttribute("data-index");
+                var citis1 = form.querySelector('.city-select[data-index="' + index + '"]');
+                var districts1 = form.querySelector('.district-select[data-index="' + index + '"]');
+                var wards1 = form.querySelector('.ward-select[data-index="' + index + '"]');
+
+                var Parameter1 = {
+                    url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+                    method: "GET",
+                    responseType: "application/json",
+                };
+
+                axios(Parameter1).then(function (result) {
+                    renderCity(result.data, citis1, districts1, wards1);
+                }).catch(function (error) {
+                    console.error("Error fetching data:", error);
+                });
+
+                function renderCity(data, citis1, districts1, wards1) {
+                    for (const x of data) {
+                        var opt = document.createElement('option');
+                        opt.value = x.Name;
+                        opt.text = x.Name;
+                        opt.setAttribute('data-id', x.Id);
+                        citis1.options.add(opt);
+                    }
+
+                    citis1.onchange = function () {
+                        districts1.length = 1;
+                        wards1.length = 1;
+                        const selectedCityId = this.options[this.selectedIndex].getAttribute('data-id');
+
+                        if (selectedCityId) {
+                            const city = data.find(n => n.Id === selectedCityId);
+
+                            if (city && city.Districts) {
+                                for (const district of city.Districts) {
+                                    var opt = document.createElement('option');
+                                    opt.value = district.Name;
+                                    opt.text = district.Name;
+                                    opt.setAttribute('data-id', district.Id);
+                                    districts1.options.add(opt);
+                                }
+                            }
+                        }
+                    };
+
+                    districts1.onchange = function () {
+                        wards1.length = 1;
+                        const selectedCityId = citis1.options[citis1.selectedIndex].getAttribute('data-id');
+                        const selectedDistrictId = this.options[this.selectedIndex].getAttribute('data-id');
+
+                        if (selectedCityId && selectedDistrictId) {
+                            const city = data.find(n => n.Id === selectedCityId);
+
+                            if (city && city.Districts) {
+                                const district = city.Districts.find(n => n.Id === selectedDistrictId);
+
+                                if (district && district.Wards) {
+                                    for (const ward of district.Wards) {
+                                        var opt = document.createElement('option');
+                                        opt.value = ward.Name;
+                                        opt.text = ward.Name;
+                                        opt.setAttribute('data-id', ward.Id);
+                                        wards1.options.add(opt);
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }
+            });
+        });
+
+
+        function showSuccessToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#4CAF50",
+                },
+                stopOnFocus: true
+            }).showToast();
+        }
+
+        function showErrorToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#f44336",
+                },
+                stopOnFocus: true
+            }).showToast();
+        }
+
+        document.getElementById("addAddressForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Ngăn chặn hành động mặc định của submit form
+
+            // Lấy dữ liệu từ form
+            let formData = new FormData(this);
+
+            // Gửi yêu cầu AJAX để thêm địa chỉ
+            fetch('/quan-ly-khach-hang/them-dia-chi', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        showSuccessToast("Thêm địa chỉ thành công!");
+                        this.reset(); // Reset form sau khi thêm thành công
+
+                        // Đợi một khoảng thời gian (tương ứng với thời gian toast hiển thị) rồi làm mới trang
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1000); // 3000ms = 3 giây (thời gian toast hiển thị)
+                    } else {
+                        throw new Error('Đã xảy ra lỗi khi thêm địa chỉ');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Xử lý lỗi, ví dụ hiển thị toast lỗi
+                    showErrorToast("Đã xảy ra lỗi khi thêm địa chỉ");
+                });
+        });
+
+        document.querySelectorAll(".update-address-form").forEach(function (form) {
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Ngăn chặn hành động mặc định của submit form
+
+                // Lấy dữ liệu từ form
+                let formData = new FormData(this);
+
+                // Gửi yêu cầu AJAX để cập nhật thông tin khách hàng
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            showSuccessToast("Cập nhật địa chỉ thành công!");
+                        } else {
+                            throw new Error('Đã xảy ra lỗi khi cập nhật địa chỉ');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Xử lý lỗi, ví dụ hiển thị toast lỗi
+                        showErrorToast("Đã xảy ra lỗi khi cập nhật địa chỉ");
+                    });
+            });
+        });
+
+        document.querySelectorAll(".updateKhachHang").forEach(function (form) {
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Ngăn chặn hành động mặc định của submit form
+
+                // Lấy dữ liệu từ form
+                let formData = new FormData(this);
+
+                // Gửi yêu cầu AJAX để cập nhật thông tin khách hàng
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            showSuccessToast("Cập nhật thông tin thành công!");
+                        } else {
+                            throw new Error('Đã xảy ra lỗi khi cập nhật thông tin');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Xử lý lỗi, ví dụ hiển thị toast lỗi
+                        showErrorToast("Đã xảy ra lỗi khi cập nhật thông tin");
+                    });
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

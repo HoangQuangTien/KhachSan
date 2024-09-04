@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/head :: head"></head>
+<body class="vertical  light  ">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content"></main>
+    <div th:include="fragment/modal :: modal"></div>
+</div>
+</body>
+<script th:include="fragment/script :: script"></script>
+</html>

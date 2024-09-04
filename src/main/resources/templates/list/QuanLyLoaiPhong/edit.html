@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Chỉnh sửa Loại Phòng</title>
+    <link rel="stylesheet" th:href="@{/css/edit.css}" />
+</head>
+<body class="vertical  light">
+<h2>Chỉnh sửa Loại Phòng</h2>
+<!-- Hiển thị thông báo lỗi nếu có -->
+<div th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></div>
+<form th:action="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" th:object="${loaiPhong}" method="post">
+    <label>Mã Loại Phòng:</label>
+    <input type="text" th:field="*{maLoaiPhong}" />
+    <div class="error"  th:if="${#fields.hasErrors('maLoaiPhong')}" th:errors="*{maLoaiPhong}"></div><br/>
+
+    <label>Tên Loại Phòng:</label>
+    <input type="text" th:field="*{tenLoaiPhong}" />
+    <div class="error"  th:if="${#fields.hasErrors('tenLoaiPhong')}" th:errors="*{tenLoaiPhong}"></div><br/>
+
+    <label>Mô Tả:</label>
+    <textarea th:field="*{moTa}"></textarea><br/>
+
+    <label>Số Lượng Giường:</label>
+    <input type="number" th:field="*{soLuongGiuong}" />
+    <div class="error"  th:if="${#fields.hasErrors('soLuongGiuong')}" th:errors="*{soLuongGiuong}"></div><br/>
+
+    <label>Số Người Tối Đa:</label>
+    <input type="number" th:field="*{soNguoiToiDa}" />
+    <div class="error"  th:if="${#fields.hasErrors('soNguoiToiDa')}" th:errors="*{soNguoiToiDa}"></div><br/>
+
+    <label>Giá:</label>
+    <input type="number" th:field="*{gia}" step="0.1" />
+    <div class="error"  th:if="${#fields.hasErrors('gia')}" th:errors="*{gia}"></div><br/>
+
+    <div style="display: flex;">
+        <a href="/loaiphongs"><button type="button" style="background-color: gray;">Quay lại</button></a>
+        <button type="submit" class="luu"> Lưu Thay Đổi</button>
+    </div>
+</form>
+</body>
+</html>
