@@ -15,6 +15,8 @@ public interface KhachHangService {
 
     KhachHangDTO save(KhachHangDTO khachHangDTO);
 
+    String generateMaKhachHang();
+
     void update(Integer id, KhachHangDTO khachHangDTO);
 
     void delete(Integer id);
@@ -32,4 +34,7 @@ public interface KhachHangService {
     Integer saveKhachHang(KhachHangDTO khachHangDTO);
 
 
+    boolean existsByEmail(String email);
+
+    boolean existsBySoDienThoai(String soDienThoai);
 }

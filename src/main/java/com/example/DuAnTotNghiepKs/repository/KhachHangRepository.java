@@ -14,6 +14,8 @@ public interface KhachHangRepository extends JpaRepository<KhachHang,Integer> {
     @Query("SELECT kh FROM KhachHang kh WHERE kh.hoVaTen LIKE %:query% OR kh.soDienThoai LIKE %:query%")
     List<KhachHang> searchByNameOrPhone(@Param("query") String query);
 
+    boolean existsByEmail(String email);
+    boolean existsBySoDienThoai(String soDienThoai);
 
 
 //    @Query("SELECT kh FROM KhachHang kh WHERE kh.trangThai = :status")

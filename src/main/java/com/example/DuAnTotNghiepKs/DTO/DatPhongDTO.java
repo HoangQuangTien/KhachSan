@@ -19,6 +19,8 @@ public class DatPhongDTO {
     private String tinhTrang;
     private String cccd;
     private Float tienCoc;
+    private Float tongTien;
+    private Float tienConLai;
 
     private Integer idPhong;
     private String tenPhong;

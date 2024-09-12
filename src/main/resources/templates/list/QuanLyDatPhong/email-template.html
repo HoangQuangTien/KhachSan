@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hóa Đơn</title>
+</head>
+<!--<head th:include="fragment/head :: head">-->
+<body>
+<h1>Hóa Đơn</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Mã CTDP</th>
+<!--        <th>Tên Nhân Viên</th>-->
+        <th>Tên Khách Hàng</th>
+        <th>Tên Phòng</th>
+        <th>Ngày Nhận Phòng</th>
+        <th>Ngày Trả Phòng</th>
+        <th>Tổng Tiền</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td th:text="${ctdp.maChiTietDatPhong}"></td>
+<!--        <td th:text="${ctdp.nhanVien.hoTen}"></td>-->
+        <td th:text="${ctdp.khachHang.hoVaTen}"></td>
+        <td th:text="${ctdp.datPhong.phong.tenPhong}"></td>
+        <td th:text="${ctdp.datPhong.ngayNhanPhong}"></td>
+        <td th:text="${ctdp.datPhong.ngayTraPhong}"></td>
+        <td th:text="${ctdp.tongTien}"></td>
+    </tr>
+    </tbody>
+</table>
+<p>QR Code:</p>
+<img th:src="@{/qrcode/{id}(id=${ctdp.idChiTietDatPhong})}" alt="QR Code"/>
+</body>
+</html>

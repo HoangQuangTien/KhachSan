@@ -10,4 +10,6 @@ public interface DienTichService {
     Optional<DienTich> getDienTichById(Integer idDienTich);
 
     List<DienTich> getAllDienTichPhongs();
+
+    DienTich saveDienTich(DienTich dienTich);
 }

@@ -10,4 +10,9 @@ public interface TangService {
     Optional<Tang> getTangById(Integer idTang);
 
     List<Tang> getAllTangs();
+
+
+
+    Tang saveTang(Tang tang);
+
 }

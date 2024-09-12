@@ -28,4 +28,12 @@ public interface DatPhongService {
     double getRevenueByFourMonths(int startMonth, int year);
 
     double getRevenueByYear(int year);
+
+    Long getBookingCount();
+
+    // Thêm phương thức tính tổng số phòng Ngung hoạt động
+    long countActivePhongsFalse();
+
+//    // Thêm phương thức tính tổng số phòng Ngung hoạt động
+//    long countActivePhongsFalse();
 }

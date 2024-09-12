@@ -30,10 +30,17 @@ public class TaiKhoan {
     @NotBlank(message = "Mật khẩu không được để trống")
     private String matKhau;
 
+    @Column(name = "vai_tro")
+    private String vaiTro;
+
     @OneToMany(mappedBy = "taiKhoan")
     private Set<NhanVien> nhanViens = new HashSet<>();
 
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "taiKhoan")
-//    List<ChiTietVaiTro> chiTietVaiTros;
+
+    // Constructor có tham số
+    public TaiKhoan(String tenDangNhap, String matKhau, String vaiTro) {
+        this.tenDangNhap = tenDangNhap;
+        this.matKhau = matKhau;
+        this.vaiTro = vaiTro;
+    }
 }

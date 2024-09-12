@@ -4,7 +4,6 @@ import com.example.DuAnTotNghiepKs.DTO.DiaChiKhachHangDTO;
 import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
 import com.example.DuAnTotNghiepKs.entity.DiaChiKhachHang;
 import com.example.DuAnTotNghiepKs.entity.KhachHang;
-import com.example.DuAnTotNghiepKs.entity.NhanVien;
 import com.example.DuAnTotNghiepKs.exception.ResourceNotfound;
 import com.example.DuAnTotNghiepKs.repository.DiaChiKhachHangRepository;
 import com.example.DuAnTotNghiepKs.repository.KhachHangRepository;
@@ -62,6 +61,14 @@ public class KhachHangImp implements KhachHangService {
         }
 
         return modelMapper.map(khachHang, KhachHangDTO.class);
+
+    }
+
+    @Override
+    public String generateMaKhachHang() {
+        // Logic để sinh mã khách hàng tự động
+        // Ví dụ: mã khách hàng có thể là một chuỗi số tự tăng
+        return "KH0" + (khachHangRepository.count() + 1);
     }
 
     @Override
@@ -158,6 +165,15 @@ public class KhachHangImp implements KhachHangService {
     }
 
 
+    @Override
+    public boolean existsByEmail(String email) {
+        return khachHangRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsBySoDienThoai(String soDienThoai) {
+        return khachHangRepository.existsBySoDienThoai(soDienThoai);
+    }
 
 
 }

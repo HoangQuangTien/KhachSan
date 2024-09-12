@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sửa Khuyến Mãi</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/editKM.css}">
+</head>
+<body>
+<h1>Sửa Khuyến Mãi</h1>
+<form th:action="@{/admin/edit}" th:object="${khuyenMai}" method="post">
+    <input type="hidden" th:field="*{idKhuyenMai}">
+
+    <div class="form-group">
+        <label for="maKhuyenMai">Mã Khuyến Mãi:</label>
+        <div class="input-group">
+            <input type="text" id="maKhuyenMai" th:field="*{maKhuyenMai}" class="form-control" />
+            <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary" onclick="generateMaKhuyenMai()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        <div th:if="${#fields.hasErrors('maKhuyenMai')}" class="error-message text-danger mt-1">
+            <p th:errors="*{maKhuyenMai}"></p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="tenKhuyenMai">Tên Khuyến Mãi:</label>
+        <input type="text" id="tenKhuyenMai" th:field="*{tenKhuyenMai}" class="form-control"/><br/>
+        <div th:if="${#fields.hasErrors('tenKhuyenMai')}" class="text-danger">
+            <p th:errors="*{tenKhuyenMai}"></p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="giamGia">Giảm Giá (% hoặc số tiền):</label>
+        <input type="number" id="giamGia" th:field="*{giamGia}" class="form-control"/><br/>
+        <div th:if="${#fields.hasErrors('giamGia')}" class="text-danger">
+            <p th:errors="*{giamGia}"></p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="moTa">Mô Tả:</label>
+        <input type="text" id="moTa" th:field="*{moTa}" class="form-control" />
+        <div th:if="${#fields.hasErrors('moTa')}" class="text-danger">
+            <p th:errors="*{moTa}"></p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="ngayBatDau">Ngày Bắt Đầu:</label>
+        <input type="date" id="ngayBatDau" th:field="*{ngayBatDau}" class="form-control"/><br/>
+        <div th:if="${#fields.hasErrors('ngayBatDau')}" class="text-danger">
+            <p th:errors="*{ngayBatDau}"></p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="ngayKetThuc">Ngày Kết Thúc:</label>
+        <input type="date" id="ngayKetThuc" th:field="*{ngayKetThuc}" class="form-control"/><br/>
+        <div th:if="${#fields.hasErrors('ngayKetThuc')}" class="text-danger">
+            <p th:errors="*{ngayKetThuc}"></p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="loaiGiam">Loại Giảm:</label>
+        <select id="loaiGiam" th:field="*{loaiGiam}" class="form-control">
+            <option value="true" th:selected="*{loaiGiam == true}">Phần trăm</option>
+            <option value="false" th:selected="*{loaiGiam == false}">Tiền mặt</option>
+        </select>
+        <div th:if="${#fields.hasErrors('loaiGiam')}" class="text-danger">
+            <p th:errors="*{loaiGiam}"></p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Trạng thái:</label><br/>
+        <input id="trangThaiConHan" type="radio" th:field="*{trangThai}" value="true" />
+        <label for="trangThaiConHan">Còn hạn</label>
+
+        <input id="trangThaiHetHan" type="radio" th:field="*{trangThai}" value="false" />
+        <label for="trangThaiHetHan">Hết hạn</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cập Nhật</button>
+</form>
+
+<a href="#" th:href="@{/admin/quan-ly-khuyen-mai}">Quay lại</a>
+
+<div th:include="fragment/script :: script"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<script crossorigin="anonymous"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+    function generateMaKhuyenMai() {
+        var length = 6; // Độ dài của mã khuyến mãi
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'; // Chỉ sử dụng chữ cái
+        var result = '';
+        var charactersLength = characters.length;
+
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+
+        // Gán mã khuyến mãi mới vào input
+        document.getElementById('maKhuyenMai').value = result;
+    }
+
+    // Chèn giá trị ngày kết thúc từ Thymeleaf vào biến JavaScript
+    // var ngayKetThuc = /*[[${#dates.format(khuyenMai.ngayKetThuc, 'yyyy-MM-dd')]]*/ '2024-12-31';
+    // console.log("Ngày kết thúc:", ngayKetThuc);
+
+</script>
+</body>
+</html>

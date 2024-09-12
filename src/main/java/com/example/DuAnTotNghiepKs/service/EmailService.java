@@ -1,0 +1,89 @@
+package com.example.DuAnTotNghiepKs.service;
+
+import com.example.DuAnTotNghiepKs.entity.ChiTietDatPhong;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+
+@Service
+public class EmailService {
+
+    @Autowired
+    private JavaMailSender emailSender;
+
+    @Autowired
+    private QrCodeService qrCodeService;
+
+    public void sendEmail(String to, String subject, String text, ChiTietDatPhong ctdp) throws MessagingException, IOException {
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        // Set email properties
+        helper.setTo(to);
+        helper.setSubject(subject);
+
+        // Generate QR code as a byte array
+        byte[] qrCodeBytes = qrCodeService.generateQRCode(
+                String.format(
+                        "Mã Chi Tiết Đặt Phòng: %s\nKhách Hàng: %s\nNgày Lập: %s\nTổng Tiền: %s",
+                        ctdp.getMaChiTietDatPhong(),
+                        ctdp.getKhachHang().getHoVaTen(),
+                        ctdp.getNgayLap(),
+                        ctdp.getTongTien().toString()
+                ), 300, 300
+        );
+
+        // Convert the byte array to a DataSource for the attachment
+        ByteArrayResource qrCodeResource = new ByteArrayResource(qrCodeBytes);
+        helper.addInline("qrCode", qrCodeResource, "image/png"); // Add QR code as an inline image
+
+        // Add improved HTML content
+        String htmlContent = "<html>" +
+                "<head>" +
+                "<style>" +
+                "body { font-family: 'Arial', sans-serif; background-color: #fff3cd; margin: 0; padding: 20px; }" +
+                ".container { max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }" +
+                ".header { background-color: #ffc107; color: white; padding: 15px; text-align: center; border-radius: 10px 10px 0 0; }" +
+                ".header h1 { margin: 0; font-size: 24px; }" +
+                "p { margin: 20px 0; color: #856404; }" +
+                ".details { margin: 20px 0; padding: 10px; background-color: #fff3cd; border-radius: 5px; color: #856404; }" +
+                ".footer { text-align: center; color: #856404; margin-top: 20px; font-size: 14px; padding-top: 10px; border-top: 1px solid #ffeeba; }" +
+                "a.button { display: inline-block; padding: 10px 20px; margin: 20px auto; font-size: 16px; color: white; background-color: #fd7e14; border-radius: 5px; text-decoration: none; }" +
+                "a.button:hover { background-color: #e8590c; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class='container'>" +
+                "<div class='header'>" +
+                "<h1>Kính gửi " + ctdp.getKhachHang().getHoVaTen() + ",</h1>" +
+                "</div>" +
+                "<p>Cảm ơn bạn đã chọn ở lại với chúng tôi tại DRAGONBALL HOTEL! Chúng tôi rất vui khi có bạn là khách hàng của chúng tôi từ <strong>" + ctdp.getNgayLap() + "</strong>.</p>" +
+                "<p>Xin lưu ý rằng loại phòng của bạn là <strong>" + ctdp.getDatPhong().getLoaiPhong().getTenLoaiPhong() + "</strong> và khoản thanh toán đã được nhận với số tiền là <strong>" + ctdp.getDatPhong().getTienCoc() + "</strong>.</p>" +
+                "<p>Nếu bạn yêu cầu bất kỳ tiện nghi hoặc dịch vụ bổ sung nào, chúng tôi sẽ sẵn lòng cung cấp những tiện nghi hoặc dịch vụ đó cho bạn trong thời gian lưu trú.</p>" +
+                "<p>Cảm ơn bạn một lần nữa vì đã chọn chúng tôi và chúng tôi mong được có bạn là khách của chúng tôi.</p>" +
+                "<div class='footer'>Trân trọng, <br>DRAGONBALL HOTEL</div>" +
+                "<div class='qr-code'>" +
+                "<img src='cid:qrCode' alt='QR Code' style='display:block;margin:10px auto; max-width: 150px;'/>" +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+
+        helper.setText(htmlContent, true);
+
+        // Send the email
+        emailSender.send(message);
+    }
+
+
+
+
+
+}

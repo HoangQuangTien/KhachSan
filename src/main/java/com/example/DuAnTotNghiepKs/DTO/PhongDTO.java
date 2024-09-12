@@ -19,6 +19,8 @@ public class PhongDTO {
         private Boolean trangThai;
         private Float gia;
 
+        private float tenDienTich;
+        private String tenTang;
         private Integer idLoaiPhong;
         private String tenLoaiPhong;
         private Float giaLoaiPhong;

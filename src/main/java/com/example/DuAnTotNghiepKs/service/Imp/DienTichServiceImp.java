@@ -2,9 +2,7 @@ package com.example.DuAnTotNghiepKs.service.Imp;
 
 
 import com.example.DuAnTotNghiepKs.entity.DienTich;
-import com.example.DuAnTotNghiepKs.entity.Tang;
 import com.example.DuAnTotNghiepKs.repository.DienTichRepo;
-import com.example.DuAnTotNghiepKs.repository.TangRepo;
 import com.example.DuAnTotNghiepKs.service.DienTichService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +23,14 @@ public class DienTichServiceImp implements DienTichService {
     public List<DienTich> getAllDienTichPhongs() {
         return dienTichRepo.findAll();
     }
+
+
+
+    @Override
+    public DienTich saveDienTich(DienTich dienTich) {
+        return dienTichRepo.save(dienTich);
+    }
+
 
 
 }

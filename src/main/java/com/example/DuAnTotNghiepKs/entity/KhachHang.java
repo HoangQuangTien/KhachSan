@@ -63,4 +63,8 @@ public class KhachHang {
 
     @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DatPhong> datPhongs = new HashSet<>();
+
+
+//    @OneToMany(mappedBy = "datPhong", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<ChiTietDatPhong> chiTietDatPhongs = new HashSet<>();
 }

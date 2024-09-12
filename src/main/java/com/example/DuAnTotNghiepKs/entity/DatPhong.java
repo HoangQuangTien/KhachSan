@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -37,6 +38,12 @@ public class DatPhong {
     @Column(name = "tien_coc")
     private Float tienCoc;
 
+    @Column(name = "tong_tien")
+    private Float tongTien;
+
+    @Column(name = "tien_con_lai")
+    private Float tienConLai;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_phong",referencedColumnName ="id_phong")
     private Phong phong;
@@ -53,8 +60,13 @@ public class DatPhong {
     private Set<Doan> doans;
 
 
+    @OneToMany(mappedBy = "datPhong")
+    private List<ChiTietDatPhong> chiTietDatPhongs;
+
     // Quan hệ với bảng ThanhToan - Một đặt phòng có thể có nhiều thanh toán
     @OneToMany(mappedBy = "datPhong", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ThanhToan> thanhToans = new HashSet<>();
+
+
 
 }

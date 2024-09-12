@@ -1,11 +1,10 @@
 package com.example.DuAnTotNghiepKs.service;
-import com.example.DuAnTotNghiepKs.DTO.DatPhongDTO;
 import com.example.DuAnTotNghiepKs.DTO.PhongDTO;
-import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.LoaiPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 import com.example.DuAnTotNghiepKs.repository.LoaiPhongRepo;
 import com.example.DuAnTotNghiepKs.repository.PhongRepo;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PhongService {
@@ -21,6 +21,9 @@ public class PhongService {
 
     @Autowired
     private LoaiPhongRepo loaiPhongRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     public Page<Phong> getAllPhongs(Pageable pageable) {
         return phongRepository.findAll(pageable);
@@ -59,9 +62,6 @@ public class PhongService {
         return phongRepository.findById(id);
     }
 
-    public long countActivePhongs1() {
-        return phongRepository.countByTrangThai(true); // Tổng số phòng còn phòng
-    }
 
     public long countInactivePhongs1() {
         return phongRepository.countByTrangThai(false); // Tổng số phòng hết phòng
@@ -69,9 +69,18 @@ public class PhongService {
 
 
     // Thêm phương thức tính tổng số phòng đang hoạt động
+    public long countActivePhongs1() {
+        return phongRepository.countByTrangThai(true);
+    }
+
+
+    // Thêm phương thức tính tổng số phòng đang hoạt động
     public long countActivePhongs() {
         return phongRepository.countByTinhTrang(true);
     }
+
+
+
 
     public void updatePhong(Phong phong) {
         if (phong.getIdPhong() == null) {
@@ -135,6 +144,25 @@ public class PhongService {
     }
 
 
+
+
+    public List<PhongDTO> search(String query) {
+        List<Phong> results = phongRepository.searchByMaOrTenPhong(query);
+        return results.stream()
+                .map(phong -> {
+                    PhongDTO phongDTO = modelMapper.map(phong, PhongDTO.class);
+
+                    phongDTO.setTenDienTich(phong.getDienTich().getTenDienTich()); // Giả sử dienTich là kiểu Float
+
+
+                    phongDTO.setTenTang(phong.getTang() != null ? phong.getTang().getTenTang() : "Chưa có tầng");
+
+                    phongDTO.setTenLoaiPhong(phong.getLoaiPhong() != null ? phong.getLoaiPhong().getTenLoaiPhong() : "Chưa có Loại Phon");
+
+                    return phongDTO;
+                })
+                .collect(Collectors.toList());
+    }
 
 }
 

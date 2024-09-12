@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.controller;
 
+import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
 import com.example.DuAnTotNghiepKs.DTO.PhongDTO;
 import com.example.DuAnTotNghiepKs.entity.DienTich;
 import com.example.DuAnTotNghiepKs.entity.LoaiPhong;
@@ -198,6 +199,35 @@ public class PhongController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Có lỗi xảy ra: " + e.getMessage());
         }
+    }
+
+
+    @PostMapping("/save-tang")
+    public ResponseEntity<?> saveTang(@RequestBody Tang tang) {
+        try {
+            Tang savedTang = tangService.saveTang(tang);
+            return ResponseEntity.ok(savedTang);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể thêm tầng mới.");
+        }
+    }
+
+
+    @PostMapping("/save-dien-tich")
+    public ResponseEntity<?> saveDienTich(@RequestBody DienTich dienTich) {
+        try {
+            DienTich savedDienTich = dienTichService.saveDienTich(dienTich);
+            return ResponseEntity.ok(savedDienTich);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể thêm diện tích mới.");
+        }
+    }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PhongDTO>> search(@RequestParam String query) {
+        List<PhongDTO> results = phongService.search(query);
+        return ResponseEntity.ok(results);
     }
 
 

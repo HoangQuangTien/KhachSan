@@ -23,4 +23,12 @@ public class TangServiceImp implements TangService {
     public List<Tang> getAllTangs() {
         return tangRepository.findAll();
     }
+
+
+
+    @Override
+    public Tang saveTang(Tang tang) { // Đảm bảo phương thức này được triển khai
+        return tangRepository.save(tang);
+    }
+
 }

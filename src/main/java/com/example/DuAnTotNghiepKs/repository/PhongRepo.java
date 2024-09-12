@@ -1,10 +1,13 @@
 package com.example.DuAnTotNghiepKs.repository;
 
 
+import com.example.DuAnTotNghiepKs.entity.KhachHang;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,5 +36,9 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
     boolean existsByMaPhong(String maPhong);
 
     long countByTrangThaiAndTinhTrang(Boolean trangThai, Boolean tinhTrang);
+
+
+    @Query("SELECT p FROM Phong p WHERE p.maPhong LIKE %:query% OR p.tenPhong LIKE %:query%")
+    List<Phong> searchByMaOrTenPhong(@Param("query") String query);
 }
 

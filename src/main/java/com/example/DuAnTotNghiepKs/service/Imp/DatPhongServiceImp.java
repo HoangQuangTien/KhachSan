@@ -112,16 +112,26 @@ public class DatPhongServiceImp implements DatPhongService {
 
     @Override
     public double getRevenueByFourMonths(int startMonth, int year) {
-        double revenue = 0;
-        for (int i = 0; i < 4; i++) {
-            revenue += datPhongRepository.findRevenueByMonth(startMonth + i, year);
-        }
-        return revenue;
+        return datPhongRepository.calculateRevenueForFourMonths(startMonth, year);
     }
 
     @Override
     public double getRevenueByYear(int year) {
         return datPhongRepository.findRevenueByYear(year);
+    }
+
+    @Override
+    public Long getBookingCount() {
+        // Triển khai logic để tính tổng số phòng đã đặt từ cơ sở dữ liệu
+        return datPhongRepository.countTotalBookings();
+    }
+
+
+
+    @Override
+    // Thêm phương thức tính tổng số phòng Ngung hoạt động
+    public long countActivePhongsFalse() {
+        return phongRepository.countByTinhTrang(false);
     }
 
 

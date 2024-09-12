@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:include="fragment/head :: head">
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thống kê doanh thu</title>
-    <!-- Thêm thư viện Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            background-color: #f8f9fa; /* Màu nền nhạt */
-            color: #856404; /* Màu chữ cảnh báo */
+            background-color: #f8f9fa;
+            color: #343a40; /* Màu chữ đậm hơn */
             font-family: Arial, sans-serif;
         }
 
         h1 {
-            color: #856404; /* Màu tiêu đề cảnh báo */
+            color: #333; /* Màu tiêu đề */
             text-align: center;
             margin-top: 20px;
         }
@@ -26,45 +26,144 @@
             margin-bottom: 20px;
         }
 
-        button {
-            margin: 0 10px;
-        }
-
         .chart-container {
-            width: 70%;
+            width: 90%;
             margin: 0 auto;
         }
 
-        .revenue-display {
+        .revenue-display, .revenue-detail-table {
             text-align: center;
-            font-size: 1.5rem;
-            color: #fd7e14; /* Màu cảnh báo đậm */
             margin-bottom: 20px;
         }
+
+        .revenue-display {
+            font-size: 1.5rem;
+            color: #28a745; /* Màu xanh đậm */
+        }
+
+        .table-container {
+            margin: 20px auto;
+            width: 90%;
+        }
+
+        .btn-custom {
+            margin: 0 10px;
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        /* Thiết kế cho ô tổng số phòng đã đặt */
+        .booking-count {
+            width: 220px; /* Kích thước lớn hơn để nổi bật */
+            height: 200px; /* Kích thước lớn hơn để dễ nhìn */
+            /*margin: 0 auto;*/
+            background: linear-gradient(135deg, #007bff, #0056b3); /* Gradient màu nền */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem; /* Kích thước chữ để cân đối với icon */
+            font-weight: bold;
+            border-radius: 15px; /* Bo góc mềm mại hơn */
+            text-align: center;
+            border: 2px solid #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Bóng đổ nhẹ để tạo chiều sâu */
+            transition: transform 0.3s, box-shadow 0.3s; /* Hiệu ứng chuyển đổi mượt mà */
+        }
+
+        .booking-count:hover {
+            transform: scale(1.05); /* Phóng to nhẹ khi hover */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Tăng bóng đổ khi hover */
+        }
+
+        .icon {
+            color: #ffdf00; /* Màu vàng cho icon */
+            font-size: 3rem; /* Kích thước lớn hơn cho icon */
+            margin-right: 10px; /* Khoảng cách giữa icon và số liệu */
+        }
+
+        /* Thiết kế cho ô tổng số phòng ngừng hoạt động */
+        .inactive-room-count {
+            width: 220px;
+            height: 200px;
+            background: linear-gradient(135deg, #dc3545, #c82333); /* Màu nền khác để phân biệt */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem; /* Kích thước chữ để cân đối với icon */
+            font-weight: bold;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #c82333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .inactive-room-count:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            display: flex;
+            align-items: center; /* Căn chỉnh phần tử theo chiều dọc */
+            gap: 10px; /* Khoảng cách giữa các phần tử */
+        }
+
     </style>
+    <head th:include="fragment/head :: head"></head>
 </head>
+
 <body class="vertical light">
 <div th:include="fragment/navbar :: navbar"></div>
 <div th:include="fragment/sidebar :: sidebar"></div>
-
 <main role="main" class="main-content">
     <div class="container-fluid">
-        <h1>Thống kê doanh thu</h1>
-        <div class="button-container">
-            <button class="btn btn-warning" onclick="fetchRevenue('month')">Thống kê theo tháng</button>
-            <button class="btn btn-warning" onclick="fetchRevenue('four-months')">Thống kê theo 4 tháng</button>
-            <button class="btn btn-warning" onclick="fetchRevenue('year')">Thống kê theo năm</button>
+<!--        <h1>Thống kê doanh thu chi tiết</h1>-->
 
+        <div class="container">
+            <!-- Thêm phần hiển thị tổng số phòng đã đặt -->
+            <div class="booking-count" id="bookingCountDisplay">
+                <!-- Nội dung sẽ được tạo động -->
+            </div>
+
+            <div class="inactive-room-count" id="inactiveRoomCountDisplay">
+                <!-- Nội dung sẽ được tạo động -->
+            </div>
         </div>
-        <div id="revenueDisplay" class="revenue-display"></div>
+
+        <div class="button-container">
+            <button class="btn btn-custom" onclick="fetchRevenue('month')">Thống kê theo tháng</button>
+            <button class="btn btn-custom" onclick="fetchRevenue('four-months')">Thống kê theo 4 tháng</button>
+            <button class="btn btn-custom" onclick="fetchRevenue('year')">Thống kê theo năm</button>
+        </div>
+        <div id="revenueDisplay" class="revenue-display">
+        </div>
         <div class="chart-container">
-            <canvas id="revenueChart" width="400" height="200"></canvas>
+            <canvas id="revenueChart" width="400" height="200">
+            </canvas>
+        </div>
+        <div class="table-container">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Tháng</th>
+                    <th>Doanh thu</th>
+                    <th>Ghi chú</th>
+                </tr>
+                </thead>
+                <tbody id="revenueDetailTable">
+                <!-- Nội dung sẽ được tạo động -->
+                </tbody>
+            </table>
         </div>
     </div>
 </main>
-<div th:include="fragment/modal :: modal"></div>
-
+<div th:include="fragment/modal :: modal">
+</div>
 <script>
+
     function fetchRevenue(type) {
         let url;
         const year = new Date().getFullYear();
@@ -87,7 +186,6 @@
             .catch(error => console.error('Lỗi khi lấy dữ liệu doanh thu:', error));
     }
 
-
     function displayRevenue(amount) {
         const revenueDisplay = document.getElementById('revenueDisplay');
         revenueDisplay.innerHTML = `Tổng doanh thu: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)}`;
@@ -99,7 +197,7 @@
             type: 'bar',
             data: {
                 labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4'], // Ví dụ cho 4 tháng
-                datasets: [{
+                datasets: [ {
                     label: 'Doanh thu',
                     data: [data], // Sử dụng dữ liệu từ server
                     backgroundColor: 'rgba(253, 126, 20, 0.5)', // Màu cam nhạt
@@ -116,7 +214,53 @@
             }
         });
     }
+
+    function updateTable(details) {
+        const tableBody = document.getElementById('revenueDetailTable');
+        tableBody.innerHTML = ''; // Xóa nội dung bảng cũ
+
+        details.forEach(detail => {
+            const row = `
+                <tr>
+                    <td>${detail.month}</td>
+                    <td>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(detail.amount)}</td>
+                    <td>${detail.note}</td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchBookingCount();  // Tự động gọi hàm lấy tổng số phòng đã đặt khi trang được tải
+    });
+
+    function fetchBookingCount() {
+        fetch('/datphongs/bookings/count')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dữ liệu tổng số phòng:', data); // Kiểm tra dữ liệu
+                document.getElementById('bookingCountDisplay').innerHTML = `<i class="fas fa-bed icon"></i> ${data}`;
+            })
+            .catch(error => console.error('Lỗi khi lấy tổng số phòng đã đặt:', error));
+    }
+
+    function fetchInactiveRoomCount() {
+        fetch('/datphongs/inactive/count')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dữ liệu tổng số phòng ngừng hoạt động:', data); // Kiểm tra dữ liệu
+                document.getElementById('inactiveRoomCountDisplay').innerHTML = `<i class='fas fa-tools icon'></i> ${data}`;
+            })
+            .catch(error => console.error('Lỗi khi lấy tổng số phòng ngừng hoạt động:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchInactiveRoomCount();  // Tự động gọi hàm lấy tổng số phòng ngừng hoạt động khi trang được tải
+    });
+
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>
+
 </html>

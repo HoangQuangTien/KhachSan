@@ -44,4 +44,20 @@ public class KhachHangRest {
     public List<KhachHangDTO> filter(@RequestParam String status) {
         return khachHangService.filter(status);
     }
+
+
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> checkEmailAndPhone(@RequestParam String email, @RequestParam String soDienThoai) {
+        boolean emailExists = khachHangService.existsByEmail(email);
+        boolean phoneExists = khachHangService.existsBySoDienThoai(soDienThoai);
+
+        if (emailExists || phoneExists) {
+            return ResponseEntity.ok(true); // Email hoặc số điện thoại đã tồn tại
+        } else {
+            return ResponseEntity.ok(false); // Không có trùng lặp
+        }
+    }
+
+
+
 }

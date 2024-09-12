@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa Đơn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <head th:include="fragment/head :: head">
+
+    </head>
+    <script>
+        function resetForm() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            window.location.href = '/danhsachdatphong';
+        }
+
+        function toggleDetails(id) {
+            $('.details').hide();
+            $('.print-only').hide();
+            $('#details-' + id).toggle();
+        }
+
+        function openEditCustomerModal(button) {
+            var id = button.getAttribute('data-id');
+            var hoVaTen = button.getAttribute('data-ho-va-ten');
+            var soDienThoai = button.getAttribute('data-so-dien-thoai');
+            var email = button.getAttribute('data-email');
+
+            document.getElementById('customerId').value = id;
+            document.getElementById('tenKhachHang').value = hoVaTen;
+            document.getElementById('soDienThoai').value = soDienThoai;
+            document.getElementById('email').value = email;
+
+            var myModal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+            myModal.show();
+        }
+
+        function printDetails(id) {
+            const content = document.getElementById('details-' + id).innerHTML;
+
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Chi Tiết</title>');
+            printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">');
+            printWindow.document.write('<style>@media print {.qr-code { display: block !important; }}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<div class="print-only">');
+            printWindow.document.write('<img src="/img/Logo.jpg" class="print-logo" style="width: 80px; height: 80px;">');
+            printWindow.document.write('<div class="print-time">Thời gian in: ' + new Date().toLocaleString('vi-VN') + '</div>');
+            printWindow.document.write('<div class="details-content">');
+            printWindow.document.write(content);
+            printWindow.document.write('</div>');
+            printWindow.document.write('</div></body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('editCustomerForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const form = event.target;
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: form.method,
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Thành công!',
+                                text: 'Cập nhật thông tin khách hàng thành công.',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.href = '/danhsachdatphong';
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Lỗi!',
+                                text: 'Đã xảy ra lỗi: ' + data.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi: ' + error.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+            });
+        });
+    </script>
+
+
+</head>
+
+<body class="vertical light">
+
+
+</div>
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <div class="container">
+<!--            <h1 class="text-center text-primary mb-4">Hóa Đơn</h1>-->
+            <form action="#" method="get" class="p-3 mb-4 bg-light border rounded">
+                <input type="hidden" name="search" value="true">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="startDate">Bắt Đầu:</label>
+                            <input type="date" id="startDate" name="startDate" th:value="${param.startDate}"
+                                   class="form-control" onchange="this.form.submit()">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="endDate">Kết Thúc:</label>
+                            <input type="date" id="endDate" name="endDate" th:value="${param.endDate}"
+                                   class="form-control" onchange="this.form.submit()">
+                        </div>
+                    </div>
+                    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+
+                </div>
+                <button type="button" class="btn btn-warning btn-custom" onclick="resetForm();">
+                    <i class="fas fa-redo"></i> Làm Mới
+                </button>
+                <button type="submit" class="btn btn-success btn-custom" formaction="/danhsachdatphong/xuat-excel">
+                    <i class="fas fa-file-excel"></i> Xuất Excel
+                </button>
+            </form>
+
+            <h2 class="text-warning mb-4 font-weight-bold">Danh Sách Đặt Phòng</h2>
+
+                <div th:if="${message}" class="alert alert-info alert-dismissible fade show mb-0" role="alert">
+                    <strong>Thông báo:</strong> <span th:text="${message}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+            <div class="card shadow mt-2">
+                <div class="card-body" id="tableCardBody">
+                    <table class="table datatables" id="dataTable-1">
+
+                        <thead class="thead-blue">
+                        <tr>
+                            <th>#</th>
+                            <th>Mã Đặt Phòng</th>
+                            <th>Khách Hàng</th>
+                            <th>Ngày Nhận Phòng</th>
+                            <th>Ngày Trả Phòng</th>
+                            <!--                    <th>Tiền Cọc</th>-->
+                            <!--                    <th>Tiền Thừa</th>-->
+                            <!--                    <th>Tổng Tiền</th>-->
+                            <th>Tình Trạng</th>
+                            <!--                    <TH>Trạng Thái</TH>-->
+                            <th>Chi Tiết</th>
+                            <th>In</th>
+                            <th>Sửa</th>
+                            <th>Gửi Email</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="dp : ${datPhongs}">
+                            <td th:text="${dp.idDatPhong}"></td>
+                            <td th:text="${dp.maDatPhong}"></td>
+                            <td th:text="${dp.khachHang.hoVaTen}"></td>
+                            <td th:text="${#dates.format(dp.ngayNhan, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${#dates.format(dp.ngayTra, 'dd/MM/yyyy HH:mm')}"></td>
+                            <!--                    <td th:text="${dp.tienCoc}"></td>-->
+                            <!--                    <td th:text="${dp.tienConLai}"></td>-->
+                            <!--                    <td th:text="${dp.tongTien}"></td>-->
+                            <td th:text="${dp.tinhTrang != null ? (dp.tinhTrang ? 'Đã Checkin' : 'Chưa Checkin') : 'Chưa Checkin'}"></td>
+
+
+                            <!--                    <td th:text="${dp.trangThai == 0 ? 'Đã Cọc' : 'Chưa Cọc'}"></td>-->
+                            <td>
+                                <button type="button" class="btn btn-info btn-custom"
+                                        th:onclick="'toggleDetails(' + ${dp.idDatPhong} + ')'">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary"
+                                        th:onclick="'printDetails(' + ${dp.idDatPhong} + ')'">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-warning"
+                                        th:attr="data-id=${dp.khachHang?.id},
+                 data-ho-va-ten=${dp.khachHang?.hoVaTen},
+                 data-so-dien-thoai=${dp.khachHang?.soDienThoai},
+                 data-email=${dp.khachHang?.email}"
+                                        onclick="openEditCustomerModal(this)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+
+                            </td>
+                            <td>
+                                <form th:action="@{/danhsachdatphong/gui-email}" method="post">
+                                    <input type="hidden" name="chiTietDatPhongId" th:value="${dp.idDatPhong}"/>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                </form>
+
+                            </td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <style>
+                h2.text-warning {
+                    color: #ffc107; /* Màu vàng cảnh báo */
+                    font-size: 2rem; /* Kích thước chữ lớn hơn */
+                    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Tạo hiệu ứng bóng nhẹ */
+                }
+
+
+                .details {
+                    display: none; /* Ẩn phần chi tiết mặc định */
+                }
+
+                @media print {
+                    /* Ẩn bảng chi tiết khi in */
+                    .details-table {
+                        display: none;
+                    }
+
+                    /* Hiển thị nội dung cần in khi in */
+                    .print-only {
+                        display: block;
+                    }
+                }
+            </style>
+            <div th:each="dp : ${datPhongs}" th:id="'details-' + ${dp.idDatPhong}" class="details">
+                <!-- Nội dung bảng chi tiết đặt phòng -->
+<!--                <h2 class="text-primary mb-4">Chi Tiết Đặt Phòng</h2>-->
+                <h2 class="text-warning mb-4 font-weight-bold">Chi Tiết Đặt Phòng</h2>
+                <table class="table table-striped table-bordered details-table">
+                    <thead class="thead-blue">
+                    <tr>
+                        <th>#</th>
+<!--                        <th>Tên Nhân Viên</th>-->
+                        <th>Tên Khách Hàng</th>
+                        <th>Tên Phòng</th>
+                        <th>Ngày Nhận Phòng</th>
+                        <th>Ngày Trả Phòng</th>
+                        <th>Tổng Tiền</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="hd : ${data}" th:if="${hd.datPhong.idDatPhong == dp.idDatPhong}">
+                        <td th:text="${hd.maChiTietDatPhong}"></td>
+<!--                        <td th:text="${hd.nhanVien.hoTen}"></td>-->
+                        <td th:text="${hd.khachHang.hoVaTen}"></td>
+                        <td th:text="${hd.datPhong.phong.tenPhong}"></td>
+                        <td th:text="${#dates.format(hd.datPhong.ngayNhan, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${#dates.format(hd.datPhong.ngayTra, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${hd.tongTien} + ' VNĐ'"></td>
+                        <td>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="details-content">
+                    <div th:each="hd : ${data}" th:if="${hd.datPhong.idDatPhong == dp.idDatPhong}">
+                        <div class="qr-code print-only">
+                            <strong>QR Code:</strong>
+                            <img th:src="@{/qrcode/{id}(id=${hd.idChiTietDatPhong})}" alt="QR Code"
+                                 class="qr-code-img"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editCustomerModalLabel">Sửa Thông Tin Khách Hàng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="editCustomerForm" method="post" action="/update-customer">
+                            <div class="modal-body">
+                                <input type="hidden" id="customerId" name="customerId">
+                                <div class="mb-3">
+                                    <label for="tenKhachHang" class="form-label">Tên Khách Hàng</label>
+                                    <input type="text" class="form-control" id="tenKhachHang" name="tenKhachHang"
+                                           required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="soDienThoai" class="form-label">Số Điện Thoại</label>
+                                    <input type="text" class="form-control" id="soDienThoai" name="soDienThoai"
+                                           required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <!-- Bootstrap Alert for Messages -->
+                                <div id="modalMessage" class="alert d-none" role="alert"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-primary">Lưu Thay Đổi</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div th:include="fragment/script :: script"></div>
+
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"></script>
+    <div th:include="fragment/modal :: modal"></div>
+
+
+</body>
+</html>
+
