@@ -111,6 +111,70 @@
             gap: 10px; /* Khoảng cách giữa các phần tử */
         }
 
+
+        .section-header {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .section-header h3 {
+            font-size: 2rem;
+            color: #ffc107;
+            font-weight: bold;
+            border-bottom: 4px solid black; /* Đường gạch chân màu xanh đậm */
+            display: inline-block;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 12px; /* Bo góc mềm mại hơn */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Bóng đổ nhẹ hơn */
+            transition: box-shadow 0.3s ease, transform 0.3s ease; /* Thêm hiệu ứng chuyển đổi cho phóng to */
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* Tăng bóng đổ khi hover */
+            transform: translateY(-5px); /* Di chuyển lên khi hover */
+        }
+
+        .card-header {
+            background-color: #007bff; /* Màu nền xanh đậm */
+            color: white;
+            font-size: 1.5rem; /* Kích thước chữ lớn hơn để nổi bật */
+            font-weight: 600; /* Đậm hơn */
+            padding: 15px; /* Thêm khoảng cách bên trong */
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 12px 12px 0 0; /* Bo góc mềm mại hơn cho phần đầu */
+        }
+
+        .card-body {
+            padding: 20px;
+            background-color: #f8f9fa; /* Màu nền sáng cho nội dung */
+            border-radius: 0 0 12px 12px; /* Bo góc mềm mại cho phần thân */
+        }
+
+        .card-body .row {
+            margin-bottom: 15px; /* Khoảng cách giữa các hàng */
+        }
+
+        .card-body .col-md-4 {
+            font-weight: 600; /* Đậm hơn cho tiêu đề */
+            color: #333; /* Màu chữ tối để dễ đọc */
+        }
+
+        .card-body .col-md-8 {
+            font-size: 1.1rem; /* Kích thước chữ lớn hơn cho nội dung */
+            color: #666; /* Màu chữ xám để dễ đọc */
+        }
+
+        .card-body .idle-days {
+            font-size: 1.5rem; /* Kích thước chữ lớn hơn cho số ngày nhàn rỗi */
+            color: #dc3545; /* Màu đỏ nổi bật cho số ngày nhàn rỗi */
+            font-weight: 700; /* Đậm hơn để nổi bật */
+        }
     </style>
     <head th:include="fragment/head :: head"></head>
 </head>
@@ -144,20 +208,60 @@
             <canvas id="revenueChart" width="400" height="200">
             </canvas>
         </div>
-        <div class="table-container">
-            <table class="table table-bordered table-striped">
-                <thead>
-                <tr>
-                    <th>Tháng</th>
-                    <th>Doanh thu</th>
-                    <th>Ghi chú</th>
-                </tr>
-                </thead>
-                <tbody id="revenueDetailTable">
-                <!-- Nội dung sẽ được tạo động -->
-                </tbody>
-            </table>
+<!--        <div class="table-container">-->
+<!--            <table class="table table-bordered table-striped">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>Tháng</th>-->
+<!--                    <th>Doanh thu</th>-->
+<!--                    <th>Ghi chú</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody id="revenueDetailTable">-->
+<!--                &lt;!&ndash; Nội dung sẽ được tạo động &ndash;&gt;-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+
+        <div class="section-header" >
+            <h3 class="text-center">Top 3 Phòng Được Đặt Nhiều Nhất</h3>
         </div>
+
+        <div id="top-phong-list" class="row mt-4">
+            <!-- Danh sách top phòng sẽ được hiển thị ở đây -->
+        </div>
+
+        <div class="section-header">
+            <h3> Phòng Có Thời Gian Nhàn Rỗi </h3>
+        </div>
+
+        <div class="row mt-3">
+            <!-- Sử dụng Thymeleaf để lặp qua danh sách phòng nhàn rỗi -->
+            <div class="col-md-4 mb-3" th:each="idleRoom : ${idleRooms}">
+                <div class="card">
+                    <div class="card-header">
+                        Tên Phòng: <span th:text="${idleRoom.phongName}"></span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">Ngày Trả Phòng Gần Nhất:</div>
+                            <div class="col-md-8" th:text="${#dates.format(idleRoom.lastCheckOut, 'dd/MM/yyyy')}"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">Ngày Nhận Phòng Tiếp Theo:</div>
+                            <div class="col-md-8" th:text="${#dates.format(idleRoom.nextCheckIn, 'dd/MM/yyyy')}"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">Số Ngày Nhàn Rỗi:</div>
+                            <div class="col-md-8 idle-days" th:text="${idleRoom.idleDays}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
     </div>
 </main>
 <div th:include="fragment/modal :: modal">
@@ -188,7 +292,10 @@
 
     function displayRevenue(amount) {
         const revenueDisplay = document.getElementById('revenueDisplay');
-        revenueDisplay.innerHTML = `Tổng doanh thu: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)}`;
+        revenueDisplay.innerHTML = `Tổng doanh thu: ${new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount)}`;
     }
 
     function updateChart(type, data) {
@@ -197,7 +304,7 @@
             type: 'bar',
             data: {
                 labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4'], // Ví dụ cho 4 tháng
-                datasets: [ {
+                datasets: [{
                     label: 'Doanh thu',
                     data: [data], // Sử dụng dữ liệu từ server
                     backgroundColor: 'rgba(253, 126, 20, 0.5)', // Màu cam nhạt
@@ -223,7 +330,7 @@
             const row = `
                 <tr>
                     <td>${detail.month}</td>
-                    <td>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(detail.amount)}</td>
+                    <td>${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(detail.amount)}</td>
                     <td>${detail.note}</td>
                 </tr>
             `;
@@ -258,6 +365,50 @@
     document.addEventListener('DOMContentLoaded', () => {
         fetchInactiveRoomCount();  // Tự động gọi hàm lấy tổng số phòng ngừng hoạt động khi trang được tải
     });
+
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Hàm để gọi API và hiển thị danh sách top phòng
+        function loadTopPhong() {
+            fetch('/datphongs/top-3-phong')
+                .then(response => response.json())
+                .then(data => {
+                    // Xử lý dữ liệu nhận được
+                    if (data.topPhong && Array.isArray(data.topPhong)) {
+                        const topPhongList = document.getElementById('top-phong-list');
+                        topPhongList.innerHTML = ''; // Xóa nội dung cũ
+
+                        // Tạo nội dung HTML cho mỗi phòng
+                        data.topPhong.forEach(item => {
+                            const phongItem = document.createElement('div');
+                            phongItem.className = 'col-md-4 mb-3'; // Đảm bảo các thẻ card nằm trên cùng một hàng
+                            phongItem.innerHTML = `
+                                <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${item.tenPhong}</h5>
+                                            <p class="card-text"><strong>ID Phòng:</strong> ${item.idPhong}</p>
+                                            <p class="card-text"><strong>Số Lượng Đặt:</strong> ${item.soLuongDat}</p>
+                                        </div>
+                                    </div>
+                            `;
+                            topPhongList.appendChild(phongItem);
+                        });
+                    } else {
+                        // Xử lý nếu dữ liệu không hợp lệ
+                        document.getElementById('top-phong-list').innerHTML = '<p>Không có dữ liệu để hiển thị.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gọi API:', error);
+                    document.getElementById('top-phong-list').innerHTML = '<p>Đã xảy ra lỗi khi tải dữ liệu.</p>';
+                });
+        }
+
+        // Gọi hàm để tải danh sách top phòng khi trang được tải
+        loadTopPhong();
+    });
+
 
 </script>
 </body>

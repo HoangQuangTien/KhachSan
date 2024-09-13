@@ -430,109 +430,153 @@
         });
 
 
-        document.getElementById('datPhongForm').addEventListener('submit', function (event) {
-            const selectedPhongIds = Array.from(document.querySelectorAll('#phongSelect .form-check-input:checked'))
-                .map(input => input.value);
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('confirmCustomerBtn').addEventListener('click', function () {
+                const hoVaTen = document.getElementById('hoVaTen').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const soDienThoai = document.getElementById('soDienThoai').value.trim();
 
-            if (selectedPhongIds.length === 0) {
-                alert("Vui lòng chọn ít nhất một phòng.");
-                event.preventDefault(); // Ngăn submit form
-                return;
-            }
-
-            if (!validateDates()) {
-                event.preventDefault(); // Ngăn submit form nếu ngày không hợp lệ
-                return;
-            }
-
-            document.getElementById('idPhong').value = selectedPhongIds[0]; // Gán ID phòng đầu tiên vào hidden input
-
-            if (selectedPhongIds.length === 0) {
-                alert("Vui lòng chọn ít nhất một phòng.");
-                event.preventDefault(); // Ngăn submit form
-                return;
-            }
-
-            if (!validateDates()) {
-                event.preventDefault(); // Ngăn submit form nếu ngày không hợp lệ
-                return;
-            }
-
-            const idKhachHang = document.getElementById('idKhachHang').value;
-            if (!idKhachHang || isNaN(idKhachHang)) {
-                alert("Vui lòng xác nhận thông tin khách hàng.");
-                event.preventDefault(); // Ngăn submit form nếu chưa có ID khách hàng
-                return;
-            }
-
-            // Gửi dữ liệu form bằng fetch
-            const formElement = document.getElementById('datPhongForm');
-            const formData = new FormData(formElement);
-
-            // Kiểm tra nội dung của FormData
-            for (const [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
-
-            fetch('/datphongs/create', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => Promise.reject(err));
-                    }
-                    return response.json();
-                })
-                .then(result => {
-                    if (result.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Đặt phòng thành công!',
-                            text: result.success,
-                            showConfirmButton: true
-                        }).then(() => {
-                            // formElement.reset();
-                            //
-                            // // Xóa dữ liệu trong các trường ẩn
-                            // document.getElementById('idPhong').value = '';
-                            // document.getElementById('idKhachHang').value = '';
-                            // document.getElementById('tongTien').value = '';
-                            // document.getElementById('tienCoc').value = '';
-                            // document.getElementById('tienConLai').value = '';
-                            //
-                            // // Xóa các phòng đã chọn
-                            // selectedPhongElements.forEach(element => {
-                            //     element.checked = false;
-                            //     element.parentElement.style.display = 'none'; // Ẩn phòng đã chọn
-                            // });
-                            //
-                            // // Ẩn form thông tin khách hàng nếu hiện
-                            // document.getElementById('customerInfoForm').style.display = 'none';
-                            // Làm mới trang sau khi đặt phòng thành công
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Lỗi!',
-                            text: result.error,
-                            showConfirmButton: true
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi khi gửi yêu cầu đặt phòng:', error);
+                // Kiểm tra tính hợp lệ của họ và tên
+                const nameRegex = /^[a-zA-ZÀ-Ỵà-ỳ\s]+$/;
+                if (!nameRegex.test(hoVaTen) || hoVaTen.length < 2 || hoVaTen.length > 50) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Lỗi!',
-                        text: 'Đã xảy ra lỗi khi gửi yêu cầu đặt phòng. Vui lòng thử lại sau.',
-                        showConfirmButton: true
+                        title: 'Tên không hợp lệ',
+                        text: 'Tên phải chứa các ký tự tiếng Việt hợp lệ, có ít nhất 2 ký tự và không quá 50 ký tự.',
+                        confirmButtonText: 'OK',
+                        timer: 3000,
+                        timerProgressBar: true
                     });
-                });
+                    return;
+                }
 
-            event.preventDefault(); // Ngăn submit form để gửi dữ liệu bằng fetch
+                // Kiểm tra các trường bắt buộc có bị để trống không
+                if (!hoVaTen || !email || !soDienThoai) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thiếu thông tin',
+                        text: 'Vui lòng điền đầy đủ thông tin vào các trường bắt buộc.',
+                        confirmButtonText: 'OK',
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    return;
+                }
+
+                // Biểu thức chính quy để kiểm tra định dạng email và số điện thoại
+                const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                const phonePattern = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+
+                if (!emailPattern.test(email)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi định dạng',
+                        text: 'Email không đúng định dạng. Vui lòng nhập lại.',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                if (!phonePattern.test(soDienThoai)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi định dạng',
+                        text: 'Số điện thoại không đúng định dạng. Vui lòng nhập lại.',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                // Gọi API kiểm tra email và số điện thoại
+                fetch(`/khach-hang/check?email=${encodeURIComponent(email)}&soDienThoai=${encodeURIComponent(soDienThoai)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.emailExists || data.phoneExists) {
+                            // Hiển thị thông báo lỗi nếu email hoặc số điện thoại đã tồn tại
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Bạn đã từng đặt phòng!',
+                                text: data.message,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                if (data.khachHang) {
+                                    // Gắn thông tin khách hàng vào form đặt phòng
+                                    document.getElementById('hoVaTen').value = data.khachHang.hoVaTen || '';
+                                    document.getElementById('email').value = data.khachHang.email || '';
+                                    document.getElementById('soDienThoai').value = data.khachHang.soDienThoai || '';
+
+                                    KhachHangInput = document.getElementById('idKhachHang');
+                                    if (idKhachHangInput) {
+                                        idKhachHangInput.value = data.khachHang.id || '';
+                                    }
+                                }
+                            });
+                        } else {
+                            // Nếu không có trùng lặp, tiếp tục gửi thông tin khách hàng để lưu
+                            const form = document.getElementById('customerInfoForm');
+
+                            if (form) {
+                                const customerData = new FormData(form);
+
+                                fetch('/datphongs/xacnhan', {
+                                    method: 'POST',
+                                    body: customerData
+                                })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log('Server response:', result); // Kiểm tra phản hồi từ server
+
+                                        if (result.success) {
+                                            const khachHangId = result.khachHangId; // Lấy ID khách hàng từ phản hồi
+                                            if (khachHangId) {
+                                                setKhachHangId(khachHangId); // Gọi hàm để thiết lập ID khách hàng
+                                            } else {
+                                                console.error('Không có ID khách hàng trong phản hồi.');
+                                            }
+
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Thông Tin Khách Hàng Được Lưu!',
+                                                text: 'Thông tin khách hàng đã được lưu thành công.',
+                                                showConfirmButton: true
+                                            }).then(() => {
+                                                document.getElementById('customerInfoForm').style.display = 'none'; // Ẩn form thông tin khách hàng
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Lỗi!',
+                                                text: 'Đã xảy ra lỗi khi lưu thông tin khách hàng. Vui lòng thử lại sau.',
+                                                showConfirmButton: true
+                                            });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Lỗi khi gửi thông tin khách hàng:', error);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Lỗi!',
+                                            text: 'Đã xảy ra lỗi khi gửi thông tin khách hàng. Vui lòng thử lại sau.',
+                                            showConfirmButton: true
+                                        });
+                                    });
+                            } else {
+                                console.error('Form không tồn tại');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi kiểm tra thông tin khách hàng:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi hệ thống',
+                            text: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+            });
         });
+
 
         document.getElementById('confirmPaymentBtn').addEventListener('click', function () {
             const idDatPhong = document.getElementById('idDatPhong').value;
@@ -613,6 +657,8 @@
     //         })
     //         .catch(error => console.error('Error:', error));
     // });
+
+
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>

@@ -1,8 +1,10 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 
+import com.example.DuAnTotNghiepKs.DTO.IdleRoomDTO;
 import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
 import com.example.DuAnTotNghiepKs.DTO.PhongDTO;
+import com.example.DuAnTotNghiepKs.DTO.TopPhongDTO;
 import com.example.DuAnTotNghiepKs.entity.*;
 import com.example.DuAnTotNghiepKs.service.*;
 import com.example.DuAnTotNghiepKs.service.NhanVienService;
@@ -114,29 +116,50 @@ public class DatPhongController {
     }
 
     @PostMapping("/xacnhan")
-    public ResponseEntity<?> xacNhanThongTinKhachHang(@ModelAttribute KhachHangDTO khachHangDTO ) {
+    public ResponseEntity<?> xacNhanThongTinKhachHang(@ModelAttribute KhachHangDTO khachHangDTO) {
         try {
-            // Kiểm tra trùng lặp email và số điện thoại
-            boolean emailExists = khachHangService.existsByEmail(khachHangDTO.getEmail());
-            boolean phoneExists = khachHangService.existsBySoDienThoai(khachHangDTO.getSoDienThoai());
-
-            if (emailExists) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Email đã tồn tại."));
+            // Kiểm tra khách hàng đã tồn tại dựa trên email
+            KhachHangDTO existingByEmail = khachHangService.findByEmail(khachHangDTO.getEmail());
+            if (existingByEmail != null && !existingByEmail.getId().equals(khachHangDTO.getId())) {
+                // Trả về thông tin khách hàng tồn tại nếu không phải là khách hàng hiện tại
+                return ResponseEntity.ok(Map.of(
+                        "message", "Khách hàng với email đã tồn tại.",
+                        "khachHang", existingByEmail
+                ));
             }
 
-            if (phoneExists) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Số điện thoại đã tồn tại."));
+            // Kiểm tra khách hàng đã tồn tại dựa trên số điện thoại
+            KhachHangDTO existingByPhone = khachHangService.findBySoDienThoai(khachHangDTO.getSoDienThoai());
+            if (existingByPhone != null && !existingByPhone.getId().equals(khachHangDTO.getId())) {
+                // Trả về thông tin khách hàng tồn tại nếu không phải là khách hàng hiện tại
+                return ResponseEntity.ok(Map.of(
+                        "message", "Khách hàng với số điện thoại đã tồn tại.",
+                        "khachHang", existingByPhone
+                ));
             }
 
-            // Lưu khách hàng và trả về ID
-            KhachHangDTO khachHang = khachHangService.save(khachHangDTO);
+            KhachHangDTO savedKhachHang = khachHangService.save(khachHangDTO);
 
-            // Trả về ID khách hàng vừa lưu
-            return ResponseEntity.ok(Map.of("success", "Xác nhận thông tin thành công!", "khachHangId", khachHang.getId()));
+            KhachHangDTO savedKhachHangDTO = new KhachHangDTO();
+            savedKhachHangDTO.setId(savedKhachHang.getId());
+            savedKhachHangDTO.setMaKhachHang(savedKhachHang.getMaKhachHang());
+            savedKhachHangDTO.setHoVaTen(savedKhachHang.getHoVaTen());
+            savedKhachHangDTO.setEmail(savedKhachHang.getEmail());
+            savedKhachHangDTO.setGioiTinh(savedKhachHang.isGioiTinh());
+            savedKhachHangDTO.setSoDienThoai(savedKhachHang.getSoDienThoai());
+             // Copy địa chỉ nếu cần
+
+            // Trả về thông báo thành công và thông tin khách hàng mới
+            return ResponseEntity.ok(Map.of(
+                    "success", "Xác nhận thông tin thành công!",
+                    "khachHang", savedKhachHangDTO
+            ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Có lỗi xảy ra: " + e.getMessage()));
         }
     }
+
+
 
     @PostMapping("/create")
     public ResponseEntity<?> createDatPhong(
@@ -283,4 +306,39 @@ public class DatPhongController {
         Long count = datPhongService.countActivePhongsFalse();
         return ResponseEntity.ok(count);
     }
+
+
+
+//    @GetMapping("/api/idle-rooms")
+//    public List<IdleRoomDTO> getIdleRooms() {
+//        return datPhongService.getIdleRoomTimes();
+//    }
+@GetMapping("/top-3-phong")
+public ResponseEntity<?> getTop3PhongDuocDatNhieuNhat() {
+    List<Object[]> topPhong = datPhongService.getTopPhongDuocDatNhieuNhat();
+
+    // Chuyển đổi kết quả truy vấn sang danh sách DTO
+    List<TopPhongDTO> topPhongDTOs = topPhong.stream().map(result -> {
+        TopPhongDTO dto = new TopPhongDTO();
+        dto.setIdPhong((Integer) result[0]); // Giả sử id_phong là Integer
+        dto.setTenPhong((String) result[1]); // Giả sử ten_phong là String
+
+        // Kiểm tra và ép kiểu `so_lan_dat` dựa trên kiểu dữ liệu
+        Object soLanDat = result[2];
+        if (soLanDat instanceof Long) {
+            dto.setSoLuongDat((Long) soLanDat);
+        } else if (soLanDat instanceof Integer) {
+            dto.setSoLuongDat(((Integer) soLanDat).longValue());
+        } else {
+            // Xử lý lỗi nếu kiểu dữ liệu không hợp lệ
+            throw new IllegalArgumentException("Kiểu dữ liệu không hợp lệ cho `so_lan_dat`.");
+        }
+
+        return dto;
+    }).collect(Collectors.toList());
+
+    return ResponseEntity.ok(Map.of("topPhong", topPhongDTOs));
+}
+
+
 }

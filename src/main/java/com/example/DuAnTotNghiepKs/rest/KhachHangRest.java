@@ -1,6 +1,7 @@
 package com.example.DuAnTotNghiepKs.rest;
 
 import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
+import com.example.DuAnTotNghiepKs.entity.KhachHang;
 import com.example.DuAnTotNghiepKs.service.KhachHangService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("khach-hang")
 public class KhachHangRest {
@@ -47,16 +51,35 @@ public class KhachHangRest {
 
 
     @GetMapping("/check")
-    public ResponseEntity<Boolean> checkEmailAndPhone(@RequestParam String email, @RequestParam String soDienThoai) {
-        boolean emailExists = khachHangService.existsByEmail(email);
-        boolean phoneExists = khachHangService.existsBySoDienThoai(soDienThoai);
+    public ResponseEntity<Map<String, Object>> checkEmailAndPhone(
+            @RequestParam String email, @RequestParam String soDienThoai) {
 
+        // Tạo một Map để chứa dữ liệu trả về
+        Map<String, Object> response = new HashMap<>();
+
+        // Kiểm tra email
+        KhachHangDTO emailCustomer = khachHangService.findByEmail(email);
+        boolean emailExists = emailCustomer != null;
+
+        // Kiểm tra số điện thoại
+        KhachHangDTO phoneCustomer = khachHangService.findBySoDienThoai(soDienThoai);
+        boolean phoneExists = phoneCustomer != null;
+
+        // Nếu có trùng lặp, trả về thông tin khách hàng
         if (emailExists || phoneExists) {
-            return ResponseEntity.ok(true); // Email hoặc số điện thoại đã tồn tại
+            response.put("exists", true);
+            response.put("message", "Khách hàng với email hoặc số điện thoại đã tồn tại.");
+            // Nếu cả hai đều tồn tại, ưu tiên trả về thông tin khách hàng từ email
+            response.put("khachHang", emailExists ? emailCustomer : phoneCustomer);
         } else {
-            return ResponseEntity.ok(false); // Không có trùng lặp
+            response.put("exists", false);
+            response.put("message", "Thông tin khách hàng không tồn tại.");
         }
+
+        return ResponseEntity.ok(response);
     }
+
+
 
 
 

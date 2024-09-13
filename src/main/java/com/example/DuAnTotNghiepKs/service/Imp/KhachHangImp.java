@@ -28,6 +28,7 @@ public class KhachHangImp implements KhachHangService {
 
     @Autowired
     private ModelMapper modelMapper;
+
     @Override
     public List<KhachHangDTO> getAll() {
         List<KhachHang> khachHangs = khachHangRepository.findAll();
@@ -158,7 +159,7 @@ public class KhachHangImp implements KhachHangService {
         KhachHang khachHang = modelMapper.map(khachHangDTO, KhachHang.class);
 
         // Lưu thông tin khách hàng vào DB
-        KhachHang savedKhachHang =khachHangRepository.save(khachHang);
+        KhachHang savedKhachHang = khachHangRepository.save(khachHang);
 
         // Trả về ID của khách hàng vừa được lưu
         return savedKhachHang.getId();
@@ -176,4 +177,42 @@ public class KhachHangImp implements KhachHangService {
     }
 
 
+    @Override
+    public KhachHangDTO findBySoDienThoai(String soDienThoai) {
+        KhachHang khachHang = khachHangRepository.findBySoDienThoai(soDienThoai);
+        if (khachHang != null) {
+            // Chuyển đổi từ KhachHang entity sang KhachHangDTO
+            return KhachHangDTO.builder()
+                    .id(khachHang.getId())
+                    .maKhachHang(khachHang.getMaKhachHang())
+                    .hoVaTen(khachHang.getHoVaTen())
+                    .email(khachHang.getEmail())
+                    .gioiTinh(khachHang.isGioiTinh())
+                    .soDienThoai(khachHang.getSoDienThoai())
+                    .build();
+        }
+        return null;
+    }
+
+
+    @Override
+    public KhachHangDTO findByEmail(String email) {
+        KhachHang khachHang = khachHangRepository.findByEmail(email);
+        if (khachHang != null) {
+            // Chuyển đổi từ KhachHang entity sang KhachHangDTO
+            return KhachHangDTO.builder()
+                    .id(khachHang.getId())
+                    .maKhachHang(khachHang.getMaKhachHang())
+                    .hoVaTen(khachHang.getHoVaTen())
+                    .email(khachHang.getEmail())
+                    .gioiTinh(khachHang.isGioiTinh())
+                    .soDienThoai(khachHang.getSoDienThoai())
+                    .build();
+        }
+        return null;
+    }
+
 }
+
+
+
