@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.service;
 
+import com.example.DuAnTotNghiepKs.DTO.IdleRoomDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,10 @@ public interface DatPhongService {
 
     // Thêm phương thức tính tổng số phòng Ngung hoạt động
     long countActivePhongsFalse();
+
+    List<IdleRoomDTO> getIdleRoomTimes();
+
+    List<Object[]> getTopPhongDuocDatNhieuNhat();
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();

@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.service.Imp;
 
+import com.example.DuAnTotNghiepKs.DTO.IdleRoomDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -133,6 +136,32 @@ public class DatPhongServiceImp implements DatPhongService {
     public long countActivePhongsFalse() {
         return phongRepository.countByTinhTrang(false);
     }
+
+
+    @Override
+    public List<IdleRoomDTO> getIdleRoomTimes() {
+        List<Object[]> results = datPhongRepository.findIdleRoomDays();  // Giả sử phương thức này trả về List<Object[]>
+        List<IdleRoomDTO> idleRoomList = new ArrayList<>();
+
+        for (Object[] result : results) {
+            Long phongId = ((Number) result[0]).longValue();  // Chuyển đổi từ Number sang Long
+            String phongName = (String) result[1];
+            Date lastCheckOut = (Date) result[2];  // Chuyển đổi từ Object sang Date
+            Date nextCheckIn = (Date) result[3];  // Chuyển đổi từ Object sang Date
+            Integer idleDays = ((Number) result[4]).intValue();  // Chuyển đổi từ Number sang Integer
+
+            idleRoomList.add(new IdleRoomDTO(phongId, phongName,lastCheckOut, nextCheckIn, idleDays));
+        }
+        return idleRoomList;
+    }
+
+
+    @Override
+    public List<Object[]> getTopPhongDuocDatNhieuNhat() {
+        // Sử dụng PageRequest để giới hạn số kết quả trả về
+        return datPhongRepository.findTopPhongDuocDatNhieuNhat();
+    }
+
 
 
 }

@@ -300,7 +300,6 @@
             const email = document.getElementById('email').value.trim();
             const soDienThoai = document.getElementById('soDienThoai').value.trim();
 
-
             // Biểu thức chính quy cho tên hợp lệ
             const nameRegex = /^[a-zA-ZÀ-Ỵà-ỳ\s]+$/;
             // Kiểm tra tính hợp lệ của họ và tên
@@ -329,12 +328,10 @@
                 return; // Ngừng xử lý nếu có trường bị để trống
             }
 
-
             // Biểu thức chính quy để kiểm tra định dạng email
             const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             // Biểu thức chính quy để kiểm tra định dạng số điện thoại
             const phonePattern = /^(0[3|5|7|8|9])+([0-9]{8})$/;
-
 
             // Kiểm tra tính hợp lệ của email
             if (!emailPattern.test(email)) {
@@ -363,12 +360,22 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.emailExists || data.phoneExists) {
-                        // Hiển thị thông báo lỗi nếu email hoặc số điện thoại đã tồn tại
+                        // Hiển thị thông báo nếu email hoặc số điện thoại đã tồn tại
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Thông tin trùng lặp',
-                            text: 'Email hoặc số điện thoại đã tồn tại. Vui lòng nhập lại.',
-                            confirmButtonText: 'OK'
+                            icon: 'info',
+                            title: 'Thông tin khách hàng đã tồn tại',
+                            text: `Khách hàng với email đã tồn tại. Họ và tên: ${data.khachHang.hoVaTen}, Số điện thoại: ${data.khachHang.soDienThoai}`,
+                            showCancelButton: true,
+                            confirmButtonText: 'OK',
+                            cancelButtonText: 'Hủy bỏ'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Nếu người dùng nhấn OK, lưu ID khách hàng vào form đặt phòng
+                                setKhachHangId(data.khachHang.id); // Gọi hàm để thiết lập ID khách hàng
+                                document.getElementById('khachHangId').value = data.khachHang.id; // Đặt giá trị ID khách hàng vào form
+
+
+                            }
                         });
                     } else {
                         // Nếu không có trùng lặp, tiếp tục gửi thông tin khách hàng để lưu
@@ -379,11 +386,12 @@
                             body: customerData
                         })
                             .then(response => response.json())
+
                             .then(result => {
                                 console.log('Server response:', result); // Kiểm tra phản hồi từ server
 
                                 if (result.success) {
-                                    const khachHangId = result.khachHangId; // Lấy ID khách hàng từ phản hồi
+                                    const khachHangId = result.khachHang.id; // Lấy ID khách hàng từ phản hồi
                                     if (khachHangId) {
                                         setKhachHangId(khachHangId); // Gọi hàm để thiết lập ID khách hàng
                                     } else {
@@ -428,6 +436,8 @@
                     });
                 });
         });
+
+
 
 
         document.getElementById('datPhongForm').addEventListener('submit', function (event) {
@@ -492,25 +502,8 @@
                             text: result.success,
                             showConfirmButton: true
                         }).then(() => {
-                            // formElement.reset();
-                            //
-                            // // Xóa dữ liệu trong các trường ẩn
-                            // document.getElementById('idPhong').value = '';
-                            // document.getElementById('idKhachHang').value = '';
-                            // document.getElementById('tongTien').value = '';
-                            // document.getElementById('tienCoc').value = '';
-                            // document.getElementById('tienConLai').value = '';
-                            //
-                            // // Xóa các phòng đã chọn
-                            // selectedPhongElements.forEach(element => {
-                            //     element.checked = false;
-                            //     element.parentElement.style.display = 'none'; // Ẩn phòng đã chọn
-                            // });
-                            //
-                            // // Ẩn form thông tin khách hàng nếu hiện
-                            // document.getElementById('customerInfoForm').style.display = 'none';
-                            // Làm mới trang sau khi đặt phòng thành công
                             location.reload();
+                            // showPaymentForm(); // Hiển thị form thanh toán sau khi đặt phòng thành công
                         });
                     } else {
                         Swal.fire({
@@ -533,6 +526,7 @@
 
             event.preventDefault(); // Ngăn submit form để gửi dữ liệu bằng fetch
         });
+
 
         document.getElementById('confirmPaymentBtn').addEventListener('click', function () {
             const idDatPhong = document.getElementById('idDatPhong').value;
@@ -613,6 +607,8 @@
     //         })
     //         .catch(error => console.error('Error:', error));
     // });
+
+
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>

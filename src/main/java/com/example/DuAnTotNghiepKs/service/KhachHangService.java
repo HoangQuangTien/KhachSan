@@ -37,4 +37,9 @@ public interface KhachHangService {
     boolean existsByEmail(String email);
 
     boolean existsBySoDienThoai(String soDienThoai);
+
+    KhachHangDTO findByEmail(String email);
+
+
+    KhachHangDTO findBySoDienThoai(String soDienThoai);
 }
