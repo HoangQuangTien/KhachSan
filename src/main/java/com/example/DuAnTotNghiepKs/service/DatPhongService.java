@@ -39,6 +39,8 @@ public interface DatPhongService {
 
     List<Object[]> getTopPhongDuocDatNhieuNhat();
 
+    Long countDistinctCustomers();
+
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();
 }

@@ -96,6 +96,12 @@
 <!--			<artifactId>spring-boot-starter-security</artifactId>-->
 <!--			<version>3.0.0</version> &lt;!&ndash; Hoặc phiên bản bạn đang sử dụng &ndash;&gt;-->
 <!--		</dependency>-->
+		<dependency>
+			<groupId>nz.ac.waikato.cms.weka</groupId>
+			<artifactId>weka-stable</artifactId>
+			<version>3.8.5</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.apache.poi</groupId>

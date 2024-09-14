@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="fragment/head :: head">
+<head>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+D1qSAA5GFZqKKN16EMOZB+89TgYPd4bkD+BSR4" crossorigin="anonymous">
     <style>
@@ -51,6 +51,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <head th:include="fragment/head :: head"></head>
 </head>
 
 <body class="vertical light">
@@ -61,99 +62,101 @@
     </div>
     <main role="main" class="main-content">
         <div class="container py-4">
-            <div class="card shadow border-0 text-start float-start" style="max-width: 400px;">
-                <div class="card-body">
-                    <h4 class="mb-3 text-center">Đặt Phòng</h4>
-                    <!-- Chọn loại phòng -->
-                    <div class="mb-3">
-                        <label for="loaiPhongSelect" class="form-label">Loại Phòng:</label>
-                        <select class="form-select form-select-sm" id="loaiPhongSelect" name="idLoaiPhong">
-                            <option value="" selected>Chọn loại phòng</option>
-                            <th:block th:each="loaiPhong : ${loaiPhongs}">
-                                <option th:value="${loaiPhong.idLoaiPhong}" th:text="${loaiPhong.tenLoaiPhong}">
-                                </option>
-                            </th:block>
-                        </select>
-                    </div>
-                    <!-- Chọn phòng -->
-                    <div class="mb-3">
-                        <label for="phongSelect" class="form-label">Phòng:</label>
-                        <div id="phongSelect" class="btn-group d-flex flex-wrap">
-                            <!-- Các phòng sẽ được thêm vào đây -->
-                        </div>
-                    </div>
-                    <!-- Form đặt phòng -->
-                    <form id="datPhongForm" method="post" action="/datphongs/create">
-                        <input type="hidden" name="idKhachHang" id="idKhachHang">
-                        <input type="hidden" name="idLoaiPhong" id="idLoaiPhong">
-                        <input type="hidden" name="idPhong" id="idPhong">
-                        <!-- Mã đặt phòng -->
-                        <div class="mb-2">
-                            <label for="maDatPhong" class="form-label">Mã Đặt Phòng:</label>
-                            <input type="text" class="form-control form-control-sm" id="maDatPhong" name="maDatPhong" placeholder="Mã đặt phòng">
-                        </div>
-
-                        <!-- Ngày nhận và ngày trả -->
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <label for="ngayNhan" class="form-label">Ngày Nhận:</label>
-                                <input type="date" class="form-control form-control-sm" id="ngayNhan" name="ngayNhan" required>
-                            </div>
-                            <div class="col-6">
-                                <label for="ngayTra" class="form-label">Ngày Trả:</label>
-                                <input type="date" class="form-control form-control-sm" id="ngayTra" name="ngayTra" required>
-                            </div>
-                        </div>
-                        <!-- CCCD -->
-                        <div class="mb-2">
-                            <label for="cccd" class="form-label">CCCD:</label>
-                            <input type="text" class="form-control form-control-sm" id="cccd" name="cccd" placeholder="CCCD" required>
-                        </div>
-                        <input type="hidden" name="tongTien" id="tongTien">
-                        <!--                        <div class="mb-3">-->
-                        <!--                            <label for="tienConLai" class="form-label">Tong Tien:</label>-->
-                        <!--                            <input type="number" class="form-control form-control-sm" id="tongTien" name="tongTien" placeholder="tienConLai" required readonly>-->
-                        <!--                        </div>-->
-                        <!-- Tiền cọc -->
-                        <div class="mb-3">
-                            <label for="tienCoc" class="form-label">Tiền Cọc:</label>
-                            <input type="number" class="form-control form-control-sm" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
-                        </div>
-                        <input type="hidden" name="tienConLai" id="tienConLai">
-                        <!--                        <div class="mb-3">-->
-                        <!--                            <label for="tienConLai" class="form-label">Tienc Con lai:</label>-->
-                        <!--                            <input type="number" class="form-control form-control-sm" id="tienConLai" name="tienConLai" placeholder="tienConLai" required readonly>-->
-                        <!--                        </div>-->
-                        <!-- Button Đặt phòng -->
-                        <button type="submit" id="submitDatPhongBtn" class="btn btn-primary w-100">Đặt Phòng</button>
-                    </form>
-                </div>
-            </div>
-            <!-- Form thông tin khách hàng -->
-            <div id="customerInfoForm" class=" shadow" style="display: none;">
-                <div class="card shadow-sm border-0 text-start">
+            <div class="form-wrapper d-flex justify-content-between align-items-start" style="gap: 20px;">
+                <div class="card shadow border-0 text-start float-start" style="max-width: 400px; flex: 1;">
                     <div class="card-body">
-                        <h4 class="mb-3 text-center">Thông Tin Khách Hàng</h4>
-                        <form id="customerForm">
-                            <div class="mb-3">
-                                <label for="maKhachHang" class="form-label">Mã:</label>
-                                <input type="text" class="form-control form-control-sm" id="maKhachHang" name="maKhachHang" placeholder="Mã(Được Null)" >
+                        <h4 class="mb-3 text-center">Đặt Phòng</h4>
+                        <!-- Chọn loại phòng -->
+                        <div class="mb-3">
+                            <label for="loaiPhongSelect" class="form-label">Loại Phòng:</label>
+                            <select class="form-select form-select-sm" id="loaiPhongSelect" name="idLoaiPhong">
+                                <option value="" selected>Chọn loại phòng</option>
+                                <th:block th:each="loaiPhong : ${loaiPhongs}">
+                                    <option th:value="${loaiPhong.idLoaiPhong}" th:text="${loaiPhong.tenLoaiPhong}">
+                                    </option>
+                                </th:block>
+                            </select>
+                        </div>
+                        <!-- Chọn phòng -->
+                        <div class="mb-3">
+                            <label for="phongSelect" class="form-label">Phòng:</label>
+                            <div id="phongSelect" class="btn-group d-flex flex-wrap">
+                                <!-- Các phòng sẽ được thêm vào đây -->
                             </div>
-                            <div class="mb-3">
-                                <label for="hoVaTen" class="form-label">Họ và Tên:</label>
-                                <input type="text" class="form-control form-control-sm" id="hoVaTen" name="hoVaTen" placeholder="Họ và tên" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email:</label>
-                                <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="soDienThoai" class="form-label">Số Điện Thoại:</label>
-                                <input type="text" class="form-control form-control-sm" id="soDienThoai" name="soDienThoai" placeholder="Số điện thoại" required>
+                        </div>
+                        <!-- Form đặt phòng -->
+                        <form id="datPhongForm" method="post" action="/datphongs/create">
+                            <input type="hidden" name="idKhachHang" id="idKhachHang">
+                            <input type="hidden" name="idLoaiPhong" id="idLoaiPhong">
+                            <input type="hidden" name="idPhong" id="idPhong">
+                            <!-- Mã đặt phòng -->
+                            <div class="mb-2">
+                                <label for="maDatPhong" class="form-label">Mã Đặt Phòng:</label>
+                                <input type="text" class="form-control form-control-sm" id="maDatPhong" name="maDatPhong" placeholder="Mã đặt phòng">
                             </div>
 
-                            <button type="button" id="confirmCustomerBtn" class="btn btn-primary w-100">Xác Nhận Thông Tin</button>
+                            <!-- Ngày nhận và ngày trả -->
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label for="ngayNhan" class="form-label">Ngày Nhận:</label>
+                                    <input type="date" class="form-control form-control-sm" id="ngayNhan" name="ngayNhan" required>
+                                </div>
+                                <div class="col-6">
+                                    <label for="ngayTra" class="form-label">Ngày Trả:</label>
+                                    <input type="date" class="form-control form-control-sm" id="ngayTra" name="ngayTra" required>
+                                </div>
+                            </div>
+                            <!-- CCCD -->
+                            <div class="mb-2">
+                                <label for="cccd" class="form-label">CCCD:</label>
+                                <input type="text" class="form-control form-control-sm" id="cccd" name="cccd" placeholder="CCCD" required>
+                            </div>
+                            <input type="hidden" name="tongTien" id="tongTien">
+                            <!--                        <div class="mb-3">-->
+                            <!--                            <label for="tienConLai" class="form-label">Tong Tien:</label>-->
+                            <!--                            <input type="number" class="form-control form-control-sm" id="tongTien" name="tongTien" placeholder="tienConLai" required readonly>-->
+                            <!--                        </div>-->
+                            <!-- Tiền cọc -->
+                            <div class="mb-3">
+                                <label for="tienCoc" class="form-label">Tiền Cọc:</label>
+                                <input type="number" class="form-control form-control-sm" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
+                            </div>
+                            <input type="hidden" name="tienConLai" id="tienConLai">
+                            <!--                        <div class="mb-3">-->
+                            <!--                            <label for="tienConLai" class="form-label">Tienc Con lai:</label>-->
+                            <!--                            <input type="number" class="form-control form-control-sm" id="tienConLai" name="tienConLai" placeholder="tienConLai" required readonly>-->
+                            <!--                        </div>-->
+                            <!-- Button Đặt phòng -->
+                            <button type="submit" id="submitDatPhongBtn" class="btn btn-dark w-100">Đặt Phòng</button>
                         </form>
+                    </div>
+                </div>
+                <!-- Form thông tin khách hàng -->
+                <div id="customerInfoForm" class=" shadow" style="display: none; max-width: 1000px ; flex: 1">
+                    <div class="card shadow-sm border-0 text-start">
+                        <div class="card-body">
+                            <h4 class="mb-3 text-center">Thông Tin Khách Hàng</h4>
+                            <form id="customerForm">
+                                <div class="mb-3">
+                                    <label for="maKhachHang" class="form-label">Mã:</label>
+                                    <input type="text" class="form-control form-control-sm" id="maKhachHang" name="maKhachHang" placeholder="Mã(Được Null)" >
+                                </div>
+                                <div class="mb-3">
+                                    <label for="hoVaTen" class="form-label">Họ và Tên:</label>
+                                    <input type="text" class="form-control form-control-sm" id="hoVaTen" name="hoVaTen" placeholder="Họ và tên" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email:</label>
+                                    <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="soDienThoai" class="form-label">Số Điện Thoại:</label>
+                                    <input type="text" class="form-control form-control-sm" id="soDienThoai" name="soDienThoai" placeholder="Số điện thoại" required>
+                                </div>
+
+                                <button type="button" id="confirmCustomerBtn" class="btn btn-dark w-100">Xác Nhận Thông Tin</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -364,10 +367,10 @@
                         Swal.fire({
                             icon: 'info',
                             title: 'Thông tin khách hàng đã tồn tại',
-                            text: `Khách hàng với email đã tồn tại. Họ và tên: ${data.khachHang.hoVaTen}, Số điện thoại: ${data.khachHang.soDienThoai}`,
+                            text: `Là Bạn Khách Hàng ${data.khachHang.hoVaTen},với Số điện thoại: ${data.khachHang.soDienThoai} phải không ạ`,
                             showCancelButton: true,
-                            confirmButtonText: 'OK',
-                            cancelButtonText: 'Hủy bỏ'
+                            confirmButtonText: 'Đúng',
+                            cancelButtonText: 'Không Phải'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 // Nếu người dùng nhấn OK, lưu ID khách hàng vào form đặt phòng

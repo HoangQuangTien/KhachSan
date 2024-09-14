@@ -377,5 +377,13 @@ public ResponseEntity<?> getTop3PhongDuocDatNhieuNhat() {
     return ResponseEntity.ok(Map.of("topPhong", topPhongDTOs));
 }
 
+    @GetMapping("/total-distinct-customers")
+    public ResponseEntity<Long> getDistinctCustomers() {
+        Long totalDistinctCustomers = datPhongService.countDistinctCustomers();
+        return ResponseEntity.ok(totalDistinctCustomers);
+    }
+
+
+
 
 }

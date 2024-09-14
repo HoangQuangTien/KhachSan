@@ -163,5 +163,14 @@ public class DatPhongServiceImp implements DatPhongService {
     }
 
 
+    @Override
+    public Long countDistinctCustomers() {
+        return datPhongRepository.countDistinctCustomers();
+    }
+
+
+
+
+
 
 }

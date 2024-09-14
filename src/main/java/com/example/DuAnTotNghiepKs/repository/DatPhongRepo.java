@@ -67,4 +67,17 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "WHERE row_num <= 3;",nativeQuery = true)
     List<Object[]> findTopPhongDuocDatNhieuNhat();
 
+
+
+    @Query(value = "SELECT COUNT(DISTINCT dp.id_khach_hang) AS total_customers\n" +
+            "FROM DatPhong dp;",nativeQuery = true)
+    Long countDistinctCustomers();
+
+
+    @Query(value = "SELECT id_dat_phong,ma_dat_phong, id_khach_hang,id_phong,id_loai_phong,ngay_nhan_phong,ngay_tra_phong,cccd ,tinh_trang , COALESCE(tien_coc, 0.0) AS tien_coc ,\n" +
+            "COALESCE(tien_con_lai, 0.0) AS tien_con_lai,COALESCE(tong_tien, 0.0) AS tong_tien\n" +
+            "FROM DatPhong\n" +
+            "WHERE ngay_nhan_phong BETWEEN '2024-01-01' AND '2024-12-31';", nativeQuery = true)
+    List<DatPhong> findBookingsWithinDateRange(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
 }
