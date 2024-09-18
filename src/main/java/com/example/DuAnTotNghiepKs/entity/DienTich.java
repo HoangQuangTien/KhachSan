@@ -24,6 +24,6 @@ public class DienTich {
     @Column(name = "mo_ta")
     private String moTa;
     @OneToMany(mappedBy = "dienTich", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Phong> phongs = new HashSet<>();
+    private Set<LoaiPhong> loaiPhongs = new HashSet<>();
 
 }
