@@ -37,6 +37,9 @@ public class Phong {
     @Column(name = "ten_phong")
     private String tenPhong;
 
+    @Column(name = "so_nguoi_toi_da")
+    private Boolean soNguoiToiDa;
+
     @Column(name = "tinh_trang")
     private Boolean tinhTrang;
 

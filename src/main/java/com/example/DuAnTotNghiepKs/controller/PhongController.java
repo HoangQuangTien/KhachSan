@@ -54,7 +54,7 @@ public class PhongController {
                             @RequestParam(required = false) Integer loaiPhongId,
                             @RequestParam(required = false) Boolean tinhTrang,
                             Model model) {
-        int pageSize = 5; // Số lượng phòng trên mỗi trang
+        int pageSize = 6; // Số lượng phòng trên mỗi trang
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by("idPhong").ascending());
         Page<Phong> phongPage;
 

@@ -2,21 +2,13 @@
 <html lang="en">
 <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
 
-<head th:include="fragment/head :: head">
+<head >
     <style>
         body {
             padding: 15px;
             font-family: Arial, sans-serif;
         }
-        .card {
-            margin-bottom: 1rem;
-        }
-        .card-header {
-            background-color: #ffc107; /* Màu warning chủ đạo */
-            color: white;
-            font-size: 0.875rem;
-            padding: 0.5rem 1rem;
-        }
+
         .form-control, .form-check-input {
             font-size: 0.75rem;
             padding: 0.25rem;
@@ -80,8 +72,7 @@
             border-radius: 5px;
         }
     </style>
-    <title>
-    </title>
+    <head th:include="fragment/head :: head"></head>
 </head>
 
 <body class="vertical light">
@@ -165,78 +156,59 @@
                             </div>
                         </div>
                     </form>
-                    <table class="table table-striped table-bordered table-sm" style="font-size: 0.95em;">
-                        <thead>
-                        <tr>
-                            <th class="text-center">Mã</th>
-                            <th class="text-center">Tên Phòng</th>
-                            <th class="text-center">Diện Tích</th>
-                            <th class="text-center">Tầng</th>
-                            <th class="text-center">Giá</th>
-                            <th class="text-center">Mô Tả</th>
-                            <th class="text-center">Loại Phòng</th>
-                            <th class="text-center">Trạng Thái</th>
-                            <th class="text-center">Tình Trạng</th>
-                            <th class="text-center">Thao Tác</th>
-                        </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                        <tr th:each="phong : ${phongs}" data-id-phong="${phong.idPhong}" data-ma-phong="${phong.maPhong}" data-ten-phong="${phong.tenPhong}" data-tinh-trang="${phong.tinhTrang ? 'true' : 'false'}" data-mo-ta="${phong.moTa}" data-loai-phong="${phong.loaiPhong.idLoaiPhong}" onclick="populateForm(this)">
-                            <!-- Mã -->
-                            <td class="text-center" th:text="${phong.maPhong}">
-                            </td>
-                            <!-- Tên Phòng -->
-                            <td class="text-left" th:text="${phong.tenPhong}">
-                            </td>
-                            <!-- Diện Tích -->
-                            <td class="text-center" th:text="${phong.dienTich.tenDienTich}">
-                            </td>
-                            <!-- Tầng -->
-                            <td class="text-center" th:text="${phong.tang.tenTang}">
-                            </td>
-                            <!-- Giá -->
-                            <td class="text-right" th:text="${phong.gia}">
-                            </td>
-                            <!-- Mô Tả -->
-                            <td class="text-left" th:text="${phong.moTa}">
-                            </td>
-                            <!-- Loại Phòng -->
-                            <td class="text-center" th:text="${phong.loaiPhong.tenLoaiPhong}">
-                            </td>
-                            <!-- Trạng Thái -->
-                            <td class="text-center" th:text="${phong.trangThai ? 'Còn Phòng' : 'Hết Phòng'}">
-                            </td>
-<!--                             Tình Trạng -->
-                            <td class="text-center" th:text="${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></td>
-                            <td class="text-center ">
-                                <!-- Nút sửa -->
-                                <a th:href="@{/phongs/edit/{id}(id=${phong.idPhong})}">
-                                    <button class="btn mb-2 mr-1 btn-outline-warning" type="button">
-                                        <i class='fas fa-pen-alt'></i>
-                                    </button>
-                                </a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <!--Phân Trang-->
-                    <nav class="d-flex justify-content-center ">
-                        <ul class="pagination pagination-sm">
-                            <!-- Previous Page -->
-                            <li th:if="${currentPage > 0}" class="page-item">
-                                <a class="page-link" th:href="@{/phongs(page=${currentPage - 1}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" aria-label="Previous">&laquo;</a>
-                            </li>
-                            <!-- Page Numbers -->
-                            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''" class="page-item">
-                                <a class="page-link" th:href="@{/phongs(page=${i}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" th:text="${i + 1}"></a>
-                            </li>
-                            <!-- Next Page -->
-                            <li th:if="${currentPage < totalPages - 1}" class="page-item">
-                                <a class="page-link" th:href="@{/phongs(page=${currentPage + 1}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" aria-label="Next">&raquo;</a>
-                            </li>
-                        </ul>
-                    </nav>
+                    <div class="row">
+                        <div th:each="phong : ${phongs}" class="col-md-4 mb-3">
+                            <div class="card shadow" th:classappend="${phong.trangThai} ? 'border-success' : 'border-danger'">
+                                <div class="card-body" th:style="${phong.trangThai} ? 'background-color: #d4edda;' : 'background-color: #f8d7da;'">
+                                    <!-- Tên Phòng -->
+                                    <h5 class="card-title" th:text="${phong.tenPhong}"></h5>
+                                    <!-- Mã Phòng -->
+                                    <h6 class="card-subtitle mb-2 text-muted" th:text="'Mã: ' + ${phong.maPhong}"></h6>
+<!--                                    soLuongNguoi-->
+                                    <p class="card-text"><strong> Số Người Tối Đa</strong>: </strong><span th:text="${phong.loaiPhong.getSoNguoiToiDa()}"></span></p>
+                                    <!-- Diện Tích -->
+                                    <p class="card-text"><strong>Diện Tích: </strong><span th:text="${phong.dienTich.tenDienTich}"></span></p>
+                                    <!-- Tầng -->
+                                    <p class="card-text"><strong>Tầng: </strong><span th:text="${phong.tang.tenTang}"></span></p>
+                                    <!-- Giá -->
+                                    <p class="card-text"><strong>Giá: </strong><span th:text="${phong.gia}"></span></p>
+                                    <!-- Mô Tả -->
+                                    <p class="card-text"><strong>Mô Tả: </strong><span th:text="${phong.moTa}"></span></p>
+                                    <!-- Loại Phòng -->
+                                    <p class="card-text"><strong>Loại Phòng: </strong><span th:text="${phong.loaiPhong.tenLoaiPhong}"></span></p>
+                                    <!-- Trạng Thái -->
+<!--                                    <p class="card-text"><strong>Trạng Thái: </strong><span th:text="${phong.trangThai ? 'Còn Phòng' : 'Hết Phòng'}"></span></p>-->
+                                    <!-- Tình Trạng -->
+                                    <p class="card-text"><strong>Tình Trạng: </strong><span th:text="${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></span></p>
+                                    <!-- Thao Tác -->
+                                    <a th:href="@{/phongs/edit/{id}(id=${phong.idPhong})}" class="btn btn-outline-warning btn-sm">
+                                        <i class='fas fa-pen-alt'></i> Sửa
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
                 </div>
+                <!--Phân Trang-->
+                <nav class="d-flex justify-content-center ">
+                    <ul class="pagination pagination-sm">
+                        <!-- Previous Page -->
+                        <li th:if="${currentPage > 0}" class="page-item">
+                            <a class="page-link" th:href="@{/phongs(page=${currentPage - 1}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" aria-label="Previous">&laquo;</a>
+                        </li>
+                        <!-- Page Numbers -->
+                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''" class="page-item">
+                            <a class="page-link" th:href="@{/phongs(page=${i}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" th:text="${i + 1}"></a>
+                        </li>
+                        <!-- Next Page -->
+                        <li th:if="${currentPage < totalPages - 1}" class="page-item">
+                            <a class="page-link" th:href="@{/phongs(page=${currentPage + 1}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" aria-label="Next">&raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
             <!-- Modal chi tiết phòng -->
             <div class="modal fade" id="chiTietPhongModal" tabindex="-1" role="dialog" aria-labelledby="chiTietPhongModalLabel" aria-hidden="true">
@@ -335,6 +307,7 @@
                                     </select>
                                 </div>
                             </div>
+
                             <div class="form-row">
                                 <!-- Tầng (Floor) -->
                                 <div class="form-group col-md-6">

@@ -6,7 +6,10 @@ import com.example.DuAnTotNghiepKs.entity.Phong;
 import org.springframework.data.domain.Page;
 
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface DatPhongService {
     DatPhong saveDatPhong(DatPhong datPhong); // Lưu thông tin đặt phòng
@@ -26,9 +29,13 @@ public interface DatPhongService {
 
     double getRevenueByMonth(int month, int year);
 
-    double getRevenueByFourMonths(int startMonth, int year);
+//    double getRevenueByFourMonths(int startMonth, int year);
 
-    double getRevenueByYear(int year);
+    Map<String, Object> getRevenueForFourMonths(int startMonth, int year);
+
+//    double getRevenueByYear(int year);
+
+    Map<String, Object> getRevenueByYear(int year);
 
     Long getBookingCount();
 
@@ -40,6 +47,8 @@ public interface DatPhongService {
     List<Object[]> getTopPhongDuocDatNhieuNhat();
 
     Long countDistinctCustomers();
+
+    List<DatPhong> findByPhongAndThoiGian(Integer idPhong, Date ngayNhan, Date ngayTra);
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();

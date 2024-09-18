@@ -1,7 +1,9 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
+import com.example.DuAnTotNghiepKs.entity.Phong;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
+import com.example.DuAnTotNghiepKs.service.PhongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,9 @@ public class DanhSachDatPhong {
 
     @Autowired
     private DatPhongService datPhongService;
+
+    @Autowired
+    private PhongService phongService;
 
     @GetMapping()
     public String showDatPhongList(Model model) {
@@ -42,9 +47,15 @@ public class DanhSachDatPhong {
             if (datPhong == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Đặt phòng không tồn tại."));
             }
+
+            Phong phong = datPhong.getPhong();
             // Cập nhật trạng thái đặt phòng thành "đang ở"
             datPhong.setTinhTrang(true);
             datPhongService.saveDatPhong1(datPhong);
+
+
+            phong.setTrangThai(false); // false biểu thị phòng đã hết
+            phongService.savePhong(phong); // Giả sử có một dịch vụ lưu phòng
             return ResponseEntity.ok(Map.of("success", "Check-in thành công!"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

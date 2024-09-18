@@ -244,6 +244,13 @@ public class DatPhongController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Ngày trả phòng phải sau ngày nhận phòng."));
             }
 
+            // Kiểm tra xem phòng đã được đặt trong khoảng thời gian này hay chưa
+            List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, convertToDate(ngayNhan), convertToDate(ngayTra));
+            if (!existingBookings.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Phòng đã được đặt trong khoảng thời gian này."));
+            }
+
+
             // Tính toán các chi phí
             long soNgayO = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
             float giaPhong = selectedPhong.getGia();
@@ -278,8 +285,8 @@ public class DatPhongController {
             chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
 
             // Cập nhật trạng thái phòng
-            selectedPhong.setTrangThai(false);
-            phongService.savePhong(selectedPhong);
+//            selectedPhong.setTrangThai(false);
+//            phongService.savePhong(selectedPhong);
 
             return ResponseEntity.ok(Map.of("success", "Đặt phòng thành công!"));
         } catch (NumberFormatException e) {
@@ -302,32 +309,20 @@ public class DatPhongController {
     }
 
     @GetMapping("/four-months")
-    public ResponseEntity<Double> getRevenueByFourMonths(
-            @RequestParam int startMonth,
-            @RequestParam int year) {
-
-        // Kiểm tra các tham số
-        if (startMonth < 1 || startMonth > 12) {
-            return ResponseEntity.badRequest().body(null); // Hoặc gửi thông báo lỗi dưới dạng Double nếu cần
-        }
-
-        if (year <= 0) {
-            return ResponseEntity.badRequest().body(null); // Hoặc gửi thông báo lỗi dưới dạng Double nếu cần
-        }
-
-        // Lấy doanh thu từ service
-        double revenue = datPhongService.getRevenueByFourMonths(startMonth, year);
-
-        // Trả về doanh thu
-        return ResponseEntity.ok(revenue);
+    public ResponseEntity<Map<String, Object>> getRevenueForFourMonths(@RequestParam int startMonth, @RequestParam int year) {
+        Map<String, Object> revenueData = datPhongService.getRevenueForFourMonths(startMonth, year);
+        return ResponseEntity.ok(revenueData);
     }
-
 
     @GetMapping("/year")
-    public ResponseEntity<Double> getRevenueByYear(@RequestParam int year) {
-        double revenue = datPhongService.getRevenueByYear(year);
-        return ResponseEntity.ok(revenue);
+    public ResponseEntity<Map<String, Object>> getRevenueByYear(@RequestParam int year) {
+        Map<String, Object> revenueData = datPhongService.getRevenueByYear(year);
+        return ResponseEntity.ok(revenueData);
     }
+
+
+
+
 
 
 
@@ -382,6 +377,9 @@ public ResponseEntity<?> getTop3PhongDuocDatNhieuNhat() {
         Long totalDistinctCustomers = datPhongService.countDistinctCustomers();
         return ResponseEntity.ok(totalDistinctCustomers);
     }
+
+
+
 
 
 

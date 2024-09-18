@@ -23,7 +23,7 @@
         .button-container {
             display: flex;
             justify-content: center;
-            margin-bottom: 20px;
+            margin: 30px 0; /* Thêm khoảng cách phía trên và dưới */
         }
 
         .chart-container {
@@ -47,11 +47,19 @@
         }
 
         .btn-custom {
-            margin: 0 10px;
+            margin: 0 15px;
             background-color: #fd7e14;
             color: white;
+            padding: 15px 30px;
+            font-size: 2rem; /* Tăng kích thước chữ lên */
+            font-weight: bold; /* Làm chữ đậm hơn nếu cần */
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
         }
 
+        .btn-custom:hover {
+            background-color: #e36b10;
+        }
         /* Thiết kế cho ô tổng số phòng đã đặt */
         .booking-count {
             width: 220px; /* Kích thước lớn hơn để nổi bật */
@@ -198,6 +206,48 @@
             color: #dc3545; /* Màu đỏ nổi bật cho số ngày nhàn rỗi */
             font-weight: 700; /* Đậm hơn để nổi bật */
         }
+
+
+        .chart-container {
+            width: 100%;
+            margin: 20px auto;
+        }
+
+        .revenue-display {
+            font-size: 2rem;
+            color: #28a745;
+            text-align: center;
+            margin: 20px 0; /* Khoảng cách giữa biểu đồ và phần hiển thị doanh thu */
+            font-weight: bold;
+        }
+
+        .revenue-display span {
+            color: #007bff; /* Đổi màu cho số doanh thu */
+        }
+
+
+        .section-header h3 {
+            font-size: 2rem;
+            color: #ffc107;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 40px;
+            border-bottom: 4px solid #333;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        /* Tùy chỉnh biểu đồ */
+        .chart-container {
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container {
+            margin-top: 30px;
+        }
     </style>
     <head th:include="fragment/head :: head"></head>
 </head>
@@ -231,6 +281,7 @@
             <button class="btn btn-custom" onclick="fetchRevenue('month')">Thống kê theo tháng</button>
             <button class="btn btn-custom" onclick="fetchRevenue('four-months')">Thống kê theo 4 tháng</button>
             <button class="btn btn-custom" onclick="fetchRevenue('year')">Thống kê theo năm</button>
+<!--            <button class="btn btn-custom" onclick="fetchRevenue('room')">Thống kê theo phong</button>-->
         </div>
         <div id="revenueDisplay" class="revenue-display">
         </div>
@@ -307,7 +358,7 @@
         if (type === 'month') {
             url = `/datphongs/month?month=${month}&year=${year}`;
         } else if (type === 'four-months') {
-            url = `/datphongs/four-months?startMonth=${7}&year=${year}`; // Bắt đầu từ tháng 7
+            url = `/datphongs/four-months?startMonth=7&year=${year}`; // Bắt đầu từ tháng 7
         } else if (type === 'year') {
             url = `/datphongs/year?year=${year}`;
         }
@@ -315,29 +366,59 @@
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                updateChart(type, data);
-                displayRevenue(data);
+                console.log("Dữ liệu trả về từ server:", data);
+                console.log("Kiểu dữ liệu của dữ liệu trả về:", typeof data);
+
+                if (type === 'month') {
+                    displayRevenue(data);
+                    updateChart(type, { revenues: [data], months: ['Tháng hiện tại'] }); // Dữ liệu biểu đồ mẫu
+                } else if (type === 'four-months' || type === 'year') {
+                    if (Array.isArray(data.revenues) && Array.isArray(data.months)) {
+                        // Đối với thống kê theo năm, hiển thị tổng doanh thu cho tất cả các tháng
+                        const totalRevenue = data.revenues.reduce((a, b) => a + b, 0);
+                        displayRevenue(totalRevenue); // Hiển thị tổng doanh thu
+                        updateChart(type, data); // Cập nhật biểu đồ
+                    } else {
+                        console.error("Dữ liệu trả về không có cấu trúc đúng.");
+                    }
+                }
             })
             .catch(error => console.error('Lỗi khi lấy dữ liệu doanh thu:', error));
     }
 
+
+
+
     function displayRevenue(amount) {
         const revenueDisplay = document.getElementById('revenueDisplay');
+        // Định dạng tổng doanh thu và hiển thị
         revenueDisplay.innerHTML = `Tổng doanh thu: ${new Intl.NumberFormat('vi-VN', {
             style: 'currency',
             currency: 'VND'
         }).format(amount)}`;
     }
 
+
+    let chartInstance;
+
     function updateChart(type, data) {
         const ctx = document.getElementById('revenueChart').getContext('2d');
-        const chart = new Chart(ctx, {
+
+        // Xóa biểu đồ cũ nếu có
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        const labels = data.months || ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12']; // Cung cấp nhãn mẫu
+        const revenues = data.revenues || Array(12).fill(0); // Đảm bảo có đủ dữ liệu cho tất cả 12 tháng
+        // Tạo biểu đồ mới
+        chartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4'], // Ví dụ cho 4 tháng
+                labels: labels,
                 datasets: [{
                     label: 'Doanh thu',
-                    data: [data], // Sử dụng dữ liệu từ server
+                    data: revenues,
                     backgroundColor: 'rgba(253, 126, 20, 0.5)', // Màu cam nhạt
                     borderColor: 'rgba(253, 126, 20, 1)', // Màu cam đậm
                     borderWidth: 1
@@ -346,12 +427,15 @@
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true // Bắt đầu trục Y từ 0
                     }
-                }
+                },
+                responsive: true,
+                maintainAspectRatio: false // Giữ kích thước biểu đồ
             }
         });
     }
+
 
     function updateTable(details) {
         const tableBody = document.getElementById('revenueDetailTable');
@@ -453,6 +537,38 @@
             })
             .catch(error => console.error('Lỗi khi lấy tổng số khách hàng đã đặt phòng:', error));
     }
+
+
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(ctx, {
+        type: 'bar', // Hoặc 'line' nếu muốn biểu đồ đường
+        data: {
+            labels: [], // Danh sách tháng hoặc năm
+            datasets: [{
+                label: 'Doanh thu',
+                data: [], // Dữ liệu doanh thu từ server
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+                hoverBackgroundColor: 'rgba(54, 162, 235, 0.5)',
+                hoverBorderColor: 'rgba(54, 162, 235, 1)',
+                hoverBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: {
+                duration: 2000, // Hiệu ứng kéo dài 2 giây
+                easing: 'easeInOutBounce' // Hiệu ứng bật
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
 
 
 

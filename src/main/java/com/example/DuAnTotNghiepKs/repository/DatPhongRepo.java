@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -22,11 +23,13 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
     @Query("SELECT SUM(dp.tienCoc) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) = :month AND YEAR(dp.ngayNhan) = :year")
     Double findRevenueByMonth(@Param("month") int month, @Param("year") int year);
 
-    @Query("SELECT SUM(dp.tienCoc) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) BETWEEN :startMonth AND (:startMonth + 3) AND YEAR(dp.ngayNhan) = :year")
-    Double calculateRevenueForFourMonths(@Param("startMonth") int startMonth, @Param("year") int year);
+    @Query("SELECT SUM(dp.tienCoc) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) = :month AND YEAR(dp.ngayNhan) = :year")
+    Double findRevenueByMonthAndYear(@Param("month") int month, @Param("year") int year);
 
-    @Query("SELECT SUM(dp.tongTien) FROM DatPhong dp WHERE YEAR(dp.ngayNhan) = :year")
-    Double findRevenueByYear(@Param("year") int year);
+
+    @Query("SELECT MONTH(dp.ngayNhan) AS month, COALESCE(SUM(dp.tongTien), 0) AS revenue FROM DatPhong dp WHERE YEAR(dp.ngayNhan) = :year GROUP BY MONTH(dp.ngayNhan)")
+    List<Object[]> findRevenueByYear(@Param("year") int year);
+
 
     @Query("SELECT COUNT(dp) FROM DatPhong dp")
     Long countTotalBookings();
@@ -79,5 +82,21 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "FROM DatPhong\n" +
             "WHERE ngay_nhan_phong BETWEEN '2024-01-01' AND '2024-12-31';", nativeQuery = true)
     List<DatPhong> findBookingsWithinDateRange(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+
+
+        // Truy vấn để tìm các đơn đặt phòng theo id phòng và trùng thời gian
+        @Query("SELECT dp FROM DatPhong dp WHERE dp.phong.idPhong = :idPhong AND " +
+                "(:ngayNhan BETWEEN dp.ngayNhan AND dp.ngayTra OR " +
+                ":ngayTra BETWEEN dp.ngayNhan AND dp.ngayTra OR " +
+                "dp.ngayNhan BETWEEN :ngayNhan AND :ngayTra)")
+        List<DatPhong> findByPhongAndThoiGian(@Param("idPhong") Integer idPhong,
+                                              @Param("ngayNhan") Date ngayNhan,
+                                              @Param("ngayTra") Date ngayTra);
+
+
+
+//    @Query("SELECT SUM(b.tongTien) FROM DatPhong b WHERE b.phong.idPhong = :roomId")
+//    float calculateTotalRevenueByRoom(@Param("roomId") Long roomId);
 
 }

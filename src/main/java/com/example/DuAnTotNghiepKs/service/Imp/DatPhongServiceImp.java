@@ -14,9 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DatPhongServiceImp implements DatPhongService {
@@ -34,9 +32,7 @@ public class DatPhongServiceImp implements DatPhongService {
         if (existsByMaDatPhong(datPhong.getMaDatPhong())) {
             throw new RuntimeException("Mã đặt phòng đã tồn tại.");
         }
-        if (phong != null && phong.getTrangThai()) {
-            phong.setTrangThai(false); // Đặt phòng, chuyển trạng thái sang đã đặt
-            phongRepository.save(phong);
+        if (phong != null) {
             return datPhongRepository.save(datPhong);
         } else {
             throw new RuntimeException("Phòng không còn trống để đặt.");
@@ -114,13 +110,39 @@ public class DatPhongServiceImp implements DatPhongService {
     }
 
     @Override
-    public double getRevenueByFourMonths(int startMonth, int year) {
-        return datPhongRepository.calculateRevenueForFourMonths(startMonth, year);
+    public Map<String, Object> getRevenueForFourMonths(int startMonth, int year) {
+        Map<String, Object> result = new HashMap<>();
+        List<Double> revenues = new ArrayList<>();
+        List<String> months = new ArrayList<>();
+
+        for (int i = startMonth; i < startMonth + 4; i++) {
+            Double revenue = datPhongRepository.findRevenueByMonthAndYear(i, year);
+            revenues.add(revenue != null ? revenue : 0.0);
+            months.add("Tháng " + i);
+        }
+
+        result.put("revenues", revenues);
+        result.put("months", months);
+        return result;
     }
 
     @Override
-    public double getRevenueByYear(int year) {
-        return datPhongRepository.findRevenueByYear(year);
+    public Map<String, Object> getRevenueByYear(int year) {
+        List<Double> revenues = new ArrayList<>();
+        List<String> months = new ArrayList<>();
+
+        List<Object[]> results = datPhongRepository.findRevenueByYear(year);
+        for (Object[] result : results) {
+            int month = (Integer) result[0];
+            Double revenue = (Double) result[1];
+            revenues.add(revenue != null ? revenue : 0.0);
+            months.add("Tháng " + month);
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("revenues", revenues);
+        data.put("months", months);
+        return data;
     }
 
     @Override
@@ -168,6 +190,11 @@ public class DatPhongServiceImp implements DatPhongService {
         return datPhongRepository.countDistinctCustomers();
     }
 
+
+    @Override
+    public List<DatPhong> findByPhongAndThoiGian(Integer idPhong, Date ngayNhan, Date ngayTra) {
+        return datPhongRepository.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra);
+    }
 
 
 

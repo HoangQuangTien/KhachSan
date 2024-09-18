@@ -1,10 +1,7 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.CustomerDTO;
-import com.example.DuAnTotNghiepKs.entity.ChiTietDatPhong;
-import com.example.DuAnTotNghiepKs.entity.DatPhong;
-import com.example.DuAnTotNghiepKs.entity.KhachHang;
-import com.example.DuAnTotNghiepKs.entity.Phong;
+import com.example.DuAnTotNghiepKs.entity.*;
 import com.example.DuAnTotNghiepKs.repository.ChiTietDatPhongRepo;
 import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
 import com.example.DuAnTotNghiepKs.repository.KhachHangRepository;
@@ -35,10 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -55,6 +49,13 @@ public class ChiTietDatPhongController {
 
     @Autowired
     private PhongRepo phongRepo;
+
+    @Autowired
+    private PhongService phongService;
+
+    @Autowired
+    private LoaiPhongService loaiPhongService;
+
     @Autowired
     private QrCodeService qrCodeService;
     @Autowired
@@ -310,6 +311,56 @@ public class ChiTietDatPhongController {
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
+
+
+//    @GetMapping("/edit-room/{id}")
+//    public String showEditRoomForm(@PathVariable("id") Integer id, Model model) {
+//        Optional<Phong> optionalPhong = phongService.getPhongById(id);
+//        if (optionalPhong.isPresent()) {
+//            Phong phong = optionalPhong.get();
+//            model.addAttribute("phong", phong);
+//            model.addAttribute("loaiPhongs", .getAllLoaiPhongs());
+//            model.addAttribute("tangs", tangService.getAllTangs());
+//        } else {
+//            model.addAttribute("errorMessage", "Không tìm thấy phòng với ID: " + id);
+//            return "error"; // Trả về trang lỗi nếu phòng không tìm thấy
+//        }
+//        return "list/QuanLyDatPhong/edit-phong";
+//    }
+//
+//
+//    @PostMapping("/update-room")
+//    public ResponseEntity<?> updateRoom(
+//            @RequestParam("roomId") Integer roomId,
+//            @RequestParam("tenPhong") String tenPhong,
+//            @RequestParam("loaiPhong") Integer loaiPhongId,
+//            @RequestParam("idTang") Integer idTang,
+//            @RequestParam("gia") Float gia) {
+//
+//        try {
+//            Phong phong = phongService.getPhongById(roomId)
+//                    .orElseThrow(() -> new RuntimeException("Phòng không tồn tại"));
+//            if (gia < phong.getGia()) {
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                        .body(Map.of("success", false, "message", "Giá mới phải lớn hơn hoặc bằng giá hiện tại"));
+//            }
+//            phong.setTenPhong(tenPhong);
+//            phong.setGia(gia);
+//            LoaiPhong loaiPhong = loaiPhongService.findById1(loaiPhongId)
+//                    .orElseThrow(() -> new RuntimeException("Không tìm thấy loại phòng với ID: " + loaiPhongId));
+//            phong.setLoaiPhong(loaiPhong);
+//            Tang tang = tangService.getTangById(idTang)
+//                    .orElseThrow(() -> new RuntimeException("Không tìm thấy tầng với ID: " + idTang));
+//            phong.setTang(tang);
+//            phongService.savePhong(phong);
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(Map.of("success", true, "message", "Phòng đã được cập nhật thành công"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Map.of("success", false, "message", "Đã xảy ra lỗi: " + e.getMessage()));
+//        }
+//    }
 }
 
 
