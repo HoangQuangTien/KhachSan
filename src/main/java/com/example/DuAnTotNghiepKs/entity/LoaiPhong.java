@@ -55,8 +55,8 @@ public class LoaiPhong {
     private Set<LoaiPhong> loaiPhongs = new HashSet<>();
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_tang",referencedColumnName ="id_tang")
+    @OneToOne
+    @JoinColumn(name = "id_Tang", referencedColumnName = "id_Tang")
     private Tang tang;
 
     @ManyToOne(fetch = FetchType.EAGER)

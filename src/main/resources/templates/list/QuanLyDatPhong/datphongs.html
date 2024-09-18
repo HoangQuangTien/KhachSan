@@ -194,32 +194,48 @@
             document.getElementById('idLoaiPhong').value = loaiPhongId; // Cập nhật hidden input
 
             if (loaiPhongId) {
-                fetch(`/datphongs/available-rooms?loaiPhongId=${loaiPhongId}`)
-                    .then(response => response.json())  // Lấy dữ liệu JSON
-                    .then(data => {
-                        if (Array.isArray(data)) {
-                            data.forEach(phong => {
-                                const div = document.createElement('div');
-                                div.classList.add('form-check');
-                                div.innerHTML = `
+                // Fetch thông tin loại phòng (để lấy số người tối đa)
+                fetch(`/api/loaiPhong/${loaiPhongId}`)
+                    .then(response => response.json())
+                    .then(loaiPhongData => {
+                        const soNguoiToiDa = loaiPhongData.soNguoiToiDa;
+                        const giaLP = loaiPhongData.gia;
+
+                        // Fetch danh sách phòng cho loại phòng đã chọn
+                        fetch(`/datphongs/available-rooms?loaiPhongId=${loaiPhongId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (Array.isArray(data)) {
+                                    data.forEach(phong => {
+                                        const div = document.createElement('div');
+                                        div.classList.add('form-check');
+
+                                        // Thêm thông tin phòng và số người tối đa từ loại phòng
+                                        div.innerHTML = `
                                     <input class="form-check-input" type="checkbox" value="${phong.idPhong}" id="phong_${phong.idPhong}">
                                     <label class="form-check-label" for="phong_${phong.idPhong}">
-                                        ${phong.tenPhong} - Giá: ${phong.gia} VND
+                                        ${phong.tenPhong} - Giá: ${giaLP} VND - <i class="fas fa-users" style="font-size: 19px ; color: #0b860d"></i> ${soNguoiToiDa}
                                     </label>
                                 `;
-                                phongSelectContainer.appendChild(div);
+                                        phongSelectContainer.appendChild(div);
 
-                                // Lưu giá phòng vào map
-                                giaPhongMap[phong.idPhong] = phong.gia;
+                                        // Lưu giá phòng vào map
+                                        giaPhongMap[phong.idPhong] = phong.gia;
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Lỗi khi tải dữ liệu phòng:', error);
+                                alert('Đã xảy ra lỗi khi tải danh sách phòng. Vui lòng thử lại sau.');
                             });
-                        }
                     })
                     .catch(error => {
-                        console.error('Lỗi khi tải dữ liệu phòng:', error);
-                        alert('Đã xảy ra lỗi khi tải danh sách phòng. Vui lòng thử lại sau.');
+                        console.error('Lỗi khi tải dữ liệu loại phòng:', error);
+                        alert('Đã xảy ra lỗi khi tải dữ liệu loại phòng.');
                     });
             }
         });
+
 
         function updateTienCoc() {
             const selectedPhongIds = Array.from(document.querySelectorAll('#phongSelect .form-check-input:checked'))
@@ -229,7 +245,7 @@
             let totalTienConLai = 0;
 
             selectedPhongIds.forEach(idPhong => {
-                const giaPhong = giaPhongMap[idPhong];
+                const giaPhong =  giaPhongMap[idPhong];
                 if (giaPhong) {
                     const ngayNhan = new Date(ngayNhanInput.value);
                     const ngayTra = new Date(ngayTraInput.value);
@@ -257,6 +273,7 @@
                 tienConLaiInput.value = totalTienConLai.toFixed(2); // Hiển thị 2 chữ số thập phân
             }
         }
+
 
 
         function validateDates() {

@@ -253,7 +253,7 @@ public class DatPhongController {
 
             // Tính toán các chi phí
             long soNgayO = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
-            float giaPhong = selectedPhong.getGia();
+            float giaPhong = selectedPhong.getLoaiPhong().getGia();
             float tongTienPhong = giaPhong * soNgayO;
             float tienCoc = tongTienPhong * 0.8f;
             float tienConLai = tongTienPhong - tienCoc;

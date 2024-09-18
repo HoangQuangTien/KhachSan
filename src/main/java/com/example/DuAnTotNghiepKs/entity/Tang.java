@@ -1,9 +1,6 @@
 package com.example.DuAnTotNghiepKs.entity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +10,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@ToString
 @Table(name = "Tang")
 public class Tang {
     @Id
@@ -24,6 +22,16 @@ public class Tang {
     @Column(name = "mo_ta")
     private String moTa;
 
-    @OneToMany(mappedBy = "tang", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<LoaiPhong> loaiPhongs = new HashSet<>();
+    @OneToOne(mappedBy = "tang", cascade = CascadeType.ALL, orphanRemoval = true)
+    private LoaiPhong loaiPhong;
+
+
+    @Override
+    public String toString() {
+        return "Tang{" +
+                "idTang=" + idTang +
+                ", tenTang='" + tenTang + '\'' +
+                ", moTa='" + moTa + '\'' +
+                '}';
+    }
 }

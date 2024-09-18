@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.service;
 
+import com.example.DuAnTotNghiepKs.DTO.LoaiPhongDTO;
 import com.example.DuAnTotNghiepKs.entity.LoaiPhong;
 import com.example.DuAnTotNghiepKs.repository.LoaiPhongRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,4 +63,16 @@ public class LoaiPhongService {
     }
 
 
+//    public LoaiPhongDTO getLoaiPhongByIdk(Integer id) {
+//        LoaiPhong loaiPhong = loaiPhongRepository.findById(id).orElse(null);
+//        if (loaiPhong != null) {
+//            LoaiPhongDTO dto = new LoaiPhongDTO();
+//            dto.setIdLoaiPhong(loaiPhong.getIdLoaiPhong());
+//            dto.setTenTang(String.valueOf(loaiPhong.getTang()));
+//            dto.setTenDienTich(loaiPhong.getDienTich().getTenDienTich());
+//            dto.setGia(loaiPhong.getGia());
+//            return dto;
+//        }
+//        return null;
+//    }
 }
