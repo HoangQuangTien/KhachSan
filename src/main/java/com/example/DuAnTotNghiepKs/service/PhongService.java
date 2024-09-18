@@ -151,11 +151,11 @@ public class PhongService {
         return results.stream()
                 .map(phong -> {
                     PhongDTO phongDTO = modelMapper.map(phong, PhongDTO.class);
-
-                    phongDTO.setTenDienTich(phong.getDienTich().getTenDienTich()); // Giả sử dienTich là kiểu Float
-
-
-                    phongDTO.setTenTang(phong.getTang() != null ? phong.getTang().getTenTang() : "Chưa có tầng");
+//
+//                    phongDTO.setTenDienTich(phong.getDienTich().getTenDienTich()); // Giả sử dienTich là kiểu Float
+//
+//
+//                    phongDTO.setTenTang(phong.getTang() != null ? phong.getTang().getTenTang() : "Chưa có tầng");
 
                     phongDTO.setTenLoaiPhong(phong.getLoaiPhong() != null ? phong.getLoaiPhong().getTenLoaiPhong() : "Chưa có Loại Phon");
 

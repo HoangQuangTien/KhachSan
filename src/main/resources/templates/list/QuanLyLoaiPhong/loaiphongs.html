@@ -31,6 +31,8 @@
                 <th>Mô Tả</th>
                 <th>Số Giường</th>
                 <th>Số Người</th>
+                <th>Tâng</th>
+                <th>Dien Tích</th>
                 <th>Giá</th>
                 <th>Hành Động</th>
             </tr>
@@ -42,6 +44,8 @@
                 <td th:text="${loaiPhong.moTa}"></td>
                 <td th:text="${loaiPhong.soLuongGiuong}"></td>
                 <td th:text="${loaiPhong.soNguoiToiDa}"></td>
+                <td th:text="${loaiPhong.tang.tenTang}"></td>
+                <td th:text="${loaiPhong.dienTich.tenDienTich}"></td>
                 <td th:text="${loaiPhong.gia}"></td>
                 <td>
                     <a th:href="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" class="btn btn-warning btn-sm">

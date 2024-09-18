@@ -167,9 +167,9 @@
 <!--                                    soLuongNguoi-->
                                     <p class="card-text"><strong> Số Người Tối Đa</strong>: </strong><span th:text="${phong.loaiPhong.getSoNguoiToiDa()}"></span></p>
                                     <!-- Diện Tích -->
-                                    <p class="card-text"><strong>Diện Tích: </strong><span th:text="${phong.dienTich.tenDienTich}"></span></p>
+                                    <p class="card-text"><strong>Diện Tích: </strong><span th:text="${phong.loaiPhong.dienTich.tenDienTich}"></span></p>
                                     <!-- Tầng -->
-                                    <p class="card-text"><strong>Tầng: </strong><span th:text="${phong.tang.tenTang}"></span></p>
+                                    <p class="card-text"><strong>Tầng: </strong><span th:text="${phong.loaiPhong.tang.tenTang}"></span></p>
                                     <!-- Giá -->
                                     <p class="card-text"><strong>Giá: </strong><span th:text="${phong.gia}"></span></p>
                                     <!-- Mô Tả -->
@@ -307,77 +307,84 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="mb-3">
+                                <label for="idLoaiPhong" class="form-label">Loại Phòng</label>
+                                <select id="idLoaiPhong" name="loaiPhong.idLoaiPhong" class="form-select" required>
+                                    <option th:each="loaiPhong : ${loaiPhongs}" th:value="${loaiPhong.idLoaiPhong}" th:selected="${phong.loaiPhong != null && phong.loaiPhong.idLoaiPhong == loaiPhong.idLoaiPhong}" th:text="${loaiPhong.tenLoaiPhong}">
+                                    </option>
+                                </select>
+                            </div>
 
-                            <div class="form-row">
-                                <!-- Tầng (Floor) -->
-                                <div class="form-group col-md-6">
-                                    <label for="idTang">Tầng</label>
-                                    <div class="d-flex">
-                                        <select id="idTang" name="tang.idTang" class="form-control" required>
-                                            <option th:each="tang : ${tangs}" th:value="${tang.idTang}" th:selected="${phong.tang != null && phong.tang.idTang == tang.idTang}">
-                          <span th:text="${tang.tenTang}">
-                          </span>
-                                            </option>
-                                        </select>
-                                        <!-- Button to add new Tầng -->
-                                        <button type="button" class="btn btn-secondary ml-2" onclick="addTang()">+</button>
-                                    </div>
-                                </div>
-                                <!-- Diện Tích (Area) -->
-                                <div class="form-group col-md-6">
-                                    <label for="idDienTich">Diện Tích</label>
-                                    <div class="d-flex">
-                                        <select id="idDienTich" name="dienTich.idDienTich" class="form-control" required>
-                                            <option th:each="dientich : ${dienTichs}" th:value="${dientich.idDienTich}" th:selected="${phong.dienTich != null && phong.dienTich.idDienTich == dientich.idDienTich}">
-                          <span th:text="${dientich.tenDienTich}">
-                          </span>
-                                            </option>
-                                        </select>
-                                        <!-- Button to add new Diện Tích -->
-                                        <button type="button" class="btn btn-secondary ml-2" onclick="addDienTich()">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Modal Nhập Tầng -->
-                            <div class="modal fade" id="tangModal" tabindex="-1" role="dialog" aria-labelledby="tangModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="tangModalLabel">Nhập tầng mới:</h5>
-                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <input type="text" id="newTangInput" class="form-control" placeholder="Nhập tầng mới">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <button type="button" class="btn btn-primary" id="saveTangButton">OK</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Modal Nhập Diện Tích -->
-                            <div class="modal fade" id="dienTichModal" tabindex="-1" role="dialog" aria-labelledby="dienTichModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="dienTichModalLabel">Nhập diện tích mới:</h5>
-                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <input type="text" id="newDienTichInput" class="form-control" placeholder="Nhập diện tích mới">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <button type="button" class="btn btn-primary" id="saveDienTichButton">OK</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+<!--                            <div class="form-row">-->
+<!--                                &lt;!&ndash; Tầng (Floor) &ndash;&gt;-->
+<!--                                <div class="form-group col-md-6">-->
+<!--                                    <label for="idTang">Tầng</label>-->
+<!--                                    <div class="d-flex">-->
+<!--                                        <select id="idTang" name="tang.idTang" class="form-control" required>-->
+<!--                                            <option th:each="tang : ${tangs}" th:value="${tangs.idTang}" th:selected="${loaiPhongs.tang != null && loaiPhongs.tang.idTang == tang.idTang}">-->
+<!--                          <span th:text="${tang.tenTang}">-->
+<!--                          </span>-->
+<!--                                            </option>-->
+<!--                                        </select>-->
+<!--                                        &lt;!&ndash; Button to add new Tầng &ndash;&gt;-->
+<!--                                        <button type="button" class="btn btn-secondary ml-2" onclick="addTang()">+</button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                &lt;!&ndash; Diện Tích (Area) &ndash;&gt;-->
+<!--                                <div class="form-group col-md-6">-->
+<!--                                    <label for="idDienTich">Diện Tích</label>-->
+<!--                                    <div class="d-flex">-->
+<!--                                        <select id="idDienTich" name="dienTich.idDienTich" class="form-control" required>-->
+<!--                                            <option th:each="dientich : ${dienTichs}" th:value="${dientich.idDienTich}" th:selected="${loaiPhongs.dienTich != null && loaiPhongs.dienTich.idDienTich == dientich.idDienTich}">-->
+<!--                          <span th:text="${dientich.tenDienTich}">-->
+<!--                          </span>-->
+<!--                                            </option>-->
+<!--                                        </select>-->
+<!--                                        &lt;!&ndash; Button to add new Diện Tích &ndash;&gt;-->
+<!--                                        <button type="button" class="btn btn-secondary ml-2" onclick="addDienTich()">+</button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            &lt;!&ndash; Modal Nhập Tầng &ndash;&gt;-->
+<!--                            <div class="modal fade" id="tangModal" tabindex="-1" role="dialog" aria-labelledby="tangModalLabel" aria-hidden="true">-->
+<!--                                <div class="modal-dialog" role="document">-->
+<!--                                    <div class="modal-content">-->
+<!--                                        <div class="modal-header">-->
+<!--                                            <h5 class="modal-title" id="tangModalLabel">Nhập tầng mới:</h5>-->
+<!--                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">-->
+<!--                                                <span aria-hidden="true">&times;</span>-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+<!--                                        <div class="modal-body">-->
+<!--                                            <input type="text" id="newTangInput" class="form-control" placeholder="Nhập tầng mới">-->
+<!--                                        </div>-->
+<!--                                        <div class="modal-footer">-->
+<!--                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>-->
+<!--                                            <button type="button" class="btn btn-primary" id="saveTangButton">OK</button>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            &lt;!&ndash; Modal Nhập Diện Tích &ndash;&gt;-->
+<!--                            <div class="modal fade" id="dienTichModal" tabindex="-1" role="dialog" aria-labelledby="dienTichModalLabel" aria-hidden="true">-->
+<!--                                <div class="modal-dialog" role="document">-->
+<!--                                    <div class="modal-content">-->
+<!--                                        <div class="modal-header">-->
+<!--                                            <h5 class="modal-title" id="dienTichModalLabel">Nhập diện tích mới:</h5>-->
+<!--                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">-->
+<!--                                                <span aria-hidden="true">&times;</span>-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+<!--                                        <div class="modal-body">-->
+<!--                                            <input type="text" id="newDienTichInput" class="form-control" placeholder="Nhập diện tích mới">-->
+<!--                                        </div>-->
+<!--                                        <div class="modal-footer">-->
+<!--                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>-->
+<!--                                            <button type="button" class="btn btn-primary" id="saveDienTichButton">OK</button>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div>
                                 <button type="submit" name="action" value="create" class="btn btn-warning">Tạo</button>
                                 <button type="reset" class="btn btn-outline-warning">

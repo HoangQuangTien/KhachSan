@@ -134,8 +134,8 @@ public class PhongController {
             }
 
             phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
-            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
-            phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
+//            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
+//            phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
 
             phongService.savePhong(phong);
             redirectAttributes.addFlashAttribute("successMessage", "Thêm phòng thành công!");
@@ -143,8 +143,8 @@ public class PhongController {
             // Xử lý cập nhật
             if (phong.getIdPhong() != null) {
                 phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
-                phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
-                phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
+//                phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
+//                phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
 
                 phongService.updatePhong(phong);
                 redirectAttributes.addFlashAttribute("successMessage", "Cập nhật phòng thành công!");

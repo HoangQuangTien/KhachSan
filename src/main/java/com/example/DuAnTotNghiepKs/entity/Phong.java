@@ -37,8 +37,8 @@ public class Phong {
     @Column(name = "ten_phong")
     private String tenPhong;
 
-    @Column(name = "so_nguoi_toi_da")
-    private Boolean soNguoiToiDa;
+//    @Column(name = "so_nguoi_toi_da")
+//    private Boolean soNguoiToiDa;
 
     @Column(name = "tinh_trang")
     private Boolean tinhTrang;
@@ -52,13 +52,13 @@ public class Phong {
     @Column(name = "trang_thai")
     private Boolean trangThai;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_tang",referencedColumnName ="id_tang")
-    private Tang tang;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_dien_tich",referencedColumnName ="id_dien_tich")
-    private DienTich dienTich;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "id_tang",referencedColumnName ="id_tang")
+//    private Tang tang;
+//
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "id_dien_tich",referencedColumnName ="id_dien_tich")
+//    private DienTich dienTich;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_loai_phong", referencedColumnName = "id_loai_phong")

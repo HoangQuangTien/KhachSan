@@ -25,5 +25,5 @@ public class Tang {
     private String moTa;
 
     @OneToMany(mappedBy = "tang", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Phong> phongs = new HashSet<>();
+    private Set<LoaiPhong> loaiPhongs = new HashSet<>();
 }
