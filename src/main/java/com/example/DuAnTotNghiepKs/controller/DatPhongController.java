@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,38 +83,38 @@ public class DatPhongController {
 
 
 
-    public List<Map<String, Object>> getDatPhongEvents() {
-        List<DatPhong> datPhongs = datPhongService.getAllDatPhong(); // Lấy tất cả thông tin đặt phòng
+//    public List<Map<String, Object>> getDatPhongEvents() {
+//        List<DatPhong> datPhongs = datPhongService.getAllDatPhong(); // Lấy tất cả thông tin đặt phòng
+//
+//        // Duyệt qua danh sách đặt phòng và tạo danh sách sự kiện
+//        return datPhongs.stream().map(datPhong -> {
+//            Map<String, Object> event = new HashMap<>();
+//            event.put("title", datPhong.getPhong().getTenPhong());
+//            event.put("start", datPhong.getNgayNhan());
+//            event.put("end", datPhong.getNgayTra());
+//            event.put("color", "#f00"); // Tùy chỉnh màu cho sự kiện (ví dụ: màu đỏ)
+//            return event;
+//        }).collect(Collectors.toList());
+//    }
 
-        // Duyệt qua danh sách đặt phòng và tạo danh sách sự kiện
-        return datPhongs.stream().map(datPhong -> {
-            Map<String, Object> event = new HashMap<>();
-            event.put("title", datPhong.getPhong().getTenPhong());
-            event.put("start", datPhong.getNgayNhan());
-            event.put("end", datPhong.getNgayTra());
-            event.put("color", "#f00"); // Tùy chỉnh màu cho sự kiện (ví dụ: màu đỏ)
-            return event;
-        }).collect(Collectors.toList());
-    }
 
-
-    @PostMapping("/confirm-payment")
-    public ResponseEntity<?> confirmPayment(
-            @RequestParam("idDatPhong") Integer idDatPhong,
-            @RequestParam("paymentAmount") Double paymentAmount) {
-
-        try {
-            boolean isPaymentSuccess = thanhToanService.xacNhanThanhToan(idDatPhong, paymentAmount);
-
-            if (isPaymentSuccess) {
-                return ResponseEntity.ok(Map.of("success", "Thanh toán thành công!"));
-            } else {
-                return ResponseEntity.badRequest().body(Map.of("error", "Thanh toán không thành công."));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Có lỗi xảy ra: " + e.getMessage()));
-        }
-    }
+//    @PostMapping("/confirm-payment")
+//    public ResponseEntity<?> confirmPayment(
+//            @RequestParam("idDatPhong") Integer idDatPhong,
+//            @RequestParam("paymentAmount") Double paymentAmount) {
+//
+//        try {
+//            boolean isPaymentSuccess = thanhToanService.xacNhanThanhToan(idDatPhong, paymentAmount);
+//
+//            if (isPaymentSuccess) {
+//                return ResponseEntity.ok(Map.of("success", "Thanh toán thành công!"));
+//            } else {
+//                return ResponseEntity.badRequest().body(Map.of("error", "Thanh toán không thành công."));
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(Map.of("error", "Có lỗi xảy ra: " + e.getMessage()));
+//        }
+//    }
 
     @PostMapping("/xacnhan")
     public ResponseEntity<?> xacNhanThongTinKhachHang(@ModelAttribute KhachHangDTO khachHangDTO) {
@@ -171,11 +172,10 @@ public class DatPhongController {
 
 
 
-
     @PostMapping("/create")
     public ResponseEntity<?> createDatPhong(
-            @RequestParam("idLoaiPhong") String idLoaiPhongStr,
-            @RequestParam("idPhong") String idPhongStr,
+            @RequestParam("idLoaiPhong") List<String> idLoaiPhongStrList,
+            @RequestParam("idPhong") List<String> idPhongStrList,
             @RequestParam("ngayNhan") String ngayNhanStr,
             @RequestParam("ngayTra") String ngayTraStr,
             @RequestParam("cccd") String cccd,
@@ -183,10 +183,14 @@ public class DatPhongController {
             @RequestParam("idKhachHang") String idKhachHangStr) {
 
         // Kiểm tra các tham số đầu vào để đảm bảo chúng không rỗng
-        if (idLoaiPhongStr == null || idLoaiPhongStr.isEmpty() ||
-                idPhongStr == null || idPhongStr.isEmpty() ||
-                idKhachHangStr == null || idKhachHangStr.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "ID không được để trống."));
+        if (idLoaiPhongStrList == null || idLoaiPhongStrList.isEmpty() ||
+                idPhongStrList == null || idPhongStrList.isEmpty() ||
+                idKhachHangStr == null || idKhachHangStr.isEmpty() ||
+                ngayNhanStr == null || ngayNhanStr.isEmpty() ||
+                ngayTraStr == null || ngayTraStr.isEmpty() ||
+                cccd == null || cccd.isEmpty() ||
+                maDatPhong == null || maDatPhong.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Các tham số không được để trống."));
         }
 
         try {
@@ -196,110 +200,123 @@ public class DatPhongController {
             }
 
             // Kiểm tra và chuyển đổi ID khách hàng
-            Integer idKhachHang = null;
-            try {
-                idKhachHang = Integer.parseInt(idKhachHangStr.trim());
-            } catch (NumberFormatException e) {
-                return ResponseEntity.badRequest().body(Map.of("error", "ID khách hàng không hợp lệ."));
-            }
-
+            Integer idKhachHang = parseInteger(idKhachHangStr, "ID khách hàng không hợp lệ.");
             KhachHangDTO khachHangDTO = khachHangService.findById(idKhachHang);
             if (khachHangDTO == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Khách hàng không tồn tại."));
             }
-
-            // Chuyển đổi từ KhachHangDTO sang KhachHang entity
             KhachHang khachHang = khachHangService.convertToEntity(khachHangDTO);
 
-            // Kiểm tra và chuyển đổi ID loại phòng
-            Integer idLoaiPhong = null;
-            try {
-                idLoaiPhong = Integer.parseInt(idLoaiPhongStr.trim());
-            } catch (NumberFormatException e) {
-                return ResponseEntity.badRequest().body(Map.of("error", "ID loại phòng không hợp lệ."));
-            }
-
-            LoaiPhong loaiPhong = loaiPhongService.findById(idLoaiPhong);
-
-            // Kiểm tra và chuyển đổi ID phòng
-            Integer idPhong = null;
-            try {
-                idPhong = Integer.parseInt(idPhongStr.trim());
-            } catch (NumberFormatException e) {
-                return ResponseEntity.badRequest().body(Map.of("error", "ID phòng không hợp lệ."));
-            }
-
-            Phong selectedPhong = phongService.findById(idPhong);
-
-            // Kiểm tra tình trạng phòng
-            if (!selectedPhong.getTinhTrang()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Phòng đã ngừng hoạt động."));
-            }
-
             // Chuyển đổi ngày nhận và ngày trả
-            LocalDate ngayNhan = LocalDate.parse(ngayNhanStr);
-            LocalDate ngayTra = LocalDate.parse(ngayTraStr);
+            LocalDate ngayNhan = parseDate(ngayNhanStr, "Ngày nhận phòng không hợp lệ.");
+            LocalDate ngayTra = parseDate(ngayTraStr, "Ngày trả phòng không hợp lệ.");
 
             if (ngayTra.isBefore(ngayNhan)) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Ngày trả phòng phải sau ngày nhận phòng."));
             }
 
-            // Kiểm tra xem phòng đã được đặt trong khoảng thời gian này hay chưa
-            List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, convertToDate(ngayNhan), convertToDate(ngayTra));
-            if (!existingBookings.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Phòng đã được đặt trong khoảng thời gian này."));
+            // Tính toán tổng tiền phòng và tiền cọc
+            float tongTienPhong = 0;
+            float tienCoc = 0;
+
+            for (int i = 0; i < idPhongStrList.size(); i++) {
+                // Kiểm tra và chuyển đổi ID loại phòng
+                Integer idLoaiPhong = parseInteger(idLoaiPhongStrList.get(i), "ID loại phòng không hợp lệ.");
+                LoaiPhong loaiPhong = loaiPhongService.findById(idLoaiPhong);
+
+                // Kiểm tra và chuyển đổi ID phòng
+                Integer idPhong = parseInteger(idPhongStrList.get(i), "ID phòng không hợp lệ.");
+                Phong selectedPhong = phongService.findById(idPhong);
+
+                // Kiểm tra tình trạng phòng
+                if (selectedPhong == null || !selectedPhong.getTinhTrang()) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "Phòng " + idPhong + " không hợp lệ hoặc đã ngừng hoạt động."));
+                }
+
+                // Kiểm tra xem phòng đã được đặt trong khoảng thời gian này hay chưa
+                List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, convertToDate(ngayNhan), convertToDate(ngayTra));
+                if (!existingBookings.isEmpty()) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "Phòng " + idPhong + " đã được đặt trong khoảng thời gian này."));
+                }
+
+                // Tính toán các chi phí cho từng phòng
+                long soNgayO = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
+                float giaPhong = selectedPhong.getLoaiPhong().getGia();
+                float tongTienPhongPhong = giaPhong * soNgayO;
+                float tienCocPhong = tongTienPhongPhong * 0.8f;
+
+                // Cập nhật tổng tiền phòng và tiền cọc
+                tongTienPhong += tongTienPhongPhong;
+                tienCoc += tienCocPhong;
+
+                // Tạo đối tượng DatPhong cho từng phòng và lưu trữ
+                DatPhong datPhong = new DatPhong();
+                datPhong.setMaDatPhong(maDatPhong);
+                datPhong.setPhong(selectedPhong);
+                datPhong.setNgayNhan(convertToDate(ngayNhan));
+                datPhong.setNgayTra(convertToDate(ngayTra));
+                datPhong.setCccd(cccd);
+                datPhong.setTongTien(tongTienPhong);
+                datPhong.setTienCoc(tienCoc);
+                datPhong.setTienConLai(tongTienPhong - tienCoc);
+                datPhong.setLoaiPhong(loaiPhong);
+                datPhong.setKhachHang(khachHang);
+                datPhong.setTinhTrang(false);
+
+                datPhongService.saveDatPhong(datPhong);
+
+                // Lưu thông tin chi tiết đặt phòng
+                ChiTietDatPhong chiTietDatPhong = new ChiTietDatPhong();
+                chiTietDatPhong.setMaChiTietDatPhong("CTDP" + datPhong.getIdDatPhong());
+                chiTietDatPhong.setDatPhong(datPhong);
+                chiTietDatPhong.setKhachHang(khachHang);
+                chiTietDatPhong.setNgayLap(new Date());
+                chiTietDatPhong.setTongTien(BigDecimal.valueOf(tongTienPhong));
+
+                chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
             }
 
-
-            // Tính toán các chi phí
-            long soNgayO = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
-            float giaPhong = selectedPhong.getLoaiPhong().getGia();
-            float tongTienPhong = giaPhong * soNgayO;
-            float tienCoc = tongTienPhong * 0.8f;
-            float tienConLai = tongTienPhong - tienCoc;
-
-            // Tạo đối tượng DatPhong và lưu trữ
-            DatPhong datPhong = new DatPhong();
-            datPhong.setMaDatPhong(maDatPhong);
-            datPhong.setPhong(selectedPhong);
-            datPhong.setNgayNhan(convertToDate(ngayNhan));
-            datPhong.setNgayTra(convertToDate(ngayTra));
-            datPhong.setCccd(cccd);
-            datPhong.setTongTien(tongTienPhong);
-            datPhong.setTienCoc(tienCoc);
-            datPhong.setTienConLai(tienConLai);
-            datPhong.setLoaiPhong(loaiPhong);
-            datPhong.setKhachHang(khachHang);
-            datPhong.setTinhTrang(false);
-
-            datPhongService.saveDatPhong(datPhong);
-
-            // Lưu thông tin chi tiết đặt phòng
-            ChiTietDatPhong chiTietDatPhong = new ChiTietDatPhong();
-            chiTietDatPhong.setMaChiTietDatPhong("CTDP" + datPhong.getIdDatPhong());
-            chiTietDatPhong.setDatPhong(datPhong);
-            chiTietDatPhong.setKhachHang(khachHang);
-            chiTietDatPhong.setNgayLap(new Date());
-            chiTietDatPhong.setTongTien(BigDecimal.valueOf(tongTienPhong));
-
-            chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
-
-            // Cập nhật trạng thái phòng
-//            selectedPhong.setTrangThai(false);
-//            phongService.savePhong(selectedPhong);
+//            // Cập nhật trạng thái phòng
+//            for (String idPhongStr : idPhongStrList) {
+//                Integer idPhong = parseInteger(idPhongStr, "ID phòng không hợp lệ.");
+//                Phong selectedPhong = phongService.findById(idPhong);
+//                if (selectedPhong != null) {
+//                    selectedPhong.setTrangThai(false);
+//                    phongService.savePhong(selectedPhong);
+//                }
+//            }
 
             return ResponseEntity.ok(Map.of("success", "Đặt phòng thành công!"));
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Định dạng ID không hợp lệ."));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Định dạng ngày không hợp lệ."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Có lỗi xảy ra: " + e.getMessage()));
         }
     }
 
+    // Helper methods for parsing integer and date
+    private Integer parseInteger(String value, String errorMessage) {
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
+    private LocalDate parseDate(String dateStr, String errorMessage) {
+        try {
+            return LocalDate.parse(dateStr);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
 
     private Date convertToDate(LocalDate localDate) {
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
+
 
 
     @GetMapping("/month")

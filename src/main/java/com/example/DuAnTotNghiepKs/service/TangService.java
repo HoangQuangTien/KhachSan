@@ -15,4 +15,6 @@ public interface TangService {
 
     Tang saveTang(Tang tang);
 
+    // Tìm danh sách tầng theo id loại phòng
+    List<Tang> findByLoaiPhongId(Integer idLoaiPhong);
 }

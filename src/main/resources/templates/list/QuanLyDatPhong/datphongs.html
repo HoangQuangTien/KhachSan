@@ -49,6 +49,36 @@
             max-height: 200px;
             overflow-y: auto;
         }
+
+        /* Thêm một số kiểu dáng tùy chỉnh nếu cần */
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        .form-check {
+            margin-bottom: 1rem;
+        }
+
+        .form-check-input {
+            margin-right: 0.5rem;
+        }
+
+        .phong-container {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .phong-container h5 {
+            margin-bottom: 1rem;
+        }
+
+        .phong-container .form-check {
+            margin-bottom: 0.5rem;
+        }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <head th:include="fragment/head :: head"></head>
@@ -67,23 +97,21 @@
                     <div class="card-body">
                         <h4 class="mb-3 text-center">Đặt Phòng</h4>
                         <!-- Chọn loại phòng -->
-                        <div class="mb-3">
-                            <label for="loaiPhongSelect" class="form-label">Loại Phòng:</label>
-                            <select class="form-select form-select-sm" id="loaiPhongSelect" name="idLoaiPhong">
-                                <option value="" selected>Chọn loại phòng</option>
-                                <th:block th:each="loaiPhong : ${loaiPhongs}">
-                                    <option th:value="${loaiPhong.idLoaiPhong}" th:text="${loaiPhong.tenLoaiPhong}">
-                                    </option>
-                                </th:block>
-                            </select>
+                        <div class="mb-4">
+                            <label for="loaiPhongSelect" class="form-label fs-5">Loại Phòng:</label>
+                            <div id="loaiPhongSelect" class="d-flex flex-wrap gap-3">
+                                <!-- Các loại phòng sẽ được thêm vào đây -->
+                            </div>
                         </div>
+
                         <!-- Chọn phòng -->
-                        <div class="mb-3">
-                            <label for="phongSelect" class="form-label">Phòng:</label>
-                            <div id="phongSelect" class="btn-group d-flex flex-wrap">
+                        <div class="mb-4">
+                            <label for="phongSelect" class="form-label fs-5">Phòng:</label>
+                            <div id="phongSelect" class="d-flex flex-wrap gap-3">
                                 <!-- Các phòng sẽ được thêm vào đây -->
                             </div>
                         </div>
+
                         <!-- Form đặt phòng -->
                         <form id="datPhongForm" method="post" action="/datphongs/create">
                             <input type="hidden" name="idKhachHang" id="idKhachHang">
@@ -188,53 +216,102 @@
             }
         }
 
-        loaiPhongSelect.addEventListener('change', function () {
-            const loaiPhongId = loaiPhongSelect.value;
-            phongSelectContainer.innerHTML = ''; // Reset danh sách phòng
-            document.getElementById('idLoaiPhong').value = loaiPhongId; // Cập nhật hidden input
+        fetch('/api/loaiPhong/all-loai-phongs')
+            .then(response => response.json())
+            .then(loaiPhongs => {
+                loaiPhongSelect.innerHTML = ''; // Clear previous data
 
-            if (loaiPhongId) {
-                // Fetch thông tin loại phòng (để lấy số người tối đa)
-                fetch(`/api/loaiPhong/${loaiPhongId}`)
-                    .then(response => response.json())
-                    .then(loaiPhongData => {
-                        const soNguoiToiDa = loaiPhongData.soNguoiToiDa;
-                        const giaLP = loaiPhongData.gia;
+                loaiPhongs.forEach(loaiPhong => {
+                    const div = document.createElement('div');
+                    div.classList.add('form-check', 'col-md-4', 'col-lg-3');
 
-                        // Fetch danh sách phòng cho loại phòng đã chọn
-                        fetch(`/datphongs/available-rooms?loaiPhongId=${loaiPhongId}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (Array.isArray(data)) {
-                                    data.forEach(phong => {
-                                        const div = document.createElement('div');
-                                        div.classList.add('form-check');
+                    div.innerHTML = `
+                    <input class="form-check-input" type="checkbox" name="loaiPhong" value="${loaiPhong.idLoaiPhong}" id="loaiPhong_${loaiPhong.idLoaiPhong}">
+                    <label class="form-check-label" for="loaiPhong_${loaiPhong.idLoaiPhong}">
+                        ${loaiPhong.tenLoaiPhong}
+                    </label>
+                `;
+                    loaiPhongSelect.appendChild(div);
+                });
 
-                                        // Thêm thông tin phòng và số người tối đa từ loại phòng
-                                        div.innerHTML = `
-                                    <input class="form-check-input" type="checkbox" value="${phong.idPhong}" id="phong_${phong.idPhong}">
-                                    <label class="form-check-label" for="phong_${phong.idPhong}">
-                                        ${phong.tenPhong} - Giá: ${giaLP} VND - <i class="fas fa-users" style="font-size: 19px ; color: #0b860d"></i> ${soNguoiToiDa}
-                                    </label>
-                                `;
-                                        phongSelectContainer.appendChild(div);
+                // Thêm sự kiện change cho các checkbox loại phòng
+                document.querySelectorAll('input[name="loaiPhong"]').forEach(input => {
+                    input.addEventListener('change', function () {
+                        const loaiPhongId = this.value; // Sử dụng giá trị từ checkbox hiện tại
+                        console.log('ID loại phòng chọn:', loaiPhongId); // Kiểm tra id
+                        document.getElementById('idLoaiPhong').value = loaiPhongId;
+                        const phongContainerId = `phong_${loaiPhongId}`;
 
-                                        // Lưu giá phòng vào map
-                                        giaPhongMap[phong.idPhong] = phong.gia;
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Lỗi khi tải dữ liệu phòng:', error);
-                                alert('Đã xảy ra lỗi khi tải danh sách phòng. Vui lòng thử lại sau.');
-                            });
-                    })
-                    .catch(error => {
-                        console.error('Lỗi khi tải dữ liệu loại phòng:', error);
-                        alert('Đã xảy ra lỗi khi tải dữ liệu loại phòng.');
+                        if (this.checked) {
+                            fetch(`/api/loaiPhong/${loaiPhongId}`)
+                                .then(response => response.json())
+                                .then(loaiPhongData => {
+                                    // Lưu giá của loại phòng vào map
+                                    giaPhongMap[loaiPhongId] = loaiPhongData.gia;
+
+                                    const soNguoiToiDa = loaiPhongData.soNguoiToiDa;
+                                    // Fetch danh sách phòng cho loại phòng đã chọn
+                                    fetch(`/datphongs/available-rooms?loaiPhongId=${loaiPhongId}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            let phongContainer = document.getElementById(phongContainerId);
+
+                                            if (!phongContainer) {
+                                                phongContainer = document.createElement('div');
+                                                phongContainer.id = phongContainerId;
+                                                phongContainer.classList.add('phong-container');
+                                                phongContainer.innerHTML = `<h5>${this.nextElementSibling.textContent}</h5>`;
+                                                document.getElementById('phongSelect').appendChild(phongContainer);
+                                            }
+
+                                            if (Array.isArray(data) && data.length > 0) {
+                                                phongContainer.innerHTML = ''; // Clear previous data
+                                                data.forEach(phong => {
+                                                    if (!document.getElementById(`phong_${phong.idPhong}`)) {
+                                                        const div = document.createElement('div');
+                                                        div.classList.add('form-check');
+
+                                                        // Thêm thông tin phòng
+                                                        div.innerHTML = `
+                                                        <input class="form-check-input" type="checkbox" value="${phong.idPhong}" id="phong_${phong.idPhong}">
+                                                        <label class="form-check-label" for="phong_${phong.idPhong}">
+                                                            ${phong.tenPhong} - Giá: ${giaPhongMap[loaiPhongId]} VND - Số Người Tối Đa: ${soNguoiToiDa}
+                                                        </label>
+                                                    `;
+                                                        phongContainer.appendChild(div);
+
+                                                        // Lưu giá phòng vào map
+                                                        giaPhongMap[phong.idPhong] = giaPhongMap[loaiPhongId];
+                                                    }
+                                                });
+                                            } else {
+                                                phongContainer.innerHTML = '<p>Không có phòng trống cho loại phòng này.</p>';
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Lỗi khi tải dữ liệu phòng:', error);
+                                            alert('Đã xảy ra lỗi khi tải danh sách phòng. Vui lòng thử lại sau.');
+                                        });
+                                })
+                                .catch(error => {
+                                    console.error('Lỗi khi tải dữ liệu loại phòng:', error);
+                                    alert('Đã xảy ra lỗi khi tải thông tin loại phòng.');
+                                });
+                        } else {
+                            // Nếu loại phòng không được chọn, xóa các phòng tương ứng
+                            const phongContainer = document.getElementById(phongContainerId);
+                            if (phongContainer) {
+                                phongContainer.remove();
+                            }
+                        }
                     });
-            }
-        });
+                });
+            })
+            .catch(error => {
+                console.error('Lỗi khi tải dữ liệu loại phòng:', error);
+                alert('Đã xảy ra lỗi khi tải danh sách loại phòng.');
+            });
+
 
 
         function updateTienCoc() {
@@ -595,38 +672,35 @@
 
     });
 
-    // document.getElementById('confirmCustomerBtn').addEventListener('click', function () {
-    //     const email = document.getElementById('email').value;
-    //     const soDienThoai = document.getElementById('soDienThoai').value;
+
+    // document.getElementById('loaiPhongSelect').addEventListener('change', function () {
+    //     const selectedLoaiPhong = this.value;
+    //     const tangInput = document.getElementById('tangInput');
     //
-    //     // Gọi API kiểm tra email và số điện thoại
-    //     fetch(`/khach-hang/check?email=${email}&soDienThoai=${soDienThoai}`)
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             if (data) {
-    //                 // Sử dụng SweetAlert2 để hiển thị thông báo lỗi
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Thông tin trùng lặp',
-    //                     text: 'Email hoặc số điện thoại đã tồn tại. Vui lòng nhập lại.',
-    //                     confirmButtonText: 'OK'
-    //                 });
-    //             } else {
-    //                 // Sử dụng SweetAlert2 để hiển thị thông báo thành công
-    //                 Swal.fire({
-    //                     icon: 'success',
-    //                     title: 'Thông tin hợp lệ',
-    //                     text: 'Tiến hành lưu thông tin khách hàng.',
-    //                     confirmButtonText: 'OK'
-    //                 }).then(() => {
-    //                     // Tiếp tục xử lý form sau khi người dùng nhấn nút OK
-    //                     // Ví dụ: Gửi form hoặc thực hiện các hành động khác
-    //                     document.getElementById('customerForm').submit();
-    //                 });
-    //             }
-    //         })
-    //         .catch(error => console.error('Error:', error));
+    //     if (selectedLoaiPhong) {
+    //         // Gửi yêu cầu đến server để lấy thông tin tầng cho loại phòng đã chọn
+    //         fetch(`/tang/for-loai-phong/${selectedLoaiPhong}`)
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 if (data && data.length > 0) {
+    //                     // Giả sử server trả về tầng đầu tiên trong danh sách
+    //                     const tang = data[0];
+    //                     tangInput.value = tang.tenTang; // Cập nhật ô input với tên tầng
+    //                 } else {
+    //                     tangInput.value = ''; // Xóa nội dung nếu không có tầng
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 console.error('Lỗi khi lấy thông tin tầng:', error);
+    //                 tangInput.value = ''; // Xóa nội dung nếu có lỗi
+    //             });
+    //     } else {
+    //         // Xóa nội dung nếu không chọn loại phòng
+    //         tangInput.value = '';
+    //     }
     // });
+
+
 
 
 </script>

@@ -5,6 +5,7 @@ import com.example.DuAnTotNghiepKs.entity.Tang;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Builder
 @ToString
@@ -26,4 +27,7 @@ public class LoaiPhongDTO {
 
     public LoaiPhongDTO(Integer idLoaiPhong, String maLoaiPhong, String tenLoaiPhong, String moTa, Integer soLuongGiuong, Integer soNguoiToiDa, Float gia, DienTich dienTich, Tang tang) {
     }
+
+    private List<PhongDTO> availableRooms;
+
 }

@@ -31,4 +31,10 @@ public class TangServiceImp implements TangService {
         return tangRepository.save(tang);
     }
 
+    // Tìm danh sách tầng theo id loại phòng
+    @Override
+    public List<Tang> findByLoaiPhongId(Integer idLoaiPhong) {
+        return tangRepository.findByLoaiPhong_IdLoaiPhong(idLoaiPhong);
+    }
+
 }
