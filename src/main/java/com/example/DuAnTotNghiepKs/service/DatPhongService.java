@@ -3,6 +3,7 @@ package com.example.DuAnTotNghiepKs.service;
 import com.example.DuAnTotNghiepKs.DTO.IdleRoomDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.data.domain.Page;
 
 
@@ -36,6 +37,8 @@ public interface DatPhongService {
 //    double getRevenueByYear(int year);
 
     Map<String, Object> getRevenueByYear(int year);
+
+    public DatPhong findTopByOrderByIdDatPhongDesc();
 
     Long getBookingCount();
 

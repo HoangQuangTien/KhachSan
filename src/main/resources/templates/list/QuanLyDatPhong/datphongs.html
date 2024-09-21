@@ -136,8 +136,8 @@
                             </div>
                             <!-- CCCD -->
                             <div class="mb-2">
-                                <label for="cccd" class="form-label">CCCD:</label>
-                                <input type="text" class="form-control form-control-sm" id="cccd" name="cccd" placeholder="CCCD" required>
+                                <label for="cccd" class="form-label">CCCD:(Có thể để trống)</label>
+                                <input type="text" class="form-control form-control-sm" id="cccd" name="cccd" placeholder="CCCD" >
                             </div>
                             <input type="hidden" name="tongTien" id="tongTien">
                             <!--                        <div class="mb-3">-->
@@ -262,6 +262,9 @@
                                                 phongContainer.classList.add('phong-container');
                                                 phongContainer.innerHTML = `<h5>${this.nextElementSibling.textContent}</h5>`;
                                                 document.getElementById('phongSelect').appendChild(phongContainer);
+                                            }else{
+                                                // Giữ lại các loại phòng khác và chỉ cập nhật phòng của loại này
+                                                phongContainer.innerHTML = `<h5>${this.nextElementSibling.textContent}</h5>`;
                                             }
 
                                             if (Array.isArray(data) && data.length > 0) {
@@ -283,10 +286,12 @@
                                                         // Lưu giá phòng vào map
                                                         giaPhongMap[phong.idPhong] = giaPhongMap[loaiPhongId];
                                                     }
+                                                    updateTienCoc();
                                                 });
                                             } else {
                                                 phongContainer.innerHTML = '<p>Không có phòng trống cho loại phòng này.</p>';
                                             }
+                                            updateTienCoc();
                                         })
                                         .catch(error => {
                                             console.error('Lỗi khi tải dữ liệu phòng:', error);
@@ -303,6 +308,17 @@
                             if (phongContainer) {
                                 phongContainer.remove();
                             }
+                            // Xóa tất cả các phòng thuộc loại phòng đó khỏi giaPhongMap
+                            Object.keys(giaPhongMap).forEach(idPhong => {
+                                if (idPhong.startsWith(loaiPhongId)) {
+                                    delete giaPhongMap[idPhong];
+                                }
+                            });
+
+                            // Xóa giá loại phòng khỏi giaPhongMap
+                            delete giaPhongMap[loaiPhongId];
+
+                            updateTienCoc(); // Cập nhật lại tiền cọc khi loại phòng bị bỏ chọn
                         }
                     });
                 });
@@ -350,6 +366,10 @@
                 tienConLaiInput.value = totalTienConLai.toFixed(2); // Hiển thị 2 chữ số thập phân
             }
         }
+
+
+
+
 
 
 
@@ -552,18 +572,23 @@
                 return;
             }
 
-            document.getElementById('idPhong').value = selectedPhongIds[0]; // Gán ID phòng đầu tiên vào hidden input
+            // Gán ID phòng vào hidden input
+            document.getElementById('idPhong').value = selectedPhongIds.join(','); // Gán danh sách ID phòng
 
-            if (selectedPhongIds.length === 0) {
-                alert("Vui lòng chọn ít nhất một phòng.");
+            const selectedLoaiPhongIds = Array.from(document.querySelectorAll('#loaiPhongSelect .form-check-input:checked'))
+                .map(input => input.value)
+                .filter(id => id); // Lọc ra các ID không rỗng
+
+            if (selectedLoaiPhongIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một loại phòng.");
                 event.preventDefault(); // Ngăn submit form
                 return;
             }
 
-            if (!validateDates()) {
-                event.preventDefault(); // Ngăn submit form nếu ngày không hợp lệ
-                return;
-            }
+            // Gán ID loại phòng vào hidden input
+            document.getElementById('idLoaiPhong').value = selectedLoaiPhongIds.join(',');
+
+
 
             const idKhachHang = document.getElementById('idKhachHang').value;
             if (!idKhachHang || isNaN(idKhachHang)) {
@@ -600,7 +625,6 @@
                             showConfirmButton: true
                         }).then(() => {
                             location.reload();
-                            // showPaymentForm(); // Hiển thị form thanh toán sau khi đặt phòng thành công
                         });
                     } else {
                         Swal.fire({
@@ -623,6 +647,8 @@
 
             event.preventDefault(); // Ngăn submit form để gửi dữ liệu bằng fetch
         });
+
+
 
 
         document.getElementById('confirmPaymentBtn').addEventListener('click', function () {

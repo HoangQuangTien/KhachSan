@@ -33,6 +33,8 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
 
     List<Phong> findByLoaiPhongIdLoaiPhong(Integer loaiPhongId);
 
+
+
     boolean existsByMaPhong(String maPhong);
 
     long countByTrangThaiAndTinhTrang(Boolean trangThai, Boolean tinhTrang);

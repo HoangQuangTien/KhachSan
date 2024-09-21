@@ -51,6 +51,11 @@ public class DatPhongServiceImp implements DatPhongService {
     }
 
     @Override
+    public DatPhong findTopByOrderByIdDatPhongDesc(){
+        return datPhongRepository.findTopByOrderByIdDatPhongDesc();
+    }
+
+    @Override
     public void deleteDatPhong(int id) {
         DatPhong datPhong = getDatPhongById(id);
         if (datPhong != null) {
