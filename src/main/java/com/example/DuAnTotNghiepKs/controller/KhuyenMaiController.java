@@ -13,12 +13,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin/quan-ly-khuyen-mai")
 public class KhuyenMaiController {
     @Autowired
     private KhuyenMaiService khuyenMaiService;
@@ -26,7 +25,7 @@ public class KhuyenMaiController {
 //    @Autowired
 //    private KhuyenMaiRepo khuyenMaiRepo;
 
-    @GetMapping("/quan-ly-khuyen-mai")
+    @GetMapping()
     public String showKhuyenMaiPage(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size,
@@ -85,6 +84,7 @@ public class KhuyenMaiController {
             result.rejectValue("maKhuyenMai", "error.khuyenMai", "Mã khuyến mãi đã tồn tại");
             return "list/QuanLyKhuyenMai/add";
         }
+        khuyenMai.getMaKhuyenMai();
         khuyenMaiService.saveKhuyenMai(khuyenMai);
         return "redirect:/admin/quan-ly-khuyen-mai";
     }
@@ -121,8 +121,8 @@ public class KhuyenMaiController {
         return "list/QuanLyKhuyenMai/edit";
     }
 
-    @PostMapping("/edit")
-    public String updateKhuyenMai(@Valid @ModelAttribute KhuyenMai khuyenMai, BindingResult result) {
+    @PostMapping("/edit/{id}")
+    public String updateKhuyenMai(@Valid @ModelAttribute KhuyenMai khuyenMai, BindingResult result, @PathVariable Integer id) {
 
         // Ngày hiện tại
         LocalDate today = LocalDate.now();
@@ -147,7 +147,7 @@ public class KhuyenMaiController {
         }
 
         // Lưu thông tin khuyến mãi nếu không có lỗi
-        khuyenMaiService.saveKhuyenMai(khuyenMai);
+        khuyenMaiService.updateKhuyenMai(id,khuyenMai);
         return "redirect:/admin/quan-ly-khuyen-mai";
     }
 
@@ -169,7 +169,7 @@ public class KhuyenMaiController {
     @GetMapping("/search")
     public String searchKhuyenMai(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
-            @RequestParam(value = "trangThai", defaultValue = "true") boolean trangThai,
+            @RequestParam(value = "trangThai") String trangThai,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size,
             Model model) {
@@ -186,4 +186,3 @@ public class KhuyenMaiController {
 
 
 }
-

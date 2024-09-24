@@ -1,66 +1,88 @@
 body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #ffffff;
     padding: 20px;
-    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 600px;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 30px;
-    color: #343a40;
+    color: #333;
+    margin-bottom: 20px;
+}
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Khoảng cách giữa các cột */
+}
+.form-group {
+    flex: 1;/* đảm bảo chia đề không gian */
+    margin-bottom: 15px;
 }
 
-form {
-    max-width: 600px;
-    margin: 0 auto;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
-
-label {
-    font-weight: bold;
-    margin-top: 15px;
+.form-group label {
     display: block;
+    color: #666;
+    margin-bottom: 5px;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="date"],
-select {
+.form-control {
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
+    padding: 8px;
     box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/* CSS mới cho trạng thái */
+.form-group-radio {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px; /* Khoảng cách giữa các nút radio */
+}
+.form-check-input {
+    margin-right: 5px; /* Khoảng cách giữa checkbox và label */
 }
 
-button[type="submit"] {
+.btn-submit {
     width: 100%;
-    padding: 10px;
-    margin-top: 20px;
     background-color: #007bff;
-    color: #fff;
+    color: #ffffff;
+    padding: 10px;
     border: none;
-    border-radius: 5px;
-    font-size: 16px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 16px;
 }
 
-button[type="submit"]:hover {
+.btn-submit:hover {
     background-color: #0056b3;
 }
 
 a {
     display: block;
+    margin-top: 10px;
     text-align: center;
-    margin-top: 20px;
     color: #007bff;
     text-decoration: none;
 }
 
 a:hover {
     text-decoration: underline;
+}
+.error-message {
+    color: red;
+    font-size: 0.875em;
 }

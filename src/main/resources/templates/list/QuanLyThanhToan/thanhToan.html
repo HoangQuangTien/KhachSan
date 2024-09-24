@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:include="fragment/head :: head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê doanh thu</title>
+    <!-- Thêm thư viện Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS cho thông báo translucent */
+        #errorMessage {
+            display: none; /* Ẩn mặc định */
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            background-color: rgba(255, 0, 0, 0.8); /* Màu đỏ translucent */
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+            z-index: 1000;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        body {
+            background-color: #f8f9fa; /* Màu nền nhạt */
+            color: #856404; /* Màu chữ cảnh báo */
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #856404; /* Màu tiêu đề cảnh báo */
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin: 0 10px;
+        }
+
+        .chart-container {
+            width: 70%;
+            margin: 0 auto;
+        }
+
+        .revenue-display {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #fd7e14; /* Màu cảnh báo đậm */
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="vertical light">
+<div th:include="fragment/navbar :: navbar"></div>
+<div th:include="fragment/sidebar :: sidebar"></div>
+
+<main role="main" class="main-content">
+    <div class="container-fluid">
+        <!-- Thông báo lỗi translucent -->
+        <!--        <div id="errorMessage"></div>-->
+
+        <div class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive"
+             aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="errorMessage">
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Cột bên trái: Bảng -->
+            <div class="col-md-6">
+                <h1 class="mb-4">Danh sách đã cọc</h1>
+                <table class="table table-bordered table-sm text-center">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Mã đặt phòng</th>
+                        <th>Khách hàng</th>
+                        <th>Phòng</th>
+                        <th>Số điện thoại</th>
+                        <th>Ngày nhận phòng</th>
+                        <!--                        <th>Ngày trả phòng</th>-->
+                        <th>Trạng Thái</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="datPhong : ${datPhongs}"
+                        th:if="${datPhong.tinhTrang == true}"
+                        th:data-id-dat-phong="${datPhong.idDatPhong}"
+                        th:data-id-phong="${datPhong.phong.idPhong}"
+                        th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}"
+                        th:data-hovaten="${datPhong.khachHang.hoVaTen}"
+                        th:data-sodienthoai="${datPhong.khachHang.soDienThoai}"
+                        th:data-tenphong="${datPhong.phong.tenPhong}"
+                        th:data-thoigian="${#dates.format(datPhong.ngayNhan,'dd/MM')} + ' - ' + ${#dates.format(datPhong.ngayTra,'dd/MM/yyyy')}"
+                        th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}"
+                        th:data-giaphong="${datPhong.phong.gia}"
+                        th:data-tiencoc="${datPhong.tienCoc}"
+                        th:data-tienconlai="${datPhong.tienConLai}"
+                        onclick="showForm(this.getAttribute('data-id-dat-phong'),
+                                        this.getAttribute('data-id-phong'),
+                                        this.getAttribute('data-id-loai-phong'),
+                                        this.getAttribute('data-hovaten'),
+                                        this.getAttribute('data-sodienthoai'),
+                                        this.getAttribute('data-tenphong'),
+                                        this.getAttribute('data-thoigian'),
+                                        this.getAttribute('data-ngaycheckin'),
+                                        this.getAttribute('data-giaphong'),
+                                        this.getAttribute('data-tiencoc'),
+                                        this.getAttribute('data-tienconlai'))">
+                        <td th:text="${datPhong.maDatPhong}"></td>
+                        <td th:text="${datPhong.khachHang.hoVaTen}"></td>
+                        <td th:text="${datPhong.phong.tenPhong}"></td>
+                        <td th:text="${datPhong.khachHang.soDienThoai}"></td>
+                        <td th:text="${#dates.format(datPhong.ngayNhan, 'dd/MM/yyyy')}"></td>
+                        <!--                        <td th:text="${#dates.format(datPhong.ngayTra, 'dd/MM/yyyy')}"></td>-->
+                        <td th:text="${datPhong.tinhTrang == 0 ? 'Đã Thanh Toán' : 'Đã trả trước'}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cột bên phải: Form -->
+            <div class="col-md-6">
+                <form th:action="@{/thanhToan/add}" method="post" th:object="${thanhToanDTO}" id="formId">
+                    <h2>Thông tin hóa đơn</h2>
+                    <input type="hidden" id="idDatPhong" th:field="*{idDatPhong}">
+                    <input type="hidden" id="idPhong" th:field="*{idPhong}">
+                    <input type="hidden" id="idLoaiPhong" th:field="*{idLoaiPhong}">
+
+                    <!-- Thông tin khách hàng -->
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="hoVaTen" class="form-label">Khách hàng</label>
+                            <input type="text" name="hoVaTen" id="hoVaTen" class="form-control">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="soDienThoai" class="form-label">Số điện thoại</label>
+                            <input type="text" name="soDienThoai" id="soDienThoai" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="tenphong" class="form-label">Tên phòng</label>
+                            <input type="text" id="tenphong" class="form-control">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="thoiGian" class="form-label">Thời gian</label>
+                            <input type="text" id="thoiGian" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="ngayCheckIn" class="form-label">Thời gian check-in</label>
+                            <input type="text" name="ngayCheckIn" id="ngayCheckIn" class="form-control">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="giaPhong" class="form-label">Giá phòng</label>
+                            <input type="text" name="gia" id="giaPhong" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="tienPhuPhi" class="form-label">Tiền phụ phí</label>
+                            <input type="text" id="tienPhuPhi" class="form-control">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="giaDichVu" class="form-label">Tiền dịch vụ</label>
+                            <input type="text" id="giaDichVu" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="tienCoc" class="form-label">Tiền cọc phòng</label>
+                            <input type="text" name="tienCoc" id="tienCoc" class="form-control">
+                        </div>
+                        <!--                        <div class="mb-3">-->
+                        <!--                            <label for="giaDichVu" class="form-label">Tiền dịch vụ</label>-->
+                        <!--                            <input type="text" name="gia" id="giaDichVu" class="form-control">-->
+                        <!--                        </div>-->
+                    </div>
+
+
+                    <!-- Thông tin thanh toán -->
+                    <h2 class="mt-4">Thanh toán</h2>
+                    <div class="mb-3 d-flex align-items-center">
+                        <label for="phuPhiSelect" class="form-label me-2">Phụ phí</label>
+                        <div class="input-group col-8">
+                            <select onchange="phuPhiChange(this);tinhTongTien();" class="form-select" id="phuPhiSelect"
+                                    name="phuPhi">
+                                <option value="Không có phụ thu nào" disabled selected>Chọn phụ phí</option>
+                                <option th:each="phuPhi : ${phuPhis}"
+                                        th:value="${phuPhi.idPhuPhi}"
+                                        th:text="${phuPhi.tenPhuPhi}"
+                                        th:data-giaphuphi="${phuPhi.giaPhuPhi}">
+                                </option>
+                            </select>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#modalPhuPhi">+
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Phương thức thanh toán: </label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="phuongThuc" id="tienMat" value="true" class="form-check-input"
+                                   onclick="toggleTienMatFields(true); generateQR(false)" checked>
+                            <label for="tienMat" class="form-check-label">Tiền mặt</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false"
+                                   class="form-check-input" onclick="toggleTienMatFields(false); generateQR(true)">
+                            <label for="chuyenKhoan" class="form-check-label">Chuyển khoản</label>
+                        </div>
+                    </div>
+
+                    <div id="qrCode" style="display: none;">
+                        <label class="form-label">Mã QR Chuyển khoản:</label>
+                        <div id="qrcode-container"></div>
+                    </div>
+
+                    <div id="tienMatFields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="soTienKhachDua" class="form-label">Số tiền khách đưa</label>
+                            <input type="number" id="soTienKhachDua" class="form-control" oninput="tinhTienThua()">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tienThua" class="form-label">Tiền thừa</label>
+                            <input type="number" id="tienThua" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tienConLai" class="form-label">Tổng phải thanh toán</label>
+                        <input type="number" name="soTien" id="tienConLai" class="form-control">
+                    </div>
+
+                    <input type="hidden" name="tinhTrang" id="daThanhToan" value="true">
+                    <div>
+                        <button type="submit" class="btn btn-primary">Thanh toán</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="modalPhuPhi" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: orange">
+                            <h5 class="modal-title" id="staticBackdropLabelUpdate">Thêm phụ phí</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formPhuPhi" class="p-3 border rounded shadow-sm bg-light">
+                                <h4 class="mb-3">Thêm phụ phí</h4>
+                                <input type="hidden" name="idDatPhong" id="datPhongId">
+                                <div class="mb-3">
+                                    <label for="tenPhuPhi" class="form-label">Tên phụ phí</label>
+                                    <input type="text" name="tenPhuPhi" id="tenPhuPhi"
+                                           class="form-control" placeholder="Nhập tên phụ phí" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="giaPhuPhi" class="form-label">Giá phụ phí</label>
+                                    <input type="number" name="giaPhuPhi" id="giaPhuPhi" class="form-control"
+                                           placeholder="Nhập giá phụ phí" required>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-success">Thêm phụ phí</button>
+                                </div>
+                            </form>
+
+                            <div class="mt-5">
+                                <!-- Kiểm tra nếu danh sách phụ phí rỗng -->
+                                <!--                                <div th:each="phuPhi:${phuPhis}" th:if="${phuPhi.getDatPhong().idDatPhong == null}"  class="text-center text-muted">-->
+                                <!--                                    Chưa có phụ phí nào-->
+                                <!--                                </div>-->
+                                <table class="table table-bordered table-striped shadow-sm">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Tên phụ phí</th>
+                                        <th scope="col">Giá phụ phí</th>
+                                        <th scope="col">Id Đặt Phòng</th>
+                                        <th scope="col">Thao tác</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="phuPhi, i : ${phuPhis}"
+                                        data-bs-toggle="modal" data-bs-target="#modalUpdatePhuPhi"
+                                        th:data-idphuphi="${phuPhi.idPhuPhi}"
+                                        th:data-tenphuphi="${phuPhi.tenPhuPhi}"
+                                        th:data-giaphuphi="${phuPhi.giaPhuPhi}"
+                                        th:data-iddatphong="${phuPhi.datPhong.idDatPhong}"
+                                        onclick="detailPhuPhi(this)">
+                                        <td th:text="${i.count}"></td>
+                                        <td th:text="${phuPhi.tenPhuPhi}"></td>
+                                        <td th:text="${phuPhi.giaPhuPhi}"></td>
+                                        <td th:text="${phuPhi.datPhong.idDatPhong}"></td>
+                                        <td>
+                                            <button type="button" th:onclick="deletePhuPhi('[[${phuPhi.idPhuPhi}]]')"
+                                                    class="btn btn-danger btn-sm">Xóa
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="btn btn-primary">Xác nhận</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Update modal  -->
+            <div class="modal fade" id="modalUpdatePhuPhi" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: orange">
+                            <h5 class="modal-title" id="staticBackdropLabel">Sửa phụ phí</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formUpdatePhuPhi" class="p-3 border rounded shadow-sm bg-light">
+                                <h4 class="mb-3">Thêm phụ phí</h4>
+                                <input type="hidden" name="idDatPhong" id="datPhongIdDetail">
+                                <input type="hidden" name="idPhuPhi" id="idPhuPhiDetail">
+                                <div class="mb-3">
+                                    <label for="tenPhuPhi" class="form-label">Tên phụ phí</label>
+                                    <input type="text" name="tenPhuPhi" id="tenPhuPhiDetail"
+                                           class="form-control" placeholder="Nhập tên phụ phí" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="giaPhuPhi" class="form-label">Giá phụ phí</label>
+                                    <input type="number" name="giaPhuPhi" id="giaPhuPhiDetail" class="form-control"
+                                           placeholder="Nhập giá phụ phí" required>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-success">Sửa phụ phí</button>
+                                </div>
+                            </form>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="btn btn-primary">Xác nhận</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+<!-- Thêm thư viện QRCode.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+
+    //Lắng nghe sự kiến submit từ form
+    document.getElementById("formPhuPhi").addEventListener('submit', function (event) {
+        event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+
+        const idDatPhong = parseInt(document.getElementById('datPhongId').value, 10);
+        const tenPhuPhi = document.getElementById('tenPhuPhi').value;
+        const giaPhuPhi = parseFloat(document.getElementById('giaPhuPhi').value);
+
+        // Kiểm tra dữ liệu đầu vào
+        if (!idDatPhong || isNaN(idDatPhong)) {
+            showError("Vui lòng nhập ID đặt phòng hợp lệ.");
+            return;
+        }
+        if (!tenPhuPhi) {
+            showError("Vui lòng nhập tên phụ phí.");
+            return;
+        }
+        if (isNaN(giaPhuPhi)) {
+            showError("Giá phụ phí phải là một số hợp lệ.");
+            return;
+        }
+
+        // Gửi dữ liệu đến server
+        fetch('/phuPhi/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `idDatPhong=${encodeURIComponent(idDatPhong)}
+            &tenPhuPhi=${encodeURIComponent(tenPhuPhi)}
+            &giaPhuPhi=${encodeURIComponent(giaPhuPhi)}`
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'Đã xảy ra lỗi khi thêm phụ phí.');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: data.success || 'Thông tin phụ phí đã được thêm thành công.',
+                    showConfirmButton: true
+                });
+                // Cập nhật nội dung mà không tải lại trang
+                // Ví dụ: thêm phụ phí vào một danh sách hiển thị hoặc làm mới một phần của trang
+                document.getElementById('datPhongId').value = '';
+                document.getElementById('tenPhuPhi').value = '';
+                document.getElementById('giaPhuPhi').value = '';
+                // Thêm phụ phí mới vào bảng
+                const tableBody = document.querySelector('tbody');
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+            <td>${tableBody.children.length + 1}</td>
+            <td>${tenPhuPhi}</td>
+            <td>${giaPhuPhi}</td>
+            <td>${idDatPhong}</td>
+            <td>
+                <a href="" class="btn btn-danger btn-sm">Xóa</a>
+            </td>
+        `;
+                tableBody.appendChild(newRow);
+            })
+            .catch(error => {
+                console.log("Lỗi khi gọi API: ", error);
+                showError("Đã xảy ra lỗi: " + error.message);
+            });
+    });
+
+    //xóa phuphi
+    function deletePhuPhi(idPhuPhi) {
+        if (confirm("Bạn có chắc chắn muốn xóa phụ phí này?")) {
+            fetch(`/phuPhi/delete/${idPhuPhi}`, {
+                method: 'DELETE', // Phương thức DELETE
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.text().then(text => {
+                    console.log(text); // In phản hồi ra console
+                    if (!response.ok) {
+                        throw new Error('Đã xảy ra lỗi khi xóa phụ phí.');
+                    }
+                    try {
+                        return JSON.parse(text); // Thử chuyển phản hồi thành JSON
+                    } catch (error) {
+                        throw new Error('Phản hồi từ server không phải là JSON.');
+                    }
+                }))
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: data.success,
+                        showConfirmButton: true
+                    }).then(() => {
+                        // Reload lại trang hoặc cập nhật lại bảng dữ liệu phụ phí
+                        location.reload(); // Tải lại trang để cập nhật thay đổi
+                    });
+                })
+                .catch(error => {
+                    console.log("Lỗi khi gọi API: ", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: error.message,
+                        showConfirmButton: true
+                    });
+                });
+        }
+    }
+
+    //detail phu phi
+    function detailPhuPhi(button) {
+        let idPhuPhi = button.getAttribute('data-idphuphi');
+        let tenPhuPhi = button.getAttribute('data-tenphuphi');
+        let giaPhuPhi = button.getAttribute('data-giaphuphi');
+        let idDatPhong = button.getAttribute('data-iddatphong');
+
+        document.getElementById('idPhuPhiDetail').value = idPhuPhi;
+        document.getElementById('tenPhuPhiDetail').value = tenPhuPhi;
+        document.getElementById('giaPhuPhiDetail').value = giaPhuPhi;
+        document.getElementById('datPhongIdDetail').value = idDatPhong;
+
+        console.log(idPhuPhi);
+        console.log(idDatPhong);
+        console.log(tenPhuPhi);
+        console.log(giaPhuPhi);
+    }
+
+    //updatePhuPhi
+    document.getElementById("formUpdatePhuPhi").addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const idPhuPhi = document.getElementById('idPhuPhiDetail').value;
+        const idDatPhong = document.getElementById('datPhongIdDetail').value;
+        const tenPhuPhi = document.getElementById('tenPhuPhiDetail').value;
+        const giaPhuPhi = document.getElementById('giaPhuPhiDetail').value;
+
+        fetch('phuPhi/update', {
+            method: 'PUT',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+
+            }, body: `idPhuPhi=${encodeURIComponent(idPhuPhi)}
+                    &idDatPhong=${encodeURIComponent(idDatPhong)}
+                    &tenPhuPhi=${encodeURIComponent(tenPhuPhi)}
+                    &giaPhuPhi=${encodeURIComponent(giaPhuPhi)}`
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'Đã xảy ra lỗi khi sửa phụ phí.');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: data.success,
+                    showConfirmButton: true
+                });
+            }).catch(error => {
+            console.log(idPhuPhi, idDatPhong, tenPhuPhi, giaPhuPhi);
+            console.log('Lỗi', error)
+            showError('Đã xảy ra lỗi: ' + error.message);
+        });
+
+    });
+
+
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Đã xảy ra lỗi!',
+            text: message,
+            showConfirmButton: true
+        });
+    }
+
+
+    // Hàm này điền dữ liệu vào các input fields trong form
+    function showForm(idDatPhong, idPhong, idLoaiPhong, hoVaTen,
+                      soDienThoai, tenPhong, thoiGian, thoiGianCheckIn,
+                      giaPhong, tienCoc, tienConLai) {
+        // Điền giá trị vào form
+        document.getElementById('idDatPhong').value = idDatPhong;
+        document.getElementById('idPhong').value = idPhong;
+        document.getElementById('idLoaiPhong').value = idLoaiPhong;
+        document.getElementById("hoVaTen").value = hoVaTen;
+        document.getElementById("soDienThoai").value = soDienThoai;
+        document.getElementById("tenphong").value = tenPhong;
+        document.getElementById("thoiGian").value = thoiGian;
+        document.getElementById("ngayCheckIn").value = thoiGianCheckIn;
+        document.getElementById("giaPhong").value = giaPhong;
+        document.getElementById("tienCoc").value = tienCoc;
+        // document.getElementById("tongTien").value = tongTien;
+        document.getElementById("tienConLai").value = tienConLai;
+        // document.getElementById("soTien").value = tongTien;
+        document.getElementById("datPhongId").value = idDatPhong;
+
+        // Chuyển đổi giá trị tình trạng sang radio button phù hợp
+        // if (tinhTrang === true) {
+        //     document.getElementById("tinhTrang").value = true;
+        // } else {
+        //     document.getElementById("tinhTrang").value = false;
+        // }
+
+    }
+
+    function phuPhiChange(selectElement) {
+        const selectOption = selectElement.options[selectElement.selectedIndex];
+        const giaPhuPhi = selectOption.getAttribute('data-giaphuphi');
+
+        //gán vào ô input
+        document.getElementById('tienPhuPhi').value = giaPhuPhi || '';
+    }
+
+    function toggleTienMatFields(isTienMat) {
+        var tienMatFields = document.getElementById("tienMatFields");
+        if (isTienMat) {
+            tienMatFields.style.display = "block";
+        } else {
+            tienMatFields.style.display = "none";
+        }
+    }
+
+    function tinhTienThua() {
+        var soTienKhachDua = parseFloat(document.getElementById("soTienKhachDua").value) || 0;
+        var tongSoTien = parseFloat(document.getElementById("tienConLai").value) || 0;
+        // var tienPhuPhi = parseFloat(document.getElementById("tienPhuPhi").value) || 0;
+        var tienThua = soTienKhachDua - tongSoTien;
+
+        document.getElementById("tienThua").value = tienThua > 0 ? tienThua.toFixed(2) : 0;
+    }
+
+    // Hàm tính tổng tiền cần thanh toán (bao gồm phụ phí)
+    function tinhTongTien() {
+        var tienPhuPhi = parseFloat(document.getElementById('tienPhuPhi').value) || 0;
+        var tongSoTien = parseFloat(document.getElementById('tienConLai').value) || 0;
+        //
+        // // Cộng phụ phí vào tổng số tiền
+        var tongTien = tongSoTien + tienPhuPhi;
+
+        // Cập nhật ô input với giá trị mới của tổng tiền
+        document.getElementById("tienConLai").value = tongTien.toFixed(2);
+    }
+
+    // function generateQR(showQR) {
+    //     var qrCodeDiv = document.getElementById("qrCode");
+    //     var qrCodeContainer = document.getElementById("qrcode-container");
+    //     if (showQR) {
+    //         qrCodeDiv.style.display = "block";
+    //         qrCodeContainer.innerHTML = ""; // Clear QR code if exists
+    //
+    //         var tongSoTien = document.getElementById("soTien").value;
+    //         var qrCodeText = `MB Bank|SoTaiKhoan=0123456789|TenNguoiNhan=NguyenVanA|SoTien=${tongSoTien}|NoiDung=ThanhToan`;
+    //
+    //         var qrcode = new QRCode(qrCodeContainer, {
+    //             text: qrCodeText,
+    //             width: 128,
+    //             height: 128
+    //         });
+    //     } else {
+    //         qrCodeDiv.style.display = "none";
+    //     }
+    // }
+
+</script>
+</body>
+<script th:include="fragment/script :: script"></script>
+</html>

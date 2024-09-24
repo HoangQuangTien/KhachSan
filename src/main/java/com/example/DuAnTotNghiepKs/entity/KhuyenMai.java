@@ -5,8 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.util.Date;
+import java.util.Random;
 
 @Getter
 @Setter
@@ -55,8 +55,40 @@ public class KhuyenMai {
     @Column(name = "loai_giam", nullable = false)
     private Boolean loaiGiam;
 
-    @NotNull
-    @Column(name = "trang_thai")
-    private Boolean trangThai;
+    @NotNull(message = "Số lượng không được để trống")
+    @PositiveOrZero(message = "Số lượng phải lớn hơn 0")
+    @Column(name = "so_luong")
+    private Integer soLuong;
 
+    @NotNull(message = "Giảm tối thiểu không được để trống")
+    @PositiveOrZero(message = "Giảm tối thiểu phải lớn hơn 0")
+    @Column(name = "giam_toi_thieu")
+    private Float giamToiThieu;
+
+    @NotNull(message = "Giảm tối đa không được để trống")
+    @PositiveOrZero(message = "Giẩm tối đa phải lớn hơn 0")
+    @Column(name = "giam_toi_da")
+    private Float giamToiDa;
+
+    @Column(name = "trang_thai")
+    private String trangThai;
+
+//    @PrePersist
+//    protected void genMa(){
+//        if (maKhuyenMai == null){
+//            maKhuyenMai = generateShortCode() ;
+//        }
+//    }
+//
+//    private String generateShortCode(){
+//        int length = 6;
+//        String kyTu = "QWERTYUIOPASDFGHJKLZXCVBNM0123456789";
+//        Random random = new Random();
+//        StringBuilder sb = new StringBuilder(length);
+//        for (int i = 0; i < length;i++){
+//            int index = random.nextInt(kyTu.length());
+//            sb.append(kyTu.charAt(index));
+//        }
+//        return sb.toString();
+//    }
 }

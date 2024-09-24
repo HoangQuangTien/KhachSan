@@ -303,7 +303,7 @@
                                     <!-- Tầng -->
                                     <p class="card-text"><strong>Tầng: </strong><span th:text="${phong.loaiPhong.tang.tenTang}"></span></p>
                                     <!-- Giá -->
-                                    <p class="card-text"><strong>Giá: </strong><span th:text="${phong.gia}"></span></p>
+                                    <p class="card-text"><strong>Giá: </strong><span th:text="${phong.loaiPhong.gia}"></span></p>
                                     <!-- Mô Tả -->
                                     <p class="card-text"><strong>Mô Tả: </strong><span th:text="${phong.moTa}"></span></p>
                                     <!-- Loại Phòng -->
@@ -394,15 +394,15 @@
                                         <label class="form-check-label" for="trangThai2">Hết Phòng</label>
                                     </div>
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="gia">Giá</label>
-                                    <select id="gia" name="gia" class="form-control" required>
-                                        <option value="300000">300,000 VNĐ</option>
-                                        <option value="400000">500,000 VNĐ</option>
-                                        <option value="700000">700,000 VNĐ</option>
-                                        <option value="1400000">1,400,000 VNĐ</option>
-                                    </select>
-                                </div>
+<!--                                <div class="form-group col-md-6">-->
+<!--                                    <label for="gia">Giá</label>-->
+<!--                                    <select id="gia" name="gia" class="form-control" required>-->
+<!--                                        <option value="300000">300,000 VNĐ</option>-->
+<!--                                        <option value="400000">500,000 VNĐ</option>-->
+<!--                                        <option value="700000">700,000 VNĐ</option>-->
+<!--                                        <option value="1400000">1,400,000 VNĐ</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
                                 <div class="mb-3">
                                     <label for="idLoaiPhong" class="form-label">Loại Phòng</label>
                                     <select id="idLoaiPhong" name="loaiPhong.idLoaiPhong" class="form-select" required>

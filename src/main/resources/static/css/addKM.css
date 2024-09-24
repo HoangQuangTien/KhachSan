@@ -14,7 +14,7 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
+    width: 600px;
 }
 
 h1 {
@@ -22,8 +22,13 @@ h1 {
     color: #333;
     margin-bottom: 20px;
 }
-
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Khoảng cách giữa các cột */
+}
 .form-group {
+    flex: 1;/* đảm bảo chia đề không gian */
     margin-bottom: 15px;
 }
 
@@ -39,6 +44,16 @@ h1 {
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+/* CSS mới cho trạng thái */
+.form-group-radio {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px; /* Khoảng cách giữa các nút radio */
+}
+.form-check-input {
+    margin-right: 5px; /* Khoảng cách giữa checkbox và label */
 }
 
 .btn-submit {

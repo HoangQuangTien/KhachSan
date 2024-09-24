@@ -6,7 +6,6 @@ import com.example.DuAnTotNghiepKs.entity.Phong;
 import org.springframework.data.domain.Page;
 
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,8 @@ public interface DatPhongService {
     Long countDistinctCustomers();
 
     List<DatPhong> findByPhongAndThoiGian(Integer idPhong, Date ngayNhan, Date ngayTra);
+
+    DatPhong findTopByOrderByIdDatPhongDesc();
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();

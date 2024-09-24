@@ -7,89 +7,151 @@
     <link rel="stylesheet" th:href="@{/css/editKM.css}">
 </head>
 <body>
-<h1>Sửa Khuyến Mãi</h1>
-<form th:action="@{/admin/edit}" th:object="${khuyenMai}" method="post">
-    <input type="hidden" th:field="*{idKhuyenMai}">
+<div class="container">
+    <h1>Sửa Khuyến Mãi</h1>
+    <!-- Hiển thị thông báo lỗi nếu có -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <p th:text="${errorMessage}"></p>
+    </div>
 
-    <div class="form-group">
-        <label for="maKhuyenMai">Mã Khuyến Mãi:</label>
-        <div class="input-group">
-            <input type="text" id="maKhuyenMai" th:field="*{maKhuyenMai}" class="form-control" />
-            <div class="input-group-append">
-                <button type="button" class="btn btn-outline-secondary" onclick="generateMaKhuyenMai()">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
+    <!-- Hiển thị thông báo thành công nếu có -->
+    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+        <p th:text="${successMessage}"></p>
+    </div>
+    <form action="#" th:action="@{/admin/quan-ly-khuyen-mai/edit/{id}(id=${khuyenMai.getIdKhuyenMai()})}"
+          th:object="${khuyenMai}" method="post" class="form">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="maKhuyenMai">Mã Khuyến Mãi:</label>
+                <!--                <div class="input-group">-->
+                <input type="text" id="maKhuyenMai" th:field="*{maKhuyenMai}" class="form-control" />
+                <!--                    <div class="input-group-append">-->
+                <!--                        <button type="button" class="btn btn-outline-secondary" onclick="generateMaKhuyenMai()">-->
+                <!--                            <i class="fas fa-sync-alt"></i> Tạo mã &lt;!&ndash; Icon cho nút &ndash;&gt;-->
+                <!--                        </button>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+                <div th:if="${#fields.hasErrors('maKhuyenMai')}" class="error-message text-danger mt-1">
+                    <p th:errors="*{maKhuyenMai}"></p>
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label for="tenKhuyenMai">Tên Khuyến Mãi:</label>
+                <input type="text" id="tenKhuyenMai" th:field="*{tenKhuyenMai}" class="form-control" />
+                <div th:if="${#fields.hasErrors('tenKhuyenMai')}" class="error-message">
+                    <p th:errors="*{tenKhuyenMai}"></p>
+                </div>
             </div>
         </div>
-        <div th:if="${#fields.hasErrors('maKhuyenMai')}" class="error-message text-danger mt-1">
-            <p th:errors="*{maKhuyenMai}"></p>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="moTa">Mô Tả:</label>
+                <input type="text" id="moTa" th:field="*{moTa}" class="form-control" />
+                <div th:if="${#fields.hasErrors('moTa')}" class="error-message">
+                    <p th:errors="*{moTa}"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="soLuong" >Số lượng:</label>
+                <input type="number" id="soLuong" th:field="*{soLuong}" class="form-control">
+                <div th:if="${#fields.hasErrors('soLuong')}" class="error-message">
+                    <p th:errors="*{soLuong}"></p>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="tenKhuyenMai">Tên Khuyến Mãi:</label>
-        <input type="text" id="tenKhuyenMai" th:field="*{tenKhuyenMai}" class="form-control"/><br/>
-        <div th:if="${#fields.hasErrors('tenKhuyenMai')}" class="text-danger">
-            <p th:errors="*{tenKhuyenMai}"></p>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="ngayBatDau">Ngày Bắt Đầu:</label>
+                <input type="date" id="ngayBatDau" th:field="*{ngayBatDau}" class="form-control" />
+                <div th:if="${#fields.hasErrors('ngayBatDau')}" class="error-message">
+                    <p th:errors="*{ngayBatDau}"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ngayKetThuc">Ngày Kết Thúc:</label>
+                <input type="date" id="ngayKetThuc" th:field="*{ngayKetThuc}" class="form-control" />
+                <div th:if="${#fields.hasErrors('ngayKetThuc')}" class="error-message">
+                    <p th:errors="*{ngayKetThuc}"></p>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="giamGia">Giảm Giá (% hoặc số tiền):</label>
-        <input type="number" id="giamGia" th:field="*{giamGia}" class="form-control"/><br/>
-        <div th:if="${#fields.hasErrors('giamGia')}" class="text-danger">
-            <p th:errors="*{giamGia}"></p>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="loaiGiam">Loại Giảm:</label>
+                <select id="loaiGiam" th:field="*{loaiGiam}" class="form-control">
+                    <option value="true">Phần trăm</option>
+                    <option value="false">Tiền mặt</option>
+                </select>
+                <div th:if="${#fields.hasErrors('loaiGiam')}" class="error-message">
+                    <p th:errors="*{loaiGiam}"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="giamGia">Giảm Giá:</label>
+                <input type="number" step="0.01" id="giamGia" th:field="*{giamGia}" class="form-control" />
+                <!--            <div th:if="${#fields.hasErrors('giaGiam')}" class="error-message">-->
+                <!--                <p th:errors="*{giaGiam}"></p>-->
+                <!--            </div>-->
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="moTa">Mô Tả:</label>
-        <input type="text" id="moTa" th:field="*{moTa}" class="form-control" />
-        <div th:if="${#fields.hasErrors('moTa')}" class="text-danger">
-            <p th:errors="*{moTa}"></p>
+
+
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="giamToiThieu">Giảm tối thiểu:</label>
+                <input type="number" id="giamToiThieu" th:field="*{giamToiThieu}" class="form-control">
+                <div th:if="${#fields.hasErrors('giamToiThieu')}" class="error-message">
+                    <p th:errors="*{giamToiThieu}"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="giamToiDa">Giảm tối đa:</label>
+                <input type="number" id="giamToiDa" th:field="*{giamToiDa}" class="form-control">
+                <div th:if="${#fields.hasErrors('giamToiDa')}" class="error-message">
+                    <p th:errors="*{giamToiDa}"></p>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="ngayBatDau">Ngày Bắt Đầu:</label>
-        <input type="date" id="ngayBatDau" th:field="*{ngayBatDau}" class="form-control"/><br/>
-        <div th:if="${#fields.hasErrors('ngayBatDau')}" class="text-danger">
-            <p th:errors="*{ngayBatDau}"></p>
+        <div class="form-group">
+
+            <div class="form-group-radio">
+                <div class="form-check">
+                    <label>Trạng thái:</label>
+                </div>
+                <div class="form-check">
+                    <input id="trangThaiConHan" value="Còn hạn" type="radio" class="form-check-input"
+                           th:field="*{trangThai}" th:checked="${trangThai == 'Còn hạn'}">
+                    <label for="trangThaiConHan">Còn hạn</label>
+                </div>
+                <div class="form-check">
+                    <input id="trangThaiSapDienRa" value="Sắp diễn ra" type="radio" class="form-check-input"
+                           th:field="*{trangThai}" th:checked="${trangThai == 'Sắp diễn ra'}">
+                    <label for="trangThaiSapDienRa">Sắp diễn ra</label>
+                </div>
+                <div class="form-check">
+                    <input id="trangThaiHetHan" value="Hết hạn" type="radio" class="form-check-input"
+                           th:field="*{trangThai}" th:checked="${trangThai == 'Hết hạn'}">
+                    <label for="trangThaiHetHan">Hết hạn</label>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="ngayKetThuc">Ngày Kết Thúc:</label>
-        <input type="date" id="ngayKetThuc" th:field="*{ngayKetThuc}" class="form-control"/><br/>
-        <div th:if="${#fields.hasErrors('ngayKetThuc')}" class="text-danger">
-            <p th:errors="*{ngayKetThuc}"></p>
-        </div>
-    </div>
 
-    <div class="form-group">
-        <label for="loaiGiam">Loại Giảm:</label>
-        <select id="loaiGiam" th:field="*{loaiGiam}" class="form-control">
-            <option value="true" th:selected="*{loaiGiam == true}">Phần trăm</option>
-            <option value="false" th:selected="*{loaiGiam == false}">Tiền mặt</option>
-        </select>
-        <div th:if="${#fields.hasErrors('loaiGiam')}" class="text-danger">
-            <p th:errors="*{loaiGiam}"></p>
-        </div>
-    </div>
+        <a href="#" th:href="@{/admin/quan-ly-khuyen-mai}">Quay lại</a>
 
-    <div class="form-group">
-        <label>Trạng thái:</label><br/>
-        <input id="trangThaiConHan" type="radio" th:field="*{trangThai}" value="true" />
-        <label for="trangThaiConHan">Còn hạn</label>
+        <button type="submit" class="btn-submit">Sửa</button>
 
-        <input id="trangThaiHetHan" type="radio" th:field="*{trangThai}" value="false" />
-        <label for="trangThaiHetHan">Hết hạn</label>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Cập Nhật</button>
-</form>
-
-<a href="#" th:href="@{/admin/quan-ly-khuyen-mai}">Quay lại</a>
+    </form>
+</div>
 
 <div th:include="fragment/script :: script"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
@@ -121,3 +183,4 @@
 </script>
 </body>
 </html>
+

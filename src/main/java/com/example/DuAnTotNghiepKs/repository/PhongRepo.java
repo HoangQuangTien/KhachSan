@@ -40,5 +40,8 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
 
     @Query("SELECT p FROM Phong p WHERE p.maPhong LIKE %:query% OR p.tenPhong LIKE %:query%")
     List<Phong> searchByMaOrTenPhong(@Param("query") String query);
+
+    Optional<Phong> findByTenPhong(String tenPhong);
+
 }
 

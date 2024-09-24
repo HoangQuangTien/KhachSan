@@ -361,6 +361,85 @@ public class ChiTietDatPhongController {
 //                    .body(Map.of("success", false, "message", "Đã xảy ra lỗi: " + e.getMessage()));
 //        }
 //    }
+
+    @GetMapping("/edit-room/{id}")
+    public String showEditRoomForm(@PathVariable("id") Integer id, Model model) {
+        Optional<Phong> optionalPhong = phongService.getPhongById(id);
+        if (optionalPhong.isPresent()) {
+            Phong phong = optionalPhong.get();
+            model.addAttribute("phong", phong);  // Truyền đúng phong
+
+            List<Phong> allRooms = phongService.getAllPhongs1(); // Lấy đúng allRooms
+            model.addAttribute("allRooms", allRooms);  // Đảm bảo allRooms chứa tên phòng
+
+            List<LoaiPhong> loaiPhongs = loaiPhongService.getAllLoaiPhongs();
+            model.addAttribute("loaiPhongs", loaiPhongs);
+        } else {
+            model.addAttribute("errorMessage", "Không tìm thấy phòng với ID: " + id);
+            return "error";
+        }
+        return "list/QuanLyDatPhong/edit-phong";
+    }
+
+
+    @PostMapping("/update-room")
+    public ResponseEntity<?> updateRoom(
+            @RequestParam("roomId") Integer roomId,
+            @RequestParam("tenPhong") String tenPhong,
+            @RequestParam("loaiPhong") Integer loaiPhongId) {
+
+        try {
+            if (tenPhong == null || tenPhong.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Tên phòng không được để trống."));
+            }
+
+            Phong phong = phongService.getPhongById(roomId)
+                    .orElseThrow(() -> new RuntimeException("Phòng không tồn tại"));
+
+            Optional<Phong> existingPhong = phongRepo.findByTenPhong(tenPhong);
+            if (existingPhong.isPresent() && !existingPhong.get().getIdPhong().equals(roomId)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Tên phòng đã tồn tại, vui lòng chọn tên khác."));
+            }
+
+            // Kiểm tra trạng thái phòng xem có đặt phòng nào đã check-in chưa
+            Optional<DatPhong> datPhongOpt = datPhongRepo.findByPhongAndTinhTrang(phong, true);
+            if (datPhongOpt.isPresent()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Phòng đã được check-in, không thể sửa đổi."));
+            }
+
+            LoaiPhong newLoaiPhong = loaiPhongService.findById(loaiPhongId);
+            if (newLoaiPhong == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Không tìm thấy loại phòng với ID: " + loaiPhongId));
+            }
+
+            // Đảm bảo rằng giá loại phòng mới bằng hoặc lớn hơn giá hiện tại
+            if (newLoaiPhong.getGia() < phong.getGia()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Loại phòng mới phải có giá bằng hoặc lớn hơn giá hiện tại"));
+            }
+
+            phong.setTenPhong(tenPhong);
+            phong.setLoaiPhong(newLoaiPhong);
+            phong.setGia(newLoaiPhong.getGia());
+            Phong updatedPhong = phongService.savePhong(phong);
+            if (updatedPhong == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("success", false, "message", "Không thể lưu phòng đã được cập nhật"));
+            }
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(Map.of("success", true, "message", "Phòng đã được cập nhật thành công"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Đã xảy ra lỗi: " + e.getMessage()));
+        }
+    }
+
 }
 
 

@@ -1,18 +1,15 @@
 package com.example.DuAnTotNghiepKs.repository;
 
-import com.example.DuAnTotNghiepKs.DTO.DatPhongDTO;
-import com.example.DuAnTotNghiepKs.DTO.IdleRoomDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
-import org.springframework.data.domain.Pageable;
+import com.example.DuAnTotNghiepKs.entity.Phong;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
@@ -98,5 +95,10 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
 //    @Query("SELECT SUM(b.tongTien) FROM DatPhong b WHERE b.phong.idPhong = :roomId")
 //    float calculateTotalRevenueByRoom(@Param("roomId") Long roomId);
+
+    DatPhong findTopByOrderByIdDatPhongDesc();
+
+    Optional<DatPhong> findByPhongAndTinhTrang(Phong phong, Boolean tinhTrang);
+
 
 }

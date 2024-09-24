@@ -299,26 +299,23 @@
                 </div>
             </div>
             <!-- Modal -->
-            <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel"
-                 aria-hidden="true">
+            <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="editCustomerModalLabel">Sửa Thông Tin Khách Hàng</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form id="editCustomerForm" method="post" action="/update-customer">
+                        <form id="editCustomerForm" method="post" action="/danhsachdatphong/update-customer">
                             <div class="modal-body">
                                 <input type="hidden" id="customerId" name="customerId">
                                 <div class="mb-3">
                                     <label for="tenKhachHang" class="form-label">Tên Khách Hàng</label>
-                                    <input type="text" class="form-control" id="tenKhachHang" name="tenKhachHang"
-                                           required>
+                                    <input type="text" class="form-control" id="tenKhachHang" name="tenKhachHang" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="soDienThoai" class="form-label">Số Điện Thoại</label>
-                                    <input type="text" class="form-control" id="soDienThoai" name="soDienThoai"
-                                           required>
+                                    <input type="text" class="form-control" id="soDienThoai" name="soDienThoai" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
@@ -335,6 +332,7 @@
                     </div>
                 </div>
             </div>
+
             <div th:include="fragment/script :: script"></div>
 
     </main>

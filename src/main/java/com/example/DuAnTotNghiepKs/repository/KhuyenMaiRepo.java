@@ -1,7 +1,6 @@
 package com.example.DuAnTotNghiepKs.repository;
 
 import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
-import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,15 +19,20 @@ public interface KhuyenMaiRepo extends JpaRepository<KhuyenMai,Integer> {
     // Các phương thức khác...
 //    Page<KhuyenMai> findByTenKhuyenMaiContaining(String keyword, Pageable pageable);
 
-    Page<KhuyenMai> findByTrangThaiTrue(Pageable pageable);
+    Page<KhuyenMai> getAllBy(Pageable pageable);
 
     // Tìm kiếm theo MaKhuyenMai hoặc TenKhuyenMai và trạng thái
-    Page<KhuyenMai> findByMaKhuyenMaiContainingIgnoreCaseOrTenKhuyenMaiContainingIgnoreCaseAndTrangThai(
-            String maKhuyenMai, String tenKhuyenMai, boolean trangThai, Pageable pageable);
+    // Truy vấn tìm kiếm kết hợp
+    @Query("SELECT k FROM KhuyenMai k WHERE (LOWER(k.maKhuyenMai) LIKE LOWER(CONCAT('%', :maKhuyenMai, '%')) " +
+            "OR LOWER(k.tenKhuyenMai) LIKE LOWER(CONCAT('%', :tenKhuyenMai, '%'))) " +
+            "AND k.trangThai = :trangThai")
+    Page<KhuyenMai> searchKhuyenMai(@Param("maKhuyenMai") String maKhuyenMai,
+                                    @Param("tenKhuyenMai") String tenKhuyenMai,
+                                    @Param("trangThai") String trangThai,
+                                    Pageable pageable);
 
     boolean existsByMaKhuyenMai(String maKhuyenMai);
 
     //Chuyển trạng thái khi ngày hết hạn
 
 }
-

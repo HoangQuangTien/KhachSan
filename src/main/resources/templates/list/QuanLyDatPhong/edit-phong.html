@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa Đơn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <head th:include="fragment/head :: head">
+
+    </head>
+</head>
+
+<body class="vertical light">
+
+
+</div>
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <div class="container mt-5">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Sửa Phòng</h4>
+                    <div id="updateRoomMessage" class="alert d-none" role="alert">
+                    </div>
+                    <form id="updateRoomForm" action="/danhsachdatphong/update-room" method="post">
+                        <input type="hidden" name="roomId" th:value="${phong.idPhong}" />
+
+                        <!-- Dropdown chọn loại phòng -->
+                        <div class="mb-3">
+                            <label for="loaiPhongSelect" class="form-label">Loại Phòng</label>
+                            <select id="loaiPhongSelect" name="loaiPhong" class="form-select" required>
+                                <option value="" disabled selected>Chọn loại phòng</option>
+                                <option th:each="loaiPhong : ${loaiPhongs}"
+                                        th:value="${loaiPhong.idLoaiPhong}"
+                                        th:text="${loaiPhong.tenLoaiPhong}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Dropdown chọn tên phòng -->
+                        <div class="mb-3">
+                            <label for="tenPhongSelect" class="form-label">Tên Phòng</label>
+                            <select id="tenPhongSelect" name="tenPhong" class="form-select" required>
+                                <option value="" disabled selected>Chọn phòng</option>
+                                <option th:each="room : ${allRooms}"
+                                        th:data-loai-phong-id="${room.loaiPhong.idLoaiPhong}"
+                                        th:value="${room.idPhong}"
+                                        th:text="${room.tenPhong}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success">Cập Nhật</button>
+                            <a href="/danhsachdatphong" class="btn btn-secondary ms-3">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('updateRoomForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    // Kiểm tra content-type của phản hồi
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    } else {
+                        return response.text().then(text => {
+                            throw new Error(`Server returned an error: ${text}`);
+                        });
+                    }
+                })
+                .then(data => {
+                    const updateRoomMessage = document.getElementById('updateRoomMessage');
+                    updateRoomMessage.classList.remove('d-none');
+
+                    if (data.success) {
+                        updateRoomMessage.classList.add('alert-success');
+                        updateRoomMessage.classList.remove('alert-danger');
+                        updateRoomMessage.textContent = 'Cập nhật phòng thành công.';
+                        setTimeout(() => {
+                            window.location.href = '/danhsachdatphong';
+                        }, 1000);
+                    } else {
+                        updateRoomMessage.classList.add('alert-danger');
+                        updateRoomMessage.classList.remove('alert-success');
+                        updateRoomMessage.textContent = 'Đã xảy ra lỗi: ' + data.message;
+                    }
+                })
+                .catch(error => {
+                    const updateRoomMessage = document.getElementById('updateRoomMessage');
+                    updateRoomMessage.classList.remove('d-none');
+                    updateRoomMessage.classList.add('alert-danger');
+                    updateRoomMessage.textContent = 'Đã xảy ra lỗi: ' + error.message;
+                });
+        });
+    });
+    document.getElementById('loaiPhongSelect').addEventListener('change', function() {
+        var selectedLoaiPhongId = this.value;
+        var roomOptions = document.querySelectorAll('#tenPhongSelect option');
+
+        roomOptions.forEach(function(option) {
+            var loaiPhongId = option.getAttribute('data-loai-phong-id');
+            if (loaiPhongId === selectedLoaiPhongId || option.value === "") {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+
+        // Reset lại lựa chọn phòng khi thay đổi loại phòng
+        document.getElementById('tenPhongSelect').value = '';
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

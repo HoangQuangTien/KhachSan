@@ -164,5 +164,8 @@ public class PhongService {
                 .collect(Collectors.toList());
     }
 
+    public List<Phong> getAllPhongs1() {
+        return phongRepository.findAll();
+    }
 }
 
