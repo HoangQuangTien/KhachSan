@@ -45,6 +45,9 @@ public class PhongService {
         return phongRepository.findById(id).orElse(null);
     }
 
+    public List<Phong> findByLoaiPhongId(Integer loaiPhongId){
+        return phongRepository.findByLoaiPhongIdLoaiPhong(loaiPhongId);
+    }
 
     public Phong savePhong(Phong phong) {
         // Kiểm tra trùng mã phòng

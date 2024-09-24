@@ -34,6 +34,7 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
     List<DatPhong> findByNgayNhanBetween(Date startDate, Date endDate);
 
 
+
     @Query(value = "SELECT dp1.id_phong AS phongId, \n" +
             "       p.ten_phong AS tenPhong,  -- Thêm tên phòng\n" +
             "       dp1.ngay_tra_phong AS lastCheckOut, \n" +
@@ -91,7 +92,7 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
                                               @Param("ngayNhan") Date ngayNhan,
                                               @Param("ngayTra") Date ngayTra);
 
-
+    DatPhong findTopByOrderByIdDatPhongDesc();
 
 //    @Query("SELECT SUM(b.tongTien) FROM DatPhong b WHERE b.phong.idPhong = :roomId")
 //    float calculateTotalRevenueByRoom(@Param("roomId") Long roomId);

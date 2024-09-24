@@ -50,99 +50,34 @@
             overflow-y: auto;
         }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #eef2f7;
-            padding: 30px;
-        }
-
-        .card {
-            border-radius: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-
-        .form-control {
-            border-radius: 12px;
-            font-size: 1.1rem;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
-        }
+        /* Thêm một số kiểu dáng tùy chỉnh nếu cần */
 
         .form-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
-
-        #loaiPhongSelect, #phongSelect {
-            background-color: #f1f1f1;
-            padding: 15px;
-            border-radius: 12px;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #dcdcdc;
-            transition: background-color 0.3s;
-        }
-
-        #loaiPhongSelect:hover, #phongSelect:hover {
-            background-color: #e9ecef;
+            font-weight: bold;
         }
 
         .form-check {
-            display: inline-block;
-            margin-right: 15px;
-            font-size: 1rem;
-            cursor: pointer;
+            margin-bottom: 1rem;
         }
 
         .form-check-input {
-            margin-right: 5px;
+            margin-right: 0.5rem;
         }
 
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            font-size: 1.2rem;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        .phong-container {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
 
-        .btn-dark:hover {
-            background-color: #0056b3;
-            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        .phong-container h5 {
+            margin-bottom: 1rem;
         }
 
-        .btn-dark:focus {
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        .phong-container .form-check {
+            margin-bottom: 0.5rem;
         }
-
-        .card-body h4 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        input::placeholder {
-            color: #adb5bd;
-            opacity: 1;
-        }
-
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(50%);
-        }
-
 
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -158,14 +93,13 @@
     <main role="main" class="main-content">
         <div class="container py-4">
             <div class="form-wrapper d-flex justify-content-between align-items-start" style="gap: 20px;">
-                <div class="card shadow border-0 text-start" style="max-width: 500px; flex: 1" >
+                <div class="card shadow border-0 text-start float-start" style="max-width: 400px; flex: 1;">
                     <div class="card-body">
                         <h4 class="mb-3 text-center">Đặt Phòng</h4>
-
                         <!-- Chọn loại phòng -->
                         <div class="mb-4">
                             <label for="loaiPhongSelect" class="form-label fs-5">Loại Phòng:</label>
-                            <div id="loaiPhongSelect" class="d-flex flex-wrap gap-3 justify-content-center">
+                            <div id="loaiPhongSelect" class="d-flex flex-wrap gap-3">
                                 <!-- Các loại phòng sẽ được thêm vào đây -->
                             </div>
                         </div>
@@ -173,7 +107,7 @@
                         <!-- Chọn phòng -->
                         <div class="mb-4">
                             <label for="phongSelect" class="form-label fs-5">Phòng:</label>
-                            <div id="phongSelect" class="d-flex flex-wrap gap-3 justify-content-center">
+                            <div id="phongSelect" class="d-flex flex-wrap gap-3">
                                 <!-- Các phòng sẽ được thêm vào đây -->
                             </div>
                         </div>
@@ -183,43 +117,48 @@
                             <input type="hidden" name="idKhachHang" id="idKhachHang">
                             <input type="hidden" name="idLoaiPhong" id="idLoaiPhong">
                             <input type="hidden" name="idPhong" id="idPhong">
-
                             <!-- Mã đặt phòng -->
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <label for="maDatPhong" class="form-label">Mã Đặt Phòng:</label>
-                                <input type="text" class="form-control" id="maDatPhong" name="maDatPhong" placeholder="Mã đặt phòng">
+                                <input type="text" class="form-control form-control-sm" id="maDatPhong" name="maDatPhong" placeholder="Mã đặt phòng">
                             </div>
 
                             <!-- Ngày nhận và ngày trả -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
+                            <div class="row g-2">
+                                <div class="col-6">
                                     <label for="ngayNhan" class="form-label">Ngày Nhận:</label>
-                                    <input type="date" class="form-control" id="ngayNhan" name="ngayNhan" required>
+                                    <input type="date" class="form-control form-control-sm" id="ngayNhan" name="ngayNhan" required>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-6">
                                     <label for="ngayTra" class="form-label">Ngày Trả:</label>
-                                    <input type="date" class="form-control" id="ngayTra" name="ngayTra" required>
+                                    <input type="date" class="form-control form-control-sm" id="ngayTra" name="ngayTra" required>
                                 </div>
                             </div>
-
                             <!-- CCCD -->
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <label for="cccd" class="form-label">CCCD:</label>
-                                <input type="text" class="form-control" id="cccd" name="cccd" placeholder="CCCD" required>
+                                <input type="text" class="form-control form-control-sm" id="cccd" name="cccd" placeholder="CCCD" required>
                             </div>
-
+                            <input type="hidden" name="tongTien" id="tongTien">
+                            <!--                        <div class="mb-3">-->
+                            <!--                            <label for="tienConLai" class="form-label">Tong Tien:</label>-->
+                            <!--                            <input type="number" class="form-control form-control-sm" id="tongTien" name="tongTien" placeholder="tienConLai" required readonly>-->
+                            <!--                        </div>-->
                             <!-- Tiền cọc -->
                             <div class="mb-3">
                                 <label for="tienCoc" class="form-label">Tiền Cọc:</label>
-                                <input type="number" class="form-control" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
+                                <input type="number" class="form-control form-control-sm" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
                             </div>
-
+                            <input type="hidden" name="tienConLai" id="tienConLai">
+                            <!--                        <div class="mb-3">-->
+                            <!--                            <label for="tienConLai" class="form-label">Tienc Con lai:</label>-->
+                            <!--                            <input type="number" class="form-control form-control-sm" id="tienConLai" name="tienConLai" placeholder="tienConLai" required readonly>-->
+                            <!--                        </div>-->
                             <!-- Button Đặt phòng -->
-                            <button type="submit" id="submitDatPhongBtn" class="btn btn-dark w-100 py-2">Đặt Phòng</button>
+                            <button type="submit" id="submitDatPhongBtn" class="btn btn-dark w-100">Đặt Phòng</button>
                         </form>
                     </div>
                 </div>
-
                 <!-- Form thông tin khách hàng -->
                 <div id="customerInfoForm" class=" shadow" style="display: none; max-width: 1000px ; flex: 1">
                     <div class="card shadow-sm border-0 text-start">
@@ -287,11 +226,11 @@
                     div.classList.add('form-check', 'col-md-4', 'col-lg-3');
 
                     div.innerHTML = `
-                <input class="form-check-input" type="checkbox" name="loaiPhong" value="${loaiPhong.idLoaiPhong}" id="loaiPhong_${loaiPhong.idLoaiPhong}">
-                <label class="form-check-label" for="loaiPhong_${loaiPhong.idLoaiPhong}">
-                    ${loaiPhong.tenLoaiPhong}
-                </label>
-            `;
+                    <input class="form-check-input" type="checkbox" name="loaiPhong" value="${loaiPhong.idLoaiPhong}" id="loaiPhong_${loaiPhong.idLoaiPhong}">
+                    <label class="form-check-label" for="loaiPhong_${loaiPhong.idLoaiPhong}">
+                        ${loaiPhong.tenLoaiPhong}
+                    </label>
+                `;
                     loaiPhongSelect.appendChild(div);
                 });
 
@@ -323,9 +262,6 @@
                                                 phongContainer.classList.add('phong-container');
                                                 phongContainer.innerHTML = `<h5>${this.nextElementSibling.textContent}</h5>`;
                                                 document.getElementById('phongSelect').appendChild(phongContainer);
-                                            }else{
-                                                // Giữ lại các loại phòng khác và chỉ cập nhật phòng của loại này
-                                                phongContainer.innerHTML = `<h5>${this.nextElementSibling.textContent}</h5>`;
                                             }
 
                                             if (Array.isArray(data) && data.length > 0) {
@@ -337,22 +273,20 @@
 
                                                         // Thêm thông tin phòng
                                                         div.innerHTML = `
-                                                    <input class="form-check-input" type="checkbox" value="${phong.idPhong}" id="phong_${phong.idPhong}">
-                                                    <label class="form-check-label" for="phong_${phong.idPhong}">
-                                                        ${phong.tenPhong} - Giá: ${giaPhongMap[loaiPhongId]} VND - <i class="fas fa-users icon" style="font-size: 19px; color: #0b860d"></i>: ${soNguoiToiDa}
-                                                    </label>
-                                                `;
+                                                        <input class="form-check-input" type="checkbox" value="${phong.idPhong}" id="phong_${phong.idPhong}">
+                                                        <label class="form-check-label" for="phong_${phong.idPhong}">
+                                                            ${phong.tenPhong} - Giá: ${giaPhongMap[loaiPhongId]} VND - Số Người Tối Đa: ${soNguoiToiDa}
+                                                        </label>
+                                                    `;
                                                         phongContainer.appendChild(div);
 
                                                         // Lưu giá phòng vào map
                                                         giaPhongMap[phong.idPhong] = giaPhongMap[loaiPhongId];
                                                     }
-                                                    updateTienCoc();
                                                 });
                                             } else {
                                                 phongContainer.innerHTML = '<p>Không có phòng trống cho loại phòng này.</p>';
                                             }
-                                            updateTienCoc();
                                         })
                                         .catch(error => {
                                             console.error('Lỗi khi tải dữ liệu phòng:', error);
@@ -369,17 +303,6 @@
                             if (phongContainer) {
                                 phongContainer.remove();
                             }
-                            // Xóa tất cả các phòng thuộc loại phòng đó khỏi giaPhongMap
-                            Object.keys(giaPhongMap).forEach(idPhong => {
-                                if (idPhong.startsWith(loaiPhongId)) {
-                                    delete giaPhongMap[idPhong];
-                                }
-                            });
-
-                            // Xóa giá loại phòng khỏi giaPhongMap
-                            delete giaPhongMap[loaiPhongId];
-
-                            updateTienCoc(); // Cập nhật lại tiền cọc khi loại phòng bị bỏ chọn
                         }
                     });
                 });
@@ -629,23 +552,18 @@
                 return;
             }
 
-            // Gán ID phòng vào hidden input
-            document.getElementById('idPhong').value = selectedPhongIds.join(','); // Gán danh sách ID phòng
+            document.getElementById('idPhong').value = selectedPhongIds[0]; // Gán ID phòng đầu tiên vào hidden input
 
-            const selectedLoaiPhongIds = Array.from(document.querySelectorAll('#loaiPhongSelect .form-check-input:checked'))
-                .map(input => input.value)
-                .filter(id => id); // Lọc ra các ID không rỗng
-
-            if (selectedLoaiPhongIds.length === 0) {
-                alert("Vui lòng chọn ít nhất một loại phòng.");
+            if (selectedPhongIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một phòng.");
                 event.preventDefault(); // Ngăn submit form
                 return;
             }
 
-            // Gán ID loại phòng vào hidden input
-            document.getElementById('idLoaiPhong').value = selectedLoaiPhongIds.join(',');
-
-
+            if (!validateDates()) {
+                event.preventDefault(); // Ngăn submit form nếu ngày không hợp lệ
+                return;
+            }
 
             const idKhachHang = document.getElementById('idKhachHang').value;
             if (!idKhachHang || isNaN(idKhachHang)) {
@@ -682,6 +600,7 @@
                             showConfirmButton: true
                         }).then(() => {
                             location.reload();
+                            // showPaymentForm(); // Hiển thị form thanh toán sau khi đặt phòng thành công
                         });
                     } else {
                         Swal.fire({
@@ -704,8 +623,6 @@
 
             event.preventDefault(); // Ngăn submit form để gửi dữ liệu bằng fetch
         });
-
-
 
 
         document.getElementById('confirmPaymentBtn').addEventListener('click', function () {
@@ -754,7 +671,8 @@
         confirmPaymentBtn.addEventListener('click', submitPayment);
 
     });
-    
+
+
     // document.getElementById('loaiPhongSelect').addEventListener('change', function () {
     //     const selectedLoaiPhong = this.value;
     //     const tangInput = document.getElementById('tangInput');
@@ -781,6 +699,9 @@
     //         tangInput.value = '';
     //     }
     // });
+
+
+
 
 </script>
 </body>
