@@ -52,7 +52,8 @@ public interface DatPhongService {
 
     List<DatPhong> findByPhongAndThoiGian(Integer idPhong, Date ngayNhan, Date ngayTra);
 
-    DatPhong findTopByOrderByIdDatPhongDesc();
+    List<DatPhong> getDatPhongsDaCoc();
+
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();

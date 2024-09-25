@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head th:include="fragment/head :: head">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +10,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* CSS cho thông báo translucent */
+
         #errorMessage {
-            display: none; /* Ẩn mặc định */
+            display: none;
+            /* Ẩn mặc định */
+
             position: fixed;
             top: 20px;
             right: 20px;
             padding: 20px;
-            background-color: rgba(255, 0, 0, 0.8); /* Màu đỏ translucent */
+            background-color: rgba(255, 0, 0, 0.8);
+            /* Màu đỏ translucent */
+
             color: white;
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -25,13 +31,19 @@
         }
 
         body {
-            background-color: #f8f9fa; /* Màu nền nhạt */
-            color: #856404; /* Màu chữ cảnh báo */
+            background-color: #f8f9fa;
+            /* Màu nền nhạt */
+
+            color: #856404;
+            /* Màu chữ cảnh báo */
+
             font-family: Arial, sans-serif;
         }
 
         h1 {
-            color: #856404; /* Màu tiêu đề cảnh báo */
+            color: #856404;
+            /* Màu tiêu đề cảnh báo */
+
             text-align: center;
             margin-top: 20px;
         }
@@ -54,11 +66,14 @@
         .revenue-display {
             text-align: center;
             font-size: 1.5rem;
-            color: #fd7e14; /* Màu cảnh báo đậm */
+            color: #fd7e14;
+            /* Màu cảnh báo đậm */
+
             margin-bottom: 20px;
         }
     </style>
 </head>
+
 <body class="vertical light">
 <div th:include="fragment/navbar :: navbar"></div>
 <div th:include="fragment/sidebar :: sidebar"></div>
@@ -68,19 +83,23 @@
         <!-- Thông báo lỗi translucent -->
         <!--        <div id="errorMessage"></div>-->
 
-        <div class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive"
-             aria-atomic="true">
+        <div class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body" id="errorMessage">
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
+
+        <div class="d-flex justify-content-center">
+            <h2 style="color: #0d4bdb">Danh Sách Hóa Dơn Cần Thanh Toán</h2>
+        </div>
+
         <div class="row">
             <!-- Cột bên trái: Bảng -->
-            <div class="col-md-6">
-                <h1 class="mb-4">Danh sách đã cọc</h1>
+            <div class="col-md-7 card p-4 shadow-sm" >
+                <h3 class="mb-4">Danh sách đã cọc</h3>
+                <hr>
                 <table class="table table-bordered table-sm text-center">
                     <thead class="table-light">
                     <tr>
@@ -94,20 +113,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="datPhong : ${datPhongs}"
-                        th:if="${datPhong.tinhTrang == true}"
-                        th:data-id-dat-phong="${datPhong.idDatPhong}"
-                        th:data-id-phong="${datPhong.phong.idPhong}"
-                        th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}"
-                        th:data-hovaten="${datPhong.khachHang.hoVaTen}"
-                        th:data-sodienthoai="${datPhong.khachHang.soDienThoai}"
-                        th:data-tenphong="${datPhong.phong.tenPhong}"
-                        th:data-thoigian="${#dates.format(datPhong.ngayNhan,'dd/MM')} + ' - ' + ${#dates.format(datPhong.ngayTra,'dd/MM/yyyy')}"
-                        th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}"
-                        th:data-giaphong="${datPhong.phong.gia}"
-                        th:data-tiencoc="${datPhong.tienCoc}"
-                        th:data-tienconlai="${datPhong.tienConLai}"
-                        onclick="showForm(this.getAttribute('data-id-dat-phong'),
+                    <tr th:each="datPhong : ${datPhongs}" th:if="${datPhong.tinhTrang == true}" th:data-id-dat-phong="${datPhong.idDatPhong}" th:data-id-phong="${datPhong.phong.idPhong}" th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}" th:data-hovaten="${datPhong.khachHang.hoVaTen}" th:data-sodienthoai="${datPhong.khachHang.soDienThoai}" th:data-tenphong="${datPhong.phong.tenPhong}" th:data-thoigian="${#dates.format(datPhong.ngayNhan,'dd/MM')} + ' - ' + ${#dates.format(datPhong.ngayTra,'dd/MM/yyyy')}" th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}" th:data-giaphong="${datPhong.phong.gia}" th:data-tiencoc="${datPhong.tienCoc}" th:data-tienconlai="${datPhong.tienConLai}" onclick="showForm(this.getAttribute('data-id-dat-phong'),
                                         this.getAttribute('data-id-phong'),
                                         this.getAttribute('data-id-loai-phong'),
                                         this.getAttribute('data-hovaten'),
@@ -124,139 +130,158 @@
                         <td th:text="${datPhong.khachHang.soDienThoai}"></td>
                         <td th:text="${#dates.format(datPhong.ngayNhan, 'dd/MM/yyyy')}"></td>
                         <!--                        <td th:text="${#dates.format(datPhong.ngayTra, 'dd/MM/yyyy')}"></td>-->
-                        <td th:text="${datPhong.tinhTrang == 0 ? 'Đã Thanh Toán' : 'Đã trả trước'}"></td>
+                        <td th:text="${datPhong.tinhTrang == 0 ? 'Đã Thanh Toán' : 'Đã Cọc'}"></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Cột bên phải: Form -->
-            <div class="col-md-6">
-                <form th:action="@{/thanhToan/add}" method="post" th:object="${thanhToanDTO}" id="formId">
-                    <h2>Thông tin hóa đơn</h2>
-                    <input type="hidden" id="idDatPhong" th:field="*{idDatPhong}">
-                    <input type="hidden" id="idPhong" th:field="*{idPhong}">
-                    <input type="hidden" id="idLoaiPhong" th:field="*{idLoaiPhong}">
+            <div class="col-md-5">
+                <div class="container py-4">
+                    <form th:action="@{/thanhToan/add}" method="post" th:object="${thanhToanDTO}" id="formId" class="card p-4 shadow-sm">
+                        <h4 style="color: #0d4bdb">Thông tin hóa đơn</h4>
+                        <hr>
+                        <input type="hidden" id="idDatPhong" th:field="*{idDatPhong}">
+                        <input type="hidden" id="idPhong" th:field="*{idPhong}">
+                        <input type="hidden" id="idLoaiPhong" th:field="*{idLoaiPhong}">
 
-                    <!-- Thông tin khách hàng -->
-                    <div class="row">
-                        <div class="mb-3 col-6">
-                            <label for="hoVaTen" class="form-label">Khách hàng</label>
-                            <input type="text" name="hoVaTen" id="hoVaTen" class="form-control">
+                        <!-- Thông tin khách hàng -->
+                        <div class="row border-bottom pb-2 mb-3">
+                            <div class="col-6 mb-3">
+                                <label for="hoVaTen" class="form-label font-weight-bold">Khách hàng</label>
+                                <input type="text" name="hoVaTen" id="hoVaTen" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="soDienThoai" class="form-label font-weight-bold">Số điện thoại</label>
+                                <input type="text" name="soDienThoai" id="soDienThoai" class="form-control form-control-sm">
+                            </div>
                         </div>
-                        <div class="mb-3 col-6">
-                            <label for="soDienThoai" class="form-label">Số điện thoại</label>
-                            <input type="text" name="soDienThoai" id="soDienThoai" class="form-control">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="mb-3 col-6">
-                            <label for="tenphong" class="form-label">Tên phòng</label>
-                            <input type="text" id="tenphong" class="form-control">
-                        </div>
-                        <div class="mb-3 col-6">
-                            <label for="thoiGian" class="form-label">Thời gian</label>
-                            <input type="text" id="thoiGian" class="form-control">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="mb-3 col-6">
-                            <label for="ngayCheckIn" class="form-label">Thời gian check-in</label>
-                            <input type="text" name="ngayCheckIn" id="ngayCheckIn" class="form-control">
-                        </div>
-                        <div class="mb-3 col-6">
-                            <label for="giaPhong" class="form-label">Giá phòng</label>
-                            <input type="text" name="gia" id="giaPhong" class="form-control">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="mb-3 col-6">
-                            <label for="tienPhuPhi" class="form-label">Tiền phụ phí</label>
-                            <input type="text" id="tienPhuPhi" class="form-control">
-                        </div>
-                        <div class="mb-3 col-6">
-                            <label for="giaDichVu" class="form-label">Tiền dịch vụ</label>
-                            <input type="text" id="giaDichVu" class="form-control">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="mb-3 col-6">
-                            <label for="tienCoc" class="form-label">Tiền cọc phòng</label>
-                            <input type="text" name="tienCoc" id="tienCoc" class="form-control">
-                        </div>
-                        <!--                        <div class="mb-3">-->
-                        <!--                            <label for="giaDichVu" class="form-label">Tiền dịch vụ</label>-->
-                        <!--                            <input type="text" name="gia" id="giaDichVu" class="form-control">-->
-                        <!--                        </div>-->
-                    </div>
 
-
-                    <!-- Thông tin thanh toán -->
-                    <h2 class="mt-4">Thanh toán</h2>
-                    <div class="mb-3 d-flex align-items-center">
-                        <label for="phuPhiSelect" class="form-label me-2">Phụ phí</label>
-                        <div class="input-group col-8">
-                            <select onchange="phuPhiChange(this);tinhTongTien();" class="form-select" id="phuPhiSelect"
-                                    name="phuPhi">
-                                <option value="Không có phụ thu nào" disabled selected>Chọn phụ phí</option>
-                                <option th:each="phuPhi : ${phuPhis}"
-                                        th:value="${phuPhi.idPhuPhi}"
-                                        th:text="${phuPhi.tenPhuPhi}"
-                                        th:data-giaphuphi="${phuPhi.giaPhuPhi}">
-                                </option>
-                            </select>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#modalPhuPhi">+
-                            </button>
+                        <div class="row border-bottom pb-2 mb-3">
+                            <div class="col-6 mb-3">
+                                <label for="tenphong" class="form-label font-weight-bold">Tên phòng</label>
+                                <input type="text" id="tenphong" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="thoiGian" class="form-label font-weight-bold">Thời gian</label>
+                                <input type="text" id="thoiGian" class="form-control form-control-sm">
+                            </div>
                         </div>
-                    </div>
 
-
-                    <div class="mb-3">
-                        <label class="form-label">Phương thức thanh toán: </label>
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="phuongThuc" id="tienMat" value="true" class="form-check-input"
-                                   onclick="toggleTienMatFields(true); generateQR(false)" checked>
-                            <label for="tienMat" class="form-check-label">Tiền mặt</label>
+                        <div class="row border-bottom pb-2 mb-3">
+                            <div class="col-6 mb-3">
+                                <label for="ngayCheckIn" class="form-label font-weight-bold">Thời gian check-in</label>
+                                <input type="text" name="ngayCheckIn" id="ngayCheckIn" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="giaPhong" class="form-label font-weight-bold">Giá phòng</label>
+                                <div class="input-group">
+                                    <input type="text" name="gia" id="giaPhong" class="form-control form-control-sm">
+                                    <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false"
-                                   class="form-check-input" onclick="toggleTienMatFields(false); generateQR(true)">
-                            <label for="chuyenKhoan" class="form-check-label">Chuyển khoản</label>
+
+                        <div class="row border-bottom pb-2 mb-3">
+                            <div class="col-6 mb-3">
+                                <label for="tienPhuPhi" class="form-label font-weight-bold">Tiền phụ phí</label>
+                                <div class="input-group">
+                                    <input type="text" id="tienPhuPhi" class="form-control form-control-sm">
+                                    <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="giaDichVu" class="form-label font-weight-bold">Tiền dịch vụ</label>
+                                <div class="input-group">
+                                    <input type="text" id="giaDichVu" class="form-control form-control-sm">
+                                    <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div id="qrCode" style="display: none;">
-                        <label class="form-label">Mã QR Chuyển khoản:</label>
-                        <div id="qrcode-container"></div>
-                    </div>
+                        <div class="row border-bottom pb-2 mb-3">
+                            <div class="col-6 mb-3">
+                                <label for="tienCoc" class="form-label font-weight-bold">Tiền cọc phòng</label>
+                                <div class="input-group">
+                                    <input type="text" name="tienCoc" id="tienCoc" class="form-control form-control-sm">
+                                    <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="KhuyenMai" class="form-label font-weight-bold">Khuyến mãi</label>
+                                <div class="input-group">
+                                    <input type="text" id="KhuyenMai" class="form-control form-control-sm">
+                                    <span class="input-group-text form-control-sm" style="font-size: 0.875rem; color: #0b860d">+</span>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div id="tienMatFields" style="display: none;">
+                        <!-- Thông tin thanh toán -->
+                        <h4 class="">Thanh toán</h4>
+                        <hr>
+                        <div class="mb-3 pb-2 d-flex align-items-center border-bottom">
+                            <label for="phuPhiSelect" class="form-label me-2 font-weight-bold">Phụ phí</label>
+                            <div class="input-group col-8 ms-auto">
+                                <select onchange="phuPhiChange(this);tinhTongTien();" class="form-select form-control-sm" id="phuPhiSelect" name="phuPhi">
+                                    <option value="Không có phụ thu nào" disabled selected>Chọn phụ phí</option>
+                                    <option th:each="phuPhi : ${phuPhis}" th:value="${phuPhi.idPhuPhi}" th:text="${phuPhi.tenPhuPhi}" th:data-giaphuphi="${phuPhi.giaPhuPhi}">
+                                    </option>
+                                </select>
+                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalPhuPhi" style="font-weight: bold;">+
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
-                            <label for="soTienKhachDua" class="form-label">Số tiền khách đưa</label>
-                            <input type="number" id="soTienKhachDua" class="form-control" oninput="tinhTienThua()">
+                            <label class="form-label font-weight-bold">Phương thức: </label>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="phuongThuc" id="tienMat" value="true" class="form-check-input" onclick="toggleTienMatFields(true); generateQR(false)" checked>
+                                <label for="tienMat" class="form-check-label font-weight-bold">Tiền mặt</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false" class="form-check-input" onclick="toggleTienMatFields(false); generateQR(true)">
+                                <label for="chuyenKhoan" class="form-check-label font-weight-bold">Chuyển khoản</label>
+                            </div>
                         </div>
+
+                        <div id="qrCode" style="display: none;">
+                            <label class="form-label">Mã QR Chuyển khoản:</label>
+                            <div id="qrcode-container"></div>
+                        </div>
+
+                        <div id="tienMatFields" style="display: none;">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label for="soTienKhachDua" class="form-label">Số tiền khách đưa</label>
+                                    <input type="number" id="soTienKhachDua" class="form-control" oninput="tinhTienThua()">
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="tienThua" class="form-label">Tiền thừa</label>
+                                    <input type="number" id="tienThua" class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
-                            <label for="tienThua" class="form-label">Tiền thừa</label>
-                            <input type="number" id="tienThua" class="form-control" readonly>
+                            <label for="tienConLai" class="form-label">Tổng phải thanh toán</label>
+                            <div class="input-group">
+                                <input type="number" name="soTien" id="tienConLai" class="form-control">
+                                <span class="input-group-text">VND</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="tienConLai" class="form-label">Tổng phải thanh toán</label>
-                        <input type="number" name="soTien" id="tienConLai" class="form-control">
-                    </div>
+                        <input type="hidden" name="tinhTrang" id="daThanhToan" value="true">
+                        <div>
+                            <button type="submit" class="btn btn-primary">Thanh toán</button>
+                        </div>
+                    </form>
+                </div>
 
-                    <input type="hidden" name="tinhTrang" id="daThanhToan" value="true">
-                    <div>
-                        <button type="submit" class="btn btn-primary">Thanh toán</button>
-                    </div>
-                </form>
             </div>
 
             <!-- Modal -->
-            <div class="modal fade" id="modalPhuPhi" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal fade" id="modalPhuPhi" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header" style="background-color: orange">
@@ -269,13 +294,11 @@
                                 <input type="hidden" name="idDatPhong" id="datPhongId">
                                 <div class="mb-3">
                                     <label for="tenPhuPhi" class="form-label">Tên phụ phí</label>
-                                    <input type="text" name="tenPhuPhi" id="tenPhuPhi"
-                                           class="form-control" placeholder="Nhập tên phụ phí" required>
+                                    <input type="text" name="tenPhuPhi" id="tenPhuPhi" class="form-control" placeholder="Nhập tên phụ phí" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="giaPhuPhi" class="form-label">Giá phụ phí</label>
-                                    <input type="number" name="giaPhuPhi" id="giaPhuPhi" class="form-control"
-                                           placeholder="Nhập giá phụ phí" required>
+                                    <input type="number" name="giaPhuPhi" id="giaPhuPhi" class="form-control" placeholder="Nhập giá phụ phí" required>
                                 </div>
                                 <div class="text-end">
                                     <button type="submit" class="btn btn-success">Thêm phụ phí</button>
@@ -298,20 +321,13 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr th:each="phuPhi, i : ${phuPhis}"
-                                        data-bs-toggle="modal" data-bs-target="#modalUpdatePhuPhi"
-                                        th:data-idphuphi="${phuPhi.idPhuPhi}"
-                                        th:data-tenphuphi="${phuPhi.tenPhuPhi}"
-                                        th:data-giaphuphi="${phuPhi.giaPhuPhi}"
-                                        th:data-iddatphong="${phuPhi.datPhong.idDatPhong}"
-                                        onclick="detailPhuPhi(this)">
+                                    <tr th:each="phuPhi, i : ${phuPhis}" data-bs-toggle="modal" data-bs-target="#modalUpdatePhuPhi" th:data-idphuphi="${phuPhi.idPhuPhi}" th:data-tenphuphi="${phuPhi.tenPhuPhi}" th:data-giaphuphi="${phuPhi.giaPhuPhi}" th:data-iddatphong="${phuPhi.datPhong.idDatPhong}" onclick="detailPhuPhi(this)">
                                         <td th:text="${i.count}"></td>
                                         <td th:text="${phuPhi.tenPhuPhi}"></td>
                                         <td th:text="${phuPhi.giaPhuPhi}"></td>
                                         <td th:text="${phuPhi.datPhong.idDatPhong}"></td>
                                         <td>
-                                            <button type="button" th:onclick="deletePhuPhi('[[${phuPhi.idPhuPhi}]]')"
-                                                    class="btn btn-danger btn-sm">Xóa
+                                            <button type="button" th:onclick="deletePhuPhi('[[${phuPhi.idPhuPhi}]]')" class="btn btn-danger btn-sm">Xóa
                                             </button>
                                         </td>
                                     </tr>
@@ -329,8 +345,7 @@
                 </div>
             </div>
             <!--Update modal  -->
-            <div class="modal fade" id="modalUpdatePhuPhi" data-bs-backdrop="static" data-bs-keyboard="false"
-                 tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal fade" id="modalUpdatePhuPhi" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header" style="background-color: orange">
@@ -344,13 +359,11 @@
                                 <input type="hidden" name="idPhuPhi" id="idPhuPhiDetail">
                                 <div class="mb-3">
                                     <label for="tenPhuPhi" class="form-label">Tên phụ phí</label>
-                                    <input type="text" name="tenPhuPhi" id="tenPhuPhiDetail"
-                                           class="form-control" placeholder="Nhập tên phụ phí" required>
+                                    <input type="text" name="tenPhuPhi" id="tenPhuPhiDetail" class="form-control" placeholder="Nhập tên phụ phí" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="giaPhuPhi" class="form-label">Giá phụ phí</label>
-                                    <input type="number" name="giaPhuPhi" id="giaPhuPhiDetail" class="form-control"
-                                           placeholder="Nhập giá phụ phí" required>
+                                    <input type="number" name="giaPhuPhi" id="giaPhuPhiDetail" class="form-control" placeholder="Nhập giá phụ phí" required>
                                 </div>
                                 <div class="text-end">
                                     <button type="submit" class="btn btn-success">Sửa phụ phí</button>
@@ -367,15 +380,15 @@
                 </div>
             </div>
 
+
         </div>
     </div>
 </main>
 <!-- Thêm thư viện QRCode.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
-
     //Lắng nghe sự kiến submit từ form
-    document.getElementById("formPhuPhi").addEventListener('submit', function (event) {
+    document.getElementById("formPhuPhi").addEventListener('submit', function(event) {
         event.preventDefault(); // Ngăn chặn hành vi mặc định của form
 
         const idDatPhong = parseInt(document.getElementById('datPhongId').value, 10);
@@ -508,7 +521,7 @@
     }
 
     //updatePhuPhi
-    document.getElementById("formUpdatePhuPhi").addEventListener('submit', function (event) {
+    document.getElementById("formUpdatePhuPhi").addEventListener('submit', function(event) {
         event.preventDefault();
 
         const idPhuPhi = document.getElementById('idPhuPhiDetail').value;
@@ -521,7 +534,8 @@
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
 
-            }, body: `idPhuPhi=${encodeURIComponent(idPhuPhi)}
+            },
+            body: `idPhuPhi=${encodeURIComponent(idPhuPhi)}
                     &idDatPhong=${encodeURIComponent(idDatPhong)}
                     &tenPhuPhi=${encodeURIComponent(tenPhuPhi)}
                     &giaPhuPhi=${encodeURIComponent(giaPhuPhi)}`
@@ -647,7 +661,34 @@
     //     }
     // }
 
+    document.getElementById("paymentForm").addEventListener("submit", function(e) {
+        confirmPayment(e);
+    });
+
+    function confirmPayment(e) {
+        e.preventDefault();
+
+        // Hiển thị hộp thoại xác nhận bằng SweetAlert
+        swal({
+            title: "Xác nhận thanh toán",
+            text: "Bạn chắc chắn muốn thanh toán chứ?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willPay) => {
+            if (willPay) {
+                // Nếu người dùng chọn "OK", gửi biểu mẫu
+                document.getElementById("paymentForm").submit();
+            } else {
+                // Nếu người dùng chọn "Cancel", không làm gì
+                swal("Thanh toán đã bị hủy!", {
+                    icon: "error",
+                });
+            }
+        });
+    }
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>
+
 </html>

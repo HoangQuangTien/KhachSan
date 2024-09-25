@@ -50,10 +50,10 @@ public class DatPhongServiceImp implements DatPhongService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin đặt phòng với ID: " + id));
     }
 
-    @Override
-    public DatPhong findTopByOrderByIdDatPhongDesc(){
-        return datPhongRepository.findTopByOrderByIdDatPhongDesc();
-    }
+//    @Override
+//    public DatPhong findTopByOrderByIdDatPhongDesc(){
+//        return datPhongRepository.findTopByOrderByIdDatPhongDesc();
+//    }
 
     @Override
     public void deleteDatPhong(int id) {
@@ -208,7 +208,10 @@ public class DatPhongServiceImp implements DatPhongService {
     }
 
 
-
+    @Override
+    public List<DatPhong> getDatPhongsDaCoc() {
+        return datPhongRepository.findAllByDaCoc();
+    }
 
 
 }

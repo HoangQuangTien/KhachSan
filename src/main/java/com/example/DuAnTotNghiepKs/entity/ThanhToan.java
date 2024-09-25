@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.entity;
 
+import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -40,4 +41,3 @@ public class ThanhToan {
     private DatPhong datPhong;
 
 }
-

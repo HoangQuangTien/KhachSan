@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +35,10 @@ public class DatPhong {
     private Date ngayTra;
     @Column(name = "tinh_trang")
     private Boolean tinhTrang;
+
+    @Column(name = "trang_thai")
+    private Boolean trangThai;
+
     @Column(name = "cccd")
     private String cccd;
     @Column(name = "tien_coc")
@@ -43,6 +49,10 @@ public class DatPhong {
 
     @Column(name = "tien_con_lai")
     private Float tienConLai;
+
+    //    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm")
+    @Column(name = "ngay_check_in")
+    private LocalDateTime ngayCheckIn;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_phong",referencedColumnName ="id_phong")
@@ -69,4 +79,11 @@ public class DatPhong {
 
 
 
+//    @OneToMany(mappedBy = "datPhong",cascade = CascadeType.ALL,orphanRemoval = true)
+//    private Set<PhuPhi> phuPhis = new HashSet<>();
+
+
+
+
 }
+

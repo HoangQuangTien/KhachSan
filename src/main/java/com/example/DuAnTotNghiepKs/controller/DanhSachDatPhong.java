@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,10 @@ public class DanhSachDatPhong {
 
             phong.setTrangThai(false); // false biểu thị phòng đã hết
             phongService.savePhong(phong); // Giả sử có một dịch vụ lưu phòng
+
+            datPhong.setTrangThai(false);
+            datPhong.setNgayCheckIn(LocalDateTime.now()); // lấy ngày hiện tại
+            datPhongService.saveDatPhong1(datPhong);
             return ResponseEntity.ok(Map.of("success", "Check-in thành công!"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

@@ -175,21 +175,22 @@ public class DatPhongController {
     @PostMapping("/create")
     public ResponseEntity<?> createDatPhong(
             @RequestParam("idLoaiPhong") List<String> idLoaiPhongStrList,
-            @RequestParam("idPhong") List<String> idPhongStrList,
+            @RequestParam("idPhong") String idPhongStr, // Chuyển sang nhận chuỗi
             @RequestParam("ngayNhan") String ngayNhanStr,
             @RequestParam("ngayTra") String ngayTraStr,
             @RequestParam("cccd") String cccd,
             @RequestParam("maDatPhong") String maDatPhong,
             @RequestParam("idKhachHang") String idKhachHangStr) {
 
+        // Chuyển đổi chuỗi ID phòng thành danh sách
+        List<String> idPhongStrList = Arrays.asList(idPhongStr.split(","));
+
         // Kiểm tra các tham số đầu vào để đảm bảo chúng không rỗng
         if (idLoaiPhongStrList == null || idLoaiPhongStrList.isEmpty() ||
                 idPhongStrList == null || idPhongStrList.isEmpty() ||
                 idKhachHangStr == null || idKhachHangStr.isEmpty() ||
                 ngayNhanStr == null || ngayNhanStr.isEmpty() ||
-                ngayTraStr == null || ngayTraStr.isEmpty() ||
-                cccd == null || cccd.isEmpty() ||
-                maDatPhong == null || maDatPhong.isEmpty()) {
+                ngayTraStr == null || ngayTraStr.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Các tham số không được để trống."));
         }
 
@@ -219,10 +220,16 @@ public class DatPhongController {
             float tongTienPhong = 0;
             float tienCoc = 0;
 
+            // Lưu danh sách các đối tượng DatPhong
+            List<DatPhong> datPhongList = new ArrayList<>();
+
             for (int i = 0; i < idPhongStrList.size(); i++) {
+
                 // Kiểm tra và chuyển đổi ID loại phòng
-                Integer idLoaiPhong = parseInteger(idLoaiPhongStrList.get(i), "ID loại phòng không hợp lệ.");
+                // Sử dụng loại phòng tương ứng hoặc giữ nguyên loại phòng cuối cùng nếu danh sách loại phòng ngắn hơn
+                Integer idLoaiPhong = parseInteger(idLoaiPhongStrList.get(Math.min(i, idLoaiPhongStrList.size() - 1)), "ID loại phòng không hợp lệ.");
                 LoaiPhong loaiPhong = loaiPhongService.findById(idLoaiPhong);
+
 
                 // Kiểm tra và chuyển đổi ID phòng
                 Integer idPhong = parseInteger(idPhongStrList.get(i), "ID phòng không hợp lệ.");
@@ -232,6 +239,7 @@ public class DatPhongController {
                 if (selectedPhong == null || !selectedPhong.getTinhTrang()) {
                     return ResponseEntity.badRequest().body(Map.of("error", "Phòng " + idPhong + " không hợp lệ hoặc đã ngừng hoạt động."));
                 }
+
 
                 // Kiểm tra xem phòng đã được đặt trong khoảng thời gian này hay chưa
                 List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, convertToDate(ngayNhan), convertToDate(ngayTra));
@@ -249,9 +257,9 @@ public class DatPhongController {
                 tongTienPhong += tongTienPhongPhong;
                 tienCoc += tienCocPhong;
 
-                // Tạo đối tượng DatPhong cho từng phòng và lưu trữ
+                // Tạo đối tượng DatPhong cho từng phòng
                 DatPhong datPhong = new DatPhong();
-                datPhong.setMaDatPhong(maDatPhong);
+                datPhong.setMaDatPhong(generateMaDatPhong()+""+(i+1));
                 datPhong.setPhong(selectedPhong);
                 datPhong.setNgayNhan(convertToDate(ngayNhan));
                 datPhong.setNgayTra(convertToDate(ngayTra));
@@ -262,7 +270,16 @@ public class DatPhongController {
                 datPhong.setLoaiPhong(loaiPhong);
                 datPhong.setKhachHang(khachHang);
                 datPhong.setTinhTrang(false);
+                datPhong.setTrangThai(false);
 
+                // Thêm vào danh sách để lưu sau
+                datPhongList.add(datPhong);
+                System.out.println("idLoaiPhongStrList: " + idLoaiPhongStrList);
+                System.out.println("idPhongStrList: " + idPhongStrList);
+            }
+
+            // Lưu tất cả các đối tượng DatPhong vào cơ sở dữ liệu
+            for (DatPhong datPhong : datPhongList) {
                 datPhongService.saveDatPhong(datPhong);
 
                 // Lưu thông tin chi tiết đặt phòng
@@ -276,16 +293,6 @@ public class DatPhongController {
                 chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
             }
 
-//            // Cập nhật trạng thái phòng
-//            for (String idPhongStr : idPhongStrList) {
-//                Integer idPhong = parseInteger(idPhongStr, "ID phòng không hợp lệ.");
-//                Phong selectedPhong = phongService.findById(idPhong);
-//                if (selectedPhong != null) {
-//                    selectedPhong.setTrangThai(false);
-//                    phongService.savePhong(selectedPhong);
-//                }
-//            }
-
             return ResponseEntity.ok(Map.of("success", "Đặt phòng thành công!"));
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Định dạng ID không hợp lệ."));
@@ -294,6 +301,13 @@ public class DatPhongController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Có lỗi xảy ra: " + e.getMessage()));
         }
+    }
+
+    private String generateMaDatPhong() {
+        String prefix = "DP";
+        DatPhong lastDatPhong = datPhongService.findTopByOrderByIdDatPhongDesc();
+        int nextId = lastDatPhong != null ? (int) (lastDatPhong.getIdDatPhong() + 1) : 1;
+        return prefix + String.format("%03d", nextId);
     }
 
     // Helper methods for parsing integer and date
