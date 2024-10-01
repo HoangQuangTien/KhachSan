@@ -2,6 +2,8 @@ package com.example.DuAnTotNghiepKs.repository;
 
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -100,7 +102,18 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
     Optional<DatPhong> findByPhongAndTinhTrang(Phong phong, Boolean tinhTrang);
 
-    @Query("SELECT dp FROM DatPhong dp WHERE dp.trangThai = false ")
-    List<DatPhong> findAllByDaCoc();
+    @Query("SELECT dp FROM DatPhong dp WHERE dp.trangThai = false")
+    Page<DatPhong> findAllByDaCoc(Pageable pageable);
+
+
+    Optional<DatPhong> findByPhong(Phong phong);
+
+
+    @Query("SELECT d FROM DatPhong d JOIN d.khachHang k WHERE " +
+            "LOWER(k.hoVaTen) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(k.soDienThoai) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(k.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(d.phong.maPhong) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<DatPhong> findByKeyword(@Param("keyword") String keyword);
 
 }

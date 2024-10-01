@@ -170,5 +170,21 @@ public class PhongService {
     public List<Phong> getAllPhongs1() {
         return phongRepository.findAll();
     }
+
+
+    public String updateRoomStatusToAvailable(Integer roomId) {
+        // Tìm phòng theo ID
+        Optional<Phong> optionalRoom = phongRepository.findById(roomId);
+
+        // Kiểm tra xem phòng có tồn tại hay không
+        if (optionalRoom.isPresent()) {
+            Phong room = optionalRoom.get();
+            room.setTrangThai(true); // Cập nhật trạng thái phòng
+            phongRepository.save(room);
+            return "Cập nhật trạng thái phòng thành công!";
+        } else {
+            return "Không tìm thấy phòng với ID: " + roomId; // Trả về thông báo nếu không tìm thấy
+        }
+    }
 }
 

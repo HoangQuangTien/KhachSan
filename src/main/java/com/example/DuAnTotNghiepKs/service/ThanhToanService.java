@@ -4,6 +4,7 @@ import com.example.DuAnTotNghiepKs.DTO.ThanhToanDTO;
 import com.example.DuAnTotNghiepKs.entity.ThanhToan;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ThanhToanService {
@@ -14,4 +15,9 @@ public interface ThanhToanService {
     ThanhToanDTO save(ThanhToanDTO thanhToanDTO);
 
     Page<ThanhToan> getLoaiPhongPage(int page, int size);
+
+
+    long getThoiGianChoPhepChuyenTrangThai();
+
+    byte[] createInvoicePDF(ThanhToanDTO thanhToanDTO) throws IOException;
 }

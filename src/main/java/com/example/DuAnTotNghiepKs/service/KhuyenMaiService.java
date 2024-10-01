@@ -97,6 +97,10 @@ public class KhuyenMaiService {
     }
 
 
+    public List<KhuyenMai> getAllActiveKhuyenMai() {
+        return khuyenMaiRepository.findByTrangThai("Còn hạn"); // "active" có thể thay đổi theo trạng thái thực tế bạn sử dụng
+    }
+
 
     // Chạy mỗi ngày vào lúc 00:00 để kiểm tra trạng thái khuyến mãi
 //    @Scheduled(cron = "0 0 0 * * ?")

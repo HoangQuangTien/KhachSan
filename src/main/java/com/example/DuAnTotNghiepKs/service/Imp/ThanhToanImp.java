@@ -6,16 +6,25 @@ import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.KhachHang;
 import com.example.DuAnTotNghiepKs.entity.ThanhToan;
 import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
+import com.example.DuAnTotNghiepKs.repository.ThamSoRepo;
 import com.example.DuAnTotNghiepKs.repository.ThanhToanRepo;
 import com.example.DuAnTotNghiepKs.service.ThanhToanService;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
 
+import java.io.ByteArrayOutputStream;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -33,6 +42,9 @@ public class ThanhToanImp implements ThanhToanService {
     private DatPhongRepo datPhongRepository;
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private ThamSoRepo thamSoRepository;
 
     @Override
     public boolean xacNhanThanhToan(Integer idDatPhong, Double paymentAmount) {
@@ -164,6 +176,43 @@ public class ThanhToanImp implements ThanhToanService {
         Pageable pageable = PageRequest.of(page, size);
         return thanhToanRepository.findAll(pageable);
     }
+
+
+
+
+    // Các phương thức khác...
+
+    @Override
+    public long getThoiGianChoPhepChuyenTrangThai() {
+        Long idThamSo = 2L; // ID cho tham số thời gian chuyển trạng thái
+        return thamSoRepository.findById(idThamSo)
+                .map(thamSo -> Long.parseLong(thamSo.getGiaTri()) * 60 * 1000) // Chuyển đổi phút thành mili giây
+                .orElse(0L); // Trả về 0 nếu không tìm thấy tham số
+    }
+
+
+    @Override
+    public byte[] createInvoicePDF(ThanhToanDTO thanhToanDTO) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PdfWriter pdfWriter = new PdfWriter(outputStream);
+        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+        Document document = new Document(pdfDocument);
+
+        // Thêm nội dung hóa đơn vào PDF
+        document.add(new Paragraph("Hóa Đơn Thanh Toán")
+                .setFontSize(20)
+                .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))); // Sử dụng PdfFontFactory
+
+        document.add(new Paragraph("Thông tin khách hàng: " + thanhToanDTO.getIdKhachHang()));
+        document.add(new Paragraph("Mã phòng: " + thanhToanDTO.getIdPhong()));
+        document.add(new Paragraph("Tổng tiền: " + thanhToanDTO.getTongTien()));
+        document.add(new Paragraph("Ngày thanh toán: " + thanhToanDTO.getNgayThanhToan()));
+
+        document.close();
+        return outputStream.toByteArray(); // Trả về byte array của PDF
+    }
+
+
 
 
 

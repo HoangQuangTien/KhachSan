@@ -35,4 +35,9 @@ public interface KhuyenMaiRepo extends JpaRepository<KhuyenMai,Integer> {
 
     //Chuyển trạng thái khi ngày hết hạn
 
+    List<KhuyenMai> findByTrangThai(String trangThai);
+
+
+
+
 }

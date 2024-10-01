@@ -409,10 +409,4 @@ public ResponseEntity<?> getTop3PhongDuocDatNhieuNhat() {
         return ResponseEntity.ok(totalDistinctCustomers);
     }
 
-
-
-
-
-
-
 }

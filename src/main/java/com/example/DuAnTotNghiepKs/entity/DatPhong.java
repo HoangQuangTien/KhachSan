@@ -34,7 +34,7 @@ public class DatPhong {
     @Column(name = "ngay_tra_phong")
     private Date ngayTra;
     @Column(name = "tinh_trang")
-    private Boolean tinhTrang;
+    private String tinhTrang;
 
     @Column(name = "trang_thai")
     private Boolean trangThai;

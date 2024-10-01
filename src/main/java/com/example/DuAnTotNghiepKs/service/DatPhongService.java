@@ -5,6 +5,7 @@ import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 import java.util.Date;
@@ -52,7 +53,9 @@ public interface DatPhongService {
 
     List<DatPhong> findByPhongAndThoiGian(Integer idPhong, Date ngayNhan, Date ngayTra);
 
-    List<DatPhong> getDatPhongsDaCoc();
+//    List<DatPhong> getDatPhongsDaCoc();
+
+    Page<DatPhong> getDatPhongsDaCoc(int page, int size);
 
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động

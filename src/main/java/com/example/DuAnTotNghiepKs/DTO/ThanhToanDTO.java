@@ -40,5 +40,6 @@ public class ThanhToanDTO {
     private Integer idPhong;
     private String tenPhong;
 
+    private boolean inHoaDon;
 
 }

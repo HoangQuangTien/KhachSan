@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.rest;
 
+import com.example.DuAnTotNghiepKs.DTO.PhongDTO;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 import com.example.DuAnTotNghiepKs.service.PhongService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,16 @@ public class PhongRest {
     @Autowired
     private PhongService phongService; // Dịch vụ xử lý logic liên quan đến phòng
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Optional<Phong>> getPhongById(@PathVariable("id") Integer id) {
-        Optional<Phong> phong = phongService.getPhongById(id); // Tìm phòng theo ID
-        if (phong != null) {
-            return ResponseEntity.ok(phong); // Trả về thông tin phòng nếu tìm thấy
-        } else {
-            return ResponseEntity.notFound().build(); // Trả về 404 nếu không tìm thấy
-        }
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<PhongDTO> getPhongById(@PathVariable("id") Integer id) {
+//        Optional<Phong> phongOpt = phongService.getPhongById(id);
+//        if (phongOpt.isPresent()) {
+//            Phong phong = phongOpt.get();
+//            PhongDTO phongDTO = new PhongDTO(phong.getTenPhong(), phong.getGia(), ,phong.getTinhTrang(), phong.getTrangThai());
+//            return ResponseEntity.ok(phongDTO);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+
 }

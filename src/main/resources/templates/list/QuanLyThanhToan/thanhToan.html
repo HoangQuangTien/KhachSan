@@ -8,6 +8,10 @@
     <!-- Thêm thư viện Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <style>
         /* CSS cho thông báo translucent */
 
@@ -79,6 +83,8 @@
 <div th:include="fragment/sidebar :: sidebar"></div>
 
 <main role="main" class="main-content">
+
+
     <div class="container-fluid">
         <!-- Thông báo lỗi translucent -->
         <!--        <div id="errorMessage"></div>-->
@@ -130,16 +136,38 @@
                         <td th:text="${datPhong.khachHang.soDienThoai}"></td>
                         <td th:text="${#dates.format(datPhong.ngayNhan, 'dd/MM/yyyy')}"></td>
                         <!--                        <td th:text="${#dates.format(datPhong.ngayTra, 'dd/MM/yyyy')}"></td>-->
-                        <td th:text="${datPhong.tinhTrang == 0 ? 'Đã Thanh Toán' : 'Đã Cọc'}"></td>
+                        <td th:text="${datPhong.trangThai == 0 ? 'Đã Thanh Toán' : 'Đã Cọc'}"></td>
                     </tr>
                     </tbody>
                 </table>
+
+                <!-- Phân trang Bootstrap -->
+                <nav class="d-flex justify-content-end">
+                    <ul class="pagination pagination-sm">
+                        <!-- Previous Page -->
+                        <li th:if="${currentPage > 1}" class="page-item">
+                            <a class="page-link" th:href="@{/thanhToan(page=${currentPage - 1})}" aria-label="Previous">&laquo;</a>
+                        </li>
+                        <!-- Page Numbers -->
+                        <li th:each="i : ${#numbers.sequence(0, totalPagesDatPhong)}"
+                            th:classappend="${i == currentPage} ? 'active' : ''" class="page-item">
+                            <a class="page-link" th:href="@{/thanhToan(page=${i})}" th:text="${i}"></a>
+                        </li>
+
+                        <!-- Next Page -->
+                        <li th:if="${currentPage < totalPagesDatPhong}" class="page-item">
+                            <a class="page-link" th:href="@{/thanhToan(page=${currentPage + 1})}" aria-label="Next">&raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+
+
             </div>
 
             <!-- Cột bên phải: Form -->
             <div class="col-md-5">
                 <div class="container py-4">
-                    <form th:action="@{/thanhToan/add}" method="post" th:object="${thanhToanDTO}" id="formId" class="card p-4 shadow-sm">
+                    <form th:action="@{/thanhToan/add}" method="post" th:object="${thanhToanDTO}" id="formId" class="card p-4 shadow-sm"  onsubmit="return false;">
                         <h4 style="color: #0d4bdb">Thông tin hóa đơn</h4>
                         <hr>
                         <input type="hidden" id="idDatPhong" th:field="*{idDatPhong}">
@@ -209,13 +237,13 @@
                                 </div>
                             </div>
                             <div class="col-6 mb-3">
-                                <label for="KhuyenMai" class="form-label font-weight-bold">Khuyến mãi</label>
-                                <div class="input-group">
-                                    <input type="text" id="KhuyenMai" class="form-control form-control-sm">
-                                    <span class="input-group-text form-control-sm" style="font-size: 0.875rem; color: #0b860d">+</span>
-                                </div>
+                                <label for="khuyenMaiSelect">Khuyến mãi:</label>
+                                <select id="khuyenMaiSelect" class="form-control" aria-label="Chọn mã khuyến mãi">
+                                    <option value="">--Chọn mã khuyến mãi--</option>
+                                </select>
                             </div>
                         </div>
+
 
                         <!-- Thông tin thanh toán -->
                         <h4 class="">Thanh toán</h4>
@@ -233,7 +261,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 border-bottom">
                             <label class="form-label font-weight-bold">Phương thức: </label>
                             <div class="form-check form-check-inline">
                                 <input type="radio" name="phuongThuc" id="tienMat" value="true" class="form-check-input" onclick="toggleTienMatFields(true); generateQR(false)" checked>
@@ -250,18 +278,27 @@
                             <div id="qrcode-container"></div>
                         </div>
 
-                        <div id="tienMatFields" style="display: none;">
+                        <div id="tienMatFields" class="border-bottom">
                             <div class="row">
                                 <div class="col-6 mb-3">
-                                    <label for="soTienKhachDua" class="form-label">Số tiền khách đưa</label>
-                                    <input type="number" id="soTienKhachDua" class="form-control" oninput="tinhTienThua()">
+                                    <label for="soTienKhachDua" class="form-label font-weight-bold">Số tiền khách đưa</label>
+                                    <input type="number" id="soTienKhachDua" class="form-control" oninput="tinhTienThua()" required>
                                 </div>
                                 <div class="col-6 mb-3">
-                                    <label for="tienThua" class="form-label">Tiền thừa</label>
+                                    <label for="tienThua" class="form-label font-weight-bold">Tiền thừa</label>
                                     <input type="number" id="tienThua" class="form-control" readonly>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="form-group border-bottom pb-2 mb-3">
+                            <label for="printInvoice" class="form-label font-weight-bold">In hóa đơn</label>
+                            <div class="form-switch">
+                                <input class="form-check-input" type="checkbox" id="printInvoice" name="inHoaDon">
+                                <label class="form-check-label" for="printInvoice">Có</label>
+                            </div>
+                        </div>
+
 
                         <div class="mb-3">
                             <label for="tienConLai" class="form-label">Tổng phải thanh toán</label>
@@ -273,12 +310,16 @@
 
                         <input type="hidden" name="tinhTrang" id="daThanhToan" value="true">
                         <div>
-                            <button type="submit" class="btn btn-primary">Thanh toán</button>
+                            <button type="submit" class="btn btn-success" onclick="return kiemTraThanhToan()">
+                                <i class="fas fa-dollar-sign"></i> Thanh toán
+                            </button>
                         </div>
                     </form>
                 </div>
 
             </div>
+
+
 
             <!-- Modal -->
             <div class="modal fade" id="modalPhuPhi" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -621,13 +662,55 @@
     }
 
     function tinhTienThua() {
+        // Lấy giá trị từ các ô input
         var soTienKhachDua = parseFloat(document.getElementById("soTienKhachDua").value) || 0;
         var tongSoTien = parseFloat(document.getElementById("tienConLai").value) || 0;
-        // var tienPhuPhi = parseFloat(document.getElementById("tienPhuPhi").value) || 0;
+
+        // Tính tiền thừa
         var tienThua = soTienKhachDua - tongSoTien;
 
+        // Cập nhật giá trị ô tiền thừa, nếu lớn hơn 0 thì hiển thị số tiền, nếu không thì giá trị là 0
         document.getElementById("tienThua").value = tienThua > 0 ? tienThua.toFixed(2) : 0;
     }
+
+    function kiemTraThanhToan() {
+        var soTienKhachDua = parseFloat(document.getElementById("soTienKhachDua").value) || 0;
+        var tongSoTien = parseFloat(document.getElementById("tienConLai").value) || 0;
+
+        // Kiểm tra nếu số chữ số của "soTienKhachDua" lớn hơn 10
+        if (soTienKhachDua.toString().length > 10) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Số tiền khách đưa không được vượt quá 10 chữ số!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false; // Ngăn form gửi
+        }
+
+        // Kiểm tra nếu số tiền khách đưa ít hơn tổng số tiền cần thanh toán thì thông báo lỗi
+        if (soTienKhachDua < tongSoTien) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Số tiền khách đưa phải lớn hơn hoặc bằng tổng tiền còn lại!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false; // Ngăn form gửi
+        } else {
+            // Nếu hợp lệ, hiển thị thông báo thành công và submit form
+            Swal.fire({
+                title: 'Thành công!',
+                text: 'Thanh toán thành công!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(function() {
+                document.getElementById("formId").submit(); // Gửi form sau khi nhấn OK
+            });
+        }
+    }
+
+
 
     // Hàm tính tổng tiền cần thanh toán (bao gồm phụ phí)
     function tinhTongTien() {
@@ -640,6 +723,16 @@
         // Cập nhật ô input với giá trị mới của tổng tiền
         document.getElementById("tienConLai").value = tongTien.toFixed(2);
     }
+
+
+
+    document.getElementById('printInvoice').addEventListener('change', function() {
+        if (this.checked) {
+            console.log("Người dùng chọn in hóa đơn");
+        } else {
+            console.log("Người dùng không chọn in hóa đơn");
+        }
+    });
 
     // function generateQR(showQR) {
     //     var qrCodeDiv = document.getElementById("qrCode");
@@ -687,6 +780,51 @@
             }
         });
     }
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const khuyenMaiSelect = document.getElementById('khuyenMaiSelect');
+        console.log("DOM fully loaded and parsed.");
+
+        if (!khuyenMaiSelect) {
+            console.error("Element with ID 'khuyenMaiSelect' not found!");
+            return;
+        }
+
+        console.log("Fetching active khuyen mai...");
+        fetch('/api/km/active')
+            .then(response => {
+                console.log("Response status: ", response.status);
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Fetched data: ", data);
+                khuyenMaiSelect.innerHTML = '<option value="">--Chọn mã khuyến mãi--</option>';
+
+                if (Array.isArray(data) && data.length > 0) {
+                    console.log("Data is an array with items. Processing...");
+                    data.forEach(khuyenMai => {
+                        const option = document.createElement('option');
+                        option.value = khuyenMai.idKhuyenMai;
+                        option.textContent = `${khuyenMai.maKhuyenMai} - ${khuyenMai.tenKhuyenMai}`;
+                        khuyenMaiSelect.appendChild(option);
+                    });
+                    console.log("Options added successfully.");
+                } else {
+                    console.error("Dữ liệu không hợp lệ, không phải là mảng hoặc mảng rỗng.");
+                }
+            })
+            .catch(error => {
+                console.error('Error occurred while fetching data:', error);
+            });
+    });
+
+
+
+
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>

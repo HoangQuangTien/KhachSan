@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/quan-ly-khuyen-mai")
@@ -50,12 +53,12 @@ public class KhuyenMaiController {
 //
 //    }
 
-    @GetMapping("/view-add")
-    public String  showAdd(Model model) {
-        model.addAttribute("khuyenMai", new KhuyenMai());
-        return "list/QuanLyKhuyenMai/add";
-
-    }
+//    @GetMapping("/view-add")
+//    public String  showAdd(Model model) {
+//        model.addAttribute("khuyenMai", new KhuyenMai());
+//        return "list/QuanLyKhuyenMai/add";
+//
+//    }
 
     @PostMapping("/add")
     public String addKhuyenMai(@ModelAttribute @Valid KhuyenMai khuyenMai, BindingResult result) {
@@ -183,6 +186,9 @@ public class KhuyenMaiController {
 
         return "list/QuanLyKhuyenMai/KhuyenMai";
     }
+
+
+
 
 
 }

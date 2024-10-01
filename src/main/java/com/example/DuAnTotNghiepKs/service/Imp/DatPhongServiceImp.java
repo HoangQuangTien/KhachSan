@@ -209,9 +209,11 @@ public class DatPhongServiceImp implements DatPhongService {
 
 
     @Override
-    public List<DatPhong> getDatPhongsDaCoc() {
-        return datPhongRepository.findAllByDaCoc();
+    public Page<DatPhong> getDatPhongsDaCoc(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return datPhongRepository.findAllByDaCoc(pageable);
     }
+
 
 
 }
