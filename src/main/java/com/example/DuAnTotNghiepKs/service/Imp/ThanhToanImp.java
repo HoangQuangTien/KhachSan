@@ -65,7 +65,7 @@ public class ThanhToanImp implements ThanhToanService {
         thanhToanRepository.save(thanhToan);
 
         // Cập nhật trạng thái đơn đặt phòng
-        datPhong.setTinhTrang(Boolean.valueOf("Đã cọc")); // Cập nhật trạng thái
+        datPhong.setTinhTrang("Đã cọc"); // Cập nhật trạng thái
         datPhongRepository.save(datPhong);
 
         return thanhToan.isPhuongThuc();

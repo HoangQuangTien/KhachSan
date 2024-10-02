@@ -3,6 +3,7 @@ package com.example.DuAnTotNghiepKs.DTO;
 import lombok.*;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @ToString
@@ -19,16 +20,18 @@ public class EventDTO {
     private String endDate;   // Định dạng chuỗi
     private String backgroundColor;
     private String status;
+    private boolean th;
 
-    public EventDTO(Integer id,String maDatPhong,String tenKhachHang, String tenPhong, Date startDate, Date endDate, String backgroundColor,String status) {
+    public EventDTO(Integer id, String maDatPhong, String tenKhachHang, String tenPhong, LocalDateTime startDate, LocalDateTime endDate, String status, String backgroundColor, boolean th) {
         this.id = id;
         this.maDatPhong = maDatPhong;
         this.tenKhachHang = tenKhachHang;
         this.tenPhong = tenPhong;
-        this.startDate = formatDate(startDate);
-        this.endDate = formatDate(endDate);
+        this.startDate = String.valueOf(startDate);
+        this.endDate = String.valueOf(endDate);
         this.backgroundColor = backgroundColor;
         this.status = status;
+        this.th = th;
 
     }
 

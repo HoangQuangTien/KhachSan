@@ -13,6 +13,7 @@ public interface ChiTietDatPhongRepo extends JpaRepository<ChiTietDatPhong, Inte
 
 
     List<ChiTietDatPhong> findByDatPhongIn(List<DatPhong> datPhongs);
+
     List<ChiTietDatPhong> findByDatPhong_IdDatPhong(Integer idDatPhong);
 
     public Optional<ChiTietDatPhong> findById(Integer id);

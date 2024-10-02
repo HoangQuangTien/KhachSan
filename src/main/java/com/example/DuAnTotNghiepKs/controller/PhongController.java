@@ -142,9 +142,15 @@ public class PhongController {
         } else if ("update".equals(action)) {
             // Xử lý cập nhật
             if (phong.getIdPhong() != null) {
+                // Kiểm tra nếu phòng không còn phòng, không cho phép cập nhật
+                if (phong.getTrangThai()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Phòng đang Có người ở không dược sửa!");
+                    return "redirect:/phongs";
+                }
+
                 phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
-//                phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
-//                phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
+//            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
+//            phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
 
                 phongService.updatePhong(phong);
                 redirectAttributes.addFlashAttribute("successMessage", "Cập nhật phòng thành công!");
@@ -154,6 +160,7 @@ public class PhongController {
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Action không hợp lệ.");
         }
+
 
         return "redirect:/phongs";
     }

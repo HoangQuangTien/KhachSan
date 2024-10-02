@@ -61,17 +61,14 @@ public class EmailService {
 
         // Determine email content based on tinhTrang
         String htmlContent;
-        if (ctdp.getDatPhong().getTinhTrang() != null && ctdp.getDatPhong().getTinhTrang()) {
-            LocalDate ngayNhan = convertToLocalDate(ctdp.getDatPhong().getNgayNhan());
-            LocalDate ngayTra = convertToLocalDate(ctdp.getDatPhong().getNgayTra());
+        if (ctdp.getDatPhong().getTinhTrang() != null && ctdp.getDatPhong().getTinhTrang().equals("Đã Checkin")) {
+            // Lấy giá trị ngày nhận và ngày trả kiểu LocalDateTime trực tiếp
+            LocalDateTime ngayNhan = ctdp.getDatPhong().getNgayNhan();
+            LocalDateTime ngayTra = ctdp.getDatPhong().getNgayTra();
 
-            // Đặt thời gian là 7 giờ sáng
-            LocalDateTime ngayNhan7AM = setDefaultTimeTo7AM(ngayNhan);
-            LocalDateTime ngayTra7AM = setDefaultTimeTo7AM(ngayTra);
-
-            // Định dạng ngày giờ
-            String formattedNgayNhan = formatDateTime(ngayNhan7AM);
-            String formattedNgayTra = formatDateTime(ngayTra7AM);
+            // Định dạng ngày giờ (không cần chỉnh thời gian vì đã có sẵn trong LocalDateTime)
+            String formattedNgayNhan = formatDateTime(ngayNhan);
+            String formattedNgayTra = formatDateTime(ngayTra);
 
             // Sử dụng các giá trị đã định dạng trong nội dung email
             htmlContent = "<html>" +

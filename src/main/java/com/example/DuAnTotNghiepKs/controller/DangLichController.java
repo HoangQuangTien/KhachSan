@@ -37,12 +37,25 @@ public class DangLichController {
                         datPhong.getPhong().getTenPhong(),
                         datPhong.getNgayNhan(),
                         datPhong.getNgayTra(),
-                        datPhong.getTinhTrang() ? "#fd7e14" : "#007bff", // Màu sắc dựa trên trạng thái
-                        datPhong.getTinhTrang() ? "Đã check-in" : "Chưa check-in" // Trạng thái
+                        datPhong.getTinhTrang(), // Lấy trạng thái từ DatPhong
+                        getColorBasedOnStatus(datPhong.getTinhTrang()), // Lấy màu tương ứng
+                        datPhong.getTrangThai()
                 ))
                 .toList();
     }
 
+    // Phương thức bổ sung để lấy màu sắc dựa trên tình trạng đặt phòng
+    private String getColorBasedOnStatus(String tinhTrang) {
+        if (tinhTrang.equals("Đã Checkin")) {
+            return "#fd7e14"; // Màu cam cho "Đã check-in"
+        } else if (tinhTrang.equals("Đã Hủy")) {
+            return "#dc3545"; // Màu đỏ cho "Đã hủy"
+        } else if (tinhTrang.equals("Chưa Checkin")) {
+            return "#007bff"; // Màu xanh cho "Chưa check-in"
+        } else {
+            return "#6c757d"; // Màu xám cho các trạng thái không xác định
+        }
+    }
 
 
 }

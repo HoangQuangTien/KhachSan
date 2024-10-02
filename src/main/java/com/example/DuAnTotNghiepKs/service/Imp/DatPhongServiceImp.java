@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -92,7 +93,7 @@ public class DatPhongServiceImp implements DatPhongService {
 
     @Override
     public List<DatPhong> getDatPhongChuaCheckIn() {
-        return datPhongRepository.findByTinhTrangFalse();
+        return datPhongRepository.findByTinhTrang("Chưa Checkin");
     }
 
     @Override
@@ -197,8 +198,8 @@ public class DatPhongServiceImp implements DatPhongService {
 
 
     @Override
-    public List<DatPhong> findByPhongAndThoiGian(Integer idPhong, Date ngayNhan, Date ngayTra) {
-        return datPhongRepository.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra);
+    public List<DatPhong> findByPhongAndThoiGian(Integer idPhong, LocalDateTime ngayNhan, LocalDateTime ngayTra30) {
+        return datPhongRepository.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra30);
     }
 
 

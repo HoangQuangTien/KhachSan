@@ -2,6 +2,7 @@ package com.example.DuAnTotNghiepKs.DTO;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Builder
@@ -14,13 +15,14 @@ import java.util.Date;
 public class DatPhongDTO {
     private Integer idDatPhong;
     private String maDatPhong;
-    private Date ngayNhanPhong;
-    private Date ngayTraPhong;
+    private LocalDateTime ngayNhanPhong;
+    private LocalDateTime ngayTraPhong;
     private String tinhTrang;
     private String cccd;
     private Float tienCoc;
     private Float tongTien;
     private Float tienConLai;
+    private boolean trangThai;
 
     private Integer idPhong;
     private String tenPhong;

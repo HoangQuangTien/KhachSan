@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
@@ -32,14 +33,14 @@ public class RoomStatusUpdater {
     // Phương thức để thực hiện việc cập nhật trạng thái phòng
     @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // Kiểm tra mỗi ngày
     public void updateRoomStatuses() {
-        LocalDate currentDate = LocalDate.now();
+        LocalDateTime currentDate = LocalDateTime.now();
 
         // Lấy tất cả các đặt phòng hiện tại
         List<DatPhong> datPhongs = datPhongService.getAllDatPhong();
 
         // Cập nhật trạng thái phòng nếu ngày hiện tại đã vượt qua ngày kết thúc đặt phòng
         for (DatPhong datPhong : datPhongs) {
-            LocalDate ngayTra = datPhong.getNgayTra().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDateTime ngayTra = datPhong.getNgayTra().atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
             Phong phong = datPhong.getPhong();
 
             if (phong != null && ngayTra.isBefore(currentDate) && !phong.getTrangThai()) {

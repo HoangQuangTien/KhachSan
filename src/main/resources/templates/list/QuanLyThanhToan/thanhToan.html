@@ -119,7 +119,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="datPhong : ${datPhongs}" th:if="${datPhong.tinhTrang == true}" th:data-id-dat-phong="${datPhong.idDatPhong}" th:data-id-phong="${datPhong.phong.idPhong}" th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}" th:data-hovaten="${datPhong.khachHang.hoVaTen}" th:data-sodienthoai="${datPhong.khachHang.soDienThoai}" th:data-tenphong="${datPhong.phong.tenPhong}" th:data-thoigian="${#dates.format(datPhong.ngayNhan,'dd/MM')} + ' - ' + ${#dates.format(datPhong.ngayTra,'dd/MM/yyyy')}" th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}" th:data-giaphong="${datPhong.phong.gia}" th:data-tiencoc="${datPhong.tienCoc}" th:data-tienconlai="${datPhong.tienConLai}" onclick="showForm(this.getAttribute('data-id-dat-phong'),
+                    <tr th:each="datPhong : ${datPhongs}" th:if="${datPhong.tinhTrang == 'Đã Checkin'}" th:data-id-dat-phong="${datPhong.idDatPhong}" th:data-id-phong="${datPhong.phong.idPhong}" th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}" th:data-hovaten="${datPhong.khachHang.hoVaTen}" th:data-sodienthoai="${datPhong.khachHang.soDienThoai}" th:data-tenphong="${datPhong.phong.tenPhong}" th:data-thoigian="${datPhong.ngayNhan} + ' - ' + ${datPhong.ngayTra}" th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}" th:data-giaphong="${datPhong.phong.gia}" th:data-tiencoc="${datPhong.tienCoc}" th:data-tienconlai="${datPhong.tienConLai}" onclick="showForm(this.getAttribute('data-id-dat-phong'),
                                         this.getAttribute('data-id-phong'),
                                         this.getAttribute('data-id-loai-phong'),
                                         this.getAttribute('data-hovaten'),
@@ -134,7 +134,7 @@
                         <td th:text="${datPhong.khachHang.hoVaTen}"></td>
                         <td th:text="${datPhong.phong.tenPhong}"></td>
                         <td th:text="${datPhong.khachHang.soDienThoai}"></td>
-                        <td th:text="${#dates.format(datPhong.ngayNhan, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${datPhong.ngayNhan}"></td>
                         <!--                        <td th:text="${#dates.format(datPhong.ngayTra, 'dd/MM/yyyy')}"></td>-->
                         <td th:text="${datPhong.trangThai == 0 ? 'Đã Thanh Toán' : 'Đã Cọc'}"></td>
                     </tr>
@@ -203,7 +203,7 @@
                                 <input type="text" name="ngayCheckIn" id="ngayCheckIn" class="form-control form-control-sm">
                             </div>
                             <div class="col-6 mb-3">
-                                <label for="giaPhong" class="form-label font-weight-bold">Giá phòng</label>
+                                <label for="giaPhong" class="form-label font-weight-bold">Tổng Giá phòng</label>
                                 <div class="input-group">
                                     <input type="text" name="gia" id="giaPhong" class="form-control form-control-sm">
                                     <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
@@ -295,7 +295,7 @@
                             <label for="printInvoice" class="form-label font-weight-bold">In hóa đơn</label>
                             <div class="form-switch">
                                 <input class="form-check-input" type="checkbox" id="printInvoice" name="inHoaDon">
-                                <label class="form-check-label" for="printInvoice">Có</label>
+                                <label class="form-check-label" for="printInvoice"></label>
                             </div>
                         </div>
 

@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -209,8 +211,9 @@ public class DatPhongController {
             KhachHang khachHang = khachHangService.convertToEntity(khachHangDTO);
 
             // Chuyển đổi ngày nhận và ngày trả
-            LocalDate ngayNhan = parseDate(ngayNhanStr, "Ngày nhận phòng không hợp lệ.");
-            LocalDate ngayTra = parseDate(ngayTraStr, "Ngày trả phòng không hợp lệ.");
+            LocalDateTime ngayNhan = parseDateTime(ngayNhanStr, "Ngày nhận phòng không hợp lệ.");
+            LocalDateTime ngayTra = parseDateTime(ngayTraStr, "Ngày trả phòng không hợp lệ.");
+
 
             if (ngayTra.isBefore(ngayNhan)) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Ngày trả phòng phải sau ngày nhận phòng."));
@@ -220,6 +223,7 @@ public class DatPhongController {
             float tongTienPhong = 0;
             float tienCoc = 0;
 
+            LocalDateTime ngayTra30 = ngayTra.plusMinutes(30);
             // Lưu danh sách các đối tượng DatPhong
             List<DatPhong> datPhongList = new ArrayList<>();
 
@@ -241,8 +245,9 @@ public class DatPhongController {
                 }
 
 
+
                 // Kiểm tra xem phòng đã được đặt trong khoảng thời gian này hay chưa
-                List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, convertToDate(ngayNhan), convertToDate(ngayTra));
+                List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra30);
                 if (!existingBookings.isEmpty()) {
                     return ResponseEntity.badRequest().body(Map.of("error", "Phòng " + idPhong + " đã được đặt trong khoảng thời gian này."));
                 }
@@ -261,15 +266,15 @@ public class DatPhongController {
                 DatPhong datPhong = new DatPhong();
                 datPhong.setMaDatPhong(generateMaDatPhong()+""+(i+1));
                 datPhong.setPhong(selectedPhong);
-                datPhong.setNgayNhan(convertToDate(ngayNhan));
-                datPhong.setNgayTra(convertToDate(ngayTra));
+                datPhong.setNgayNhan(ngayNhan);
+                datPhong.setNgayTra(ngayTra);
                 datPhong.setCccd(cccd);
                 datPhong.setTongTien(tongTienPhong);
                 datPhong.setTienCoc(tienCoc);
                 datPhong.setTienConLai(tongTienPhong - tienCoc);
                 datPhong.setLoaiPhong(loaiPhong);
                 datPhong.setKhachHang(khachHang);
-                datPhong.setTinhTrang(false);
+                datPhong.setTinhTrang("Chưa Checkin");
                 datPhong.setTrangThai(false);
 
                 // Thêm vào danh sách để lưu sau
@@ -303,6 +308,21 @@ public class DatPhongController {
         }
     }
 
+
+
+    // Phương thức chuyển đổi ngày giờ
+    private LocalDateTime parseDateTime(String dateTimeStr, String errorMessage) {
+        try {
+            // Định dạng datetime-local
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            return LocalDateTime.parse(dateTimeStr, formatter);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
+
+
     private String generateMaDatPhong() {
         String prefix = "DP";
         DatPhong lastDatPhong = datPhongService.findTopByOrderByIdDatPhongDesc();
@@ -318,19 +338,6 @@ public class DatPhongController {
             throw new IllegalArgumentException(errorMessage);
         }
     }
-
-    private LocalDate parseDate(String dateStr, String errorMessage) {
-        try {
-            return LocalDate.parse(dateStr);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException(errorMessage);
-        }
-    }
-
-    private Date convertToDate(LocalDate localDate) {
-        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    }
-
 
 
     @GetMapping("/month")

@@ -220,6 +220,13 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+
+            <!-- Hiển thị thông báo lỗi -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
             <div th:if="${successMessage}">
                 <div class="alert alert-success" th:text="${successMessage}">
                 </div>
@@ -354,7 +361,9 @@
                     <div class="modal-body">
                         <form action="/phongs/save" id="addForm" method="post">
                             <input type="hidden" id="idPhong" name="idPhong" th:value="${phong.idPhong}" />
-                            <div class="row">
+
+                            <!-- Mã Phòng và Tên Phòng -->
+                            <div class="row g-3">
                                 <div class="form-group col-md-6">
                                     <label for="maPhong">Mã Phòng</label>
                                     <input type="text" id="maPhong" name="maPhong" class="form-control" onchange="checkMaPhong()" th:value="${phong.maPhong}" required />
@@ -364,7 +373,9 @@
                                     <input type="text" id="tenPhong" name="tenPhong" class="form-control" th:value="${phong.tenPhong}" required />
                                 </div>
                             </div>
-                            <div class="row">
+
+                            <!-- Tình Trạng và Mô Tả -->
+                            <div class="row g-3">
                                 <div class="form-group col-md-6">
                                     <label>Tình Trạng</label>
                                     <div class="form-check">
@@ -378,11 +389,12 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="moTa">Mô Tả</label>
-                                    <textarea id="moTa" name="moTa" class="form-control" th:text="${phong.moTa}" required>
-                    </textarea>
+                                    <textarea id="moTa" name="moTa" class="form-control" rows="2" th:text="${phong.moTa}" required></textarea>
                                 </div>
                             </div>
-                            <div class="row">
+
+                            <!-- Trạng Thái và Loại Phòng -->
+                            <div class="row g-3">
                                 <div class="form-group col-md-6">
                                     <label>Trạng Thái</label>
                                     <div class="form-check">
@@ -394,16 +406,7 @@
                                         <label class="form-check-label" for="trangThai2">Hết Phòng</label>
                                     </div>
                                 </div>
-<!--                                <div class="form-group col-md-6">-->
-<!--                                    <label for="gia">Giá</label>-->
-<!--                                    <select id="gia" name="gia" class="form-control" required>-->
-<!--                                        <option value="300000">300,000 VNĐ</option>-->
-<!--                                        <option value="400000">500,000 VNĐ</option>-->
-<!--                                        <option value="700000">700,000 VNĐ</option>-->
-<!--                                        <option value="1400000">1,400,000 VNĐ</option>-->
-<!--                                    </select>-->
-<!--                                </div>-->
-                                <div class="mb-3">
+                                <div class="form-group col-md-6">
                                     <label for="idLoaiPhong" class="form-label">Loại Phòng</label>
                                     <select id="idLoaiPhong" name="loaiPhong.idLoaiPhong" class="form-select" required>
                                         <option th:each="loaiPhong : ${loaiPhongs}" th:value="${loaiPhong.idLoaiPhong}"
@@ -412,42 +415,35 @@
                                         </option>
                                     </select>
                                 </div>
-
-                                <div class="row mb-3">
-                                    <!-- Số Người Tối Đa -->
-                                    <div class="col-md-6">
-                                        <label class="form-label">Số Người Tối Đa</label>
-                                        <div id="nguoiToiDa" class="form-control bg-light">Chọn loại phòng để hiển thị số người tối đa</div>
-                                    </div>
-
-                                    <!-- Tầng -->
-                                    <div class="col-md-6">
-                                        <label class="form-label">Tầng</label>
-                                        <div id="tang" class="form-control bg-light">Chọn loại phòng để hiển thị tầng</div>
-                                    </div>
-                                </div>
-
-                                <!-- Diện Tích và Giá -->
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Diện Tích</label>
-                                        <div id="dienTich" class="form-control bg-light">Chọn loại phòng để hiển thị diện tích</div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label">Giá</label>
-                                        <div id="gia1" class="form-control bg-light">Chọn loại phòng để hiển thị giá</div>
-                                    </div>
-                                </div>
-
-
                             </div>
 
+                            <!-- Số Người Tối Đa và Tầng -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Số Người Tối Đa</label>
+                                    <div id="nguoiToiDa" class="form-control bg-light">Chọn loại phòng để hiển thị số người tối đa</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Tầng</label>
+                                    <div id="tang" class="form-control bg-light">Chọn loại phòng để hiển thị tầng</div>
+                                </div>
+                            </div>
 
+                            <!-- Diện Tích và Giá -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Diện Tích</label>
+                                    <div id="dienTich" class="form-control bg-light">Chọn loại phòng để hiển thị diện tích</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Giá</label>
+                                    <div id="gia1" class="form-control bg-light">Chọn loại phòng để hiển thị giá</div>
+                                </div>
+                            </div>
 
-                            <div>
+                            <div class=" mt-3">
                                 <button type="submit" name="action" value="create" class="btn btn-warning">Tạo</button>
-                                <button type="reset" class="btn btn-outline-warning">
+                                <button type="reset" class="btn btn-outline-warning ms-2">
                                     <i class='fas fa-sync-alt'></i>
                                 </button>
                             </div>
@@ -456,6 +452,8 @@
                 </div>
             </div>
         </div>
+
+
     </main>
 </div>
 <div th:include="fragment/script :: script">

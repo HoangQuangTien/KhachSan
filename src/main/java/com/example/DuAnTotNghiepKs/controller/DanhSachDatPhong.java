@@ -59,7 +59,7 @@ public class DanhSachDatPhong {
 
             Phong phong = datPhong.getPhong();
             // Cập nhật trạng thái đặt phòng thành "đang ở"
-            datPhong.setTinhTrang(true);
+            datPhong.setTinhTrang("Đã Checkin");
             datPhongService.saveDatPhong1(datPhong);
 
 
@@ -91,18 +91,16 @@ public class DanhSachDatPhong {
             }
 
             // Chỉ cập nhật trạng thái của đặt phòng và lý do hủy
-            if (!datPhong.getTrangThai()) {
-                datPhong.setTrangThai(true);  // Chuyển trạng thái thành true
-//                datPhong.setLyDoHuy(reason);   // Lưu lý do hủy vào đối tượng
-//                datPhongService.saveDatPhong1(datPhong); // Lưu đối tượng đã cập nhật
 
-                // Lưu lịch sử hủy
-                LichSuDatPhong lichSuDatPhong = new LichSuDatPhong();
-                lichSuDatPhong.setDatPhong(datPhong);
-                lichSuDatPhong.setChiTietThayDoi("Phòng: " + datPhong.getPhong().getTenPhong() + " đã hủy. Lý do: " + reason);
-                lichSuDatPhong.setThoiGianThayDoi(new Date());  // Thời gian hủy hiện tại
-                lichSuDatPhongService.saveLichSuDatPhong(lichSuDatPhong);  // Lưu lịch sử hủy
-            }
+            datPhong.setTinhTrang("Đã Hủy");
+
+            // Lưu lịch sử hủy
+            LichSuDatPhong lichSuDatPhong = new LichSuDatPhong();
+            lichSuDatPhong.setDatPhong(datPhong);
+            lichSuDatPhong.setChiTietThayDoi("Phòng: " + datPhong.getPhong().getTenPhong() + " đã hủy. Lý do: " + reason);
+            lichSuDatPhong.setThoiGianThayDoi(new Date());  // Thời gian hủy hiện tại
+            lichSuDatPhongService.saveLichSuDatPhong(lichSuDatPhong);  // Lưu lịch sử hủy
+
 
             response.put("success", true);
             response.put("message", "Hủy phòng thành công!");

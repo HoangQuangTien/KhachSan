@@ -2,10 +2,7 @@ package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.CustomerDTO;
 import com.example.DuAnTotNghiepKs.entity.*;
-import com.example.DuAnTotNghiepKs.repository.ChiTietDatPhongRepo;
-import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
-import com.example.DuAnTotNghiepKs.repository.KhachHangRepository;
-import com.example.DuAnTotNghiepKs.repository.PhongRepo;
+import com.example.DuAnTotNghiepKs.repository.*;
 import com.example.DuAnTotNghiepKs.service.*;
 
 import jakarta.mail.MessagingException;
@@ -32,6 +29,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,81 +61,92 @@ public class ChiTietDatPhongController {
     @Autowired
     private ChiTietDatPhongService chiTietDatPhongService;
     @Autowired
-    private DatPhongService datPhongService;
+    private LichSuDatPhongRepo lichSuDatPhongRepo;
     @Autowired
     private EmailService emailService;
+
     @GetMapping
     public String index(
             @RequestParam(name = "page", defaultValue = "1") int pageNo,
-            @RequestParam(name = "limit", defaultValue = "10") int pageSize,
+            @RequestParam(name = "size", defaultValue = "5") int pageSize,
             @RequestParam(name = "startDate", defaultValue = "") String startDateStr,
             @RequestParam(name = "endDate", defaultValue = "") String endDateStr,
-            @RequestParam(name = "search", defaultValue = "false") boolean search,
+            @RequestParam(defaultValue = "", name = "keyword") String keyword,
+            @RequestParam(name = "tinhTrang", defaultValue = "") String tinhTrangStr,
             Model model
     ) {
-        Date startDate = null;
-        Date endDate = null;
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
         String errorMessage = null;
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
+        // Xử lý ngày tháng
         try {
             if (!startDateStr.isEmpty()) {
-                startDate = dateFormat.parse(startDateStr);
+                startDate = LocalDateTime.parse(startDateStr + "T00:00", formatter);
             }
             if (!endDateStr.isEmpty()) {
-                endDate = dateFormat.parse(endDateStr);
+                endDate = LocalDateTime.parse(endDateStr + "T23:59", formatter);
             }
-            if (startDate != null && endDate != null && startDate.after(endDate)) {
+            if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
                 errorMessage = "Ngày bắt đầu không được lớn hơn ngày kết thúc.";
                 startDate = null;
                 endDate = null;
             }
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             errorMessage = "Ngày tháng không hợp lệ. Vui lòng nhập đúng định dạng yyyy-MM-dd.";
         }
 
-        List<DatPhong> datPhongs;
-        List<ChiTietDatPhong> chiTietDatPhongs;
-        List<KhachHang> khachHangs;
-        List<Phong> phongs;
+        List<DatPhong> datPhongs = new ArrayList<>();
+        List<ChiTietDatPhong> chiTietDatPhongs = new ArrayList<>();
 
         if (errorMessage == null) {
-            if (search) {
-                if (startDate == null || endDate == null) {
-                    errorMessage = "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.";
-                    datPhongs = List.of();
-                    chiTietDatPhongs = List.of();
-                } else {
-                    datPhongs = datPhongRepo.findByNgayNhanBetween(startDate, endDate);
-                    chiTietDatPhongs = chiTietDatPhongRepo.findByDatPhongIn(datPhongs);
-                }
+            // Lọc theo ngày nhận nếu có
+            if (startDate != null && endDate != null) {
+                datPhongs = datPhongRepo.findByNgayNhanBetween(startDate, endDate);
             } else {
                 datPhongs = datPhongRepo.findAll();
-                chiTietDatPhongs = chiTietDatPhongRepo.findAll();
             }
-            datPhongs.forEach(datPhong -> {
-                if (datPhong.getNgayNhan() != null) {
-                    datPhong.setNgayNhan(setDefaultTimeTo7AM(datPhong.getNgayNhan()));
-                }
-                if (datPhong.getNgayTra() != null) {
-                    datPhong.setNgayTra(setDefaultTimeTo7AM(datPhong.getNgayTra()));
-                }
-            });
-            // Lấy danh sách khách hàng và phòng
-            khachHangs = khachHangRepository.findAll();
-            phongs = phongRepo.findAll();
-            // Phân trang chi tiết đặt phòng
+
+            // Lọc theo tình trạng nếu có
+            if (!tinhTrangStr.isEmpty()) {
+                datPhongs = datPhongs.stream()
+                        .filter(datPhong -> datPhong.getTinhTrang().equals(tinhTrangStr))
+                        .collect(Collectors.toList());
+            }
+
+            // Tìm kiếm theo từ khóa
+            if (!keyword.isEmpty()) {
+                datPhongs = datPhongRepo.findByKeyword(keyword);
+            }
+
+            // Lấy chi tiết đặt phòng từ danh sách đặt phòng
+            chiTietDatPhongs = chiTietDatPhongRepo.findByDatPhongIn(datPhongs);
+
+//            // Đặt lại thời gian cho ngày nhận và trả
+//            datPhongs.forEach(datPhong -> {
+//                if (datPhong.getNgayNhan() != null) {
+//                    datPhong.setNgayNhan(setDefaultTimeTo7AM(datPhong.getNgayNhan()));
+//                }
+//                if (datPhong.getNgayTra() != null) {
+//                    datPhong.setNgayTra(setDefaultTimeTo7AM(datPhong.getNgayTra()));
+//                }
+//            });
+
+            List<KhachHang> khachHangs = khachHangRepository.findAll();
+            List<Phong> phongs = phongRepo.findAll();
+
             int startItem = (pageNo - 1) * pageSize;
             List<ChiTietDatPhong> paginatedChiTietDatPhongs = chiTietDatPhongs.stream()
                     .skip(startItem)
                     .limit(pageSize)
-                    .toList();
+                    .collect(Collectors.toList());
 
             int totalItems = chiTietDatPhongs.size();
             int totalPages = (int) Math.ceil((double) totalItems / pageSize);
 
+            // Thêm các thuộc tính vào model
             model.addAttribute("data", paginatedChiTietDatPhongs);
             model.addAttribute("datPhongs", datPhongs);
             model.addAttribute("khachHangs", khachHangs);
@@ -150,12 +161,16 @@ public class ChiTietDatPhongController {
             model.addAttribute("phongs", List.of());
         }
 
+        // Thêm các thuộc tính cần thiết vào model
         model.addAttribute("startDate", startDateStr);
         model.addAttribute("endDate", endDateStr);
+        model.addAttribute("tinhTrang", tinhTrangStr);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("errorMessage", errorMessage);
 
         return "list/QuanLyDatPhong/danhsachdatphong";
     }
+
 
     @GetMapping("/qrcode/{id}")
     public ResponseEntity<byte[]> getQRCode(@PathVariable("id") Integer id) {
@@ -365,82 +380,95 @@ public class ChiTietDatPhongController {
     @GetMapping("/edit-room/{id}")
     public String showEditRoomForm(@PathVariable("id") Integer id, Model model) {
         Optional<Phong> optionalPhong = phongService.getPhongById(id);
+
         if (optionalPhong.isPresent()) {
             Phong phong = optionalPhong.get();
-            model.addAttribute("phong", phong);  // Truyền đúng phong
+            model.addAttribute("phong", phong); // Đảm bảo phong đã được lấy đầy đủ thông tin
 
-            List<Phong> allRooms = phongService.getAllPhongs1(); // Lấy đúng allRooms
-            model.addAttribute("allRooms", allRooms);  // Đảm bảo allRooms chứa tên phòng
+            List<Phong> allRooms = phongService.getAllPhongs1();
+            model.addAttribute("allRooms", allRooms);
 
             List<LoaiPhong> loaiPhongs = loaiPhongService.getAllLoaiPhongs();
             model.addAttribute("loaiPhongs", loaiPhongs);
         } else {
             model.addAttribute("errorMessage", "Không tìm thấy phòng với ID: " + id);
-            return "error";
+            return "error"; // Xử lý lỗi nếu không tìm thấy phòng
         }
-        return "list/QuanLyDatPhong/edit-phong";
+
+        return "list/QuanLyDatPhong/edit-phong"; // Trả về trang chỉnh sửa phòng
     }
 
 
     @PostMapping("/update-room")
     public ResponseEntity<?> updateRoom(
             @RequestParam("roomId") Integer roomId,
-            @RequestParam("tenPhong") String tenPhong,
-            @RequestParam("loaiPhong") Integer loaiPhongId) {
+            @RequestParam("tenPhong") Integer tenPhongId, // ID của phòng mới được chọn
+            @RequestParam("lyDoThayDoi") String lyDoThayDoi) {
 
         try {
-            if (tenPhong == null || tenPhong.trim().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("success", false, "message", "Tên phòng không được để trống."));
-            }
-
-            Phong phong = phongService.getPhongById(roomId)
+            // Tìm phòng hiện tại để cập nhật
+            Phong phongHienTai = phongService.getPhongById(roomId)
                     .orElseThrow(() -> new RuntimeException("Phòng không tồn tại"));
 
-            Optional<Phong> existingPhong = phongRepo.findByTenPhong(tenPhong);
-            if (existingPhong.isPresent() && !existingPhong.get().getIdPhong().equals(roomId)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("success", false, "message", "Tên phòng đã tồn tại, vui lòng chọn tên khác."));
-            }
-
-            // Kiểm tra trạng thái phòng xem có đặt phòng nào đã check-in chưa
-            Optional<DatPhong> datPhongOpt = datPhongRepo.findByPhongAndTinhTrang(phong, true);
+            // Kiểm tra xem phòng hiện tại có đặt phòng nào không
+            Optional<DatPhong> datPhongOpt = datPhongRepo.findByPhong(phongHienTai);
             if (datPhongOpt.isPresent()) {
+                DatPhong datPhong = datPhongOpt.get();
+
+                // Kiểm tra nếu trạng thái là "Đã Checkin" hoặc "Đã Hủy"
+                if ("Đã Checkin".equals(datPhong.getTinhTrang())) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("success", false, "message", "Không thể đổi phòng vì phòng đã được check-in."));
+                }
+                if ("Đã Hủy".equals(datPhong.getTinhTrang())) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("success", false, "message", "Không thể đổi phòng vì phòng đã bị hủy."));
+                }
+            }
+
+            // Tìm phòng mới từ ID phòng đã chọn
+            Phong phongMoi = phongService.getPhongById(tenPhongId)
+                    .orElseThrow(() -> new RuntimeException("Phòng không tồn tại với ID: " + tenPhongId));
+
+            // Kiểm tra xem phòng mới có giá thấp hơn phòng hiện tại không
+            if (phongMoi.getGia() < phongHienTai.getGia()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("success", false, "message", "Phòng đã được check-in, không thể sửa đổi."));
+                        .body(Map.of("success", false, "message", "Không thể đổi sang phòng có giá thấp hơn phòng hiện tại."));
             }
 
-            LoaiPhong newLoaiPhong = loaiPhongService.findById(loaiPhongId);
-            if (newLoaiPhong == null) {
+            // Kiểm tra xem phòng mới có đang được đặt không
+            boolean isPhongMoiBooked = datPhongRepo.findByPhong(phongMoi).isPresent();
+            if (isPhongMoiBooked) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("success", false, "message", "Không tìm thấy loại phòng với ID: " + loaiPhongId));
+                        .body(Map.of("success", false, "message", "Phòng mới đang được đặt. Không thể chuyển sang phòng này."));
             }
 
-            // Đảm bảo rằng giá loại phòng mới bằng hoặc lớn hơn giá hiện tại
-            if (newLoaiPhong.getGia() < phong.getGia()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("success", false, "message", "Loại phòng mới phải có giá bằng hoặc lớn hơn giá hiện tại"));
+            // Cập nhật thông tin phòng trong đặt phòng
+            if (datPhongOpt.isPresent()) {
+                DatPhong datPhong = datPhongOpt.get();
+                datPhong.setPhong(phongMoi); // Thay đổi phòng trong đối tượng DatPhong
+                datPhongRepo.save(datPhong); // Lưu lại thay đổi
             }
 
-            phong.setTenPhong(tenPhong);
-            phong.setLoaiPhong(newLoaiPhong);
-            phong.setGia(newLoaiPhong.getGia());
-            Phong updatedPhong = phongService.savePhong(phong);
-            if (updatedPhong == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("success", false, "message", "Không thể lưu phòng đã được cập nhật"));
-            }
+            // Lưu lịch sử đặt phòng
+            LichSuDatPhong lichSuDatPhong = new LichSuDatPhong();
+            lichSuDatPhong.setDatPhong(datPhongOpt.get());
+            lichSuDatPhong.setChiTietThayDoi("Đổi từ " + phongHienTai.getTenPhong() + " sang phòng " + phongMoi.getTenPhong() + ". Lý do: " + lyDoThayDoi);
+            lichSuDatPhong.setThoiGianThayDoi(new Date());
+            lichSuDatPhongRepo.save(lichSuDatPhong);
 
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(Map.of("success", true, "message", "Phòng đã được cập nhật thành công"));
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã chuyển phòng thành công"));
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("success", false, "message", "Đã xảy ra lỗi: " + e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Đã xảy ra lỗi: " + e.getMessage()));
+                    .body(Map.of("success", false, "message", "Đã xảy ra lỗi không mong muốn: " + e.getMessage()));
         }
     }
 
 }
-
 
 

@@ -24,8 +24,8 @@ public class ThanhToanDTO {
     private Boolean tinhTrang;
 
     private Integer idDatPhong;
-    private Date ngayNhan;
-    private Date ngayTra;
+    private LocalDateTime ngayNhan;
+    private LocalDateTime ngayTra;
     @DateTimeFormat(pattern = "HH:mm - dd/MM/yyyy")
     private LocalDateTime ngayCheckIn;
     private Float tienCoc;

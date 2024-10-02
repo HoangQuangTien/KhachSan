@@ -30,9 +30,9 @@ public class DatPhong {
     @Column(name = "ma_dat_phong")
     private String maDatPhong;
     @Column(name = "ngay_nhan_phong")
-    private Date ngayNhan;
+    private LocalDateTime ngayNhan;
     @Column(name = "ngay_tra_phong")
-    private Date ngayTra;
+    private LocalDateTime ngayTra;
     @Column(name = "tinh_trang")
     private String tinhTrang;
 

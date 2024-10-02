@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import java.util.Optional;
 public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
     boolean existsByMaDatPhong(String maDatPhong);
 
-    List<DatPhong> findByTinhTrangFalse();
+    List<DatPhong> findByTinhTrang(String tinhTrang);
 
     @Query("SELECT SUM(dp.tienCoc) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) = :month AND YEAR(dp.ngayNhan) = :year")
     Double findRevenueByMonth(@Param("month") int month, @Param("year") int year);
@@ -33,7 +34,7 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
     @Query("SELECT COUNT(dp) FROM DatPhong dp")
     Long countTotalBookings();
 
-    List<DatPhong> findByNgayNhanBetween(Date startDate, Date endDate);
+    List<DatPhong> findByNgayNhanBetween(LocalDateTime startDate, LocalDateTime endDate);
 
 
     @Query(value = "SELECT dp1.id_phong AS phongId, \n" +
@@ -90,8 +91,9 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
                 ":ngayTra BETWEEN dp.ngayNhan AND dp.ngayTra OR " +
                 "dp.ngayNhan BETWEEN :ngayNhan AND :ngayTra)")
         List<DatPhong> findByPhongAndThoiGian(@Param("idPhong") Integer idPhong,
-                                              @Param("ngayNhan") Date ngayNhan,
-                                              @Param("ngayTra") Date ngayTra);
+                                              @Param("ngayNhan") LocalDateTime ngayNhan,
+                                              @Param("ngayTra") LocalDateTime ngayTra);
+
 
 
 
@@ -100,13 +102,14 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
     DatPhong findTopByOrderByIdDatPhongDesc();
 
-    Optional<DatPhong> findByPhongAndTinhTrang(Phong phong, Boolean tinhTrang);
+    Optional<DatPhong> findByPhongAndTinhTrang(Phong phong, String tinhTrang);
 
     @Query("SELECT dp FROM DatPhong dp WHERE dp.trangThai = false")
     Page<DatPhong> findAllByDaCoc(Pageable pageable);
 
 
     Optional<DatPhong> findByPhong(Phong phong);
+
 
 
     @Query("SELECT d FROM DatPhong d JOIN d.khachHang k WHERE " +
