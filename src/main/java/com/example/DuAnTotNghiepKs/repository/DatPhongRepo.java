@@ -96,7 +96,6 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
 
 
-
 //    @Query("SELECT SUM(b.tongTien) FROM DatPhong b WHERE b.phong.idPhong = :roomId")
 //    float calculateTotalRevenueByRoom(@Param("roomId") Long roomId);
 

@@ -142,11 +142,18 @@ public class PhongController {
         } else if ("update".equals(action)) {
             // Xử lý cập nhật
             if (phong.getIdPhong() != null) {
-                // Kiểm tra nếu phòng không còn phòng, không cho phép cập nhật
-                if (phong.getTrangThai()) {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Phòng đang Có người ở không dược sửa!");
+
+                // Kiểm tra trạng thái của phòng
+                if (phong.getTrangThai() != null && !phong.getTrangThai()) { // Trạng thái phòng không phải là "Còn phòng"
+                    redirectAttributes.addFlashAttribute("errorMessage", "Chỉ được sửa tình trạng phòng khi phòng đó có trạng thái 'Còn phòng'!");
                     return "redirect:/phongs";
                 }
+
+//                // Kiểm tra tình trạng phòng
+//                if (phong.getTinhTrang() != null && phong.getTinhTrang()) { // Phòng có người đang ở
+//                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa tình trạng phòng vì có người đang ở!");
+//                    return "redirect:/phongs";
+//                }
 
                 phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
 //            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));

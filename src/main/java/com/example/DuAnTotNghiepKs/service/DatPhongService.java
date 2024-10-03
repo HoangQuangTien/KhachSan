@@ -52,11 +52,13 @@ public interface DatPhongService {
 
     Long countDistinctCustomers();
 
-    List<DatPhong> findByPhongAndThoiGian(Integer idPhong, LocalDateTime ngayNhan, LocalDateTime ngayTra);
+    List<DatPhong> findByPhongAndThoiGian(Integer idPhong, LocalDateTime ngayNhan, LocalDateTime ngayTra );
 
 //    List<DatPhong> getDatPhongsDaCoc();
 
     Page<DatPhong> getDatPhongsDaCoc(int page, int size);
+
+    long getThoiGianChoPhepDatPhong();
 
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động

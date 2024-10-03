@@ -6,6 +6,7 @@ import com.example.DuAnTotNghiepKs.entity.Phong;
 
 import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
 import com.example.DuAnTotNghiepKs.repository.PhongRepo;
+import com.example.DuAnTotNghiepKs.repository.ThamSoRepo;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,12 @@ public class DatPhongServiceImp implements DatPhongService {
 
     @Autowired
     private PhongRepo phongRepository;
+
+    @Autowired
+    private ThamSoRepo thamSoRepo;
+
+
+
 
     @Override
     public DatPhong saveDatPhong(DatPhong datPhong) {
@@ -198,9 +205,10 @@ public class DatPhongServiceImp implements DatPhongService {
 
 
     @Override
-    public List<DatPhong> findByPhongAndThoiGian(Integer idPhong, LocalDateTime ngayNhan, LocalDateTime ngayTra30) {
-        return datPhongRepository.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra30);
+    public List<DatPhong> findByPhongAndThoiGian(Integer idPhong, LocalDateTime ngayNhan, LocalDateTime ngayTra) {
+        return datPhongRepository.findByPhongAndThoiGian(idPhong, ngayNhan,ngayTra);
     }
+
 
 
     @Override
@@ -213,6 +221,15 @@ public class DatPhongServiceImp implements DatPhongService {
     public Page<DatPhong> getDatPhongsDaCoc(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return datPhongRepository.findAllByDaCoc(pageable);
+    }
+
+
+    @Override
+    public long getThoiGianChoPhepDatPhong() {
+        Long idThamSo = 3L; // ID cho tham số thời gian chuyển trạng thái
+        return thamSoRepo.findById(idThamSo)
+                .map(thamSo -> Long.parseLong(thamSo.getGiaTri()) * 60 * 1000)
+                .orElse(0L); // Trả về 0 nếu không tìm thấy tham số
     }
 
 
