@@ -2,14 +2,12 @@ package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
 import com.example.DuAnTotNghiepKs.DTO.PhongDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.DienTich;
 import com.example.DuAnTotNghiepKs.entity.LoaiPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 import com.example.DuAnTotNghiepKs.entity.Tang;
-import com.example.DuAnTotNghiepKs.service.DienTichService;
-import com.example.DuAnTotNghiepKs.service.LoaiPhongService;
-import com.example.DuAnTotNghiepKs.service.PhongService;
-import com.example.DuAnTotNghiepKs.service.TangService;
+import com.example.DuAnTotNghiepKs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +41,9 @@ public class PhongController {
 
     @Autowired
     private DienTichService dienTichService;
+
+    @Autowired
+    private TaiKhoanService taiKhoanService;
 
 //    @Autowired
 //    private ChiTietPhongService chiTietPhongService;
@@ -91,6 +92,12 @@ public class PhongController {
         model.addAttribute("phong", new Phong());
         model.addAttribute("totalActivePhongs", phongService.countActivePhongs());
         model.addAttribute("totalInactivePhongs1", phongService.countAvailableActiveRooms());
+
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
         return "list/QuanLyPhong/phongs";
     }
 
@@ -149,11 +156,11 @@ public class PhongController {
                     return "redirect:/phongs";
                 }
 
-//                // Kiểm tra tình trạng phòng
-//                if (phong.getTinhTrang() != null && phong.getTinhTrang()) { // Phòng có người đang ở
-//                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa tình trạng phòng vì có người đang ở!");
-//                    return "redirect:/phongs";
-//                }
+                // Kiểm tra tình trạng phòng
+                if (phong.getTinhTrang() != null && phong.getTinhTrang()) { // Phòng có người đang ở
+                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa vì phòng đang có người đang ở!");
+                    return "redirect:/phongs";
+                }
 
                 phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
 //            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
@@ -167,6 +174,7 @@ public class PhongController {
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Action không hợp lệ.");
         }
+
 
 
         return "redirect:/phongs";
@@ -215,27 +223,6 @@ public class PhongController {
         }
     }
 
-
-    @PostMapping("/save-tang")
-    public ResponseEntity<?> saveTang(@RequestBody Tang tang) {
-        try {
-            Tang savedTang = tangService.saveTang(tang);
-            return ResponseEntity.ok(savedTang);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể thêm tầng mới.");
-        }
-    }
-
-
-    @PostMapping("/save-dien-tich")
-    public ResponseEntity<?> saveDienTich(@RequestBody DienTich dienTich) {
-        try {
-            DienTich savedDienTich = dienTichService.saveDienTich(dienTich);
-            return ResponseEntity.ok(savedDienTich);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể thêm diện tích mới.");
-        }
-    }
 
 
     @GetMapping("/search")

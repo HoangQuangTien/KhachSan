@@ -42,4 +42,8 @@ public interface KhachHangService {
 
 
     KhachHangDTO findBySoDienThoai(String soDienThoai);
+
+    boolean existsById(Integer id);
+
+    boolean update1(Integer id, KhachHangDTO khachHangDTO);
 }

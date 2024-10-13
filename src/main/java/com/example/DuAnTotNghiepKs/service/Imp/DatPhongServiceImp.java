@@ -220,8 +220,14 @@ public class DatPhongServiceImp implements DatPhongService {
     @Override
     public Page<DatPhong> getDatPhongsDaCoc(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return datPhongRepository.findAllByDaCoc(pageable);
+        return datPhongRepository.findAllByDaCocAndDaCheckin(pageable);
     }
+
+//    @Override
+//    public Page<DatPhong> getDatPhongsDaCheckin(int page, int size) {
+//        Pageable pageable = PageRequest.of(page, size);
+//        return datPhongRepository.findAllByDaCheckin(pageable);
+//    }
 
 
     @Override
@@ -230,6 +236,14 @@ public class DatPhongServiceImp implements DatPhongService {
         return thamSoRepo.findById(idThamSo)
                 .map(thamSo -> Long.parseLong(thamSo.getGiaTri()) * 60 * 1000)
                 .orElse(0L); // Trả về 0 nếu không tìm thấy tham số
+    }
+
+
+
+    @Override
+    public DatPhong findById(Integer id) {
+        Optional<DatPhong> optionalDatPhong = datPhongRepository.findById(id);
+        return optionalDatPhong.orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin đặt phòng với ID: " + id));
     }
 
 

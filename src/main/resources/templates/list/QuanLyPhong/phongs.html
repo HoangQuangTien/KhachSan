@@ -521,55 +521,7 @@
             console.error('Error fetching available active rooms count:', error);
         });
 
-    function addTang() {
-        const tangModal = new bootstrap.Modal(document.getElementById('tangModal'));
-        tangModal.show();
 
-        document.getElementById('saveTangButton').onclick = function() {
-            const newTang = document.getElementById('newTangInput').value;
-            if (newTang) {
-                axios.post('/phongs/save-tang', { tenTang: newTang })
-                    .then(response => {
-                        const newTangOption = `<option value="${response.data.idTang}" selected>${newTang}</option>`;
-                        const tangSelect = document.getElementById('idTang');
-                        tangSelect.insertAdjacentHTML('beforeend', newTangOption);
-                        alert('Tầng mới đã được thêm thành công.');
-                        tangModal.hide();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Không thể thêm tầng mới.');
-                    });
-            } else {
-                alert("Vui lòng nhập tầng.");
-            }
-        };
-    }
-
-    function addDienTich() {
-        const dienTichModal = new bootstrap.Modal(document.getElementById('dienTichModal'));
-        dienTichModal.show();
-
-        document.getElementById('saveDienTichButton').onclick = function() {
-            const newDienTich = document.getElementById('newDienTichInput').value;
-            if (newDienTich) {
-                axios.post('/phongs/save-dien-tich', { tenDienTich: newDienTich })
-                    .then(response => {
-                        const newDienTichOption = `<option value="${response.data.idDienTich}" selected>${newDienTich}</option>`;
-                        const dienTichSelect = document.getElementById('idDienTich');
-                        dienTichSelect.insertAdjacentHTML('beforeend', newDienTichOption);
-                        alert('Diện tích mới đã được thêm thành công.');
-                        dienTichModal.hide();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Không thể thêm diện tích mới.');
-                    });
-            } else {
-                alert("Vui lòng nhập diện tích.");
-            }
-        };
-    }
 
 
     async function searchPhong() {

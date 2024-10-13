@@ -20,12 +20,12 @@ import java.util.Date;
 public class ThanhToan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id_thanh_toan")
     private Integer idThanhToan;
     @Column(name = "ma_thanh_toan")
     private String maThanhToan;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+//
+//    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "ngay_thanh_toan")
     private Date ngayThanhToan;
     @Column(name = "so_tien")
@@ -39,5 +39,10 @@ public class ThanhToan {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_dat_phong", referencedColumnName = "id_dat_phong")
     private DatPhong datPhong;
+
+
+    @ManyToOne
+    @JoinColumn(name = "id_nhan_vien")
+    private NhanVien nhanVien;
 
 }

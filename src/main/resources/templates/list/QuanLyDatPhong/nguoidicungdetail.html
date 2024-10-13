@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragment/head :: head">
+    <style>
+        .form-container {
+            border: 1px solid #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .companion-form {
+            border: 2px solid #000; /* Border cho từng người đi cùng */
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #f9f9f9; /* Màu nền nhẹ */
+        }
+        .companion-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+
+    <head th:include="fragment/head :: head"></head>
+</head>
+<body class="vertical  light  ">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <div class="container mt-5">
+            <h2 class="text-center mb-4">Thông tin khách hàng</h2>
+
+            <form id="customerForm">
+                <div class="row">
+                    <div class="col-md-6 form-container">
+                        <div class="mb-3">
+                            <input type="hidden" name="idKhachHang" th:value="${datPhongDTO.idKhachHang}"/>
+                            <label for="username" class="form-label">UserName</label>
+                            <input type="text" class="form-control" id="username" th:value="${datPhongDTO.maKhachHang}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fullname" class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" id="fullname" name="hoVaTen" th:value="${datPhongDTO.hoVaTen}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" th:value="${datPhongDTO.email}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="phone" name="soDienThoai" th:value="${datPhongDTO.soDienThoai}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Giới tính</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gioiTinh" id="male" value="true" th:checked="${datPhongDTO.gioiTinh}">
+                                    <label class="form-check-label" for="male">Nam</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gioiTinh" id="female" value="false" th:checked="${!datPhongDTO.gioiTinh}">
+                                    <label class="form-check-label" for="female">Nữ</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <button type="button" id="updateCustomerBtn" class="btn btn-primary me-2">Cập nhật thông tin</button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 form-container">
+                        <div class="mb-3">
+                            <label class="form-label">Thêm người đi cùng</label>
+                            <input type="hidden" name="idDatPhong" id="idDatPhong" th:value="${id}"/>
+
+                            <div class="mb-3">
+                                <label for="fullname1" class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" id="fullname1" name="tenNguoiDiCung" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Cmnd" class="form-label">Số CCCD</label>
+                                <input type="text" class="form-control" id="Cmnd" name="soCmnd" required>
+                            </div>
+
+                            <div class="d-flex justify-content-center mt-4">
+                                <button type="button" id="addCustomerBtn" class="btn btn-success me-2">Thêm người đi cùng</button>
+                                <button type="button" class="btn btn-primary">Quay lại</button>
+                            </div>
+                        </div>
+
+                        <div id="companionFormsContainer"></div>
+
+                    </div>
+                </div>
+            </form>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                document.getElementById('updateCustomerBtn').addEventListener('click', function() {
+                    const fullname = document.getElementById('fullname').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const phone = document.getElementById('phone').value.trim();
+                    const genderInput = document.querySelector('input[name="gioiTinh"]:checked');
+                    const idKhachHang = document.querySelector('input[name="idKhachHang"]').value;
+
+                    // Kiểm tra dữ liệu nhập
+                    if (!fullname || !email || !phone || !genderInput) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Thiếu thông tin!',
+                            text: 'Vui lòng điền đầy đủ thông tin.',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    const gender = genderInput.value === "true"; // Chuyển đổi thành boolean
+
+                    // Gửi yêu cầu cập nhật thông tin khách hàng
+                    fetch('/nguoidicung/' + idKhachHang, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            hoVaTen: fullname,
+                            email: email,
+                            soDienThoai: phone,
+                            gioiTinh: gender,
+                        })
+                    })
+                        .then(response => response.text())
+                        .then(text => {
+                            try {
+                                const data = JSON.parse(text);
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thành công!',
+                                    text: 'Cập nhật thông tin khách hàng thành công.',
+                                    confirmButtonText: 'OK'
+                                });
+                            } catch (error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi!',
+                                    text: 'Thông báo từ server: ' + text,
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: 'Có lỗi xảy ra: ' + error.message,
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                });
+
+                let soNguoiToiDa = 6;
+                let idDatPhong = document.getElementById('idDatPhong').value;
+                let companions = JSON.parse(localStorage.getItem('companions')) || {};
+
+                document.addEventListener("DOMContentLoaded", function () {
+                    const companionFormsContainer = document.getElementById('companionFormsContainer');
+
+                    // Hiển thị người đi cùng từ Local Storage cho phòng cụ thể
+                    if (companions[idDatPhong]) {
+                        companions[idDatPhong].forEach((companion, index) => {
+                            const companionDiv = document.createElement('div');
+                            companionDiv.classList.add('companion-form', 'mb-2');
+                            companionDiv.innerHTML = `
+                <strong>Người đi cùng ${index + 1}:</strong><br>
+                Họ và tên: <input type="text" class="form-control" value="${companion.fullname}" disabled/><br>
+                Số CCCD: <input type="text" class="form-control" value="${companion.cmnd}" disabled/><br>
+            `;
+                            companionFormsContainer.appendChild(companionDiv);
+                        });
+                    }
+
+                    // Kiểm tra số người tối đa
+                    const currentCompanionCount = companions[idDatPhong] ? companions[idDatPhong].length : 0;
+                    const maxCompanionsAllowed = soNguoiToiDa - 1; // Giới hạn số người đi cùng tối đa (giảm 1 vì 1 người phải là khách hàng)
+
+                    console.log("Số người đi cùng hiện tại:", currentCompanionCount);
+                    console.log("Số người đi cùng tối đa cho phép:", maxCompanionsAllowed);
+
+
+                });
+
+                document.getElementById('addCustomerBtn').addEventListener('click', function() {
+                    const newFullname = document.getElementById('fullname1').value.trim();
+                    const newCmnd = document.getElementById('Cmnd').value.trim();
+
+                    // Kiểm tra thông tin người đi cùng
+                    if (!newFullname) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Thiếu thông tin!',
+                            text: 'Họ và tên không được để trống!',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+                    if (!newCmnd) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Thiếu thông tin!',
+                            text: 'Số CCCD không được để trống!',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+                    if (newCmnd.length !== 12 || isNaN(newCmnd)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Lỗi CCCD!',
+                            text: 'Số CCCD phải là 12 số!',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    // Kiểm tra số người tối đa
+                    if (companions[idDatPhong] && companions[idDatPhong].length >= soNguoiToiDa) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Quá tải!',
+                            text: 'Phòng quá tải! Không thể thêm người đi cùng.',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    // Kiểm tra trùng lặp
+                    const isDuplicate = companions[idDatPhong] && companions[idDatPhong].some(companion => companion.cmnd === newCmnd);
+                    if (isDuplicate) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Trùng lặp!',
+                            text: 'Người đi cùng với số CCCD này đã tồn tại!',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    // Gửi yêu cầu thêm người đi cùng
+                    fetch('/nguoidicung/them-nguoi-di-cung', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            tenNguoiDiCung: newFullname,
+                            soCmnd: newCmnd,
+                            datPhongId: parseInt(idDatPhong, 10)
+                        })
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error(text);
+                                });
+                            }
+
+                            // Lưu thông tin người đi cùng vào Local Storage
+                            if (!companions[idDatPhong]) {
+                                companions[idDatPhong] = [];
+                            }
+                            companions[idDatPhong].push({ fullname: newFullname, cmnd: newCmnd });
+                            localStorage.setItem('companions', JSON.stringify(companions));
+
+                            // Thêm người đi cùng vào giao diện
+                            const companionDiv = document.createElement('div');
+                            companionDiv.classList.add('companion-form', 'mb-2');
+                            companionDiv.innerHTML = `
+            <strong>Người đi cùng:</strong><br>
+            Họ và tên: <input type="text" class="form-control" value="${newFullname}" disabled/><br>
+            Số CCCD: <input type="text" class="form-control" value="${newCmnd}" disabled/><br>
+        `;
+                            companionFormsContainer.appendChild(companionDiv);
+
+                            // Xóa nội dung form nhập người đi cùng
+                            document.getElementById('fullname1').value = '';
+                            document.getElementById('Cmnd').value = '';
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: 'Thêm người đi cùng thành công!',
+                                confirmButtonText: 'OK'
+                            });
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: error.message,
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                });
+
+            </script>
+        </div>
+    </main>
+    <div th:include="fragment/modal :: modal"></div>
+</div>
+</body>
+<script th:include="fragment/script :: script"></script>
+</html>
+

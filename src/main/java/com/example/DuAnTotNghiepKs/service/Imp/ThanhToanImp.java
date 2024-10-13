@@ -2,12 +2,12 @@ package com.example.DuAnTotNghiepKs.service.Imp;
 
 import com.example.DuAnTotNghiepKs.DTO.ThanhToanDTO;
 
-import com.example.DuAnTotNghiepKs.entity.DatPhong;
-import com.example.DuAnTotNghiepKs.entity.KhachHang;
-import com.example.DuAnTotNghiepKs.entity.ThanhToan;
+import com.example.DuAnTotNghiepKs.entity.*;
 import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
+import com.example.DuAnTotNghiepKs.repository.TaiKhoanRepo;
 import com.example.DuAnTotNghiepKs.repository.ThamSoRepo;
 import com.example.DuAnTotNghiepKs.repository.ThanhToanRepo;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import com.example.DuAnTotNghiepKs.service.ThanhToanService;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import org.modelmapper.ModelMapper;
@@ -46,6 +46,9 @@ public class ThanhToanImp implements ThanhToanService {
     @Autowired
     private ThamSoRepo thamSoRepository;
 
+    @Autowired
+    private TaiKhoanService taiKhoanService;
+
     @Override
     public boolean xacNhanThanhToan(Integer idDatPhong, Double paymentAmount) {
         // Tìm đơn đặt phòng
@@ -79,6 +82,54 @@ public class ThanhToanImp implements ThanhToanService {
                 .map(thanhToan -> modelMapper.map(thanhToan,ThanhToanDTO.class))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<ThanhToanDTO> findAllByTinhTrang(Pageable pageable) {
+        Page<ThanhToan> thanhToans = thanhToanRepository.findAllByTinhTrang(pageable);
+
+        return thanhToans.map(thanhToan -> {
+            ThanhToanDTO dto = new ThanhToanDTO();
+
+            // Lấy thông tin phòng
+            Phong phong = thanhToan.getDatPhong().getPhong();
+            if (phong != null) {
+                dto.setIdPhong(phong.getIdPhong());
+                dto.setTenPhong(phong.getTenPhong()); // Thêm tên phòng vào DTO
+            }
+
+            // Lấy thông tin đặt phòng
+            DatPhong datPhong = thanhToan.getDatPhong();
+            if (datPhong != null) {
+                dto.setIdDatPhong(datPhong.getIdDatPhong());
+                dto.setTongTien(datPhong.getTongTien());
+
+                // Lấy thông tin khách hàng
+                KhachHang khachHang = datPhong.getKhachHang();
+                if (khachHang != null) {
+                    dto.setIdKhachHang(khachHang.getId()); // Lấy ID khách hàng
+                    dto.setHoVaTen(khachHang.getHoVaTen()); // Lấy tên khách hàng vào DTO
+                }
+            }
+
+            NhanVien nhanVien  = thanhToan.getNhanVien();
+            if (nhanVien != null) {
+                dto.setIdNhanVien(nhanVien.getIdNhanVien()); // Lấy ID khách hàng
+                dto.setHoTen(nhanVien.getHoTen());
+            }
+
+            // Lấy các thông tin thanh toán
+            dto.setNgayThanhToan(thanhToan.getNgayThanhToan());
+            dto.setMaThanhToan(thanhToan.getMaThanhToan());
+            dto.setTinhTrang(thanhToan.getTinhTrang());
+            dto.setSoTien(thanhToan.getSoTien());
+
+            return dto;
+        });
+    }
+
+
+
+
 
     // ngày hiện tại
     private Date getCurrentDate() {
@@ -123,9 +174,16 @@ public class ThanhToanImp implements ThanhToanService {
         // Lưu đối tượng DatPhong đã được cập nhật
         datPhongRepository.save(datPhong);
         System.out.println("Trạng thái DatPhong sau khi cập nhật: " + datPhong.getTrangThai());
-
+        // Lưu thông tin thanh toán
+        TaiKhoan taiKhoan = taiKhoanService.getTaiKhoanTuSession1();
+        if (taiKhoan == null || taiKhoan.getNhanVien() == null){
+            System.out.println("Nhân viên del tồn tại:"+taiKhoan.getNhanVien());
+            throw new IllegalArgumentException("Nhân viên không tồn tại"+taiKhoan.getNhanVien());
+        }
+        NhanVien nhanVien = taiKhoan.getNhanVien();
         // Tạo đối tượng ThanhToan từ DTO
         ThanhToan thanhToan = new ThanhToan();
+        thanhToan.setNhanVien(nhanVien);
         thanhToan.setDatPhong(datPhong);
         thanhToan.setMaThanhToan(generateRandomCode());
         thanhToan.setNgayThanhToan(getCurrentDate());
@@ -151,6 +209,7 @@ public class ThanhToanImp implements ThanhToanService {
         if (datPhong.getPhong() != null) {
             resultDTO.setIdPhong(datPhong.getPhong().getIdPhong());
             resultDTO.setTenPhong(datPhong.getPhong().getTenPhong());
+
             resultDTO.setNgayCheckIn(datPhong.getNgayCheckIn());
         }
         if (datPhong.getLoaiPhong() != null) {
@@ -203,10 +262,11 @@ public class ThanhToanImp implements ThanhToanService {
                 .setFontSize(20)
                 .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))); // Sử dụng PdfFontFactory
 
-        document.add(new Paragraph("Thông tin khách hàng: " + thanhToanDTO.getIdKhachHang()));
-        document.add(new Paragraph("Mã phòng: " + thanhToanDTO.getIdPhong()));
+        document.add(new Paragraph("Thông tin khách hàng: " + thanhToanDTO.getHoVaTen()));
+        document.add(new Paragraph("Phòng: " + thanhToanDTO.getTenPhong()));
         document.add(new Paragraph("Tổng tiền: " + thanhToanDTO.getTongTien()));
         document.add(new Paragraph("Ngày thanh toán: " + thanhToanDTO.getNgayThanhToan()));
+        document.add(new Paragraph("Nhân Viên: " + thanhToanDTO.getHoTen()));
 
         document.close();
         return outputStream.toByteArray(); // Trả về byte array của PDF

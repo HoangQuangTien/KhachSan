@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "NhanVien")
 public class NhanVien {
@@ -29,7 +31,7 @@ public class NhanVien {
     @Column(name = "ma_nhan_vien",unique = true,nullable = false)
     private String maNhanVien;
 
-    @NotBlank(message = "Họ tên không được để trống")
+    //    @NotBlank(message = "Họ tên không được để trống")
     @Column(name = "ho_ten")
     private String hoTen;
 
@@ -42,7 +44,7 @@ public class NhanVien {
     private Boolean gioiTinh;
 
     @NotNull
-    @Pattern(regexp = "\\d{9,11}$", message = "Số điện thoại phải là số và có từ 10 số")
+//    @Pattern(regexp = "\\d{9,11}$", message = "Số điện thoại phải là số và có từ 10 số")
     @Column(name = "so_dien_thoai")
     private String soDienThoai;
 
@@ -59,23 +61,28 @@ public class NhanVien {
     private Boolean trangThai;
 
     @NotNull
-    @Pattern(regexp = "^[\\w\\.-]+@gmail\\.com$", message = "Email không đúng định dạng")
+//    @Pattern(regexp = "^[\\w\\.-]+@gmail\\.com$", message = "Email không đúng định dạng")
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     @Column(name = "li_do")
     private String liDo;
 
-    @ManyToOne
-    @JoinColumn(name = "ten_dang_nhap",referencedColumnName = "ten_dang_nhap")
-    private TaiKhoan taiKhoan;
+    @Column(name = "img")
+    private String img;
+
+    @OneToOne
+    @JoinColumn(name = "ten_dang_nhap")
+    private TaiKhoan taiKhoan; // Đảm bảo thuộc tính này có mặt
 
     @OneToMany(mappedBy = "nhanVien")
     private Set<ChamSocKhachHang> chamSocKhachHangs;
 
     @OneToMany(mappedBy = "nhanVien")
-    private List<LichLamViec> lichLamViecs;
+    @JsonBackReference
+    private Set<LichLamViec> lichLamViecs;
 
 
 
 }
+

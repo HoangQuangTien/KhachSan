@@ -1,0 +1,303 @@
+/* Đảm bảo toàn bộ container giữ vị trí tương đối */
+.container-fluid {
+    position: relative;
+    height: 100vh; /* Chiều cao của container là toàn màn hình */
+    overflow: hidden; /* Đảm bảo không có nội dung nào tràn ra */
+}
+
+/* Cài đặt ảnh nền */
+.container-fluid img.img-fluid {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ảnh sẽ bao phủ toàn bộ khu vực */
+    position: absolute; /* Đặt vị trí tuyệt đối cho ảnh nền */
+    top: 0;
+    left: 0;
+    z-index: -1; /* Ảnh nằm phía sau nội dung */
+}
+
+/* Định vị logo ở góc trên cùng bên trái và tăng kích thước */
+.logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    width: 170px; /* Tăng kích thước logo */
+    height: auto;
+}
+
+
+
+
+/* Lớp overlay chứa nội dung nằm phía trên ảnh */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.4); /* Nền đen mờ giúp làm nổi bật nội dung */
+    z-index: 1; /* Đảm bảo overlay nằm trên ảnh */
+}
+
+/* Tiêu đề và mô tả */
+.overlay h1, .overlay p {
+    color: white;
+    z-index: 2;
+}
+
+/* Form tìm kiếm */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    z-index: 2;
+}
+
+
+
+/* Các input */
+.search-bar .form-control {
+    border: none;
+    box-shadow: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    background-color: transparent;
+}
+
+/* Nút tìm kiếm */
+.search-bar .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* Nút đăng nhập */
+.overlay .btn-outline-light {
+    color: white;
+    border-color: white;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+.login-button-container {
+    position: absolute;
+    top: 20px; /* Khoảng cách từ trên xuống */
+    right: 20px; /* Khoảng cách từ bên phải */
+}
+
+
+.overlay .btn-outline-light:hover {
+    background-color: white;
+    color: black;
+}
+
+
+/* Cải thiện kiểu dáng cho tiêu đề và phụ đề */
+h1 {
+    font-size: 2.5rem; /* Kích thước chữ lớn hơn */
+    font-weight: bold; /* Làm đậm chữ */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Thêm bóng cho chữ */
+}
+
+p {
+    font-size: 1.25rem; /* Kích thước chữ cho phụ đề */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); /* Thêm bóng cho chữ */
+}
+
+/* Cải thiện kiểu dáng cho thanh tìm kiếm */
+.search-bar {
+    background-color: rgba(255, 255, 255, 0.9); /* Màu nền với độ trong suốt */
+    border-radius: 10px; /* Bo tròn góc */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ */
+}
+
+/* Kiểu dáng cho input */
+.form-control {
+    border-radius: 5px; /* Bo tròn góc cho input */
+    box-shadow: none; /* Xóa bóng mặc định của input */
+    transition: border-color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+}
+
+/* Thay đổi màu viền khi hover */
+.form-control:focus {
+    border-color: #007bff; /* Màu viền khi hover */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Hiệu ứng bóng khi focus */
+}
+
+/* Kiểu dáng cho nút tìm kiếm */
+.btn-primary {
+    border-radius: 5px; /* Bo tròn góc cho nút */
+    transition: background-color 0.3s, transform 0.3s; /* Hiệu ứng chuyển màu và phóng to */
+}
+
+/* Hiệu ứng khi hover và click cho nút tìm kiếm */
+.btn-primary:hover {
+    background-color: #0056b3; /* Màu nền khi hover */
+    transform: scale(1.05); /* Phóng to nhẹ khi hover */
+}
+
+footer {
+    width: 100%;         /* Chiều rộng full màn hình */
+    max-height: 500px;    /* Giới hạn chiều cao tối đa */
+    overflow: hidden; /* Ẩn nội dung vượt quá chiều cao */
+    background-color: #222;   /* Màu nền tối */
+    color: #ddd;              /* Màu chữ sáng hơn */
+    padding: 40px 0;
+    font-family: 'Arial', sans-serif;
+    position: relative;
+}
+
+
+/* Google Map container with border and shadow */
+.map-container iframe {
+    border: 0;
+    border-radius: 10px;      /* Bo tròn góc bản đồ */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);  /* Hiệu ứng đổ bóng */
+}
+
+/* Headings in Footer */
+footer h5 {
+    font-size: 1.5rem;
+    color: #fff;  /* Màu trắng cho tiêu đề */
+    margin-bottom: 20px;
+}
+
+/* Contact Info Styles */
+footer p {
+    font-size: 1rem;
+    color: #ddd;
+    margin-bottom: 8px;
+}
+
+/* Social Media Icons */
+footer ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+footer ul li {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+footer ul li a {
+    font-size: 1.2rem;
+    color: #ddd;
+    transition: color 0.3s ease;  /* Hiệu ứng chuyển đổi màu */
+    text-decoration: none;
+}
+
+/* Hover effects for social links */
+footer ul li a:hover {
+    color: #00acee;   /* Đổi màu khi hover (Màu xanh nhẹ) */
+    text-decoration: underline;  /* Gạch chân khi hover */
+}
+
+/* Hover effects for contact info */
+footer p:hover {
+    color: #fff;       /* Đổi màu trắng khi hover */
+}
+
+/* Copyright Section */
+.copyright {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* Custom Divider */
+.divider {
+    border-top: 1px solid #555;  /* Đường kẻ ngăn cách */
+    margin: 30px 0;
+}
+
+/* Hover effect for map */
+.map-container iframe:hover {
+    transform: scale(1.05);      /* Phóng to nhẹ khi hover */
+    transition: transform 0.4s ease;
+}
+
+/* Footer Hover Transition for Links */
+footer a {
+    transition: all 0.3s ease;
+}
+
+/* Footer background animation */
+footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 0, 150, 0.1), rgba(0, 204, 255, 0.1));
+    pointer-events: none;  /* Không ảnh hưởng đến các phần tử khác */
+    z-index: 1;
+    opacity: 0.4;
+}
+
+footer .container {
+    position: relative;
+    z-index: 2;   /* Để nội dung nổi lên trên hiệu ứng nền */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    footer .row {
+        flex-direction: column;
+    }
+    footer .col-md-6 {
+        margin-bottom: 20px;
+    }
+}
+
+
+.Home-button-container {
+    position: absolute;
+    top: 20px; /* Khoảng cách từ trên xuống */
+    left: 40%; /* Đặt ở giữa theo chiều ngang */
+    transform: translateX(-50%); /* Đẩy sang trái một nửa chiều rộng của nó */
+}
+
+.text-link {
+    color: transparent; /* Làm chữ trong suốt */
+    text-decoration: none; /* Bỏ gạch chân */
+    font-weight: bold; /* Tùy chọn: làm cho chữ đậm hơn */
+    font-size: 1.2em; /* Tăng kích thước chữ */
+    text-shadow:
+            0 0 0 white, /* Viền trắng xung quanh chữ */
+            0 0 5px rgba(255, 255, 255, 0.5); /* Viền mờ thêm nếu cần */
+    transition: opacity 0.3s ease; /* Hiệu ứng chuyển đổi cho opacity */
+}
+
+.text-link:hover {
+    color: pink; /* Đổi màu chữ thành màu hồng khi hover */
+    opacity: 1; /* Độ trong suốt đầy đủ khi hover */
+    text-shadow: 0 0 0 white; /* Hiệu ứng viền trắng rõ hơn khi hover */
+}
+
+.language-buttons{
+    position: absolute;
+    top: 20px; /* Khoảng cách từ trên xuống */
+    left: 80%; /* Đặt ở giữa theo chiều ngang */
+    transform: translateX(-50%); /* Đẩy sang trái một nửa chiều rộng của nó */
+    margin: 1.5rem;
+}
+
+.language-option {
+    color: white; /* Màu chữ mặc định */
+    transition: color 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */
+}
+
+.language-option:hover {
+    color: pink; /* Màu chữ khi hover */
+}
+
+
+

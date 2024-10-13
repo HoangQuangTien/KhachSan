@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head th:include="fragment/head :: head">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thống kê doanh thu</title>
@@ -13,7 +13,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <style>
-        /* CSS cho thông báo translucent */
 
         #errorMessage {
             display: none;
@@ -75,7 +74,33 @@
 
             margin-bottom: 20px;
         }
+
+        .card {
+            width: 100%; /* Hoặc chiều rộng tùy ý */
+            margin: 10px; /* Khoảng cách giữa các card */
+        }
+
+        .card-deck .card {
+            flex: 1 0 auto; /* Để các card tự động giãn ra theo chiều ngang */
+        }
+
+        table {
+            font-size: 13px; /* Kích thước chữ nhỏ hơn */
+        }
+
+        th, td {
+            padding: 8px; /* Đảm bảo bảng vẫn có khoảng cách hợp lý */
+            text-align: center; /* Căn giữa nội dung */
+        }
+
+        /* Tùy chọn thêm: giảm khoảng cách giữa các hàng */
+        tr {
+            line-height: 1.2; /* Điều chỉnh chiều cao dòng để phù hợp với kích thước chữ */
+        }
+
     </style>
+
+    <head th:include="fragment/head :: head"></head>
 </head>
 
 <body class="vertical light">
@@ -103,70 +128,147 @@
 
         <div class="row">
             <!-- Cột bên trái: Bảng -->
-            <div class="col-md-7 card p-4 shadow-sm" >
-                <h3 class="mb-4">Danh sách đã cọc</h3>
-                <hr>
-                <table class="table table-bordered table-sm text-center">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Mã đặt phòng</th>
-                        <th>Khách hàng</th>
-                        <th>Phòng</th>
-                        <th>Số điện thoại</th>
-                        <th>Ngày nhận phòng</th>
-                        <!--                        <th>Ngày trả phòng</th>-->
-                        <th>Trạng Thái</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="datPhong : ${datPhongs}" th:if="${datPhong.tinhTrang == 'Đã Checkin'}" th:data-id-dat-phong="${datPhong.idDatPhong}" th:data-id-phong="${datPhong.phong.idPhong}" th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}" th:data-hovaten="${datPhong.khachHang.hoVaTen}" th:data-sodienthoai="${datPhong.khachHang.soDienThoai}" th:data-tenphong="${datPhong.phong.tenPhong}" th:data-thoigian="${datPhong.ngayNhan} + ' - ' + ${datPhong.ngayTra}" th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}" th:data-giaphong="${datPhong.phong.gia}" th:data-tiencoc="${datPhong.tienCoc}" th:data-tienconlai="${datPhong.tienConLai}" onclick="showForm(this.getAttribute('data-id-dat-phong'),
-                                        this.getAttribute('data-id-phong'),
-                                        this.getAttribute('data-id-loai-phong'),
-                                        this.getAttribute('data-hovaten'),
-                                        this.getAttribute('data-sodienthoai'),
-                                        this.getAttribute('data-tenphong'),
-                                        this.getAttribute('data-thoigian'),
-                                        this.getAttribute('data-ngaycheckin'),
-                                        this.getAttribute('data-giaphong'),
-                                        this.getAttribute('data-tiencoc'),
-                                        this.getAttribute('data-tienconlai'))">
-                        <td th:text="${datPhong.maDatPhong}"></td>
-                        <td th:text="${datPhong.khachHang.hoVaTen}"></td>
-                        <td th:text="${datPhong.phong.tenPhong}"></td>
-                        <td th:text="${datPhong.khachHang.soDienThoai}"></td>
-                        <td th:text="${datPhong.ngayNhan}"></td>
-                        <!--                        <td th:text="${#dates.format(datPhong.ngayTra, 'dd/MM/yyyy')}"></td>-->
-                        <td th:text="${datPhong.trangThai == 0 ? 'Đã Thanh Toán' : 'Đã Cọc'}"></td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="col-md-6">
+                <div class="py-4">
+                    <div class="card p-4 shadow-sm">
+                        <h4 class=" d-flex justify-content-center" style="color: #0d4bdb;">Danh sách đã cọc</h4>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card-deck flex-wrap p-1">
+                                    <div th:each="datPhong : ${datPhongs}" th:if="${datPhong.tinhTrang == 'Đã Checkin'}"
+                                         th:data-id-dat-phong="${datPhong.idDatPhong}"
+                                         th:data-id-phong="${datPhong.phong.idPhong}"
+                                         th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}"
+                                         th:data-hovaten="${datPhong.khachHang.hoVaTen}"
+                                         th:data-sodienthoai="${datPhong.khachHang.soDienThoai}"
+                                         th:data-tenphong="${datPhong.phong.tenPhong}"
+                                         th:data-thoigian="${datPhong.ngayNhan} + ' - ' + ${datPhong.ngayTra}"
+                                         th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}"
+                                         th:data-giaphong="${datPhong.phong.gia}"
+                                         th:data-tiencoc="${datPhong.tienCoc}"
+                                         th:data-tienconlai="${datPhong.tienConLai}"
+                                         class="card mb-3"
+                                         onclick="showForm(this.getAttribute('data-id-dat-phong'),
+                            this.getAttribute('data-id-phong'),
+                            this.getAttribute('data-id-loai-phong'),
+                            this.getAttribute('data-hovaten'),
+                            this.getAttribute('data-sodienthoai'),
+                            this.getAttribute('data-tenphong'),
+                            this.getAttribute('data-thoigian'),
+                            this.getAttribute('data-ngaycheckin'),
+                            this.getAttribute('data-giaphong'),
+                            this.getAttribute('data-tiencoc'),
+                            this.getAttribute('data-tienconlai'),
+                            this)">
+                                        <div class="card-body">
+                                            <h5 class="card-title" th:text="${datPhong.khachHang.hoVaTen}"></h5>
+                                            <p class="card-text">
+                                                <strong>Mã đặt phòng:</strong> <span th:text="${datPhong.maDatPhong}"></span>
+                                            </p>
+                                            <p class="card-text mb-2">
+                                                <strong>Phòng:</strong> <span th:text="${datPhong.phong.tenPhong}"></span>
+                                            </p>
+                                            <p class="card-text mb-2">
+                                                <strong>Số điện thoại:</strong> <span th:text="${datPhong.khachHang.soDienThoai}"></span>
+                                            </p>
+                                            <p class="card-text mb-2">
+                                                <strong>Ngày nhận phòng:</strong> <span th:text="${datPhong.ngayNhan}"></span>
+                                            </p>
+                                            <p class="card-text mb-2">
+                                                <strong>Trạng thái:</strong> <span th:text="${datPhong.trangThai == 0 ? 'Đã Thanh Toán' : 'Đã Cọc'}"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <!-- Phân trang Bootstrap -->
-                <nav class="d-flex justify-content-end">
-                    <ul class="pagination pagination-sm">
-                        <!-- Previous Page -->
-                        <li th:if="${currentPage > 1}" class="page-item">
-                            <a class="page-link" th:href="@{/thanhToan(page=${currentPage - 1})}" aria-label="Previous">&laquo;</a>
-                        </li>
-                        <!-- Page Numbers -->
-                        <li th:each="i : ${#numbers.sequence(0, totalPagesDatPhong)}"
-                            th:classappend="${i == currentPage} ? 'active' : ''" class="page-item">
-                            <a class="page-link" th:href="@{/thanhToan(page=${i})}" th:text="${i}"></a>
-                        </li>
+                        <!-- Phân trang Bootstrap -->
+                        <nav class="d-flex justify-content-end">
+                            <ul class="pagination pagination-sm">
+                                <!-- Previous Page -->
+                                <li th:if="${currentPage > 1}" class="page-item">
+                                    <a class="page-link" th:href="@{/thanhToan(page=${currentPage - 1})}" aria-label="Previous">&laquo;</a>
+                                </li>
+                                <!-- Page Numbers -->
+                                <li th:each="i : ${#numbers.sequence(0, totalPagesDatPhong)}"
+                                    th:classappend="${i == currentPage} ? 'active' : ''" class="page-item">
+                                    <a class="page-link" th:href="@{/thanhToan(page=${i})}" th:text="${i}"></a>
+                                </li>
+                                <!-- Next Page -->
+                                <li th:if="${currentPage < totalPagesDatPhong}" class="page-item">
+                                    <a class="page-link" th:href="@{/thanhToan(page=${currentPage + 1})}" aria-label="Next">&raquo;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
 
-                        <!-- Next Page -->
-                        <li th:if="${currentPage < totalPagesDatPhong}" class="page-item">
-                            <a class="page-link" th:href="@{/thanhToan(page=${currentPage + 1})}" aria-label="Next">&raquo;</a>
-                        </li>
-                    </ul>
-                </nav>
+
+
+                <div class="py-4">
+                    <div class="card p-4 shadow-sm">
+                        <h4 class="d-flex justify-content-center" style="color: #0d4bdb;">Lịch Sử Thanh Toán</h4>
+                        <hr>
+                        <!-- Bảng hiển thị lịch sử thanh toán -->
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>Mã</th>
+                                <th>Ngày</th>
+                                <th>Phòng</th>
+                                <th>Khách Hàng</th>
+                                <th>Số Tiền</th>
+                                <th>Trạng Thái</th>
+                                <th>Nhân Viên</th>
+                            </tr>
+                            </thead>
+                            <tbody id="transactionTableBody">
+                            <!-- Nội dung bảng sẽ được thêm vào đây qua JavaScript -->
+                            </tbody>
+                            <tr id="noDataRow" style="display: none;">
+                                <td colspan="4" class="text-center">Chưa có lịch sử thanh toán nào.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Phân trang -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span>Trang hiện tại: <span th:text="${currentPage + 1}"></span></span>
+                                <span>Tổng số trang: <span th:text="${totalPages}"></span></span>
+                            </div>
+
+                            <div th:if="${totalPages > 1}" class="pagination">
+                                <!-- Trang trước -->
+                                <a th:href="@{/hienThi(page=${currentPage - 1}, size=${pageSize})}"
+                                   th:if="${currentPage > 0}" class="btn btn-primary me-2">Trang Trước</a>
+
+                                <!-- Danh sách số trang -->
+                                <div th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                                    <a th:href="@{/hienThi(page=${i}, size=${pageSize})}"
+                                       class="btn btn-outline-primary mx-1"
+                                       th:class="${i == currentPage} ? 'active'"
+                                       th:text="${i + 1}"></a>
+                                </div>
+
+                                <!-- Trang tiếp -->
+                                <a th:href="@{/hienThi(page=${currentPage + 1}, size=${pageSize})}"
+                                   th:if="${currentPage < totalPages - 1}" class="btn btn-primary ms-2">Trang Tiếp</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
 
 
             </div>
 
+
             <!-- Cột bên phải: Form -->
-            <div class="col-md-5">
-                <div class="container py-4">
+            <div class="col-md-6">
+                <div class="py-4">
                     <form th:action="@{/thanhToan/add}" method="post" th:object="${thanhToanDTO}" id="formId" class="card p-4 shadow-sm"  onsubmit="return false;">
                         <h4 style="color: #0d4bdb">Thông tin hóa đơn</h4>
                         <hr>
@@ -428,6 +530,52 @@
 <!-- Thêm thư viện QRCode.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const currentPage = 0; // Hoặc lấy giá trị từ URL
+        const pageSize = 5; // Hoặc giá trị mặc định
+
+        fetch(`/api/km/hienThi?page=${currentPage}&size=${pageSize}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const transactions = data.content; // Giả định dữ liệu trả về có thuộc tính 'content'
+                const transactionTableBody = document.getElementById('transactionTableBody');
+                const noDataRow = document.getElementById('noDataRow');
+
+                if (transactions.length === 0) {
+                    noDataRow.style.display = 'table-row'; // Hiển thị thông báo không có dữ liệu
+                } else {
+                    noDataRow.style.display = 'none'; // Ẩn thông báo không có dữ liệu
+                    transactions.forEach(transaction => {
+                        const row = document.createElement('tr');
+
+                        // Format ngayThanhToan to only show date
+                        const formattedDate = transaction.ngayThanhToan
+                            ? new Date(transaction.ngayThanhToan).toLocaleDateString()
+                            : 'N/A';
+
+                        row.innerHTML = `
+                        <td>${transaction.maThanhToan || 'N/A'}</td>
+                        <td>${formattedDate}</td>
+                        <td>${transaction.tenPhong || 'N/A'}</td>
+                        <td>${transaction.hoVaTen || 'N/A'}</td>
+                        <td>${transaction.tongTien || '0.00'}</td>
+                        <td>${transaction.tinhTrang ? 'Đã Thanh Toán' : 'Chưa Thanh Toán'}</td>
+                        <td>${transaction.hoTen || 'N/A'}</td>
+                    `;
+                        transactionTableBody.appendChild(row);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching transactions:', error));
+    });
+
+
     //Lắng nghe sự kiến submit từ form
     document.getElementById("formPhuPhi").addEventListener('submit', function(event) {
         event.preventDefault(); // Ngăn chặn hành vi mặc định của form
@@ -618,7 +766,7 @@
     // Hàm này điền dữ liệu vào các input fields trong form
     function showForm(idDatPhong, idPhong, idLoaiPhong, hoVaTen,
                       soDienThoai, tenPhong, thoiGian, thoiGianCheckIn,
-                      giaPhong, tienCoc, tienConLai) {
+                      giaPhong, tienCoc, tienConLai ,cardElement) {
         // Điền giá trị vào form
         document.getElementById('idDatPhong').value = idDatPhong;
         document.getElementById('idPhong').value = idPhong;
@@ -641,6 +789,15 @@
         // } else {
         //     document.getElementById("tinhTrang").value = false;
         // }
+
+
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.classList.remove('bg-light');
+        });
+
+        // Thêm lớp 'bg-light' vào thẻ card đang được click
+        cardElement.classList.add('bg-light');
 
     }
 

@@ -30,17 +30,9 @@ public class TaiKhoan {
     @NotBlank(message = "Mật khẩu không được để trống")
     private String matKhau;
 
-    @Column(name = "vai_tro")
-    private String vaiTro;
+    @OneToOne(mappedBy = "taiKhoan", cascade = CascadeType.ALL)
+    private NhanVien nhanVien; // Đảm bảo thuộc tính này có mặt
 
-    @OneToMany(mappedBy = "taiKhoan")
-    private Set<NhanVien> nhanViens = new HashSet<>();
-
-
-    // Constructor có tham số
-    public TaiKhoan(String tenDangNhap, String matKhau, String vaiTro) {
-        this.tenDangNhap = tenDangNhap;
-        this.matKhau = matKhau;
-        this.vaiTro = vaiTro;
-    }
+    @OneToMany(mappedBy = "taiKhoan",fetch = FetchType.EAGER)
+    private Set<ChiTietVaiTro> chiTietVaiTros;
 }

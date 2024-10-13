@@ -17,7 +17,7 @@ public class ThanhToanDTO {
 
     private Integer idThanhToan;
     private String maThanhToan;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+//    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date ngayThanhToan;
     private Boolean phuongThuc;
     private Float soTien;
@@ -41,5 +41,8 @@ public class ThanhToanDTO {
     private String tenPhong;
 
     private boolean inHoaDon;
+
+    private Integer idNhanVien;
+    private String hoTen;
 
 }

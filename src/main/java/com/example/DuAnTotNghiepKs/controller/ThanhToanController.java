@@ -1,15 +1,15 @@
 package com.example.DuAnTotNghiepKs.controller;
 
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.DTO.ThanhToanDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
-import com.example.DuAnTotNghiepKs.service.DatPhongService;
-import com.example.DuAnTotNghiepKs.service.PhongService;
-import com.example.DuAnTotNghiepKs.service.PhuPhiService;
-import com.example.DuAnTotNghiepKs.service.ThanhToanService;
+import com.example.DuAnTotNghiepKs.entity.ThanhToan;
+import com.example.DuAnTotNghiepKs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,29 +35,46 @@ public class ThanhToanController {
     @Autowired
     private PhongService phongService;
 
+    @Autowired
+    private TaiKhoanService taiKhoanService;
+
 
     @GetMapping
     public String loadAll(
             @ModelAttribute ThanhToanDTO thanhToanDTO,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "2") int size,// Trang hiện tại
+            @RequestParam(value = "page", defaultValue = "0") int currentPage, // Trang hiện tại
+            @RequestParam(value = "size", defaultValue = "2") int pageSize, // Kích thước trang
             Model model) {
 
+        // Lấy danh sách đặt phòng đã cọc
+        Page<DatPhong> datPhongPage = datPhongService.getDatPhongsDaCoc(currentPage, pageSize);
 
-
-        Page<DatPhong> datPhongPage = datPhongService.getDatPhongsDaCoc(page,size);
-
-//        // Thêm dữ liệu vào model
-//        model.addAttribute("phuPhis", phuPhiPage.getContent());
+        // Thêm dữ liệu vào model
         model.addAttribute("datPhongs", datPhongPage.getContent());
+        model.addAttribute("phuPhis", phuPhiService.getAll());
 
         // Thêm thông tin phân trang
-        model.addAttribute("currentPage", page);
-        model.addAttribute("phuPhis",phuPhiService.getAll());
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("currentPage", pageSize);
         model.addAttribute("totalPagesDatPhong", datPhongPage.getTotalPages());
 
-        return "list/QuanLyThanhToan/thanhToan";
+        //lấy id nhân viên
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
+
+
+        return "list/QuanLyThanhToan/thanhToan"; // Trả về view
+
+
     }
+
+
+
+
+
 
 
     @PostMapping("/add")
@@ -124,6 +141,8 @@ public class ThanhToanController {
         // Redirect về trang thanh toán
         return "redirect:/thanhToan";
     }
+
+
 
 
 }

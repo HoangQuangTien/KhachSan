@@ -16,4 +16,9 @@ public interface ThanhToanRepo extends JpaRepository<ThanhToan, Integer> {
     @Query("SELECT dp FROM DatPhong dp WHERE dp.trangThai = true")
     Page<DatPhong> findAllByDaCoc(Pageable pageable);
 
+
+    @Query("SELECT tt FROM ThanhToan tt WHERE tt.tinhTrang = true")
+    Page<ThanhToan> findAllByTinhTrang(Pageable pageable);
+
+
 }

@@ -17,7 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,8 +26,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -64,6 +61,8 @@ public class ChiTietDatPhongController {
     private LichSuDatPhongRepo lichSuDatPhongRepo;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private NhanVienRepo nhanVienRepo;
 
     @GetMapping
     public String index(
@@ -136,6 +135,7 @@ public class ChiTietDatPhongController {
 
             List<KhachHang> khachHangs = khachHangRepository.findAll();
             List<Phong> phongs = phongRepo.findAll();
+//            List<NhanVien> nhanViens = nhanVienRepo.findAll();
 
             int startItem = (pageNo - 1) * pageSize;
             List<ChiTietDatPhong> paginatedChiTietDatPhongs = chiTietDatPhongs.stream()

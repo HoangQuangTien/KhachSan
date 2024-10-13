@@ -1,11 +1,11 @@
 package com.example.DuAnTotNghiepKs.controller;
 
-import com.example.DuAnTotNghiepKs.entity.DatPhong;
-import com.example.DuAnTotNghiepKs.entity.LichSuDatPhong;
-import com.example.DuAnTotNghiepKs.entity.Phong;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
+import com.example.DuAnTotNghiepKs.entity.*;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
 import com.example.DuAnTotNghiepKs.service.LichSuDatPhongService;
 import com.example.DuAnTotNghiepKs.service.PhongService;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,11 +36,20 @@ public class DanhSachDatPhong {
     @Autowired
     private LichSuDatPhongService lichSuDatPhongService;
 
+    @Autowired
+    private TaiKhoanService taiKhoanService;
+
     @GetMapping()
     public String showDatPhongList(Model model) {
         // Lấy tất cả thông tin đặt phòng chưa check-in
         List<DatPhong> datPhongs = datPhongService.getDatPhongChuaCheckIn();
 
+        //lấy id nhân viên
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
         // Truyền danh sách đặt phòng vào model
         model.addAttribute("datPhongs", datPhongs);
 
@@ -57,6 +66,17 @@ public class DanhSachDatPhong {
                 return ResponseEntity.badRequest().body(Map.of("error", "Đặt phòng không tồn tại."));
             }
 
+            // Lấy thông tin tài khoản từ session
+            TaiKhoan taiKhoan = taiKhoanService.getTaiKhoanTuSession1();
+            if (taiKhoan == null || taiKhoan.getNhanVien() == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Không tìm thấy thông tin nhân viên."));
+            }
+
+            // Cập nhật thông tin check-in
+            NhanVien nhanVienCheckIn = taiKhoan.getNhanVien();
+            datPhong.setNhanVienCheckIn(nhanVienCheckIn); // Lưu đối tượng NhanVien
+
+
             Phong phong = datPhong.getPhong();
             // Cập nhật trạng thái đặt phòng thành "đang ở"
             datPhong.setTinhTrang("Đã Checkin");
@@ -68,12 +88,14 @@ public class DanhSachDatPhong {
 
             datPhong.setTrangThai(false);
             datPhong.setNgayCheckIn(LocalDateTime.now()); // lấy ngày hiện tại
+
             datPhongService.saveDatPhong1(datPhong);
             return ResponseEntity.ok(Map.of("success", "Check-in thành công!"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
 
 
 

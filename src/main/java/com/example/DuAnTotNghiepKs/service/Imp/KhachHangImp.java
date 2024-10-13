@@ -212,6 +212,29 @@ public class KhachHangImp implements KhachHangService {
         return null;
     }
 
+
+    @Override
+    public boolean existsById(Integer id) {
+        return khachHangRepository.existsById(id);
+    }
+
+
+    @Override
+    public boolean update1(Integer id, KhachHangDTO khachHangDTO) {
+        // Tìm kiếm khách hàng theo ID
+        KhachHang khachHang = khachHangRepository.findById(id).orElse(null);
+        if (khachHang != null) {
+            // Cập nhật thông tin từ DTO
+            khachHang.setHoVaTen(khachHangDTO.getHoVaTen());
+            khachHang.setEmail(khachHangDTO.getEmail());
+            khachHang.setSoDienThoai(khachHangDTO.getSoDienThoai());
+            khachHang.setGioiTinh(khachHangDTO.isGioiTinh());
+            khachHangRepository.save(khachHang);
+            return true;
+        }
+        return false;
+    }
+
 }
 
 

@@ -33,6 +33,10 @@ public class DatPhongDTO {
     private String isGroup;
     private Integer soLuong;
 
-
-
+    private Integer idKhachHang;
+    private String maKhachHang;
+    private String hoVaTen;
+    private String email;
+    private String soDienThoai;
+    private Boolean gioiTinh;
 }

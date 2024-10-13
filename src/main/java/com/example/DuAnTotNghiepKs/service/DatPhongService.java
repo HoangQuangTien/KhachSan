@@ -58,7 +58,11 @@ public interface DatPhongService {
 
     Page<DatPhong> getDatPhongsDaCoc(int page, int size);
 
+
+
     long getThoiGianChoPhepDatPhong();
+
+    DatPhong findById(Integer id);
 
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động

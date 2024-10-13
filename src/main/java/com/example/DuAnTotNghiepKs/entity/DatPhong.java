@@ -78,10 +78,16 @@ public class DatPhong {
     private Set<ThanhToan> thanhToans = new HashSet<>();
 
 
+    @ManyToOne
+    @JoinColumn(name = "id_nhan_vien")
+    private NhanVien nhanVienCheckIn;
+
 
 //    @OneToMany(mappedBy = "datPhong",cascade = CascadeType.ALL,orphanRemoval = true)
 //    private Set<PhuPhi> phuPhis = new HashSet<>();
 
+    @OneToMany(mappedBy = "datPhong", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<NguoiDiCung> nguoiDiCungList;
 
 
 

@@ -103,8 +103,11 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
     Optional<DatPhong> findByPhongAndTinhTrang(Phong phong, String tinhTrang);
 
-    @Query("SELECT dp FROM DatPhong dp WHERE dp.trangThai = false")
-    Page<DatPhong> findAllByDaCoc(Pageable pageable);
+    @Query(value = "SELECT * \n" +
+            "FROM DatPhong \n" +
+            "WHERE trang_thai = 'false' \n" +
+            "  AND tinh_trang = N'Đã Checkin';",nativeQuery = true)
+    Page<DatPhong> findAllByDaCocAndDaCheckin(Pageable pageable);
 
 
     Optional<DatPhong> findByPhong(Phong phong);

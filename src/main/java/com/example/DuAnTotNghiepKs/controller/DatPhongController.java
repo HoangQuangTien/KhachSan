@@ -50,7 +50,11 @@ public class DatPhongController {
     @Autowired
     private NhanVienService nhanVienService;
 
-    @Autowired ThamSoService thamSoService;
+    @Autowired
+    private ThamSoService thamSoService;
+
+    @Autowired
+    private TaiKhoanService taiKhoanService;
 
 
     // Hiển thị trang đặt phòng
@@ -64,6 +68,12 @@ public class DatPhongController {
             model.addAttribute("phongs", phongs);
         }
 
+        //lấy id nhân viên
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
         return "list/QuanLyDatPhong/datphongs";
     }
 

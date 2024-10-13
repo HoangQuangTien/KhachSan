@@ -1,333 +1,380 @@
 package com.example.DuAnTotNghiepKs.controller;
 
+import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.DiaChiNhanVien;
 import com.example.DuAnTotNghiepKs.entity.NhanVien;
+import com.example.DuAnTotNghiepKs.entity.TaiKhoan;
 import com.example.DuAnTotNghiepKs.repository.DiaChiNhanVienRepo;
 import com.example.DuAnTotNghiepKs.repository.NhanVienRepo;
+import com.example.DuAnTotNghiepKs.repository.TaiKhoanRepo;
+import com.example.DuAnTotNghiepKs.service.NhanVienService;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin/quan-ly-nhan-vien")
 public class NhanVienController {
 
 
+    private static final Logger log = LoggerFactory.getLogger(NhanVienController.class);
     @Autowired
     private NhanVienRepo nhanVienRepo;
 
     @Autowired
-    private DiaChiNhanVienRepo diaChiNhanVienRepo;
+    private TaiKhoanService taiKhoanService;
+    @Autowired
+    private NhanVienService nhanVienSerVice;
 
-    @ModelAttribute()
-    public void getModel(Model model) {
-        model.addAttribute("list", nhanVienRepo.findAll());
+
+    @GetMapping
+    public String loadEmployee(@RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "5") int size
+            , Model model) {
+
+        Pageable pageable = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"idNhanVien"));
+        Page<NhanVienDTO> nhanVienDTOS = nhanVienSerVice.getAll(pageable);
+        model.addAttribute("nhanViens", nhanVienDTOS.getContent()); // Lấy danh sách nhân viên
+        model.addAttribute("currentPage", page); // Truyền thêm thông tin trang hiện tại
+        model.addAttribute("totalPages", nhanVienDTOS.getTotalPages()); // Tổng số trang
+        model.addAttribute("size", size); // Số mục trên mỗi trang
+        return "list/QuanLyNhanVien/home";
     }
 
-    @GetMapping("quan-ly-nhan-vien")
-    public String loadEmployee(
-            @RequestParam(defaultValue = "", name = "keyword") String keyword,
-            @RequestParam(defaultValue = "0", name = "page") int number,
-            @RequestParam(defaultValue = "true", name = "trangThai") String trangThai,
-            @ModelAttribute NhanVien nhanVien, Model model) {
 
-        // Tạo Pageable để phân trang, 5 là số lượng nhân viên trên mỗi trang
-        Pageable pageable = PageRequest.of(number, 5, Sort.by(Sort.Direction.DESC, "idNhanVien"));
-        Page<NhanVien> page;
 
-        // Kiểm tra xem trạng thái có được cung cấp hay không
-        if (trangThai.isEmpty()) {
-            // Nếu trạng thái không được cung cấp, chỉ lọc theo từ khóa
-            page = nhanVienRepo.findByKeyword(keyword, pageable);
-        } else {
-            // Nếu trạng thái được cung cấp, lọc theo từ khóa và trạng thái
-            boolean status = Boolean.parseBoolean(trangThai);
-            page = nhanVienRepo.findByKeywordAndTrangThai(keyword, status, pageable);
-        }
+    //tìm kiếm contrller
+    @GetMapping("/search")
+    public ResponseEntity<Page<NhanVienDTO>> searchEmployee(
+            @RequestParam(value = "page",defaultValue = "0") int page,
+            @RequestParam(value = "size",defaultValue = "5") int size,
+            @RequestParam(value = "keyword",required = false) String keyword) {
 
-        // Thêm các thuộc tính vào model để gửi về view
-        model.addAttribute("list", page.getContent()); // Danh sách nhân viên trên trang hiện tại
-        model.addAttribute("currentPage", number); // Trang hiện tại
-        model.addAttribute("totalPages", page.getTotalPages()); // Tổng số trang
-        model.addAttribute("keyword", keyword); // Từ khóa hiện tại
-        model.addAttribute("trangThai", trangThai); // Trạng thái hiện tại
+        Pageable pageable = PageRequest.of(page,size);
+        Page<NhanVienDTO> nhanVienDTOS = nhanVienSerVice.searchEmployees(keyword,pageable);
 
-        return "list/QuanLyNhanVien/home"; // Trả về fragment HTML để cập nhật bảng
+        return ResponseEntity.ok(nhanVienDTOS); // Trả về danh sách nhân viên phân trang
     }
 
-    @GetMapping("/delete")
-    public String delee(@RequestParam(value = "idNhanVien")Integer id){
-        DiaChiNhanVien vien = new DiaChiNhanVien();
-        if (vien.getIdDiaChi() != null){
-            diaChiNhanVienRepo.deleteById(vien.getIdDiaChi());
-        }
-        nhanVienRepo.deleteById(id);
-        return "redirect:/admin/quan-ly-nhan-vien";
-    }
+    @GetMapping("/filter")
+    public ResponseEntity<Page<NhanVienDTO>> filterTrangThai(
+            @RequestParam(value = "page",defaultValue = "0") int page,
+            @RequestParam(value = "size",defaultValue = "5") int size,
+            @RequestParam(value = "trangThai",defaultValue = "true") Boolean trangThai){
 
-    @GetMapping("/add")
-    public String viewErrors(Model model){
-        model.addAttribute("nhanVien",new NhanVien());
-        return "nhanVien/home";
-    }
-
-    @PostMapping("/add-employee")
-    public String addEmployee(@Valid @ModelAttribute NhanVien nhanVien, BindingResult errors, RedirectAttributes redirectAttributes) {
-
-        Optional<NhanVien> existingSdt = nhanVienRepo.findBysoDienThoai(nhanVien.getSoDienThoai());
-        if (existingSdt.isPresent()) {
-            errors.rejectValue("soDienThoai", "error.nhanVien", "Số điện thoại đã tồn tại");
-        }
-        Optional<NhanVien> extingEmail = nhanVienRepo.findByemail(nhanVien.getEmail());
-        if (extingEmail.isPresent()){
-            errors.rejectValue("email","error.nhanVien","Email đã tồn tại");
-        }
-
-        Date ngaySinhDate = nhanVien.getNgaySinh();
-
-        if (ngaySinhDate != null) {
-            // Chuyển đổi Date thành LocalDate
-            LocalDate ngaySinh = ngaySinhDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate today = LocalDate.now();
-            Period age = Period.between(ngaySinh, today);
-
-            // Kiểm tra độ tuổi
-            if (age.getYears() < 18) {
-                errors.rejectValue("ngaySinh", "error.nhanVien", "Nhân viên phải đủ 18 tuổi");
-            }
-        } else {
-            // Xử lý khi ngaySinhDate là null
-            errors.rejectValue("ngaySinh", "error.nhanVien", "Ngày sinh không được để trống");
-        }
-
-        if (errors.hasErrors()) {
-            List<String> errorMessages = errors.getAllErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
-            return "redirect:/admin/add"; // Đảm bảo URL này đúng với trang thêm nhân viên của bạn
-        }
-        //ma gen tự động
-        String newNhanVien = generateMaNhanVien();
-        nhanVien.setMaNhanVien(newNhanVien);
-        nhanVienRepo.save(nhanVien);
-        return "redirect:/admin/quan-ly-nhan-vien";
+        Pageable pageable = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"idNhanVien"));
+        Page<NhanVienDTO> nhanVienDTOS = nhanVienSerVice.filterTrangThai(trangThai,pageable);
+        return ResponseEntity.ok(nhanVienDTOS);
     }
 
 
 
 
-    @GetMapping("/viewUpdate-employee")
-    public String viewUpdateEmployee(
-            @ModelAttribute NhanVien nhanVien,
-            @RequestParam(value = "idNhanVien") Integer id, Model model) {
-        nhanVien = nhanVienRepo.findById(id).get();
-        model.addAttribute("nhanVien",nhanVien);
-        return "list/QuanLyNhanVien/update";
+    @PostMapping("/add")
+    public ResponseEntity<?> save(
+            @RequestParam("tenDangNhap") String tenDangNhap,
+            @RequestParam("matKhau") String matKhau,
+            @RequestParam("maNhanVien") String maNhanVien,
+            @RequestParam("hoTen") String hoTen,
+            @RequestParam("soDienThoai") String soDienThoai,
+            @RequestParam("ngaySinh") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngaySinh,
+            @RequestParam("email") String email,
+            @RequestParam("thanhPho") String thanhPho,
+            @RequestParam("quanHuyen") String quanHuyen,
+            @RequestParam("phuongXa") String phuongXa,
+            @RequestParam("img") MultipartFile img,
+            @RequestParam("trangThai") String trangThai,
+            @RequestParam("gioiTinh") String gioiTinh
+    ){
+        try {
 
+            // Kiểm tra điều kiện
+            if (!isValidPhoneNumber(soDienThoai)){
+                return ResponseEntity.badRequest().body(Map.of("error","Số điện thoại phải là số và phải nhiều hơn 10 số."));
+            }
+            if (isPhoneNumberExists(soDienThoai)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Số điện thoại đã tồn tại."));
+            }
+            if (isEmailExists(email)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email đã tồn tại."));
+            }
+            if (!isValidEmail(email)){
+                return ResponseEntity.badRequest().body(Map.of("error","Email không đúng định dạng."));
+            }
+            if (!isMeaningfulEmail(email)){
+                return ResponseEntity.badRequest().body(Map.of("error","email phải có ý nghĩa."));
+            }
+            if (!isOver18(ngaySinh)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Người dùng phải lớn hơn 18 tuổi."));
+            }
+            if (!isOver200(ngaySinh)){
+                return ResponseEntity.badRequest().body(Map.of("error","Người dùng đã không được quá 200 tuổi"));
+            }
+            if (img.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Tệp ảnh không được để trống."));
+            }
+
+            // Tạo đường dẫn thư mục static/images
+            String uploadDir = "src/main/resources/static/img";
+            String fileName = img.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir, fileName);
+
+            // Lưu file ảnh vào hệ thống
+            Files.copy(img.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // Tách họ và tên
+            String[] hoTenParts = hoTen.trim().split(" ");
+            String ho = hoTenParts[0]; // Giả sử họ là phần đầu tiên
+            String ten = hoTenParts[hoTenParts.length - 1]; // Giả sử tên là phần cuối cùng
+
+            // Khởi tạo tên đăng nhập
+            tenDangNhap = genTenDangNhap(ho, ten);
+
+            // Giả sử bạn có một đối tượng Date
+
+            // Chuyển đổi Date thành String năm sinh
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+            String namSinh = sdf.format(ngaySinh);
+            // Tạo mật khẩu ngẫu nhiên
+            matKhau = generatePasswordFromNameAndBirthYear(ten,namSinh);
+
+            TaiKhoanDTO taiKhoanDTO = new TaiKhoanDTO(tenDangNhap,matKhau);
+
+            // Khởi tạo maNhanVien
+            String generateMaNhanVien = generateMaNhanVien();
+
+            // Create NhanVienDTO
+            NhanVienDTO nhanVienDTO = NhanVienDTO.builder()
+                    .maNhanVien(generateMaNhanVien)
+                    .hoTen(hoTen)
+                    .ngaySinh(ngaySinh)
+                    .soDienThoai(soDienThoai)
+                    .email(email)
+                    .thanhPho(thanhPho)
+                    .quanHuyen(quanHuyen)
+                    .phuongXa(phuongXa)
+                    .img("/img/" + fileName)
+                    .trangThai(Boolean.valueOf(trangThai))
+                    .gioiTinh(Boolean.parseBoolean(gioiTinh))
+                    .taiKhoanDTO(taiKhoanDTO)
+                    .build();
+
+            System.out.println("NhanVienDTO: "+ nhanVienDTO.toString());
+            nhanVienSerVice.save(nhanVienDTO);
+
+            // Gửi email khi thêm nhân viên thành công
+            String to = email; // Email của nhân viên
+            String subject = "Thêm nhân viên thành công";
+            String text = "<html>" +
+                    "<body>" +
+                    "<h2>Chúc mừng!</h2>" +
+                    "<p>Nhân viên <strong>" + hoTen + "</strong> đã được nhận vào khách sạn <strong>DRAGONBALL HOTEL</strong>.</p>" +
+                    "<p><strong>Tài khoản:</strong> " + tenDangNhap + "</p>" +
+                    "<p><strong>Mật khẩu:</strong> " + matKhau + "</p>" +
+                    "<p>Chúc bạn có một trải nghiệm tuyệt vời!</p>" +
+                    "<p>Trân trọng,<br>Đội ngũ quản lý khách sạn <strong>DRAGONBALL HOTEL</strong></p>" +
+                    "</body>" +
+                    "</html>";
+            nhanVienSerVice.sendEmail(to, subject, text);
+
+            return ResponseEntity.ok(Map.of("success","Thêm nhân viên thành công!"));
+
+        }catch (Exception e){
+            System.out.println("Lỗi:"+e.getMessage());
+            log.error("Error adding employee",e);
+            return ResponseEntity.badRequest().body(Map.of("error","Đã xảy ra lỗi: ")+e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/update")
+    public ResponseEntity<?> update(
+            @RequestParam("idNhanVien") Integer idNhanVien,
+            @RequestParam("maNhanVien") String maNhanVien,
+            @RequestParam("tenDangNhap") String tenDangNhap,
+            @RequestParam("matKhau") String matKhau,
+            @RequestParam("hoTen") String hoTen,
+            @RequestParam("soDienThoai") String soDienThoai,
+            @RequestParam("ngaySinh") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngaySinh,
+            @RequestParam("email") String email,
+            @RequestParam("thanhPho") String thanhPho,
+            @RequestParam("quanHuyen") String quanHuyen,
+            @RequestParam("phuongXa") String phuongXa,
+            @RequestParam("img") MultipartFile img,
+            @RequestParam("trangThai") Boolean trangThai,
+            @RequestParam("gioiTinh") String gioiTinh
+    ){
+        try {
+
+            // Kiểm tra điều kiện
+            if (!isValidPhoneNumber(soDienThoai)){
+                return ResponseEntity.badRequest().body(Map.of("error","Số điện thoại phải là số và phải nhiều hơn 10 số."));
+            }
+            if (isEmailExistsUpDate(soDienThoai,idNhanVien)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Số điện thoại đã tồn tại."));
+            }
+            if (isEmailExistsUpDate(email,idNhanVien)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email đã tồn tại."));
+            }
+            if (!isValidEmail(email)){
+                return ResponseEntity.badRequest().body(Map.of("error","Email không đúng định dạng."));
+            }
+            if (!isMeaningfulEmail(email)){
+                return ResponseEntity.badRequest().body(Map.of("error","email phải có ý nghĩa."));
+            }
+            if (!isOver18(ngaySinh)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Người dùng phải lớn hơn 18 tuổi."));
+            }
+            if (!isOver200(ngaySinh)){
+                return ResponseEntity.badRequest().body(Map.of("error","Người dùng đã không được quá 200 tuổi"));
+            }
+            if (img.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Tệp ảnh không được để trống."));
+            }
+
+
+            TaiKhoanDTO taiKhoanDTO = new TaiKhoanDTO();
+            taiKhoanDTO.setTenDangNhap(tenDangNhap);
+            taiKhoanDTO.setMatKhau(matKhau);
+            // Khởi tạo maNhanVien
+            maNhanVien = generateMaNhanVien();
+
+            NhanVienDTO nhanVienDTO = new NhanVienDTO();
+            nhanVienDTO.setIdNhanVien(idNhanVien);
+            nhanVienDTO.setMaNhanVien(maNhanVien);
+            nhanVienDTO.setHoTen(hoTen);
+            nhanVienDTO.setNgaySinh(ngaySinh);
+            nhanVienDTO.setSoDienThoai(soDienThoai);
+            nhanVienDTO.setEmail(email);
+            nhanVienDTO.setThanhPho(thanhPho);
+            nhanVienDTO.setQuanHuyen(quanHuyen);
+            nhanVienDTO.setPhuongXa(phuongXa);
+            nhanVienDTO.setTaiKhoanDTO(taiKhoanDTO);
+            nhanVienDTO.setTrangThai(trangThai);
+            nhanVienDTO.setGioiTinh(Boolean.parseBoolean(gioiTinh));
+
+            // Xử lý ảnh
+            if (img != null && !img.isEmpty()) {
+                String uploadDir = "src/main/resources/static/img"; // Hoặc đường dẫn khác
+                String fileName = img.getOriginalFilename();
+                Path filePath = Paths.get(uploadDir, fileName);
+                Files.copy(img.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                nhanVienDTO.setImg("/images/" + fileName); // Cập nhật đường dẫn hình ảnh
+            }
+            System.out.println("Nhân viên:"+nhanVienDTO);
+            nhanVienSerVice.save(nhanVienDTO);
+
+
+            return ResponseEntity.ok(Map.of("success","Sửa nhân viên thành công!"));
+
+        }catch (Exception e) {
+            System.out.println("Lỗi:" + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", "Đã xảy ra lỗi: " + e.getMessage()));
+        }
+
+    }
+
+    //validate
+    private boolean isOver18(Date ngaySinh) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -18);
+        return ngaySinh.before(calendar.getTime());
+    }
+
+    private boolean isOver200(Date ngaySinh){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR,-200);
+        return ngaySinh.after(calendar.getTime());
+    }
+
+    //validate add
+    private boolean isEmailExists(String email) {
+        return nhanVienSerVice.isEmailExists(email); // Phương thức kiểm tra email tồn tại
+    }
+    // Khai báo biểu thức chính quy để kiểm tra định dạng email
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+    public boolean isValidEmail(String email) {
+        // Kiểm tra định dạng email
+        return Pattern.matches(EMAIL_REGEX, email);
+    }
+
+    public boolean isMeaningfulEmail(String email) {
+        // Kiểm tra xem email có đủ ý nghĩa hay không
+        String[] parts = email.split("@");
+        if (parts.length != 2 || parts[0].length() < 3) {
+            return false; // Phần local phải dài hơn 2 ký tự
+        }
+        // Kiểm tra tên miền không hợp lệ
+        String domain = parts[1];
+        if (!domain.contains(".")) {
+            return false; // Tên miền không hợp lệ
+        }
+        // Có thể thêm các kiểm tra khác như kiểm tra từ ngữ không phù hợp
+        return true;
+    }
+
+    private boolean isPhoneNumberExists(String soDienThoai) {
+        return nhanVienSerVice.isPhoneNumberExists(soDienThoai); // Phương thức kiểm tra số điện thoại tồn tại
+    }
+    // Phương thức kiểm tra số điện thoại
+    public boolean isValidPhoneNumber(String phoneNumber) {
+        String PHONE_REGEX = "^\\d+$";
+        return Pattern.matches(PHONE_REGEX, phoneNumber) && phoneNumber.length() >= 10; // Kiểm tra số điện thoại phải có ít nhất 10 ký tự
+    }
+
+    //validate update
+    private boolean isEmailExistsUpDate(String email, Integer idNhanVien) {
+        // Lấy danh sách tất cả nhân viên từ cơ sở dữ liệu
+        List<NhanVienDTO> existingEmployees = nhanVienSerVice.findAll(); // Giả sử bạn có phương thức này
+
+        // Kiểm tra nếu email đã tồn tại, ngoại trừ email của nhân viên hiện tại
+        return existingEmployees.stream()
+                .anyMatch(employee -> employee.getEmail().equals(email) && !employee.getIdNhanVien().equals(idNhanVien));
+    }
+
+    private boolean isPhoneExistsUpDate(String soDienThoai, Integer idNhanVien) {
+        // Lấy danh sách tất cả nhân viên từ cơ sở dữ liệu
+        List<NhanVienDTO> existingEmployees = nhanVienSerVice.findAll(); // Giả sử bạn có phương thức này
+
+        // Kiểm tra nếu email đã tồn tại, ngoại trừ email của nhân viên hiện tại
+        return existingEmployees.stream()
+                .anyMatch(employee -> employee.getSoDienThoai().equals(soDienThoai) && !employee.getIdNhanVien().equals(idNhanVien));
     }
 
 
 
-
-    @PostMapping("/update-employee")
-    public String update(@Valid @ModelAttribute("nhanVien") NhanVien nhanVien, BindingResult errors, Model model) {
-
-        Optional<NhanVien> existingNhanVien = nhanVienRepo.findById(nhanVien.getIdNhanVien());
-
-        Date ngaySinhDate = nhanVien.getNgaySinh();
-
-        if (ngaySinhDate != null) {
-            // Chuyển đổi Date thành LocalDate
-            LocalDate ngaySinh = ngaySinhDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate today = LocalDate.now();
-            Period age = Period.between(ngaySinh, today);
-
-            // Kiểm tra độ tuổi
-            if (age.getYears() < 18) {
-                errors.rejectValue("ngaySinh", "error.nhanVien", "Nhân viên phải đủ 18 tuổi");
-            }
-        } else {
-            // Xử lý khi ngaySinhDate là null
-            errors.rejectValue("ngaySinh", "error.nhanVien", "Ngày sinh không được để trống");
-        }
-        if (existingNhanVien.isPresent()) {
-            NhanVien existing = existingNhanVien.get();
-
-            // Kiểm tra nếu maNhanVien thay đổi
-            if (!existing.getMaNhanVien().equals(nhanVien.getMaNhanVien())) {
-                Optional<NhanVien> existingMa = nhanVienRepo.findBymaNhanVien(nhanVien.getMaNhanVien());
-                if (existingMa.isPresent()) {
-                    errors.rejectValue("maNhanVien", "error.nhanVien", "Mã nhân viên đã tồn tại");
-                }
-            }
-
-            // Kiểm tra nếu soDienThoai thay đổi
-            if (!existing.getSoDienThoai().equals(nhanVien.getSoDienThoai())) {
-                Optional<NhanVien> existingSdt = nhanVienRepo.findBysoDienThoai(nhanVien.getSoDienThoai());
-                if (existingSdt.isPresent()) {
-                    errors.rejectValue("soDienThoai", "error.nhanVien", "Số điện thoại đã tồn tại");
-                }
-            }
-
-
-            if (errors.hasErrors()) {
-                model.addAttribute("nhanVien", nhanVien);
-                return "list/QuanLyNhanVien/update";
-            }
-
-            // Cập nhật thông tin nhân viên
-            existing.setMaNhanVien(nhanVien.getMaNhanVien());
-            existing.setHoTen(nhanVien.getHoTen());
-            existing.setSoDienThoai(nhanVien.getSoDienThoai());
-            existing.setNgaySinh(nhanVien.getNgaySinh());
-            existing.setLiDo(nhanVien.getLiDo());
-            existing.setTrangThai(nhanVien.getTrangThai());
-            existing.setGioiTinh(nhanVien.getGioiTinh());
-            existing.setThanhPho(nhanVien.getThanhPho());
-            existing.setPhuongXa(nhanVien.getPhuongXa());
-            existing.setQuanHuyen(nhanVien.getQuanHuyen());
-            // Thêm các trường khác nếu cần
-
-            nhanVienRepo.save(existing);
-            return "redirect:/admin/quan-ly-nhan-vien";
-        } else {
-            errors.reject("error.nhanVien", "Nhân viên không tồn tại");
-            model.addAttribute("nhanVien", nhanVien);
-            return "list/QuanLyNhanVien/home";
-        }
-    }
-
-
-    @PostMapping("/save-employee")
-    public String saveEmployee(@Valid @ModelAttribute NhanVien nhanVien, BindingResult errors,
-                               @RequestParam String action,
-                               @RequestParam(defaultValue = "0", name = "page") int number, Model model) {
-
-        //phân trang
-        Pageable pageable = PageRequest.of(number, 5, Sort.by(Sort.Direction.DESC, "idNhanVien"));
-        Page<NhanVien> page = nhanVienRepo.findAll(pageable);
-
-        //validate ngày sinh phải lớn hơn 18 tuổi
-        Date ngaySinhDate = nhanVien.getNgaySinh();
-
-        if (ngaySinhDate != null) {
-            // Chuyển đổi Date thành LocalDate
-            LocalDate ngaySinh = ngaySinhDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate today = LocalDate.now();
-            Period age = Period.between(ngaySinh, today);
-
-            // Kiểm tra độ tuổi
-            if (age.getYears() < 18) {
-                errors.rejectValue("ngaySinh", "error.nhanVien", "Nhân viên phải đủ 18 tuổi");
-            }
-        } else {
-            // Xử lý khi ngaySinhDate là null
-            errors.rejectValue("ngaySinh", "error.nhanVien", "Ngày sinh không được để trống");
-        }
-
-
-        // Các kiểm tra và xử lý khác...
-
-        boolean isUpdate = "update".equals(action) && nhanVien.getIdNhanVien() != null
-                && nhanVienRepo.existsById(nhanVien.getIdNhanVien());
-
-        if (isUpdate) {
-            // Update operation
-            Optional<NhanVien> existingNhanVien = nhanVienRepo.findById(nhanVien.getIdNhanVien());
-
-            if (existingNhanVien.isPresent()) {
-                NhanVien existing = existingNhanVien.get();
-
-                // Check if maNhanVien is changing and if it already exists
-                if (!existing.getMaNhanVien().equals(nhanVien.getMaNhanVien())) {
-                    Optional<NhanVien> existingMa = nhanVienRepo.findBymaNhanVien(nhanVien.getMaNhanVien());
-                    if (existingMa.isPresent()) {
-                        errors.rejectValue("maNhanVien", "error.nhanVien", "Mã nhân viên đã tồn tại");
-                    }
-                }
-
-                // Check if soDienThoai is changing and if it already exists
-                if (!existing.getSoDienThoai().equals(nhanVien.getSoDienThoai())) {
-                    Optional<NhanVien> existingSdt = nhanVienRepo.findBysoDienThoai(nhanVien.getSoDienThoai());
-                    if (existingSdt.isPresent()) {
-                        errors.rejectValue("soDienThoai", "error.nhanVien", "Số điện thoại đã tồn tại");
-                    }
-                }
-
-                if (errors.hasErrors()) {
-                    model.addAttribute("nhanVien", nhanVien);
-                    model.addAttribute("listDiaChi", diaChiNhanVienRepo.findAll()); // Add this to populate dropdown
-                    return "list/QuanLyNhanVien/home";
-                }
-
-                // Update existing employee
-                existing.setMaNhanVien(nhanVien.getMaNhanVien());
-                existing.setHoTen(nhanVien.getHoTen());
-                existing.setSoDienThoai(nhanVien.getSoDienThoai());
-                existing.setNgaySinh(nhanVien.getNgaySinh());
-                existing.setEmail(nhanVien.getEmail());
-
-                existing.setTrangThai(nhanVien.getTrangThai());
-                existing.setGioiTinh(nhanVien.getGioiTinh());
-
-                nhanVienRepo.save(existing);
-            } else {
-                errors.reject("error.nhanVien", "Nhân viên không tồn tại");
-                model.addAttribute("nhanVien", nhanVien);
-                model.addAttribute("list", page.getContent()); // Danh sách nhân viên trên trang hiện tại
-                model.addAttribute("listDiaChi", diaChiNhanVienRepo.findAll());
-                model.addAttribute("currentPage", number); // Trang hiện tại
-                model.addAttribute("totalPages", page.getTotalPages()); // Tổng số trang
-                return "list/QuanLyNhanVien/home";
-            }
-        } else {
-            // Add operation
-            //Gen tự động mà nhân viên
-            if (nhanVien.getIdNhanVien() == null) {
-                String newMaNhanVien = generateMaNhanVien();
-                nhanVien.setMaNhanVien(newMaNhanVien);
-            }
-            Optional<NhanVien> existingMa = nhanVienRepo.findBymaNhanVien(nhanVien.getMaNhanVien());
-            if (existingMa.isPresent()) {
-                errors.rejectValue("maNhanVien", "error.nhanVien", "Mã nhân viên đã tồn tại");
-            }
-            Optional<NhanVien> existingSdt = nhanVienRepo.findBysoDienThoai(nhanVien.getSoDienThoai());
-            if (existingSdt.isPresent()) {
-                errors.rejectValue("soDienThoai", "error.nhanVien", "Số điện thoại đã tồn tại");
-            }
-            if (errors.hasErrors()) {
-                model.addAttribute("nhanVien", nhanVien);
-                model.addAttribute("list", page.getContent()); // Danh sách nhân viên trên trang hiện tại
-                model.addAttribute("listDiaChi", diaChiNhanVienRepo.findAll());
-                model.addAttribute("currentPage", number); // Trang hiện tại
-                model.addAttribute("totalPages", page.getTotalPages()); // Tổng số trang
-                return "list/QuanLyNhanVien/home";
-            }
-            nhanVienRepo.save(nhanVien);
-        }
-        return "redirect:/admin/quan-ly-nhan-vien";
-    }
 
     //hàm mã tự gen
     private String generateMaNhanVien() {
@@ -336,5 +383,37 @@ public class NhanVienController {
         int nextId = lastNhanVien != null ? (int) (lastNhanVien.getIdNhanVien() + 1) : 1;
         return prefix + String.format("%03d", nextId);
     }
+
+    private String genTenDangNhap(String ho, String ten) {
+        // Xử lý để loại bỏ dấu
+        String hoKhongDau = removeAccents(ho);
+        String tenKhongDau = removeAccents(ten);
+        NhanVien lastNhanVien = nhanVienRepo.findTopByOrderByIdNhanVienDesc();
+        int nextId = lastNhanVien != null ? (int) (lastNhanVien.getIdNhanVien() + 1) : 1;
+        // Tạo tên đăng nhập theo định dạng: "tên cuối cùng (không dấu) + họ (không dấu) + ID nhân viên"
+        String tenDangNhap = tenKhongDau + hoKhongDau +  String.format("%03d", nextId);
+
+        return tenDangNhap.toLowerCase(); // Chuyển thành chữ thường
+    }
+
+
+    // Hàm removeAccents để loại bỏ dấu
+    private String removeAccents(String input) {
+        return Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("[^\\p{ASCII}]", "");
+    }
+    //gen mk
+    private String generatePasswordFromNameAndBirthYear(String ten, String namSinh) {
+        // Loại bỏ dấu (nếu cần)
+        String tenKhongDau = removeAccents(ten);
+
+        // Tạo mật khẩu theo định dạng: "tên (không dấu) + năm sinh"
+        String matKhau = tenKhongDau + namSinh;
+
+        return matKhau.toLowerCase(); // Chuyển thành chữ thường
+    }
+
+
 
 }
