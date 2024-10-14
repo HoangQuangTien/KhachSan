@@ -1,7 +1,9 @@
 package com.example.DuAnTotNghiepKs.controller;
 
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
 import com.example.DuAnTotNghiepKs.service.KhuyenMaiService;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +29,8 @@ public class KhuyenMaiController {
 
 //    @Autowired
 //    private KhuyenMaiRepo khuyenMaiRepo;
+    @Autowired
+    private TaiKhoanService taiKhoanService;
 
     @GetMapping()
     public String showKhuyenMaiPage(
@@ -37,6 +41,11 @@ public class KhuyenMaiController {
         Sort sort = Sort.by(Sort.Direction.DESC, "ngayKetThuc");
         Page<KhuyenMai> khuyenMaiPage = khuyenMaiService.getKhuyenMaiPage(page, size,sort);
         model.addAttribute("khuyenMaiPage", khuyenMaiPage);
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
         return "list/QuanLyKhuyenMai/KhuyenMai";
     }
 

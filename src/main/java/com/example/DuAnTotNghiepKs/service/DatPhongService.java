@@ -67,4 +67,5 @@ public interface DatPhongService {
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();
+
 }

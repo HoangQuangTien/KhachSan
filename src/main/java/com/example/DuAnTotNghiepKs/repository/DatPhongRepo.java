@@ -121,4 +121,8 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "OR LOWER(d.phong.maPhong) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<DatPhong> findByKeyword(@Param("keyword") String keyword);
 
+
+
+
+
 }

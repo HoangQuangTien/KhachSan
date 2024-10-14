@@ -49,7 +49,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
     public UserDetailsService userDetailsService(TaiKhoanService taiKhoanService) {
         return tenDangNhap -> {
@@ -75,10 +74,10 @@ public class SecurityConfig {
                     .roles(roleNames)  // Sử dụng mảng roleNames
                     .build();
 
-
             return userDetails;
         };
     }
+
 
 
 
