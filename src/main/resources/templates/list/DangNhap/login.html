@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
+    <!-- Thêm SweetAlert từ CDN vào phần <head> của file HTML -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <style>
+        /* Reset margin và padding cho tất cả các phần tử */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Căn giữa toàn bộ trang */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Chiều cao toàn bộ viewport */
+            background-color: #f8f9fa; /* Màu nền sáng */
+            font-family: Arial, sans-serif; /* Font chữ */
+        }
+
+        /* Thêm kiểu cho tiêu đề */
+        h1 {
+            margin-bottom: 20px; /* Khoảng cách dưới tiêu đề */
+            color: #333; /* Màu chữ */
+            text-align: center; /* Căn giữa tiêu đề */
+        }
+
+        /* Thêm kiểu cho thông báo lỗi và thông báo thoát */
+        .alert {
+            margin-bottom: 20px; /* Khoảng cách dưới thông báo */
+            padding: 10px; /* Padding cho thông báo */
+            border-radius: 5px; /* Bo tròn góc cho thông báo */
+        }
+
+        /* Căn chỉnh kiểu cho form */
+        form {
+            background: #fff; /* Màu nền trắng cho form */
+            padding: 20px; /* Padding cho form */
+            border-radius: 5px; /* Bo tròn góc cho form */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho form */
+            width: 300px; /* Chiều rộng cố định cho form */
+        }
+
+        /* Thêm kiểu cho các ô input */
+        input[type="text"],
+        input[type="password"] {
+            width: 100%; /* Chiều rộng 100% cho ô input */
+            padding: 10px; /* Padding cho ô input */
+            border: 1px solid #ced4da; /* Đường viền cho ô input */
+            border-radius: 5px; /* Bo tròn góc cho ô input */
+            margin-bottom: 15px; /* Khoảng cách dưới ô input */
+        }
+
+        /* Thêm kiểu cho nút đăng nhập */
+        input[type="submit"] {
+            background-color: #007bff; /* Màu nền cho nút */
+            color: white; /* Màu chữ cho nút */
+            border: none; /* Không có đường viền cho nút */
+            border-radius: 5px; /* Bo tròn góc cho nút */
+            padding: 10px; /* Padding cho nút */
+            cursor: pointer; /* Con trỏ chuột khi hover */
+            transition: background-color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+        }
+
+        /* Thay đổi màu nền của nút khi hover */
+        input[type="submit"]:hover {
+            background-color: #0056b3; /* Màu nền khi hover */
+        }
+
+    </style>
+    <title>Login</title>
+</head>
+
+<body>
+<h1>Vui lòng đăng nhập để sử dụng hệ thống!</h1>
+<div id="errorMessage" class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}" style="display:block;"></div>
+<div id="successMessage" class="alert alert-info" style="display:none;"></div>
+<div th:if="${param.logout}" class="alert alert-info">
+    Bạn đã đăng xuất.
+</div>
+<form id="idForm">
+    <div class="mb-3">
+        <input type="text" name="tenDangNhap" class="form-control" placeholder="Tên đăng nhập" required />
+    </div>
+    <div class="mb-3">
+        <input type="password" name="matKhau" class="form-control" placeholder="Mật khẩu" required />
+    </div>
+    <input type="submit" class="btn btn-primary" value="Đăng nhập" />
+</form>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('idForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Ngăn chặn gửi form mặc định
+        const submitButton = this.querySelector('input[type="submit"]');
+        submitButton.disabled = true; // Vô hiệu hóa nút submit
+
+        // Thay vì sử dụng FormData, chúng ta sử dụng URLSearchParams
+        const formData = new URLSearchParams(new FormData(this));
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded', // Định dạng URL-encoded
+            },
+            body: formData.toString() // Chuyển đổi thành chuỗi URL-encoded
+        })
+            .then(response => {
+                submitButton.disabled = false; // Kích hoạt lại nút submit
+                if (response.ok) {
+                    // Nếu đăng nhập thành công, chuyển hướng đến trang chính
+                    window.location.href = '/trang-chu'; // Thay đổi thành trang mà bạn muốn chuyển hướng
+                } else {
+                    // Nếu có lỗi trong quá trình đăng nhập
+                    return response.text().then(text => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: text,
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Có lỗi xảy ra',
+                    text: 'Vui lòng thử lại sau.',
+                });
+                submitButton.disabled = false; // Kích hoạt lại nút submit
+            });
+    });
+
+</script>
+
+
+</body>
+</html>

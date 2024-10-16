@@ -30,6 +30,7 @@ public class ThanhToanDTO {
     private LocalDateTime ngayCheckIn;
     private Float tienCoc;
     private Float tongTien;
+    private DatPhongDTO datPhongDTO;
 
     private Integer idKhachHang;
     private String hoVaTen;
@@ -41,5 +42,7 @@ public class ThanhToanDTO {
     private String tenPhong;
 
     private boolean inHoaDon;
+
+    private NhanVienDTO nhanVienDTO;
 
 }

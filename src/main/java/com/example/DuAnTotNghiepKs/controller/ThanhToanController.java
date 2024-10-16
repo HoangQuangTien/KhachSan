@@ -1,11 +1,11 @@
 package com.example.DuAnTotNghiepKs.controller;
 
+import com.example.DuAnTotNghiepKs.DTO.DatPhongDTO;
+import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.DTO.ThanhToanDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
-import com.example.DuAnTotNghiepKs.service.DatPhongService;
-import com.example.DuAnTotNghiepKs.service.PhongService;
-import com.example.DuAnTotNghiepKs.service.PhuPhiService;
-import com.example.DuAnTotNghiepKs.service.ThanhToanService;
+import com.example.DuAnTotNghiepKs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +35,9 @@ public class ThanhToanController {
     @Autowired
     private PhongService phongService;
 
+    @Autowired
+    private TaiKhoanService taiKhoanService;
+
 
     @GetMapping
     public String loadAll(
@@ -49,6 +52,12 @@ public class ThanhToanController {
 
 //        // Thêm dữ liệu vào model
 //        model.addAttribute("phuPhis", phuPhiPage.getContent());
+        //lấy id nhân viên
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
         model.addAttribute("datPhongs", datPhongPage.getContent());
 
         // Thêm thông tin phân trang
@@ -61,9 +70,9 @@ public class ThanhToanController {
 
 
     @PostMapping("/add")
-    public String save(@ModelAttribute ThanhToanDTO thanhToanDTO, RedirectAttributes redirectAttributes) {
+    public String save(@ModelAttribute ThanhToanDTO thanhToanDTO, RedirectAttributes redirectAttributes,Model model) {
         try {
-            // Lưu thông tin thanh toán
+
             thanhToanService.save(thanhToanDTO);
 
             // Lấy thời gian cho phép chuyển trạng thái

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lịch Làm Việc Nhân Viên</title>
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css' rel='stylesheet' />
+<head th:include="fragment/head :: head">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 0;
+            color: #495057;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 30px;
+        }
+        #calendar {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .fc-toolbar {
+            background: #007bff;
+            color: #ffffff;
+            border-radius: 8px 8px 0 0;
+            padding: 10px;
+        }
+        .fc-toolbar-title {
+            color: #ffffff;
+            font-size: 18px;
+        }
+        .fc-button-primary {
+            background-color: #0056b3;
+            border: none;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .fc-button-primary:hover {
+            background-color: #004085;
+        }
+        .fc-daygrid-day-number {
+            color: #343a40;
+        }
+        .fc-daygrid-day-top {
+            padding: 5px;
+        }
+        .fc-daygrid-day-bottom {
+            padding: 5px;
+        }
+
+        /* Màu sắc của sự kiện */
+        .fc-event.booked {
+            background-color: #007bff; /* Màu xanh dương cho sự kiện đã đặt */
+        }
+        .fc-event.checked-in {
+            background-color: #fd7e14; /* Màu cam cho sự kiện đang ở */
+        }
+
+    </style>
+</head>
+<body class="vertical light">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <div class="container-fluid py-4">
+            <h2 class="text-center mb-4">Lịch Làm Việc Nhân Viên</h2>
+            <div class="d-flex justify-content-end align-items-center mb-4">
+                <div class="d-flex align-items-center me-3">
+                    <div class="btn" style="background-color: #007bff; width: 20px; height: 20px; border-radius: 3px;"></div>
+                    <span class="ms-2"><strong>Ca sáng</strong></span>
+                </div>
+                <div class="d-flex align-items-center me-3">
+                    <div class="btn" style="background-color: #fd7e14; width: 20px; height: 20px; border-radius: 3px;"></div>
+                    <span class="ms-2"><strong>Ca chiều</strong></span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="btn" style="background-color: #a71d2a; width: 20px; height: 20px; border-radius: 3px;"></div>
+                    <span class="ms-2"><strong>Ca đêm</strong></span>
+                </div>
+            </div>
+
+            <div id="calendar">
+
+            </div>
+        </div>
+
+    </main>
+    <div th:include="fragment/modal :: modal"></div>
+</div>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/locales/vi.min.js'></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'vi',
+            initialView: 'dayGridMonth',
+            events: function(fetchInfo, successCallback, failureCallback) {
+                fetch('/admin/quan-ly-lich-lam-viec/load')
+                    .then(response => response.json())
+                    .then(events => {
+                        var formattedEvents = events.map(event => ({
+                            id: event.id,
+                            title: event.hoTen,
+                            start: event.ngay,
+                            backgroundColor: event.caLamViec === 'Sáng' ? '#007bff' :
+                                event.caLamViec === 'Chiều' ? '#fd7e14' : '#a71d2a',
+                            extendedProps: {
+                                maLichLamViec: event.maLichLamViec,
+                                caLamViec: event.caLamViec,
+                                status: event.status
+                            }
+                        }));
+                        successCallback(formattedEvents);
+                    })
+                    .catch(error => {
+                        console.error('Có lỗi xảy ra khi tải lịch làm việc:', error);
+                        failureCallback(error);
+                    });
+            },
+            eventClick: function(info) {
+                var ngayLamViec = new Date(info.event.startStr);
+                var caLamViec = info.event.extendedProps.caLamViec;
+                Swal.fire({
+                    title: 'Thông tin lịch làm việc',
+                    html: `<strong>Mã Lịch:</strong> ${info.event.extendedProps.maLichLamViec}<br>
+                           <strong>Nhân viên:</strong> ${info.event.title}<br>
+                           <strong>Ngày làm việc:</strong> ${ngayLamViec.toLocaleString()}<br>
+                           <strong>Ca làm việc:</strong> ${caLamViec}`,
+                    icon: 'info',
+                    confirmButtonText: 'Đóng'
+                });
+            }
+        });
+
+        calendar.render();
+    });
+
+
+</script>
+
+</body>
+<script th:include="fragment/script :: script"></script>
+</html>

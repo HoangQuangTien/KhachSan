@@ -22,6 +22,7 @@ public class ThanhToan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer idThanhToan;
+
     @Column(name = "ma_thanh_toan")
     private String maThanhToan;
 
@@ -39,5 +40,9 @@ public class ThanhToan {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_dat_phong", referencedColumnName = "id_dat_phong")
     private DatPhong datPhong;
+
+    @ManyToOne
+    @JoinColumn(name = "id_nhan_vien",referencedColumnName = "id_nhan_vien")
+    private NhanVien nhanVien;
 
 }

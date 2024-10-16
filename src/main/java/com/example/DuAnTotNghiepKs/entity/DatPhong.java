@@ -77,6 +77,9 @@ public class DatPhong {
     @OneToMany(mappedBy = "datPhong", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ThanhToan> thanhToans = new HashSet<>();
 
+    @ManyToOne
+    @JoinColumn(name = "id_nhan_vien")
+    private NhanVien nhanVienCheckIn;
 
 
 //    @OneToMany(mappedBy = "datPhong",cascade = CascadeType.ALL,orphanRemoval = true)

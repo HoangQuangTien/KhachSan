@@ -119,7 +119,20 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="datPhong : ${datPhongs}" th:if="${datPhong.tinhTrang == 'Đã Checkin'}" th:data-id-dat-phong="${datPhong.idDatPhong}" th:data-id-phong="${datPhong.phong.idPhong}" th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}" th:data-hovaten="${datPhong.khachHang.hoVaTen}" th:data-sodienthoai="${datPhong.khachHang.soDienThoai}" th:data-tenphong="${datPhong.phong.tenPhong}" th:data-thoigian="${datPhong.ngayNhan} + ' - ' + ${datPhong.ngayTra}" th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}" th:data-giaphong="${datPhong.phong.gia}" th:data-tiencoc="${datPhong.tienCoc}" th:data-tienconlai="${datPhong.tienConLai}" onclick="showForm(this.getAttribute('data-id-dat-phong'),
+                    <tr th:each="datPhong : ${datPhongs}"
+                        th:if="${datPhong.tinhTrang == 'Đã Checkin'}"
+                        th:data-id-dat-phong="${datPhong.idDatPhong}"
+                        th:data-id-phong="${datPhong.phong.idPhong}"
+                        th:data-id-loai-phong="${datPhong.loaiPhong.idLoaiPhong}"
+                        th:data-hovaten="${datPhong.khachHang.hoVaTen}"
+                        th:data-sodienthoai="${datPhong.khachHang.soDienThoai}"
+                        th:data-tenphong="${datPhong.phong.tenPhong}"
+                        th:data-thoigian="${datPhong.ngayNhan} + ' - ' + ${datPhong.ngayTra}"
+                        th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}"
+                        th:data-giaphong="${datPhong.phong.gia}"
+                        th:data-tiencoc="${datPhong.tienCoc}"
+                        th:data-tienconlai="${datPhong.tienConLai}"
+                        onclick="showForm(this.getAttribute('data-id-dat-phong'),
                                         this.getAttribute('data-id-phong'),
                                         this.getAttribute('data-id-loai-phong'),
                                         this.getAttribute('data-hovaten'),
