@@ -21,13 +21,15 @@ public class LoaiPhongDTO {
     private Integer soLuongGiuong;
     private Integer soNguoiToiDa;
     private Float gia;
+    private Integer sucChua;
     private Float tenDienTich;
     private String tenTang;
 
 
-    public LoaiPhongDTO(Integer idLoaiPhong, String maLoaiPhong, String tenLoaiPhong, String moTa, Integer soLuongGiuong, Integer soNguoiToiDa, Float gia, DienTich dienTich, Tang tang) {
-    }
+   
 
     private List<PhongDTO> availableRooms;
 
+    public LoaiPhongDTO(Integer idLoaiPhong, String maLoaiPhong, String tenLoaiPhong, String moTa, Integer soLuongGiuong, Integer soNguoiToiDa, Float gia, DienTich dienTich, Integer sucChua, Tang tang) {
+    }
 }

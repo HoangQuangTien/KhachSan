@@ -320,7 +320,7 @@
                                     <!-- Tình Trạng -->
                                     <p class="card-text"><strong>Tình Trạng: </strong><span th:text="${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></span></p>
                                     <!-- Thao Tác -->
-                                    <a th:href="@{/phongs/edit/{id}(id=${phong.idPhong})}" class="btn btn-outline-warning btn-sm">
+                                    <a th:href="@{/edit(id=${phong.idPhong})}" class="btn btn-outline-warning btn-sm">
                                         <i class='fas fa-pen-alt'></i> Sửa
                                     </a>
                                 </div>
@@ -359,7 +359,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="/phongs/save" id="addForm" method="post">
+                        <form action="/save" id="addForm" method="post">
                             <input type="hidden" id="idPhong" name="idPhong" th:value="${phong.idPhong}" />
 
                             <!-- Mã Phòng và Tên Phòng -->

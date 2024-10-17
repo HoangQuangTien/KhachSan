@@ -46,5 +46,10 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
     Optional<Phong> findByTenPhong(String tenPhong);
 
 
+    @Query("SELECT COUNT(p) FROM Phong p WHERE p.loaiPhong.idLoaiPhong = :idLoaiPhong")
+    int countByLoaiPhongId(@Param("idLoaiPhong") Integer idLoaiPhong);
+
+
+
 }
 

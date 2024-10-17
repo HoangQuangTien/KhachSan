@@ -47,6 +47,9 @@ public class LoaiPhong {
     @Column(name = "gia")
     private Float gia;
 
+    @Column(name = "suc_chua")
+    private Integer sucChua;
+
     @OneToMany(mappedBy = "loaiPhong", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Phong> phongs = new HashSet<>();
 

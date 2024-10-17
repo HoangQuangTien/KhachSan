@@ -116,6 +116,7 @@ public class LoaiPhongController {
                 loaiPhong.getSoNguoiToiDa(),
                 loaiPhong.getGia(),
                 loaiPhong.getDienTich(),
+                loaiPhong.getSucChua(),
                 loaiPhong.getTang()
         );
     }

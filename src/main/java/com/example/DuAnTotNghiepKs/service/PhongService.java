@@ -186,5 +186,10 @@ public class PhongService {
             return "Không tìm thấy phòng với ID: " + roomId; // Trả về thông báo nếu không tìm thấy
         }
     }
+
+
+    public int countByLoaiPhongId(Integer idLoaiPhong) {
+        return phongRepository.countByLoaiPhongId(idLoaiPhong);
+    }
 }
 

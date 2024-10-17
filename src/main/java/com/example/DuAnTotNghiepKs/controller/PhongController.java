@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/phongs")
+@RequestMapping
 public class PhongController {
     @Autowired
     private PhongService phongService;
@@ -50,7 +50,7 @@ public class PhongController {
 
 
 
-    @GetMapping
+    @GetMapping("phongs")
     public String listPhong(@RequestParam(defaultValue = "0") int page,
                             @RequestParam(required = false) Integer loaiPhongId,
                             @RequestParam(required = false) Boolean tinhTrang,
@@ -141,8 +141,19 @@ public class PhongController {
             }
 
             phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
-//            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
-//            phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
+            // Lấy loại phòng từ cơ sở dữ liệu
+            LoaiPhong loaiPhong = loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null);
+
+            if (loaiPhong != null) {
+                // Lấy số lượng phòng hiện có thuộc loại phòng này
+                int soLuongPhongHienTai = phongService.countByLoaiPhongId(loaiPhong.getIdLoaiPhong());
+
+                // Kiểm tra nếu số lượng phòng hiện tại đã đạt đến sức chứa
+                if (soLuongPhongHienTai >= loaiPhong.getSucChua()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể thêm phòng. Số lượng phòng đã đạt đến sức chứa của loại phòng này.");
+                    return "redirect:/phongs"; // Thay đổi đường dẫn đến trang cần thiết
+                }
+            }
 
             phongService.savePhong(phong);
             redirectAttributes.addFlashAttribute("successMessage", "Thêm phòng thành công!");
@@ -150,17 +161,17 @@ public class PhongController {
             // Xử lý cập nhật
             if (phong.getIdPhong() != null) {
 
-                // Kiểm tra trạng thái của phòng
-                if (phong.getTrangThai() != null && !phong.getTrangThai()) { // Trạng thái phòng không phải là "Còn phòng"
-                    redirectAttributes.addFlashAttribute("errorMessage", "Chỉ được sửa tình trạng phòng khi phòng đó có trạng thái 'Còn phòng'!");
-                    return "redirect:/phongs";
-                }
-
-                // Kiểm tra tình trạng phòng
-                if (phong.getTinhTrang() != null && phong.getTinhTrang()) { // Phòng có người đang ở
-                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa vì phòng đang có người đang ở!");
-                    return "redirect:/phongs";
-                }
+//                // Kiểm tra trạng thái của phòng
+//                if (phong.getTrangThai() != null && !phong.getTrangThai()) { // Trạng thái phòng không phải là "Còn phòng"
+//                    redirectAttributes.addFlashAttribute("errorMessage", "Chỉ được sửa tình trạng phòng khi phòng đó có trạng thái 'Còn phòng'!");
+//                    return "redirect:/phongs";
+//                }
+//
+//                // Kiểm tra tình trạng phòng
+//                if (phong.getTinhTrang() != null && phong.getTinhTrang()) { // Phòng có người đang ở
+//                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa vì phòng đang có người đang ở!");
+//                    return "redirect:/phongs";
+//                }
 
                 phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
 //            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
@@ -181,8 +192,8 @@ public class PhongController {
     }
 
 
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable("id") Integer id, Model model) {
+    @GetMapping("/edit")
+    public String showEditForm(@RequestParam("id") Integer id, Model model) {
         Phong phong = phongService.findById(id);
         model.addAttribute("phong", phong);
         model.addAttribute("loaiPhongs", loaiPhongService.getAllLoaiPhongs());
@@ -190,6 +201,7 @@ public class PhongController {
         model.addAttribute("dienTichs", dienTichService.getAllDienTichPhongs());
         return "list/QuanLyPhong/edit-phong";
     }
+
 
     @PostMapping("/update")
     public String updatePhong(@ModelAttribute("phong") Phong phong) {
