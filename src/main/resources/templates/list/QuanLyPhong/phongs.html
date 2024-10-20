@@ -1,614 +1,1465 @@
 <!DOCTYPE html>
-<html lang="en">
-<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
 
-<head >
+<html lang="en">
+
+<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
+
+
+
+<head>
+
     <style>
+
         body {
+
             padding: 15px;
+
             font-family: Arial, sans-serif;
+
         }
+
+
 
         .form-control, .form-check-input {
+
             font-size: 0.75rem;
+
             padding: 0.25rem;
+
         }
+
+
+
         .form-row .form-group {
+
             margin-bottom: 0.5rem;
+
         }
+
+
+
         .form-row .form-group label {
+
             font-size: 0.75rem;
+
             margin-bottom: 0.25rem;
+
         }
+
+
+
         .form-row .form-group input, .form-row .form-group select {
+
             font-size: 0.75rem;
+
             padding: 0.25rem;
+
         }
+
+
+
         .table th {
+
             background-color: #007bff;
+
             color: white;
+
             font-size: 0.75rem;
+
         }
+
+
+
         .table td, .table th {
+
             vertical-align: middle;
+
             font-size: 0.75rem;
+
         }
+
+
+
         .pagination {
+
             justify-content: center;
+
             font-size: 0.75rem;
+
         }
+
+
+
         .btn-primary {
+
             background-color: #007bff;
+
             border-color: #007bff;
+
             font-size: 0.75rem;
+
             padding: 0.25rem 0.5rem;
+
         }
+
+
+
         .btn-primary:hover {
+
             background-color: #0056b3;
+
             border-color: #004085;
+
         }
+
+
+
         .pagination .page-item.active .page-link {
+
             background-color: #007bff;
+
             border-color: #007bff;
+
         }
+
+
+
         .pagination .page-link {
+
             border-radius: 0.25rem;
+
             padding: 0.25rem 0.5rem;
+
         }
+
+
+
         .alert-info {
+
             font-size: 0.875rem;
+
             border-radius: 0.25rem;
+
         }
+
+
+
         .alert .font-weight-bold {
+
             font-size: 1.125rem;
+
         }
+
+
 
         .alert {
+
             border: 1px solid red;
+
             background-color: #f8d7da;
+
             color: #721c24;
+
             padding: 10px;
+
             margin-top: 10px;
+
             border-radius: 5px;
+
         }
+
+
 
         /* Custom Card Style */
+
         .custom-card {
+
             border: none;
+
             border-radius: 10px;
+
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
             background-color: #ffffff;
+
         }
+
+
 
         /* Toolbar Style */
+
         .toolbar {
+
             display: flex;
+
             justify-content: space-between;
+
             align-items: center;
+
         }
+
+
 
         /* Form Inline Style */
+
         .form-inline {
+
             display: flex;
+
             gap: 15px;
+
         }
+
+
 
         /* Button Style */
+
         .custom-btn {
+
             display: flex;
+
             align-items: center;
+
             padding: 10px 20px;
+
             border-radius: 25px;
+
             font-weight: 500;
+
             transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
+
         }
+
+
 
         .custom-btn i {
+
             font-size: 16px;
+
         }
+
+
 
         .btn-outline-warning {
+
             border: 2px solid #ffc107;
+
             color: #ffc107;
+
         }
+
+
 
         .btn-outline-warning:hover {
+
             background-color: #ffc107;
+
             color: #fff;
+
         }
+
+
 
         .btn-warning {
+
             background-color: #ffc107;
+
             border: none;
+
             color: #fff;
+
         }
+
+
 
         .btn-warning:hover {
+
             background-color: #e0a800;
+
         }
 
+
+
         /* Responsive Design */
+
         @media (max-width: 768px) {
+
             .form-inline {
+
                 flex-direction: column;
+
                 gap: 10px;
+
             }
+
+
 
             .custom-btn {
+
                 width: 100%;
+
                 text-align: center;
+
             }
+
         }
+
+
 
         /* Additional Styles for Modern Look */
+
         .card-body {
+
             padding: 20px;
+
         }
+
+
 
         .text-warning {
+
             color: #ffc107;
+
         }
+
+
 
         .text-end {
+
             text-align: right;
+
         }
 
 
 
-        * Container for date and time */
+
+
+        /* Container for date and time */
+
         .datetime-container {
+
             position: fixed; /* Fixed position to keep it in view */
+
             bottom: 10px; /* Position it towards the bottom */
+
             right: 10px; /* Position it towards the right */
+
             background-color: #fff3cd; /* Light yellow background for contrast */
+
             border: 1px solid #ffeeba; /* Slightly darker border for emphasis */
+
             padding: 15px;
+
             border-radius: 8px;
+
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
             z-index: 1000; /* Ensure it stays above other elements */
+
             display: flex; /* Use flexbox to align icon and text */
+
             align-items: center; /* Vertically center the items */
+
             gap: 10px; /* Space between icon and text */
+
         }
+
+
 
         /* Styling for the date and time */
+
         #currentDateTime {
+
             font-size: 24px; /* Increase font size for better readability */
+
             font-weight: 600;
+
             color: #ffc107; /* Warning color to match the theme */
+
             margin: 0;
+
         }
+
+
 
         /* Icon styling */
+
         .fas.fa-calendar-day {
+
             font-size: 24px; /* Ensure icon is large and visible */
+
         }
+
+
 
         /* Responsive Design */
+
         @media (max-width: 768px) {
+
             .datetime-container {
+
                 bottom: 5px;
+
                 right: 5px;
+
                 padding: 10px;
+
                 font-size: 18px; /* Adjust font size for smaller screens */
+
             }
 
+
+
             .datetime-container i {
+
                 font-size: 20px; /* Adjust icon size for smaller screens */
+
             }
+
         }
+
+
+
+        /* Chỉnh ảnh trong phòng   */
+
+        .img-text {
+
+            position: relative;
+
+            display: inline-block;
+
+            text-align: center;
+
+        }
+
+
+
+        .img-text img {
+
+            width: 120%;
+
+            height: auto;
+
+        }
+
+
+
+        /*.img-text .text-overlay {*/
+
+        /*    position: absolute;*/
+
+        /*    top: 50%;*/
+
+        /*    left: 50%;*/
+
+        /*    transform: translate(-50%, -50%);*/
+
+        /*    color: white;*/
+
+        /*    font-size: 18px;*/
+
+        /*    font-weight: bold;*/
+
+        /*}*/
+
+
+
+        /*.img-text .text-ma {*/
+
+        /*    position: absolute;*/
+
+        /*    top: 50%;*/
+
+        /*    left: 50%;*/
+
+        /*    transform: translate(-170%, -400%);*/
+
+        /*    color: white;*/
+
+        /*    font-size: 18px;*/
+
+        /*    font-weight: bold;*/
+
+        /*}*/
+
+
+
 
 
     </style>
+
     <head th:include="fragment/head :: head"></head>
+
 </head>
 
+
+
 <body class="vertical light">
+
 <div class="wrapper">
+
     <div th:include="fragment/navbar :: navbar">
+
     </div>
+
     <div th:include="fragment/sidebar :: sidebar">
+
     </div>
+
     <!-- Hiển thị tổng số phòng đang hoạt động -->
+
     <main class="main-content" role="main">
+
         <div class="container-fluid">
+
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
+
                 <strong>Tổng số phòng đang hoạt động:</strong>
-                <span class="ml-2 font-weight-bold" th:text="${totalActivePhongs}">
+
+                <span class="ml-2 font-weight-bold" th:text="${totalActivePhongs}"> 
+
           </span>
+
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+
                     <span aria-hidden="true">&times;</span>
+
                 </button>
+
             </div>
+
+
 
             <!-- Hiển thị thông báo lỗi -->
+
             <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+
                 <span th:text="${errorMessage}"></span>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
             </div>
+
+
 
             <div th:if="${successMessage}">
+
                 <div class="alert alert-success" th:text="${successMessage}">
+
                 </div>
+
             </div>
+
             <!-- Form thêm phòng -->
+
             <div class="card mb-4 shadow-sm">
+
                 <div class="card-body">
+
                     <div class="d-flex justify-content-between align-items-center">
+
                         <div class="toolbar">
+
                             <form class="form-inline d-flex gap-2">
+
                                 <!-- Reset Button -->
+
                                 <a th:href="@{phongs}" class="btn btn-outline-warning">
+
                                     <i class="fas fa-undo me-2"></i> Reset
+
                                 </a>
 
+
+
                                 <!-- Add Button -->
-                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addModal">
+
+                                <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+
+                                        data-bs-target="#addModal">
+
                                     <i class="fas fa-plus me-2"></i> Tạo mới
+
                                 </button>
+
                             </form>
+
                         </div>
+
+
+
 
 
                         <!-- Separate container for the current date and time -->
+
                         <div class="datetime-container text-center d-flex ">
+
                             <i class="fas fa-calendar-day me-2 text-warning" style="font-size: 28px;"></i>
+
                             <p id="currentDateTime" class="text-warning mb-0"></p>
+
                         </div>
+
+
+
 
 
                         <div class="text-end">
+
                             <h2 class="text-warning mb-0">
+
                                 <i class="fa fa-battery-empty me-2"></i>
+
                                 <span th:text="${totalInactivePhongs1}"></span>
+
                             </h2>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
+
+
 
 
             <!-- Danh sách phòng -->
+
             <div class="card shadow mt-1">
+
                 <div class="card-header">Danh Sách Phòng</div>
+
                 <div class="card-body p-2">
+
                     <!-- Lọc loại phòng và tình trạng -->
+
                     <form method="get" action="#">
+
                         <div class="form-row mb-2">
+
                             <div class="form-group col-md-6">
+
                                 <label for="filterLoaiPhong">Lọc theo loại phòng:</label>
-                                <select id="filterLoaiPhong" name="loaiPhongId" class="form-control form-control-sm" onchange="this.form.submit()">
+
+                                <select id="filterLoaiPhong" name="loaiPhongId" class="form-control form-control-sm"
+
+                                        onchange="this.form.submit()">
+
                                     <option value="">Tất cả</option>
-                                    <option th:each="loaiPhong : ${loaiPhongs}" th:value="${loaiPhong.idLoaiPhong}" th:selected="${selectedLoaiPhong == loaiPhong.idLoaiPhong}">
-                      <span th:text="${loaiPhong.tenLoaiPhong}">
+
+                                    <option th:each="loaiPhong : ${loaiPhongs}" th:value="${loaiPhong.idLoaiPhong}"
+
+                                            th:selected="${selectedLoaiPhong == loaiPhong.idLoaiPhong}"> 
+
+                      <span th:text="${loaiPhong.tenLoaiPhong}"> 
+
                       </span>
+
                                     </option>
+
                                 </select>
+
                             </div>
+
                             <div class="form-group col-md-6">
+
                                 <label for="filterTinhTrang">Lọc theo tình trạng:</label>
-                                <select id="filterTinhTrang" name="tinhTrang" class="form-control form-control-sm" onchange="this.form.submit()">
+
+                                <select id="filterTinhTrang" name="tinhTrang" class="form-control form-control-sm"
+
+                                        onchange="this.form.submit()">
+
                                     <option value="">Tất cả</option>
-                                    <option value="true" th:selected="${selectedTinhTrang == 'true'}">Đang hoạt động</option>
-                                    <option value="false" th:selected="${selectedTinhTrang == 'false'}">Ngừng hoạt động</option>
+
+                                    <option value="true" th:selected="${selectedTinhTrang == 'true'}">Đang hoạt động
+
+                                    </option>
+
+                                    <option value="false" th:selected="${selectedTinhTrang == 'false'}">Ngừng hoạt
+
+                                        động
+
+                                    </option>
+
                                 </select>
+
                             </div>
+
                         </div>
+
                     </form>
+
                     <div class="row">
+
                         <div th:each="phong : ${phongs}" class="col-md-4 mb-3">
+
                             <div class="card shadow" th:classappend="${phong.trangThai} ? 'border-success' : 'border-danger'">
+
                                 <div class="card-body" th:style="${phong.trangThai} ? 'background-color: #d4edda;' : 'background-color: #f8d7da;'">
-                                    <!-- Tên Phòng -->
-                                    <h5 class="card-title" th:text="${phong.tenPhong}"></h5>
-                                    <!-- Mã Phòng -->
-                                    <h6 class="card-subtitle mb-2 text-muted" th:text="'Mã: ' + ${phong.maPhong}"></h6>
-<!--                                    soLuongNguoi-->
-                                    <p class="card-text"><strong> Số Người Tối Đa</strong>: </strong><span th:text="${phong.loaiPhong.getSoNguoiToiDa()}"></span></p>
-                                    <!-- Diện Tích -->
-                                    <p class="card-text"><strong>Diện Tích: </strong><span th:text="${phong.loaiPhong.dienTich.tenDienTich}"></span></p>
-                                    <!-- Tầng -->
-                                    <p class="card-text"><strong>Tầng: </strong><span th:text="${phong.loaiPhong.tang.tenTang}"></span></p>
-                                    <!-- Giá -->
-                                    <p class="card-text"><strong>Giá: </strong><span th:text="${phong.loaiPhong.gia}"></span></p>
+
+                                    <!-- Ảnh và phần overlay chỉ chứa tên phòng và giá -->
+
+                                    <div class="overlay position-relative">
+
+                                        <img th:src="${phong.img}" width="100%" alt="Ảnh phòng">
+
+                                        <div class="overlay-content position-absolute bottom-0 w-100 bg-dark bg-opacity-50 text-white p-2">
+
+                                            <h5 class="mb-1" th:text="${phong.tenPhong}"></h5>
+
+                                            <p class="mb-0" th:text="'Giá: ' + ${phong.loaiPhong.gia}"></p>
+
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <!-- Các thuộc tính khác được đưa ra ngoài ảnh -->
+
+                                    <div class="row mt-3">
+
+                                        <div class="col-6">
+
+                                            <p class="card-text"><strong>Số Người Tối Đa: </strong><span th:text="${phong.loaiPhong.getSoNguoiToiDa()}"></span></p>
+
+                                        </div>
+
+                                        <div class="col-6">
+
+                                            <p class="card-text"><strong>Diện Tích: </strong><span th:text="${phong.loaiPhong.dienTich.tenDienTich}"></span></p>
+
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <div class="row">
+
+                                        <div class="col-6">
+
+                                            <p class="card-text"><strong>Tầng: </strong><span th:text="${phong.loaiPhong.tang.tenTang}"></span></p>
+
+                                        </div>
+
+                                        <div class="col-6">
+
+                                            <p class="card-text"><strong>Mã: </strong><span th:text="${phong.maPhong}"></span></p>
+
+                                        </div>
+
+                                    </div>
+
+
+
                                     <!-- Mô Tả -->
+
                                     <p class="card-text"><strong>Mô Tả: </strong><span th:text="${phong.moTa}"></span></p>
-                                    <!-- Loại Phòng -->
-                                    <p class="card-text"><strong>Loại Phòng: </strong><span th:text="${phong.loaiPhong.tenLoaiPhong}"></span></p>
-                                    <!-- Trạng Thái -->
-<!--                                    <p class="card-text"><strong>Trạng Thái: </strong><span th:text="${phong.trangThai ? 'Còn Phòng' : 'Hết Phòng'}"></span></p>-->
+
+
+
                                     <!-- Tình Trạng -->
+
                                     <p class="card-text"><strong>Tình Trạng: </strong><span th:text="${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></span></p>
-                                    <!-- Thao Tác -->
+
+
+
+                                    <!-- Nút Sửa -->
+
                                     <a th:href="@{/edit(id=${phong.idPhong})}" class="btn btn-outline-warning btn-sm">
                                         <i class='fas fa-pen-alt'></i> Sửa
                                     </a>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
+
+
                 </div>
+
                 <!--Phân Trang-->
+
                 <nav class="d-flex justify-content-center ">
+
                     <ul class="pagination pagination-sm">
+
                         <!-- Previous Page -->
+
                         <li th:if="${currentPage > 0}" class="page-item">
-                            <a class="page-link" th:href="@{/phongs(page=${currentPage - 1}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" aria-label="Previous">&laquo;</a>
+
+                            <a class="page-link"
+
+                               th:href="@{/phongs(page=${currentPage - 1}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}"
+
+                               aria-label="Previous">&laquo;</a>
+
                         </li>
+
                         <!-- Page Numbers -->
-                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''" class="page-item">
-                            <a class="page-link" th:href="@{/phongs(page=${i}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" th:text="${i + 1}"></a>
+
+                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+
+                            th:classappend="${i == currentPage} ? 'active' : ''" class="page-item">
+
+                            <a class="page-link"
+
+                               th:href="@{/phongs(page=${i}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}"
+
+                               th:text="${i + 1}"></a>
+
                         </li>
+
                         <!-- Next Page -->
+
                         <li th:if="${currentPage < totalPages - 1}" class="page-item">
-                            <a class="page-link" th:href="@{/phongs(page=${currentPage + 1}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}" aria-label="Next">&raquo;</a>
+
+                            <a class="page-link"
+
+                               th:href="@{/phongs(page=${currentPage + 1}, loaiPhongId=${selectedLoaiPhong}, tinhTrang=${selectedTinhTrang})}"
+
+                               aria-label="Next">&raquo;</a>
+
                         </li>
+
                     </ul>
+
                 </nav>
+
             </div>
+
         </div>
 
-        <!-- Modal -->
-        <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+
+
+        <!-- Modal thêm phòng-->
+
+        <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+
+             aria-hidden="true">
+
             <div class="modal-dialog modal-lg" role="document">
+
                 <div class="modal-content">
+
                     <div class="modal-header bg-warning text-white">
+
                         <h5 class="modal-title" id="addModalLabel">Tạo Phòng Mới</h5>
+
                         <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+
                             <span aria-hidden="true">&times;</span>
+
                         </button>
+
                     </div>
+
                     <div class="modal-body">
+
                         <form action="/save" id="addForm" method="post">
-                            <input type="hidden" id="idPhong" name="idPhong" th:value="${phong.idPhong}" />
+
+                            <input type="hidden" id="idPhong" name="idPhong" th:value="${phong.idPhong}"/>
+
+                            <!-- Ảnh Phòng -->
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-6 offset-md-3 text-center">
+
+                                    <img id="imgPreview" src="#" alt="Ảnh phòng" class="img-thumbnail"
+
+                                         style="max-width: 100%; height: auto;"/>
+
+                                </div>
+
+                            </div>
+
+
+
+                            <!-- Chọn ảnh -->
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-6 offset-md-3">
+
+                                    <input type="file" id="imageInput" name="img" class="form-control" accept="image/*"
+
+                                           onchange="previewImage(event)"/>
+
+                                </div>
+
+                            </div>
 
                             <!-- Mã Phòng và Tên Phòng -->
+
                             <div class="row g-3">
+
                                 <div class="form-group col-md-6">
+
                                     <label for="maPhong">Mã Phòng</label>
-                                    <input type="text" id="maPhong" name="maPhong" class="form-control" onchange="checkMaPhong()" th:value="${phong.maPhong}" required />
+
+                                    <input type="text" id="maPhong" name="maPhong" class="form-control"
+
+                                           onchange="checkMaPhong()" th:value="${phong.maPhong}" required/>
+
                                 </div>
+
                                 <div class="form-group col-md-6">
+
                                     <label for="tenPhong">Tên Phòng</label>
-                                    <input type="text" id="tenPhong" name="tenPhong" class="form-control" th:value="${phong.tenPhong}" required />
+
+                                    <input type="text" id="tenPhong" name="tenPhong" class="form-control"
+
+                                           th:value="${phong.tenPhong}" required/>
+
                                 </div>
+
                             </div>
+
+
 
                             <!-- Tình Trạng và Mô Tả -->
+
                             <div class="row g-3">
+
                                 <div class="form-group col-md-6">
+
                                     <label>Tình Trạng</label>
+
                                     <div class="form-check">
-                                        <input type="radio" id="tinhTrang1" name="tinhTrang" value="true" class="form-check-input" th:checked="${phong.tinhTrang == true}" />
+
+                                        <input type="radio" id="tinhTrang1" name="tinhTrang" value="true"
+
+                                               class="form-check-input" th:checked="${phong.tinhTrang == true}"/>
+
                                         <label class="form-check-label" for="tinhTrang1">Đang hoạt động</label>
+
                                     </div>
+
                                     <div class="form-check">
-                                        <input type="radio" id="tinhTrang2" name="tinhTrang" value="false" class="form-check-input" th:checked="${phong.tinhTrang == false}" />
+
+                                        <input type="radio" id="tinhTrang2" name="tinhTrang" value="false"
+
+                                               class="form-check-input" th:checked="${phong.tinhTrang == false}"/>
+
                                         <label class="form-check-label" for="tinhTrang2">Ngừng hoạt động</label>
+
                                     </div>
+
                                 </div>
+
                                 <div class="form-group col-md-6">
+
                                     <label for="moTa">Mô Tả</label>
-                                    <textarea id="moTa" name="moTa" class="form-control" rows="2" th:text="${phong.moTa}" required></textarea>
+
+                                    <textarea id="moTa" name="moTa" class="form-control" rows="2"
+
+                                              th:text="${phong.moTa}" required></textarea>
+
                                 </div>
+
                             </div>
+
+
 
                             <!-- Trạng Thái và Loại Phòng -->
+
                             <div class="row g-3">
+
                                 <div class="form-group col-md-6">
+
                                     <label>Trạng Thái</label>
+
                                     <div class="form-check">
-                                        <input type="radio" id="trangThai1" name="trangThai" value="true" class="form-check-input" th:checked="${phong.trangThai == true}" />
+
+                                        <input type="radio" id="trangThai1" name="trangThai" value="true"
+
+                                               class="form-check-input" th:checked="${phong.trangThai == true}"/>
+
                                         <label class="form-check-label" for="trangThai1">Còn Phòng</label>
+
                                     </div>
+
                                     <div class="form-check">
-                                        <input type="radio" id="trangThai2" name="trangThai" value="false" class="form-check-input" th:checked="${phong.trangThai == false}" />
+
+                                        <input type="radio" id="trangThai2" name="trangThai" value="false"
+
+                                               class="form-check-input" th:checked="${phong.trangThai == false}"/>
+
                                         <label class="form-check-label" for="trangThai2">Hết Phòng</label>
+
                                     </div>
+
                                 </div>
+
                                 <div class="form-group col-md-6">
+
                                     <label for="idLoaiPhong" class="form-label">Loại Phòng</label>
+
                                     <select id="idLoaiPhong" name="loaiPhong.idLoaiPhong" class="form-select" required>
+
                                         <option th:each="loaiPhong : ${loaiPhongs}" th:value="${loaiPhong.idLoaiPhong}"
+
                                                 th:selected="${phong.loaiPhong != null && phong.loaiPhong.idLoaiPhong == loaiPhong.idLoaiPhong}"
+
                                                 th:text="${loaiPhong.tenLoaiPhong}">
+
                                         </option>
+
                                     </select>
+
                                 </div>
+
                             </div>
+
+
 
                             <!-- Số Người Tối Đa và Tầng -->
+
                             <div class="row g-3">
+
                                 <div class="col-md-6">
+
                                     <label class="form-label">Số Người Tối Đa</label>
-                                    <div id="nguoiToiDa" class="form-control bg-light">Chọn loại phòng để hiển thị số người tối đa</div>
+
+                                    <div id="nguoiToiDa" class="form-control bg-light">Chọn loại phòng để hiển thị số
+
+                                        người tối đa
+
+                                    </div>
+
                                 </div>
+
                                 <div class="col-md-6">
+
                                     <label class="form-label">Tầng</label>
+
                                     <div id="tang" class="form-control bg-light">Chọn loại phòng để hiển thị tầng</div>
+
                                 </div>
+
                             </div>
+
+
 
                             <!-- Diện Tích và Giá -->
+
                             <div class="row g-3">
+
                                 <div class="col-md-6">
+
                                     <label class="form-label">Diện Tích</label>
-                                    <div id="dienTich" class="form-control bg-light">Chọn loại phòng để hiển thị diện tích</div>
+
+                                    <div id="dienTich" class="form-control bg-light">Chọn loại phòng để hiển thị diện
+
+                                        tích
+
+                                    </div>
+
                                 </div>
+
                                 <div class="col-md-6">
+
                                     <label class="form-label">Giá</label>
+
                                     <div id="gia1" class="form-control bg-light">Chọn loại phòng để hiển thị giá</div>
+
                                 </div>
+
                             </div>
 
+
+
                             <div class=" mt-3">
+
                                 <button type="submit" name="action" value="create" class="btn btn-warning">Tạo</button>
+
                                 <button type="reset" class="btn btn-outline-warning ms-2">
+
                                     <i class='fas fa-sync-alt'></i>
+
                                 </button>
+
                             </div>
+
                         </form>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
+
+
 
 
     </main>
+
 </div>
+
 <div th:include="fragment/script :: script">
+
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+
+        crossorigin="anonymous"></script>
+
 <script>
-    document.getElementById('idLoaiPhong').addEventListener('change', function () {
-        var loaiPhongId = this.value;
-        if (loaiPhongId) {
-            fetch(`/api/loaiPhong/${loaiPhongId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Cập nhật thông tin tầng, diện tích và giá
-                    document.getElementById('nguoiToiDa').textContent = data.soNguoiToiDa;
-                    document.getElementById('tang').textContent = data.tenTang;
-                    document.getElementById('dienTich').textContent = data.tenDienTich + ' m²';
-                    document.getElementById('gia1').textContent = data.gia + ' VND';
-                })
-                .catch(error => console.error('Error fetching data:', error));
+
+    <!--    -->
+
+    function previewImage(event) {
+
+        const reader = new FileReader();
+
+        const imgPreview = document.getElementById('imgPreview');
+
+
+
+        reader.onload = function () {
+
+            if (reader.readyState === 2) {
+
+                imgPreview.src = reader.result;
+
+            }
+
         }
-    });
 
-    document.getElementById('maPhong').addEventListener('blur', function() {
-        const maPhong = this.value;
 
-        fetch(`/api/phongs/check-ma-phong?maPhong=${maPhong}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    alert("Mã phòng đã tồn tại. Vui lòng nhập mã khác.");
-                    document.getElementById('maPhong').classList.add('is-invalid');
-                } else {
-                    document.getElementById('maPhong').classList.remove('is-invalid');
-                }
-            });
-    });
 
-    function checkMaPhong() {
-        var maPhong = document.getElementById("maPhong").value;
-        fetch('/phongs/checkMaPhong?maPhong=' + maPhong)
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    // Hiển thị thông báo lỗi
-                    alert("Mã phòng đã tồn tại!");
+        reader.readAsDataURL(event.target.files[0]);
 
-                    // Xóa giá trị trong trường mã phòng
-                    document.getElementById("maPhong").value = "";
-
-                    // Đặt focus vào trường mã phòng
-                    document.getElementById("maPhong").focus();
-                }
-            })
-            .catch(error => console.error("Lỗi khi kiểm tra mã phòng:", error));
     }
 
+
+
+    document.getElementById('idLoaiPhong').addEventListener('change', function () {
+
+        var loaiPhongId = this.value;
+
+        if (loaiPhongId) {
+
+            fetch(`/api/loaiPhong/${loaiPhongId}`)
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    // Cập nhật thông tin tầng, diện tích và giá 
+
+                    document.getElementById('nguoiToiDa').textContent = data.soNguoiToiDa;
+
+                    document.getElementById('tang').textContent = data.tenTang;
+
+                    document.getElementById('dienTich').textContent = data.tenDienTich + ' m²';
+
+                    document.getElementById('gia1').textContent = data.gia + ' VND';
+
+                })
+
+                .catch(error => console.error('Error fetching data:', error));
+
+        }
+
+    });
+
+
+
+    document.getElementById('maPhong').addEventListener('blur', function () {
+
+        const maPhong = this.value;
+
+
+
+        fetch(`/api/phongs/check-ma-phong?maPhong=${maPhong}`)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                if (data.exists) {
+
+                    alert("Mã phòng đã tồn tại. Vui lòng nhập mã khác.");
+
+                    document.getElementById('maPhong').classList.add('is-invalid');
+
+                } else {
+
+                    document.getElementById('maPhong').classList.remove('is-invalid');
+
+                }
+
+            });
+
+    });
+
+
+
+    function checkMaPhong() {
+
+        var maPhong = document.getElementById("maPhong").value;
+
+        fetch('/phongs/checkMaPhong?maPhong=' + maPhong)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                if (data.exists) {
+
+                    // Hiển thị thông báo lỗi 
+
+                    alert("Mã phòng đã tồn tại!");
+
+
+
+                    // Xóa giá trị trong trường mã phòng 
+
+                    document.getElementById("maPhong").value = "";
+
+
+
+                    // Đặt focus vào trường mã phòng 
+
+                    document.getElementById("maPhong").focus();
+
+                }
+
+            })
+
+            .catch(error => console.error("Lỗi khi kiểm tra mã phòng:", error));
+
+    }
+
+
+
     fetch('/api/phong/countAvailableActiveRooms')
+
         .then(response => response.json())
+
         .then(data => {
+
             document.getElementById('availableActiveRoomsCount').textContent = data;
+
         })
+
         .catch(error => {
+
             console.error('Error fetching available active rooms count:', error);
+
         });
+
 
 
 
 
     async function searchPhong() {
+
         const searchQuery = document.getElementById('search').value.trim();
 
-        // Kiểm tra nếu ô tìm kiếm trống
+
+
+        // Kiểm tra nếu ô tìm kiếm trống 
+
         if (!searchQuery) {
+
             console.log('Vui lòng nhập từ khóa tìm kiếm');
+
             return;
+
         }
 
-        console.log(searchQuery); // Debug: log giá trị searchQuery để kiểm tra
+
+
+        console.log(searchQuery); // Debug: log giá trị searchQuery để kiểm tra 
+
+
 
         try {
+
             const response = await fetch('/phongs/search?query=' + encodeURIComponent(searchQuery), {
+
                 method: 'GET',
+
                 headers: {
+
                     'Content-Type': 'application/json'
+
                 }
+
             });
 
+
+
             if (!response.ok) {
+
                 throw new Error('Network response was not ok');
+
             }
 
+
+
             const data = await response.json();
-            updateTableBody(data); // Gọi hàm cập nhật bảng dữ liệu với dữ liệu trả về từ server
+
+            updateTableBody(data); // Gọi hàm cập nhật bảng dữ liệu với dữ liệu trả về từ server 
+
         } catch (error) {
+
             console.error('Error fetching search results:', error);
+
             alert('Không thể tìm kiếm, vui lòng thử lại sau.');
+
         }
+
     }
+
+
 
     function updateTableBody(data) {
-        const tableBody = document.getElementById('tableBody'); // Đảm bảo ID này khớp với phần tử trong HTML của bạn
 
-        // Xóa nội dung hiện tại của bảng
+        const tableBody = document.getElementById('tableBody'); // Đảm bảo ID này khớp với phần tử trong HTML của bạn 
+
+
+
+        // Xóa nội dung hiện tại của bảng 
+
         tableBody.innerHTML = '';
 
-        // Kiểm tra nếu không có dữ liệu
+
+
+        // Kiểm tra nếu không có dữ liệu 
+
         if (data.length === 0) {
+
             tableBody.innerHTML = '<tr><td colspan="10">Không tìm thấy kết quả.</td></tr>';
+
             return;
+
         }
 
-        // Duyệt qua các kết quả tìm kiếm và thêm các hàng mới vào bảng
+
+
+        // Duyệt qua các kết quả tìm kiếm và thêm các hàng mới vào bảng 
+
         data.forEach((phong, index) => {
+
             const row = document.createElement('tr');
 
-            row.innerHTML = `
-            <td>${phong.maPhong || ''}</td>
-            <td>${phong.tenPhong || ''}</td>
-            <td>${phong.tenDienTich || ''}</td>
-            <td>${phong.tenTang || ''}</td>
-            <td>${phong.gia || ''}</td>
-            <td>${phong.moTa || ''}</td>
-            <td>${phong.tenLoaiPhong || ''}</td>
-            <td>${phong.trangThai ? 'Còn Phòng' : 'Hết Phòng'}</td>
-            <td>${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}</td>
-            <td class="text-center">
-                <!-- Nút sửa -->
-                <a href="/phongs/edit/${phong.idPhong}">
-                    <button class="btn mb-2 mr-1 btn-outline-warning" type="button">
-                        <i class='fas fa-pen-alt'></i>
-                    </button>
-                </a>
-            </td>
+
+
+            row.innerHTML = ` 
+
+            <td>${phong.maPhong || ''}</td> 
+
+            <td>${phong.tenPhong || ''}</td> 
+
+            <td>${phong.tenDienTich || ''}</td> 
+
+            <td>${phong.tenTang || ''}</td> 
+
+            <td>${phong.gia || ''}</td> 
+
+            <td>${phong.moTa || ''}</td> 
+
+            <td>${phong.tenLoaiPhong || ''}</td> 
+
+            <td>${phong.trangThai ? 'Còn Phòng' : 'Hết Phòng'}</td> 
+
+            <td>${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}</td> 
+
+            <td class="text-center"> 
+
+                <!-- Nút sửa --> 
+
+                <a href="/phongs/edit/${phong.idPhong}"> 
+
+                    <button class="btn mb-2 mr-1 btn-outline-warning" type="button"> 
+
+                        <i class='fas fa-pen-alt'></i> 
+
+                    </button> 
+
+                </a> 
+
+            </td> 
+
         `;
 
+
+
             tableBody.appendChild(row);
+
         });
+
     }
+
+
 
     function updateDateTime() {
+
         const now = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+
+        const options = {
+
+            year: 'numeric',
+
+            month: 'long',
+
+            day: 'numeric',
+
+            hour: '2-digit',
+
+            minute: '2-digit',
+
+            second: '2-digit'
+
+        };
+
         const dateTimeString = now.toLocaleDateString('vi-VN', options);
+
         document.getElementById('currentDateTime').innerText = dateTimeString;
+
     }
 
-    // Update date and time on page load
+
+
+    // Update date and time on page load 
+
     updateDateTime();
 
-    // Optionally, update the date and time every second
+
+
+    // Optionally, update the date and time every second 
+
     setInterval(updateDateTime, 1000);
 
+
+
 </script>
+
 </body>
 
-</html>
+
+
+</html> 

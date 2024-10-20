@@ -150,11 +150,77 @@
 
 <script>
     function setModalData(button) {
-        document.getElementById('editId').value = button.getAttribute('data-id');
-        document.getElementById('editTenThamSo').value = button.getAttribute('data-tenThamSo');
-        document.getElementById('editGiaTri').value = button.getAttribute('data-giaTri');
-        document.getElementById('editMoTa').value = button.getAttribute('data-moTa');
+        const id = button.getAttribute('data-id');
+        const tenThamSo = button.getAttribute('data-tenThamSo');
+        const giaTri = button.getAttribute('data-giaTri');
+        const moTa = button.getAttribute('data-moTa');
+
+        document.getElementById('editId').value = id;
+        document.getElementById('editTenThamSo').value = tenThamSo;
+        document.getElementById('editGiaTri').value = giaTri;
+        document.getElementById('editMoTa').value = moTa;
+    }
+    function validateAddForm() {
+        const tenThamSo = document.getElementById('tenThamSo').value.trim();
+        const giaTri = document.getElementById('giaTri').value.trim();
+        const moTa = document.getElementById('moTa').value.trim();
+        if (!tenThamSo || !giaTri) {
+            alert("Vui lòng điền tất cả các trường yêu cầu.");
+            return false;
+        }
+        if (hasSpecialCharacters(tenThamSo) || hasSpecialCharacters(moTa)) {
+            alert("Tên Tham Số và Mô Tả không được chứa ký tự đặc biệt.");
+            return false;
+        }
+        if (isOnlyNumbers(tenThamSo)) {
+            alert("Tên Tham Số không được là số.");
+            return false;
+        }
+        if (isDuplicate(tenThamSo)) {
+            alert("Tên Tham Số đã tồn tại. Vui lòng nhập tên khác.");
+            return false;
+        }
+        return true;
+    }
+    function validateEditForm() {
+        const editTenThamSo = document.getElementById('editTenThamSo').value.trim();
+        const editGiaTri = document.getElementById('editGiaTri').value.trim();
+        const editMoTa = document.getElementById('editMoTa').value.trim();
+        if (!editTenThamSo || !editGiaTri) {
+            alert("Vui lòng điền tất cả các trường yêu cầu.");
+            return false;
+        }
+        if (hasSpecialCharacters(editTenThamSo) || hasSpecialCharacters(editMoTa)) {
+            alert("Tên Tham Số và Mô Tả không được chứa ký tự đặc biệt.");
+            return false;
+        }
+        if (isOnlyNumbers(editTenThamSo)) {
+            alert("Tên Tham Số không được là số.");
+            return false;
+        }
+        if (isDuplicate(editTenThamSo, document.getElementById('editId').value)) {
+            alert("Tên Tham Số đã tồn tại. Vui lòng nhập tên khác.");
+            return false;
+        }
+
+        return true;
+    }
+    function isDuplicate(tenThamSo, currentId = null) {
+        const thamSoList = [...document.querySelectorAll('tbody tr')].map(row => {
+            const id = row.querySelector('td:nth-child(1)').innerText.trim();
+            const name = row.querySelector('td:nth-child(2)').innerText.trim();
+            return { id, name: name.toLowerCase() };
+        });
+        return thamSoList.some(thamSo => thamSo.name === tenThamSo.toLowerCase() && thamSo.id !== currentId);
+    }
+    function hasSpecialCharacters(str) {
+        const specialChars = /[!@#$%^&*(),.?":{}|<>]/g;
+        return specialChars.test(str);
+    }
+    function isOnlyNumbers(str) {
+        return /^\d+$/.test(str);
     }
 </script>
+
 </body>
 </html>

@@ -113,7 +113,7 @@
                                 <img src="/img/logo.jpg" alt="Logo" width="100" height="100">
                             </div>
 
-                            <form id="form-add-employee" enctype="multipart/form-data" th:action="@{/admin/quan-ly-nhan-vien/add}" method="post" class="p-4 bg-light rounded shadow">
+                            <form id="form-add-employee" enctype="multipart/form-data" th:action="@{/quan-ly-nhan-vien/add}" method="post" class="p-4 bg-light rounded shadow">
                                 <input type="hidden" name="maNhanVien">
                                 <input type="hidden" name="trangThai" value="true">
                                 <div class="row g-3">
@@ -213,7 +213,7 @@
                             </div>
 
                             <form id="form-update-employee" enctype="multipart/form-data" class="form-update-employee"
-                                  th:action="@{/admin/quan-ly-lich-lam-viec/admin/quan-ly-nhan-vien/update}"
+                                  th:action="@{/quan-ly-nhan-vien/update}"
                                   method="post">
                                 <input type="text" name="idNhanVien" id="idNhanVienDetail">
                                 <input type="hidden" name="maNhanVien" id="maNhanVienDetail">
@@ -403,13 +403,13 @@
                         <!-- Nút Trang Số -->
                         <li class="page-item" th:each="page : ${#numbers.sequence(0, totalPages - 1)}"
                             th:if="${page >= currentPage - 1 && page <= currentPage + 2}" th:class="${page == currentPage} ? 'active'">
-                            <a class="page-link" th:href="@{/admin/quan-ly-nhan-vien(page=${page}, size=${size})}">[[${page + 1}]]</a>
+                            <a class="page-link" th:href="@{/quan-ly-nhan-vien(page=${page}, size=${size})}">[[${page + 1}]]</a>
                         </li>
 
                         <!-- Nút Sau -->
                         <li class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
                             <a class="page-link"
-                               th:href="@{/admin/quan-ly-nhan-vien(page=${currentPage + 1}, size=${size})}">Next</a>
+                               th:href="@{/quan-ly-nhan-vien(page=${currentPage + 1}, size=${size})}">Next</a>
                         </li>
                     </ul>
                 </nav>
@@ -509,7 +509,7 @@
             const formElement = document.getElementById('form-add-employee');
             const form = new FormData(formElement);
 
-            fetch('/admin/quan-ly-nhan-vien/add', {
+            fetch('/quan-ly-nhan-vien/add', {
                 method: 'POST',
                 body: form,
             })
@@ -703,7 +703,7 @@
 
 
             // Gửi yêu cầu AJAX đến API cập nhật nhân viên
-            fetch('/admin/quan-ly-nhan-vien/update', {
+            fetch('/quan-ly-nhan-vien/update', {
                 method: 'POST',
                 body: formData
             })
@@ -767,7 +767,7 @@
         const page = 0; // Trang mặc định hoặc lấy từ input của người dùng nếu cần
         const size = 5; // Kích thước mặc định hoặc thay đổi tùy ý
 
-        fetch(`/admin/quan-ly-nhan-vien/filter?trangThai=${trangThai}&page=${page}&size=${size}`, {
+        fetch(`/quan-ly-nhan-vien/filter?trangThai=${trangThai}&page=${page}&size=${size}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -797,7 +797,7 @@
 
         console.log(searchQuery);
         try {
-            const response = await fetch(`/admin/quan-ly-nhan-vien/search?keyword=${encodeURIComponent(searchQuery)}&page=${page}&size=${size}`, {
+            const response = await fetch(`/quan-ly-nhan-vien/search?keyword=${encodeURIComponent(searchQuery)}&page=${page}&size=${size}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

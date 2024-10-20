@@ -31,6 +31,29 @@
 	</properties>
 	<dependencies>
 
+<!--		<dependency>-->
+<!--			<groupId>org.eclipse.jetty</groupId>-->
+<!--			<artifactId>jetty-websocket-server</artifactId>-->
+<!--			<version>9.4.51.v20220113</version>-->
+<!--		</dependency>-->
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.44.v20210927</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>9.4.44.v20210927</version>
+		</dependency>
+		<dependency>
+				<groupId>org.eclipse.jetty.websocket</groupId>
+				<artifactId>websocket-servlet</artifactId>
+				<version>9.4.44.v20210927</version>
+			</dependency>
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -205,6 +228,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+
     </dependencies>
 
 	<build>

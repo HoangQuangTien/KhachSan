@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -190,6 +191,11 @@ public class PhongService {
 
     public int countByLoaiPhongId(Integer idLoaiPhong) {
         return phongRepository.countByLoaiPhongId(idLoaiPhong);
+    }
+
+
+    public List<Phong> getAvailableRoomsForEdit(Integer currentRoomId, LocalDateTime startDate, LocalDateTime endDate) {
+        return phongRepository.findAvailableRoomsForTimeRange(currentRoomId, startDate, endDate);
     }
 }
 

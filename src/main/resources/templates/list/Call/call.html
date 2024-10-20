@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<h1>Nhận Cuộc Gọi Video với WebRTC</h1>
+<video id="localVideo" autoplay muted playsinline></video>
+<video id="remoteVideo" autoplay playsinline></video>
+<button id="hangupButton" disabled>Kết thúc</button>
+
+<script>
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const hangupButton = document.getElementById('hangupButton');
+
+    let localStream;
+    let pc;
+    const signalingServer = new WebSocket('ws://localhost:8080/ws');
+
+    const configuration = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    };
+
+    signalingServer.onmessage = message => {
+        const data = JSON.parse(message.data);
+
+        if (data.offer) {
+            // Khi nhân viên nhận được offer
+            pc = new RTCPeerConnection(configuration);
+            pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+
+            // Tạo stream từ webcam
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(stream => {
+                    localVideo.srcObject = stream;
+                    localStream = stream;
+
+                    // Thêm các track của local stream vào PeerConnection
+                    localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+                    // Tạo answer cho cuộc gọi
+                    pc.createAnswer().then(answer => {
+                        pc.setLocalDescription(answer);
+                        signalingServer.send(JSON.stringify({ answer: answer }));
+                    });
+                })
+                .catch(error => {
+                    console.error('Lỗi khi truy cập thiết bị.', error);
+                });
+
+            pc.onicecandidate = event => {
+                if (event.candidate) {
+                    signalingServer.send(JSON.stringify({ candidate: event.candidate }));
+                }
+            };
+
+            pc.ontrack = event => {
+                remoteVideo.srcObject = event.streams[0]; // Gán stream từ remote video
+            };
+        } else if (data.answer) {
+            // Khi nhận được answer từ người gọi
+            pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        } else if (data.candidate) {
+            // Khi nhận được ICE candidate
+            pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+    };
+
+    hangupButton.onclick = hangupCall;
+
+    function hangupCall() {
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                track.stop(); // Dừng track
+            });
+        }
+
+        if (pc) {
+            pc.close();
+            pc = null;
+        }
+
+        hangupButton.disabled = true;
+
+        localVideo.srcObject = null; // Hoặc giữ lại video nếu cần
+        remoteVideo.srcObject = null; // Hoặc giữ lại video nếu cần
+    }
+</script>
+
+</body>
+</html>

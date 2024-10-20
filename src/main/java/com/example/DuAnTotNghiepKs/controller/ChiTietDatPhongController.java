@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/danhsachdatphong")
+@RequestMapping
 public class ChiTietDatPhongController {
 
     @Autowired
@@ -64,7 +64,7 @@ public class ChiTietDatPhongController {
     @Autowired
     private NhanVienRepo nhanVienRepo;
 
-    @GetMapping
+    @GetMapping("/danhsachdatphong")
     public String index(
             @RequestParam(name = "page", defaultValue = "1") int pageNo,
             @RequestParam(name = "size", defaultValue = "5") int pageSize,
@@ -377,45 +377,54 @@ public class ChiTietDatPhongController {
 //        }
 //    }
 
-    @GetMapping("/edit-room/{id}")
-    public String showEditRoomForm(@PathVariable("id") Integer id, Model model) {
+    @GetMapping("/edit-room")
+    public String showEditRoomForm(@RequestParam("roomId") Integer id, Model model) {
         Optional<Phong> optionalPhong = phongService.getPhongById(id);
 
         if (optionalPhong.isPresent()) {
             Phong phong = optionalPhong.get();
-            model.addAttribute("phong", phong); // Đảm bảo phong đã được lấy đầy đủ thông tin
+            model.addAttribute("phong", phong);
+            Optional<DatPhong> datPhongOpt = datPhongRepo.findTopByPhongOrderByNgayNhanDesc(phong);
+            List<Phong> availableRooms = new ArrayList<>();
 
-            List<Phong> allRooms = phongService.getAllPhongs1();
-            model.addAttribute("allRooms", allRooms);
-
+            if (datPhongOpt.isPresent()) {
+                DatPhong datPhong = datPhongOpt.get();
+                LocalDateTime startDate = datPhong.getNgayNhan();
+                LocalDateTime endDate = datPhong.getNgayTra();
+                availableRooms = phongService.getAvailableRoomsForEdit(phong.getIdPhong(), startDate, endDate);
+            } else {
+                availableRooms = phongService.getAvailableRoomsForEdit(phong.getIdPhong(), null, null);
+            }
+            if (!availableRooms.contains(phong)) {
+                availableRooms.add(phong);
+            }
+            model.addAttribute("allRooms", availableRooms);
             List<LoaiPhong> loaiPhongs = loaiPhongService.getAllLoaiPhongs();
             model.addAttribute("loaiPhongs", loaiPhongs);
         } else {
             model.addAttribute("errorMessage", "Không tìm thấy phòng với ID: " + id);
-            return "error"; // Xử lý lỗi nếu không tìm thấy phòng
+            return "error";
         }
 
-        return "list/QuanLyDatPhong/edit-phong"; // Trả về trang chỉnh sửa phòng
+        return "list/QuanLyDatPhong/edit-phong";
     }
+
 
 
     @PostMapping("/update-room")
     public ResponseEntity<?> updateRoom(
             @RequestParam("roomId") Integer roomId,
-            @RequestParam("tenPhong") Integer tenPhongId, // ID của phòng mới được chọn
+            @RequestParam("tenPhong") Integer tenPhongId,
             @RequestParam("lyDoThayDoi") String lyDoThayDoi) {
 
         try {
-            // Tìm phòng hiện tại để cập nhật
             Phong phongHienTai = phongService.getPhongById(roomId)
                     .orElseThrow(() -> new RuntimeException("Phòng không tồn tại"));
 
-            // Kiểm tra xem phòng hiện tại có đặt phòng nào không
-            Optional<DatPhong> datPhongOpt = datPhongRepo.findByPhong(phongHienTai);
+            Optional<DatPhong> datPhongOpt = datPhongRepo.findTopByPhongOrderByNgayNhanDesc(phongHienTai);
+
             if (datPhongOpt.isPresent()) {
                 DatPhong datPhong = datPhongOpt.get();
-
-                // Kiểm tra nếu trạng thái là "Đã Checkin" hoặc "Đã Hủy"
                 if ("Đã Checkin".equals(datPhong.getTinhTrang())) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body(Map.of("success", false, "message", "Không thể đổi phòng vì phòng đã được check-in."));
@@ -426,31 +435,29 @@ public class ChiTietDatPhongController {
                 }
             }
 
-            // Tìm phòng mới từ ID phòng đã chọn
             Phong phongMoi = phongService.getPhongById(tenPhongId)
                     .orElseThrow(() -> new RuntimeException("Phòng không tồn tại với ID: " + tenPhongId));
 
-            // Kiểm tra xem phòng mới có giá thấp hơn phòng hiện tại không
             if (phongMoi.getGia() < phongHienTai.getGia()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("success", false, "message", "Không thể đổi sang phòng có giá thấp hơn phòng hiện tại."));
             }
 
-            // Kiểm tra xem phòng mới có đang được đặt không
-            boolean isPhongMoiBooked = datPhongRepo.findByPhong(phongMoi).isPresent();
+            LocalDateTime startDate = datPhongOpt.get().getNgayNhan();
+            LocalDateTime endDate = datPhongOpt.get().getNgayTra();
+
+            // Kiểm tra xem phòng mới có bị đặt trùng thời gian không
+            boolean isPhongMoiBooked = datPhongRepo.findByPhongAndThoiGian(phongMoi.getIdPhong(), startDate, endDate).size() > 0;
+
             if (isPhongMoiBooked) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("success", false, "message", "Phòng mới đang được đặt. Không thể chuyển sang phòng này."));
             }
-
-            // Cập nhật thông tin phòng trong đặt phòng
             if (datPhongOpt.isPresent()) {
                 DatPhong datPhong = datPhongOpt.get();
-                datPhong.setPhong(phongMoi); // Thay đổi phòng trong đối tượng DatPhong
-                datPhongRepo.save(datPhong); // Lưu lại thay đổi
+                datPhong.setPhong(phongMoi);
+                datPhongRepo.save(datPhong);
             }
-
-            // Lưu lịch sử đặt phòng
             LichSuDatPhong lichSuDatPhong = new LichSuDatPhong();
             lichSuDatPhong.setDatPhong(datPhongOpt.get());
             lichSuDatPhong.setChiTietThayDoi("Đổi từ " + phongHienTai.getTenPhong() + " sang phòng " + phongMoi.getTenPhong() + ". Lý do: " + lyDoThayDoi);
@@ -468,6 +475,7 @@ public class ChiTietDatPhongController {
                     .body(Map.of("success", false, "message", "Đã xảy ra lỗi không mong muốn: " + e.getMessage()));
         }
     }
+
 
 }
 

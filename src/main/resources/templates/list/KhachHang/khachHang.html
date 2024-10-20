@@ -87,6 +87,10 @@
             <a href="/about" class="text-link mb-2 p-2">Giới Thiệu</a>
             <!-- Hạng Phòng -->
             <a href="/room-classes" class="text-link mb-2 p-2">Hạng Phòng</a>
+
+            <a href="/room-classes" class="text-link mb-2 p-2">Liên Hệ</a>
+
+            <a href="/room-classes" class="text-link mb-2 p-2">Quy Tắc</a>
         </div>
 
         <!-- Các nút chọn ngôn ngữ -->
@@ -111,12 +115,18 @@
     </div>
 
 
-
-
     </div>
-
-
 </div>
+
+<h1>Gọi Video với WebRTC</h1>
+<input type="text" id="employeeName" placeholder="Nhập tên nhân viên" />
+<button id="callButton">Gọi điện</button>
+<video id="localVideo" autoplay muted playsinline></video>
+<video id="remoteVideo" autoplay playsinline></video>
+<button id="startButton">Bắt đầu gọi</button>
+<button id="hangupButton" disabled>Kết thúc</button>
+
+
 
 <footer class="bg-dark text-white py-4 mt-2">
     <div class="container">
@@ -150,15 +160,130 @@
         <div class="text-center mt-4">
             <p class="copyright mb-0">&copy; 2024 DragonBall Hotel. All Rights Reserved.</p>
         </div>
-
-
     </div>
+
+
 </footer>
 
 
 
 <script th:src="@{/js/KH.js}"></script>
 
+<script>
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const startButton = document.getElementById('startButton');
+    const hangupButton = document.getElementById('hangupButton');
+    const employeeInput = document.getElementById('employeeName');
+
+    let localStream;
+    let pc;
+    const signalingServer = new WebSocket('ws://localhost:8080/ws');
+
+    startButton.onclick = startCall;
+    hangupButton.onclick = hangupCall;
+
+    const configuration = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    };
+
+    function startCall() {
+        const employeeName = employeeInput.value; // Lấy tên nhân viên từ input
+        if (!employeeName) {
+            alert('Vui lòng nhập tên nhân viên!');
+            return;
+        }
+
+        fetch(`/api/employees/${encodeURIComponent(employeeName)}`) // Mã hóa tên nhân viên
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Lỗi ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(employees => {
+                if (employees.length === 0) {
+                    alert('Không tìm thấy nhân viên.');
+                    return;
+                }
+
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                    .then(stream => {
+                        localVideo.srcObject = stream;
+                        localStream = stream;
+
+                        pc = new RTCPeerConnection(configuration);
+                        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+                        // Kích hoạt nút "Kết thúc"
+                        startButton.disabled = true;
+                        hangupButton.disabled = false;
+
+                        // Tạo offer và gửi qua WebSocket
+                        pc.createOffer().then(offer => {
+                            return pc.setLocalDescription(offer);
+                        }).then(() => {
+                            signalingServer.send(JSON.stringify({ offer: pc.localDescription }));
+                        });
+
+                        pc.onicecandidate = event => {
+                            if (event.candidate) {
+                                signalingServer.send(JSON.stringify({ candidate: event.candidate }));
+                            }
+                        };
+
+                        pc.ontrack = event => {
+                            remoteVideo.srcObject = event.streams[0]; // Gán stream từ remote video
+                        };
+                    })
+                    .catch(error => console.error('Lỗi khi truy cập thiết bị.', error));
+            })
+            .catch(error => {
+                alert(`Lỗi khi tìm kiếm nhân viên: ${error.message}`);
+                console.error('Lỗi:', error);
+            });
+    }
+
+
+    signalingServer.onmessage = message => {
+        const data = JSON.parse(message.data);
+
+        if (data.offer) {
+            pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+            pc.createAnswer().then(answer => {
+                pc.setLocalDescription(answer);
+                signalingServer.send(JSON.stringify({ answer: answer }));
+            });
+        } else if (data.answer) {
+            pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        } else if (data.candidate) {
+            pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+    };
+
+    function hangupCall() {
+        // Dừng tất cả các track trong localStream
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                track.stop(); // Dừng track
+            });
+        }
+
+        // Đóng kết nối PeerConnection
+        if (pc) {
+            pc.close();
+            pc = null;
+        }
+
+        startButton.disabled = false;
+        hangupButton.disabled = true;
+
+        // Thay đổi video source về một nguồn khác hoặc để trống nếu cần
+        localVideo.srcObject = null; // Giữ lại video nếu cần
+        remoteVideo.srcObject = null; // Giữ lại video nếu cần
+        alert('Cuộc gọi đã kết thúc.');
+    }
+</script>
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>

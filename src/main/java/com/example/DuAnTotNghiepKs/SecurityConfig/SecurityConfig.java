@@ -24,7 +24,7 @@ import java.util.Set;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = { "/api", "/login","khach-hang","/img/**","/css/**","/js/**"};
+    private final String[] PUBLIC_ENDPOINTS = { "/api/**", "/login","khach-hang","call","/img/**","/css/**","/js/**"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, TaiKhoanService taiKhoanService) throws Exception {

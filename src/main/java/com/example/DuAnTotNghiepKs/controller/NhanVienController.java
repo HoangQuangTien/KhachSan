@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin/quan-ly-nhan-vien")
+@RequestMapping("/quan-ly-nhan-vien")
 public class NhanVienController {
 
 
@@ -147,7 +147,7 @@ public class NhanVienController {
             }
 
             // Tạo đường dẫn thư mục static/images
-            String uploadDir = "src/main/resources/static/img";
+            String uploadDir = "src/main/resources/static";
             String fileName = img.getOriginalFilename();
             Path filePath = Paths.get(uploadDir, fileName);
 
@@ -287,11 +287,11 @@ public class NhanVienController {
 
             // Xử lý ảnh
             if (img != null && !img.isEmpty()) {
-                String uploadDir = "src/main/resources/static/img"; // Hoặc đường dẫn khác
+                String uploadDir = "src/main/resources/static"; // Hoặc đường dẫn khác
                 String fileName = img.getOriginalFilename();
                 Path filePath = Paths.get(uploadDir, fileName);
                 Files.copy(img.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                nhanVienDTO.setImg("/images/" + fileName); // Cập nhật đường dẫn hình ảnh
+                nhanVienDTO.setImg("/img/" + fileName); // Cập nhật đường dẫn hình ảnh
             }
             System.out.println("Nhân viên:"+nhanVienDTO);
             nhanVienSerVice.save(nhanVienDTO);

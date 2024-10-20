@@ -1,6 +1,7 @@
 package com.example.DuAnTotNghiepKs.repository;
 
 
+import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.KhachHang;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +51,13 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
     @Query("SELECT COUNT(p) FROM Phong p WHERE p.loaiPhong.idLoaiPhong = :idLoaiPhong")
     int countByLoaiPhongId(@Param("idLoaiPhong") Integer idLoaiPhong);
 
+
+    @Query("SELECT p FROM Phong p WHERE p.idPhong != :currentRoomId AND p.idPhong NOT IN " +
+            "(SELECT dp.phong.idPhong FROM DatPhong dp WHERE " +
+            "(dp.ngayNhan < :endDate AND dp.ngayTra > :startDate))")
+    List<Phong> findAvailableRoomsForTimeRange(@Param("currentRoomId") Integer currentRoomId,
+                                               @Param("startDate") LocalDateTime startDate,
+                                               @Param("endDate") LocalDateTime endDate);
 
 
 }

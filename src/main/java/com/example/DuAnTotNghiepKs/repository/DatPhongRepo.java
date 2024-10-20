@@ -123,6 +123,6 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
 
 
-
+    Optional<DatPhong> findTopByPhongOrderByNgayNhanDesc(Phong phong);
 
 }

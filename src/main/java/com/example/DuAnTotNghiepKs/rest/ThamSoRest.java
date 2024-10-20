@@ -34,15 +34,30 @@ public class ThamSoRest {
     }
 
     @PostMapping("/add")
-    public String addThamSo(@ModelAttribute ThamSoDTO thamSoDTO) {
+    public String addThamSo(@ModelAttribute ThamSoDTO thamSoDTO, Model model) {
+        if (thamSoDTO.getTenThamSo() == null || thamSoDTO.getTenThamSo().isEmpty() ||
+                thamSoDTO.getGiaTri() == null || thamSoDTO.getMoTa() == null || thamSoDTO.getMoTa().isEmpty()) {
+            model.addAttribute("errorMessage", "Vui lòng điền tất cả các trường yêu cầu.");
+            model.addAttribute("thamSoList", thamSoService.getAllThamSo());
+            return "list/QuanLyThamSo/thamSo";
+        }
+
         thamSoService.save(thamSoDTO);
         return "redirect:/thamSo";
     }
 
     @PostMapping("/update")
-    public String updateThamSo(@ModelAttribute ThamSoDTO thamSoDTO) {
+    public String updateThamSo(@ModelAttribute ThamSoDTO thamSoDTO, Model model) {
+        if (thamSoDTO.getId() == null || thamSoDTO.getTenThamSo() == null || thamSoDTO.getTenThamSo().isEmpty() ||
+                thamSoDTO.getGiaTri() == null || thamSoDTO.getMoTa() == null || thamSoDTO.getMoTa().isEmpty()) {
+            model.addAttribute("errorMessage", "Vui lòng điền tất cả các trường yêu cầu.");
+            model.addAttribute("thamSoList", thamSoService.getAllThamSo());
+            return "list/QuanLyThamSo/thamSo";
+        }
+
         thamSoService.save(thamSoDTO);
         return "redirect:/thamSo";
     }
+
 }
 

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -127,20 +128,35 @@ public class PhongController {
     }
 
     @PostMapping("/save")
+
     public String savePhong(@ModelAttribute Phong phong,PhongDTO phongDTO,
+
                             @RequestParam String action,
-                            RedirectAttributes redirectAttributes) {
+
+                            RedirectAttributes redirectAttributes) throws IOException {
+
         if ("create".equals(action)) {
+
             // Xử lý tạo mới
+
             if (phong.getTinhTrang() == null) {
+
                 phong.setTinhTrang(false); // Giá trị mặc định
-            }
-            if (phongService.isMaPhongTrung(phongDTO.getMaPhong())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Mã phòng đã tồn tại!");
-                return "redirect:/phongs";
+
             }
 
+            if (phongService.isMaPhongTrung(phongDTO.getMaPhong())) {
+
+                redirectAttributes.addFlashAttribute("errorMessage", "Mã phòng đã tồn tại!");
+
+                return "redirect:/phongs";
+
+            }
+
+
+
             phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
+
             // Lấy loại phòng từ cơ sở dữ liệu
             LoaiPhong loaiPhong = loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null);
 
@@ -154,43 +170,99 @@ public class PhongController {
                     return "redirect:/phongs"; // Thay đổi đường dẫn đến trang cần thiết
                 }
             }
-
-            phongService.savePhong(phong);
-            redirectAttributes.addFlashAttribute("successMessage", "Thêm phòng thành công!");
-        } else if ("update".equals(action)) {
-            // Xử lý cập nhật
-            if (phong.getIdPhong() != null) {
-
-//                // Kiểm tra trạng thái của phòng
-//                if (phong.getTrangThai() != null && !phong.getTrangThai()) { // Trạng thái phòng không phải là "Còn phòng"
-//                    redirectAttributes.addFlashAttribute("errorMessage", "Chỉ được sửa tình trạng phòng khi phòng đó có trạng thái 'Còn phòng'!");
-//                    return "redirect:/phongs";
-//                }
-//
-//                // Kiểm tra tình trạng phòng
-//                if (phong.getTinhTrang() != null && phong.getTinhTrang()) { // Phòng có người đang ở
-//                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa vì phòng đang có người đang ở!");
-//                    return "redirect:/phongs";
-//                }
-
-                phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
 //            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
+
 //            phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
 
+            phong.setImg("/img/"+phongDTO.getImg());
+
+            phongService.savePhong(phong);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Thêm phòng thành công!");
+
+        } else if ("update".equals(action)) {
+
+            // Xử lý cập nhật
+
+            if (phong.getIdPhong() != null) {
+
+
+
+//                // Kiểm tra trạng thái của phòng
+
+//                if (phong.getTrangThai() != null && !phong.getTrangThai()) { // Trạng thái phòng không phải là "Còn phòng"
+
+//                    redirectAttributes.addFlashAttribute("errorMessage", "Chỉ được sửa tình trạng phòng khi phòng đó có trạng thái 'Còn phòng'!");
+
+//                    return "redirect:/phongs";
+
+//                }
+
+//
+
+//                // Kiểm tra tình trạng phòng
+
+//                if (phong.getTinhTrang() != null && phong.getTinhTrang()) { // Phòng có người đang ở
+
+//                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa vì phòng đang có người đang ở!");
+
+//                    return "redirect:/phongs";
+
+//                }
+
+
+
+                phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
+
+//            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
+
+//            phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
+
+//                if (!img.isEmpty()) {
+
+//                    String uploadDir = "src/main/resources/static/img"; // Hoặc đường dẫn khác
+
+//                    String imgName = img.getOriginalFilename();
+
+//                    Path filePath = Paths.get(uploadDir, imgName);
+
+//                    Files.copy(img.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+//                    // Lưu tệp vào một thư mục trên server, sau đó lưu tên file hoặc đường dẫn vào thuộc tính img
+
+//                    // Ví dụ:
+
+//                    phongDTO.setImg("img/" + imgName); // Đường dẫn file
+
+//                }
+
+                phong.setImg("/img/"+phongDTO.getImg());
+
                 phongService.updatePhong(phong);
+
                 redirectAttributes.addFlashAttribute("successMessage", "Cập nhật phòng thành công!");
+
             } else {
+
                 redirectAttributes.addFlashAttribute("errorMessage", "Phòng không tồn tại.");
+
             }
+
         } else {
+
             redirectAttributes.addFlashAttribute("errorMessage", "Action không hợp lệ.");
+
         }
 
 
 
-        return "redirect:/phongs";
-    }
 
+
+
+
+        return "redirect:/phongs";
+
+    }
 
     @GetMapping("/edit")
     public String showEditForm(@RequestParam("id") Integer id, Model model) {

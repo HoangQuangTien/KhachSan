@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/nguoidicung")
+@RequestMapping
 public class NguoiDiCungRest {
 
     @Autowired
@@ -36,7 +36,7 @@ public class NguoiDiCungRest {
     @Autowired
     private TaiKhoanService taiKhoanService;
 
-    @GetMapping()
+    @GetMapping("/nguoidicung")
     public String showDatPhongList(Model model) {
         // Lấy tất cả thông tin đặt phòng chưa check-in
         List<DatPhong> datPhongs = datPhongService.getDatPhongChuaCheckIn();
@@ -53,8 +53,8 @@ public class NguoiDiCungRest {
         return "list/QuanLyDatPhong/nguoidicung"; // Đường dẫn tới trang HTML hiển thị danh sách đặt phòng
     }
 
-    @GetMapping("/{id}")
-    public String hienThiKhachDiCung(@PathVariable Integer id, Model model) {
+    @GetMapping("")
+    public String hienThiKhachDiCung(@RequestParam Integer id, Model model) {
         DatPhong datPhong = datPhongService.findById(id);
         DatPhongDTO datPhongDTO = new DatPhongDTO();
         datPhongDTO.setIdDatPhong(datPhong.getIdDatPhong());

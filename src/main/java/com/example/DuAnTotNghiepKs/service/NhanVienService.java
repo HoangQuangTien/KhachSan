@@ -176,4 +176,32 @@ public class NhanVienService {
 
 
 
+
+    // Phương thức tìm kiếm nhân viên theo tên
+    public List<NhanVienDTO> findByName(String name) {
+        return nhanVienRepo.findByHoTenContaining(name)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    private NhanVienDTO convertToDTO(NhanVien nhanVien) {
+        if (nhanVien == null) {
+            return null; // Trả về null nếu đối tượng là null
+        }
+
+        return NhanVienDTO.builder()
+                .maNhanVien(nhanVien.getMaNhanVien())
+                .hoTen(nhanVien.getHoTen())
+                .ngaySinh(nhanVien.getNgaySinh())
+                .gioiTinh(nhanVien.getGioiTinh())
+                .soDienThoai(nhanVien.getSoDienThoai())
+                .email(nhanVien.getEmail())
+                // Thêm các trường khác mà bạn muốn chuyển đổi
+                .build();
+    }
+
+
+
 }

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +8,60 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <head th:include="fragment/head :: head"></head>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .wrapper {
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-title {
+            font-weight: bold;
+            color: #495057;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .form-control {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            transition: border-color 0.2s ease-in-out;
+        }
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .alert {
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .text-center {
+            margin-top: 20px;
+        }
+    </style>
 </head>
-
-<body class="vertical light">
-
+<body class="vertical  light  ">
 <div class="wrapper">
     <div th:include="fragment/navbar :: navbar"></div>
     <div th:include="fragment/sidebar :: sidebar"></div>
@@ -20,29 +69,49 @@
         <div class="container mt-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-4">Sửa Phòng</h4>
+                    <h1 class="text-center text-primary mb-4">Sửa Phòng</h1>
                     <div id="updateRoomMessage" class="alert d-none" role="alert"></div>
-                    <form id="updateRoomForm" action="/danhsachdatphong/update-room" method="post">
+                    <form id="updateRoomForm" action="/update-room" method="post">
                         <input type="hidden" name="roomId" th:value="${phong.idPhong}" />
 
                         <!-- Dropdown chọn loại phòng -->
                         <div class="mb-3">
                             <label for="loaiPhongSelect" class="form-label">Loại Phòng</label>
                             <select id="loaiPhongSelect" name="loaiPhong" class="form-select" required>
-                                <option value="" disabled selected>Chọn loại phòng</option>
-                                <option th:each="loaiPhong : ${loaiPhongs}" th:value="${loaiPhong.idLoaiPhong}" th:text="${loaiPhong.tenLoaiPhong}">
+                                <option value="" disabled>Chọn loại phòng</option>
+                                <option th:each="loaiPhong : ${loaiPhongs}"
+                                        th:value="${loaiPhong.idLoaiPhong}"
+                                        th:text="${loaiPhong.tenLoaiPhong}"
+                                        th:selected="${loaiPhong.idLoaiPhong == phong.loaiPhong.idLoaiPhong}">
                                 </option>
                             </select>
                         </div>
 
-                        <!-- Dropdown chọn tên phòng -->
-                        <div class="mb-3">
-                            <label for="tenPhongSelect" class="form-label">Tên Phòng</label>
-                            <select id="tenPhongSelect" name="tenPhong" class="form-select" required>
-                                <option value="" disabled selected>Chọn phòng</option>
-                                <option th:each="room : ${allRooms}" th:data-loai-phong-id="${room.loaiPhong.idLoaiPhong}" th:data-price="${room.gia}" th:value="${room.idPhong}" th:text="${room.tenPhong}">
+                        <select id="tenPhongSelect" name="tenPhong" class="form-select" required>
+                            <option value="" disabled>Chọn phòng</option>
+                            <th:block th:each="room : ${allRooms}">
+                                <option th:value="${room.idPhong}"
+                                        th:text="${room.tenPhong}"
+                                        th:data-loai-phong-id="${room.loaiPhong.idLoaiPhong}"
+                                        th:data-gia-phong="${room.loaiPhong.gia}"
+                                        th:data-so-nguoi-toi-da="${room.loaiPhong.soNguoiToiDa}"
+                                        th:selected="${room.idPhong == phong.idPhong ? 'selected' : ''}">
                                 </option>
-                            </select>
+                            </th:block>
+                        </select>
+
+                        <!-- Số lượng người tối đa -->
+                        <div class="mb-3">
+                            <label for="soNguoiToiDa" class="form-label">Số Người Tối Đa</label>
+                            <input type="number" id="soNguoiToiDa" name="soNguoiToiDa" class="form-control"
+                                   th:value="${phong.loaiPhong.soNguoiToiDa}" readonly>
+                        </div>
+
+                        <!-- Giá phòng -->
+                        <div class="mb-3">
+                            <label for="giaPhong" class="form-label">Giá Phòng</label>
+                            <input type="number" id="giaPhong" name="giaPhong" class="form-control"
+                                   th:value="${phong.loaiPhong.gia}" readonly>
                         </div>
 
                         <div class="mb-3">
@@ -51,277 +120,111 @@
                         </div>
 
                         <div class="text-center">
-                            <button type="submit" class="btn btn-success">Cập Nhật</button>
-                            <a href="/danhsachdatphong" class="btn btn-secondary ms-3">Quay lại</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Cập Nhật
+                            </button>
+                            <a href="/danhsachdatphong" class="btn btn-secondary ms-3">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
                         </div>
+
                     </form>
                 </div>
             </div>
         </div>
-    </main>
-</div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const updateRoomForm = document.getElementById('updateRoomForm');
+                const updateRoomMessage = document.getElementById('updateRoomMessage');
+                const loaiPhongSelect = document.getElementById('loaiPhongSelect');
+                const tenPhongSelect = document.getElementById('tenPhongSelect');
+                const soNguoiToiDaInput = document.getElementById('soNguoiToiDa');
+                const giaPhongInput = document.getElementById('giaPhong');
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('updateRoomForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+                // Sự kiện submit form
+                updateRoomForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(updateRoomForm);
 
-            const form = event.target;
-            const formData = new FormData(form);
-
-            fetch(form.action, {
-                method: form.method,
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => {
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        return response.json();
-                    } else {
-                        return response.text().then(text => {
-                            throw new Error(`Server returned an error: ${text}`);
-                        });
-                    }
-                })
-                .then(data => {
-                    const updateRoomMessage = document.getElementById('updateRoomMessage');
-                    updateRoomMessage.classList.remove('d-none');
-
-                    if (data.success) {
-                        updateRoomMessage.classList.add('alert-success');
-                        updateRoomMessage.classList.remove('alert-danger');
-                        updateRoomMessage.textContent = 'Cập nhật phòng thành công.';
-                        setTimeout(() => {
-                            window.location.href = '/danhsachdatphong';
-                        }, 1000);
-                    } else {
-                        updateRoomMessage.classList.add('alert-danger');
-                        updateRoomMessage.classList.remove('alert-success');
-                        updateRoomMessage.textContent = 'Đã xảy ra lỗi: ' + data.message;
-                    }
-                })
-                .catch(error => {
-                    const updateRoomMessage = document.getElementById('updateRoomMessage');
-                    updateRoomMessage.classList.remove('d-none');
-                    updateRoomMessage.classList.add('alert-danger');
-                    updateRoomMessage.textContent = 'Đã xảy ra lỗi: ' + error.message;
-                });
-        });
-    });
-
-    document.getElementById('loaiPhongSelect').addEventListener('change', function() {
-        var selectedLoaiPhongId = this.value;
-        var roomOptions = document.querySelectorAll('#tenPhongSelect option');
-
-        // Lấy giá của loại phòng đã chọn
-        var selectedRoomPrice = null;
-        roomOptions.forEach(function(option) {
-            var loaiPhongId = option.getAttribute('data-loai-phong-id');
-            if (loaiPhongId === selectedLoaiPhongId) {
-                selectedRoomPrice = parseFloat(option.getAttribute('data-price'));
-            }
-        });
-
-        roomOptions.forEach(function(option) {
-            var loaiPhongId = option.getAttribute('data-loai-phong-id');
-            var price = parseFloat(option.getAttribute('data-price'));
-
-            // Chỉ hiển thị phòng nếu loại khác và giá lớn hơn giá phòng đã chọn
-            if (loaiPhongId !== selectedLoaiPhongId && price > selectedRoomPrice) {
-                option.style.display = '';
-            } else if (loaiPhongId === selectedLoaiPhongId) {
-                option.style.display = '';
-            } else {
-                option.style.display = 'none'; // Ẩn những phòng không thỏa điều kiện
-            }
-        });
-
-        // Reset lại lựa chọn phòng khi thay đổi loại phòng
-        document.getElementById('tenPhongSelect').value = '';
-    });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
-
-
-Danhsach.html
-<script>
-    function confirmCheckIn(idDatPhong) {
-        Swal.fire({
-            title: 'Xác nhận check-in',
-            text: 'Bạn có chắc chắn muốn check-in?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Xác nhận',
-            cancelButtonText: 'Hủy',
-            reverseButtons: true,
-            customClass: {
-                confirmButton: 'btn btn-warning',
-                cancelButton: 'btn btn-secondary'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                checkInDatPhong(idDatPhong);
-            }
-        });
-    }
-
-    function checkInDatPhong(idDatPhong) {
-        fetch(`/danhsach/check-in?idDatPhong=${encodeURIComponent(idDatPhong)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById(`datPhong-${idDatPhong}`).remove();
-                    if (window.calendar) {
-                        window.calendar.refetchEvents();
-                    }
-                    Swal.fire({
-                        title: 'Thành công!',
-                        text: 'Check-in thành công!',
-                        icon: 'success',
-                        confirmButtonText: 'Đóng',
-                        customClass: {
-                            confirmButton: 'btn btn-success'
-                        }
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Có lỗi xảy ra!',
-                        text: data.error || 'Không có thông tin lỗi',
-                        icon: 'error',
-                        confirmButtonText: 'Đóng',
-                        customClass: {
-                            confirmButton: 'btn btn-danger'
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                Swal.fire({
-                    title: 'Có lỗi xảy ra!',
-                    text: 'Vui lòng thử lại sau.',
-                    icon: 'error',
-                    confirmButtonText: 'Đóng',
-                    customClass: {
-                        confirmButton: 'btn btn-danger'
-                    }
-                });
-            });
-    }
-
-    function confirmCancelBooking(idDatPhong) {
-        Swal.fire({
-            title: 'Xác nhận hủy đặt phòng',
-            text: 'Bạn có chắc chắn muốn hủy đặt phòng này?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Xác nhận',
-            cancelButtonText: 'Hủy',
-            reverseButtons: true,
-            customClass: {
-                confirmButton: 'btn btn-danger',
-                cancelButton: 'btn btn-secondary'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                cancelBooking(idDatPhong); // Gọi hàm hủy đặt phòng
-            }
-        });
-    }
-
-    function cancelBooking(idDatPhong) {
-        // Hiển thị thông báo yêu cầu lý do hủy
-        Swal.fire({
-            title: 'Nhập lý do hủy',
-            input: 'text',
-            inputPlaceholder: 'Nhập lý do...',
-            showCancelButton: true,
-            confirmButtonText: 'Hủy Đặt',
-            cancelButtonText: 'Quay lại',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Bạn cần nhập lý do!';
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const reason = result.value;
-
-                // Gửi yêu cầu hủy đặt phòng với lý do
-                fetch(`/danhsach/cancel-booking?idDatPhong=${encodeURIComponent(idDatPhong)}&reason=${encodeURIComponent(reason)}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        Swal.close(); // Đóng thông báo xử lý
-                        if (data.success) {
-                            // Cập nhật trạng thái cho dòng đặt phòng
-                            const datPhongElement = document.getElementById(`datPhong-${idDatPhong}`);
-                            if (datPhongElement) {
-                                // Cập nhật ô trạng thái (có thể điều chỉnh theo vị trí thực tế)
-                                const statusCell = datPhongElement.querySelector('td:nth-child(7)'); // Chỉ định cột trạng thái
-                                const reasonCell = datPhongElement.querySelector('td:nth-child(8)'); // Chỉ định cột lý do hủy
-                                statusCell.textContent = 'Đã hủy'; // Cập nhật trạng thái
-                                reasonCell.textContent = reason; // Cập nhật lý do hủy
-
-                                // Ẩn hoặc xóa các nút hành động
-                                const buttons = datPhongElement.querySelectorAll('button');
-                                buttons.forEach(button => button.style.display = 'none'); // Ẩn nút nếu cần
-                            }
-
-                            // Hiển thị thông báo thành công
-                            Swal.fire({
-                                title: 'Thành công!',
-                                text: 'Đặt phòng đã được hủy. Lý do: ' + reason,
-                                icon: 'success',
-                                confirmButtonText: 'Đóng',
-                                customClass: {
-                                    confirmButton: 'btn btn-success'
-                                }
-                            });
-                        } else {
-                            // Thông báo lỗi nếu không thành công
-                            Swal.fire({
-                                title: 'Có lỗi xảy ra!',
-                                text: data.error || 'Không có thông tin lỗi',
-                                icon: 'error',
-                                confirmButtonText: 'Đóng',
-                                customClass: {
-                                    confirmButton: 'btn btn-danger'
-                                }
-                            });
+                    fetch(updateRoomForm.action, {
+                        method: updateRoomForm.method,
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
                         }
                     })
-                    .catch(error => {
-                        console.error('Có lỗi xảy ra:', error);
-                        Swal.close();
-                        // Hiển thị thông báo lỗi chung
-                        Swal.fire({
-                            title: 'Có lỗi xảy ra!',
-                            text: 'Vui lòng thử lại sau.',
-                            icon: 'error',
-                            confirmButtonText: 'Đóng',
-                            customClass: {
-                                confirmButton: 'btn btn-danger'
+                        .then(response => {
+                            const contentType = response.headers.get('content-type');
+                            if (contentType && contentType.includes('application/json')) {
+                                return response.json();
+                            } else {
+                                return response.text().then(text => {
+                                    throw new Error(`Server returned an error: ${text}`);
+                                });
                             }
+                        })
+                        .then(data => {
+                            updateRoomMessage.classList.remove('d-none');
+                            if (data.success) {
+                                updateRoomMessage.classList.add('alert-success');
+                                updateRoomMessage.classList.remove('alert-danger');
+                                updateRoomMessage.textContent = 'Cập nhật phòng thành công.';
+                                setTimeout(() => {
+                                    window.location.href = '/danhsachdatphong';
+                                }, 1000);
+                            } else {
+                                updateRoomMessage.classList.add('alert-danger');
+                                updateRoomMessage.classList.remove('alert-success');
+                                updateRoomMessage.textContent = 'Đã xảy ra lỗi: ' + data.message;
+                            }
+                        })
+                        .catch(error => {
+                            updateRoomMessage.classList.remove('d-none');
+                            updateRoomMessage.classList.add('alert-danger');
+                            updateRoomMessage.textContent = 'Đã xảy ra lỗi: ' + error.message;
                         });
-                    });
-            }
-        });
-    }
+                });
 
-</script>
+                // Cập nhật dropdown tên phòng và giá/số người khi chọn loại phòng
+                loaiPhongSelect.addEventListener('change', function() {
+                    const selectedLoaiPhongId = this.value;
+                    const roomOptions = document.querySelectorAll('#tenPhongSelect option');
+
+                    roomOptions.forEach(function(option) {
+                        const loaiPhongId = option.getAttribute('data-loai-phong-id');
+                        option.style.display = loaiPhongId === selectedLoaiPhongId ? '' : 'none';
+                    });
+
+                    // Cập nhật giá trị của dropdown tên phòng
+                    const selectedRoom = tenPhongSelect.value;
+                    if (selectedRoom) {
+                        const previouslySelectedRoom = document.querySelector(`#tenPhongSelect option[value="${selectedRoom}"]`);
+                        if (previouslySelectedRoom && previouslySelectedRoom.style.display !== 'none') {
+                            tenPhongSelect.value = selectedRoom;
+                            updateRoomDetails(previouslySelectedRoom);
+                        } else {
+                            tenPhongSelect.value = '';
+                            soNguoiToiDaInput.value = '';
+                            giaPhongInput.value = '';
+                        }
+                    }
+                });
+
+                tenPhongSelect.addEventListener('change', function() {
+                    const selectedRoom = this.options[this.selectedIndex];
+                    updateRoomDetails(selectedRoom);
+                    loaiPhongSelect.value = selectedRoom.getAttribute('data-loai-phong-id');
+                });
+
+                function updateRoomDetails(selectedRoom) {
+                    soNguoiToiDaInput.value = selectedRoom.getAttribute('data-so-nguoi-toi-da');
+                    giaPhongInput.value = selectedRoom.getAttribute('data-gia-phong');
+                }
+            });
+        </script>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -288,9 +288,12 @@
 
                         </td>
                         <td>
-                            <a th:href="@{/danhsachdatphong/edit-room/{roomId}(roomId=${dp.phong.idPhong})}" class="btn btn-warning">
+                        <td>
+                            <a th:href="@{/edit-room(roomId=${dp.phong.idPhong})}" class="btn btn-warning">
                                 <i class="fas fa-edit"></i>
                             </a>
+                        </td>
+
                         </td>
                     </tr>
                     </tbody>

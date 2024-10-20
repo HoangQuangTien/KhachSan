@@ -52,4 +52,8 @@ public interface NhanVienRepo extends JpaRepository<NhanVien, Integer> {
 
     @Query("SELECT n FROM NhanVien n WHERE n.soDienThoai = ?1")
     List<Tuple> findBySoDienThoai(String soDienThoai);
+
+
+    List<NhanVien> findByHoTenContaining(String hoTen);
+
 }
