@@ -1,12 +1,21 @@
 package com.example.DuAnTotNghiepKs.repository;
 
+import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
 import com.example.DuAnTotNghiepKs.entity.LichLamViec;
+import com.example.DuAnTotNghiepKs.entity.NhanVien;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface LichLamViecRepo extends JpaRepository<LichLamViec, Integer> {
-    Optional<LichLamViec> findBymaLichLamViec(String maLichlamViec);
+
+    List<LichLamViec> findByNhanVien(NhanVienDTO nhanVienDTO);
+
+    LichLamViec findTopByOrderByIdLichLamViecDesc();
 }

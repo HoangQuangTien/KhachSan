@@ -35,17 +35,90 @@ public class KhuyenMaiService {
     public boolean existsByMaKhuyenMai(String maKhuyenMai) {
         return khuyenMaiRepository.existsByMaKhuyenMai(maKhuyenMai);
     }
+//    public KhuyenMai saveKhuyenMai(KhuyenMai khuyenMai) {
+//        Float giamToiThieu = khuyenMai.getGiamToiThieu();
+//        Float giamToiDa = khuyenMai.getGiamToiDa();
+//        if (giamToiDa < giamToiThieu){
+//            throw new IllegalArgumentException("Giảm tối đa phải lơn hơn giảm tối thiểu");
+//        }
+//        if (khuyenMaiRepository.existsByMaKhuyenMai(khuyenMai.getMaKhuyenMai())){
+//            throw new RuntimeException("Mã khuyến mại đã tồn tại");
+//        }
+//        return khuyenMaiRepository.save(khuyenMai);
+//    }
+
     public KhuyenMai saveKhuyenMai(KhuyenMai khuyenMai) {
+        // Kiểm tra mã khuyến mại
+        if (khuyenMai.getMaKhuyenMai() == null || khuyenMai.getMaKhuyenMai().isBlank()) {
+            throw new IllegalArgumentException("Mã khuyến mại không được để trống");
+        }
+
+        // Kiểm tra tên khuyến mại
+        if (khuyenMai.getTenKhuyenMai() == null || khuyenMai.getTenKhuyenMai().isBlank()) {
+            throw new IllegalArgumentException("Tên khuyến mại không được để trống");
+        }
+
+        // Kiểm tra mô tả
+        String moTa = khuyenMai.getMoTa();
+        if (moTa == null || moTa.length() < 10 || moTa.length() > 200) {
+            throw new IllegalArgumentException("Mô tả phải có độ dài từ 10 đến 200 ký tự");
+        }
+
+        // Kiểm tra ngày bắt đầu
+        if (khuyenMai.getNgayBatDau() == null) {
+            throw new IllegalArgumentException("Ngày bắt đầu không được để trống");
+        }
+
+        // Kiểm tra ngày kết thúc
+        if (khuyenMai.getNgayKetThuc() == null) {
+            throw new IllegalArgumentException("Ngày kết thúc không được để trống");
+        }
+
+        // Kiểm tra giảm giá
+        Float giamGia = khuyenMai.getGiamGia();
+        if (giamGia == null) {
+            throw new IllegalArgumentException("Giảm giá không được để trống");
+        }
+
+        // Kiểm tra loại giảm
+        if (khuyenMai.getLoaiGiam() == null) {
+            throw new IllegalArgumentException("Loại giảm không được để trống");
+        }
+
+        // Kiểm tra số lượng
+        Integer soLuong = khuyenMai.getSoLuong();
+        if (soLuong == null || soLuong < 0) {
+            throw new IllegalArgumentException("Số lượng phải lớn hơn hoặc bằng 0");
+        }
+
+        // Kiểm tra giảm tối thiểu và tối đa
         Float giamToiThieu = khuyenMai.getGiamToiThieu();
         Float giamToiDa = khuyenMai.getGiamToiDa();
-        if (giamToiDa < giamToiThieu){
-            throw new IllegalArgumentException("Giảm tối đa phải lơn hơn giảm tối thiểu");
+
+        if (giamToiThieu == null || giamToiDa == null) {
+            throw new IllegalArgumentException("Giảm tối thiểu và tối đa không được để trống");
         }
-        if (khuyenMaiRepository.existsByMaKhuyenMai(khuyenMai.getMaKhuyenMai())){
-            throw new RuntimeException("Mã khuyến mại đã tồn tại");
+
+        if (giamToiDa < giamToiThieu) {
+            throw new IllegalArgumentException("Giảm tối đa phải lớn hơn giảm tối thiểu");
         }
+
+        // Kiểm tra mã khuyến mại đã tồn tại
+        if (khuyenMaiRepository.existsByMaKhuyenMai(khuyenMai.getMaKhuyenMai())) {
+            throw new RuntimeException("Mã khuyến mại '" + khuyenMai.getMaKhuyenMai() + "' đã tồn tại");
+        }
+
+        // Kiểm tra trạng thái
+        String trangThai = khuyenMai.getTrangThai();
+        if (trangThai == null || trangThai.isBlank()) {
+            throw new IllegalArgumentException("Trạng thái không được để trống");
+        }
+
+
+        // Lưu khuyến mại
         return khuyenMaiRepository.save(khuyenMai);
     }
+
 
     public KhuyenMai updateKhuyenMai(Integer id, KhuyenMai updatedKhuyenMai) {
         // Kiểm tra xem khuyến mãi có tồn tại không

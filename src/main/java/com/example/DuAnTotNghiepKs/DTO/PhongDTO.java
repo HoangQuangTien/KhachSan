@@ -55,7 +55,6 @@ public class PhongDTO {
         private Float giaLoaiPhong;
 
 
-
-
-
+        public void setSoNguoiToiDa(Integer soNguoiToiDa) {
+        }
 }

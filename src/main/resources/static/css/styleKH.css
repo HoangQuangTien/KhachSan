@@ -301,3 +301,66 @@ footer .container {
 
 
 
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+.room-class-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+#room-class-list {
+    display: none;
+    background-color: black;
+    border-radius: 5px;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+#room-class-list li {
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+#room-class-list li:hover {
+    background-color: #333;
+}
+.card {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.card-body {
+    display: flex; /* Sử dụng flexbox để căn giữa */
+    flex-direction: column; /* Đặt chiều dọc */
+
+    align-items: center; /* Căn giữa theo chiều ngang */
+}
+
+.card-title, .card-text {
+    margin: 10px 0; /* Thêm khoảng cách giữa tiêu đề và giá */
+}
+.container {
+    display: grid;
+    grid-gap: 11px; /* Thêm khoảng cách 11px giữa các phần tử trong lưới */
+}
+.room-card {
+    margin: 30px auto; /* Căn giữa và tạo khoảng trắng đều cho trên dưới */
+
+}
+
+
+
+

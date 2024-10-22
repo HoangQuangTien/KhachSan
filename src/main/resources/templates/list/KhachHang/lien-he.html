@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DragonBall Hotel</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/styleKH.css}"/>
+
+
+</head>
+
+<body>
+
+<!-- Header Section -->
+<div class="container-fluid p-0 position-relative">
+    <!-- Background Image -->
+    <!-- Carousel -->
+    <div id="carouselExample" class="carousel slide" data-ride="carousel" data-interval="2000">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img th:src="@{/img/296817374_1015897554.jpg}" class="d-block w-100" alt="Slide 1" style="height: 100vh; object-fit: cover;">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/img/phong-khach-san-dep-de-chup-anh-o-ha-noi-3.jpg}" class="d-block w-100" alt="Slide 2" style="height: 100vh; object-fit: cover;">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/img/anhPhongKS1.jpg}" class="d-block w-100" alt="Slide 3" style="height: 100vh; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+
+    <img th:src="@{/img/logo-Photoroom.png}" class="logo position-absolute" alt="Logo">
+    <!-- Overlay content -->
+    <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center" style="background: rgba(0, 0, 0, 0.5);">
+
+        <!-- Title -->
+        <h1 class="text-white mb-3 text-center">Chào Mừng Đến Với DragonBall HOTEL</h1>
+
+        <!-- Subtitle -->
+        <p class="text-white mb-4 text-center">Tìm kiếm để so sánh giá cả và khám phá ưu đãi tuyệt vời</p>
+
+        <!-- Search Bar -->
+        <form class="search-bar p-4 bg-white rounded shadow-sm d-flex align-items-center justify-content-between">
+            <!-- Location Search -->
+            <div class="input-group me-2 w-25">
+        <span class="input-group-text bg-transparent border-0">
+            <i class="bi bi-search"></i>
+        </span>
+                <input type="text" class="form-control border-0" placeholder="Loại Phòng" aria-label="Search location">
+            </div>
+
+            <!-- Check-in & Check-out Section -->
+            <div class="check-in-out d-flex align-items-center">
+                <!-- Check-in -->
+                <div class="input-group me-2">
+                    <input type="datetime-local" id="checkin" class="form-control border-0" placeholder="Nhận phòng">
+                </div>
+
+                <!-- Check-out -->
+                <div class="input-group me-2">
+                    <input type="datetime-local" id="checkout" class="form-control border-0" placeholder="Trả phòng">
+                </div>
+            </div>
+
+
+            <!-- Guests -->
+            <div class="input-group me-2 w-25">
+                <input type="text" class="form-control border-0" placeholder="So nguoi">
+            </div>
+
+            <!-- Search Button -->
+            <button class="btn btn-primary px-4">Tìm</button>
+        </form>
+
+
+        <!-- Login Button -->
+        <div class="login-button-container position-absolute top-0 end-0 m-3">
+            <a href="/login" class="btn btn-outline-light">Đăng Nhập</a>
+        </div>
+
+        <div class="Home-button-container d-flex align-items-center position-absolute top-0 end-0 m-3">
+            <!-- Trang Chủ -->
+            <a href="/khach-hang" class="text-link mb-2 p-2">Trang Chủ</a>
+            <!-- Giới Thiệu -->
+            <a href="/about" class="text-link mb-2 p-2">Giới Thiệu</a>
+            <!-- Hạng Phòng -->
+            <a href="/room-classes" class="text-link mb-2 p-2">Hạng Phòng</a>
+        </div>
+
+        <!-- Các nút chọn ngôn ngữ -->
+        <div class="language-buttons d-flex top-0 end-0">
+            <div id="vi-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;" >
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" alt="Cờ Việt Nam" style="width: 20px; height: 15px; margin-right: 5px;">
+                Tiếng Việt
+            </div>
+            <div id="en-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;">
+                <img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="Cờ Anh" style="width: 20px; height: 15px; margin-right: 5px;">
+                English
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</div>
+
+
+
+<h1>Gọi Video với WebRTC</h1>
+<input type="text" id="employeeName" placeholder="Nhập tên nhân viên" />
+<button id="callButton">Gọi điện</button>
+<video id="localVideo" autoplay muted playsinline></video>
+<video id="remoteVideo" autoplay playsinline></video>
+<button id="startButton">Bắt đầu gọi</button>
+<button id="hangupButton" disabled>Kết thúc</button>
+
+
+
+<footer class="bg-dark text-white py-4 mt-2">
+    <div class="container">
+        <div class="row">
+            <!-- Google Maps Embed (Left) -->
+            <div class="col-md-6">
+                <h5 class="text-white">Vị trí của chúng tôi</h5>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4337.097401206077!2d105.74389980195575!3d21.045412325554775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313455b3f6710da1%3A0x240105831b77a1a2!2zVHLGsOG7nW5nIENhbyDEkeG6s25nIEZQVCBQb2x5dGVjaG5pYw!5e0!3m2!1sen!2s!4v1728742407402!5m2!1sen!2s" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+
+            </div>
+
+            <!-- Contact Info (Right) -->
+            <div class="col-md-6">
+                <h5 class="text-white" id="footerContact">Thông tin liên hệ</h5>
+                <p class="mb-0" id="footerAddress">Địa chỉ: P. Kiều Mai, Phúc Diễn, Từ Liêm, Hà Nội</p>
+                <p id="footerEmail">Email: contact@dragonballhotel.com</p>
+                <p id="footerPhone">Phone: +84 397156204</p>
+                <ul class="list-inline">
+                    <li class="list-inline-item"><a href="#" class="text-white">Facebook</a></li>
+                    <li class="list-inline-item"><a href="#" class="text-white">Instagram</a></li>
+                    <li class="list-inline-item"><a href="#" class="text-white">Twitter</a></li>
+                </ul>
+            </div>
+
+        </div>
+        <!-- Divider -->
+        <div class="divider"></div>
+        <!-- Copyright Section -->
+        <div class="text-center mt-4">
+            <p class="copyright mb-0">&copy; 2024 DragonBall Hotel. All Rights Reserved.</p>
+        </div>
+    </div>
+
+
+</footer>
+
+<div class="chat-icon" onclick="toggleChat()">
+    <i class="fas fa-comments"></i> <!-- Icon chat -->
+</div>
+
+<div class="boxchat" id="chatBox" style="display: none;">
+    <div class="boxchat-header">
+        Hỗ trợ trực tuyến
+        <button class="close" onclick="toggleChat()" style="float: right;">&times;</button>
+    </div>
+    <div class="boxchat-body" id="chatbox" style="height: 200px; overflow-y: auto;">
+        <!-- Nội dung chat sẽ hiển thị tại đây -->
+    </div>
+    <div class="boxchat-footer">
+        <input type="text" id="user-input" placeholder="Nhập tin nhắn..." style="width: 80%;">
+        <button id="send-button" class="btn btn-primary">Gửi</button>
+    </div>
+</div>
+
+<!-- CSS -->
+<style>
+    .chat-icon {
+        position: fixed; /* Giữ icon cố định ở vị trí khi cuộn trang */
+        bottom: 20px;    /* Khoảng cách từ dưới lên */
+        right: 20px;     /* Khoảng cách từ phải sang */
+        background-color: #007bff; /* Màu nền */
+        border-radius: 50%; /* Bo tròn để có hình tròn */
+        width: 60px;     /* Chiều rộng */
+        height: 60px;    /* Chiều cao */
+        display: flex;   /* Sử dụng flexbox để căn giữa icon */
+        justify-content: center;
+        align-items: center;
+        cursor: pointer; /* Con trỏ biến thành tay khi hover */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Tạo hiệu ứng shadow */
+        transition: background-color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+    }
+
+    .chat-icon i {
+        color: #fff; /* Màu của icon */
+        font-size: 24px; /* Kích thước của icon */
+    }
+
+    .chat-icon:hover {
+        background-color: #0056b3; /* Màu khi hover */
+    }
+
+
+    .boxchat {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .boxchat-header {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .boxchat-body {
+        padding: 10px;
+        height: 200px;
+        overflow-y: auto;
+    }
+
+    .boxchat-footer {
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    .close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .message {
+        margin: 5px 0;
+    }
+
+    .message.user {
+        text-align: right;
+    }
+
+    .message.bot {
+        text-align: left;
+        color: #007bff;
+    }
+</style>
+
+
+<script>
+
+    // Hàm để ẩn/hiện hộp chat
+    function toggleChat() {
+        const chatBox = document.getElementById("chatBox");
+        if (chatBox.style.display === "none") {
+            chatBox.style.display = "block";
+        } else {
+            chatBox.style.display = "none";
+        }
+    }
+    const sendMessage = () => {
+        const userInput = document.getElementById('user-input').value.trim();
+        if (!userInput) return;
+
+        // Hiển thị tin nhắn của người dùng
+        const chatbox = document.getElementById('chatbox');
+        chatbox.innerHTML += `<div class="message user"><strong>Bạn:</strong> ${userInput}</div>`;
+        document.getElementById('user-input').value = ''; // Xóa input
+
+        // Gửi yêu cầu đến chatbot
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: userInput })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Lỗi khi gọi API');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Gọi hàm để hiển thị phản hồi từ chatbot với hiệu ứng gõ
+                typeWriter(data.response);
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra:', error);
+                chatbox.innerHTML += `<div class="message bot"><strong>Bot:</strong> Đã xảy ra lỗi khi gửi tin nhắn, vui lòng thử lại sau.</div>`;
+                chatbox.scrollTop = chatbox.scrollHeight; // Cuộn xuống cuối
+            });
+    };
+
+    // Hiệu ứng gõ chữ
+    function typeWriter(text) {
+        const chatbox = document.getElementById('chatbox');
+        let i = 0;
+        chatbox.innerHTML += `<div class="message bot"><strong>Bot:</strong> </div>`; // Tạo dòng bot
+        const botMessage = chatbox.lastElementChild; // Lấy dòng bot vừa tạo
+
+        const interval = setInterval(() => {
+            if (i < text.length) {
+                botMessage.innerHTML += text.charAt(i); // Thêm từng chữ một
+                i++;
+                chatbox.scrollTop = chatbox.scrollHeight; // Cuộn xuống cuối
+            } else {
+                clearInterval(interval); // Dừng khi hết chữ
+            }
+        }, 50); // Giảm tốc độ gõ xuống 50 ms cho mỗi chữ
+    }
+
+    // Xử lý khi nhấn nút "Gửi"
+    document.getElementById('send-button').onclick = sendMessage;
+
+    // Xử lý khi nhấn phím "Enter"
+    document.getElementById('user-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+
+</script>
+
+
+<script th:src="@{/js/KH.js}"></script>
+
+<script>
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const startButton = document.getElementById('startButton');
+    const hangupButton = document.getElementById('hangupButton');
+    const employeeInput = document.getElementById('employeeName');
+
+    let localStream;
+    let pc;
+    const signalingServer = new WebSocket('ws://localhost:8080/ws');
+
+    startButton.onclick = startCall;
+    hangupButton.onclick = hangupCall;
+
+    const configuration = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    };
+
+    function startCall() {
+        const employeeName = employeeInput.value; // Lấy tên nhân viên từ input
+        if (!employeeName) {
+            alert('Vui lòng nhập tên nhân viên!');
+            return;
+        }
+
+        fetch(`/api/employees/${encodeURIComponent(employeeName)}`) // Mã hóa tên nhân viên
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Lỗi ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(employees => {
+                if (employees.length === 0) {
+                    alert('Không tìm thấy nhân viên.');
+                    return;
+                }
+
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                    .then(stream => {
+                        localVideo.srcObject = stream;
+                        localStream = stream;
+
+                        pc = new RTCPeerConnection(configuration);
+                        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+                        // Kích hoạt nút "Kết thúc"
+                        startButton.disabled = true;
+                        hangupButton.disabled = false;
+
+                        // Tạo offer và gửi qua WebSocket
+                        pc.createOffer().then(offer => {
+                            return pc.setLocalDescription(offer);
+                        }).then(() => {
+                            signalingServer.send(JSON.stringify({ offer: pc.localDescription }));
+                        });
+
+                        pc.onicecandidate = event => {
+                            if (event.candidate) {
+                                signalingServer.send(JSON.stringify({ candidate: event.candidate }));
+                            }
+                        };
+
+                        pc.ontrack = event => {
+                            remoteVideo.srcObject = event.streams[0]; // Gán stream từ remote video
+                        };
+                    })
+                    .catch(error => console.error('Lỗi khi truy cập thiết bị.', error));
+            })
+            .catch(error => {
+                alert(`Lỗi khi tìm kiếm nhân viên: ${error.message}`);
+                console.error('Lỗi:', error);
+            });
+    }
+
+
+    signalingServer.onmessage = message => {
+        const data = JSON.parse(message.data);
+
+        if (data.offer) {
+            pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+            pc.createAnswer().then(answer => {
+                pc.setLocalDescription(answer);
+                signalingServer.send(JSON.stringify({ answer: answer }));
+            });
+        } else if (data.answer) {
+            pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        } else if (data.candidate) {
+            pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+    };
+
+    function hangupCall() {
+        // Dừng tất cả các track trong localStream
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                track.stop(); // Dừng track
+            });
+        }
+
+        // Đóng kết nối PeerConnection
+        if (pc) {
+            pc.close();
+            pc = null;
+        }
+
+        startButton.disabled = false;
+        hangupButton.disabled = true;
+
+        // Thay đổi video source về một nguồn khác hoặc để trống nếu cần
+        localVideo.srcObject = null; // Giữ lại video nếu cần
+        remoteVideo.srcObject = null; // Giữ lại video nếu cần
+        alert('Cuộc gọi đã kết thúc.');
+    }
+</script>
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
