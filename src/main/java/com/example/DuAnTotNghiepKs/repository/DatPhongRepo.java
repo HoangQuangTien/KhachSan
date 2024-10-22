@@ -125,4 +125,22 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
     Optional<DatPhong> findTopByPhongOrderByNgayNhanDesc(Phong phong);
 
+
+    @Query(value = "WITH PhongDatNhieuNhat AS (\n" +
+            "    SELECT \n" +
+            "        p.id_phong,\n" +
+            "        p.img,\n" +
+            "        p.ten_phong,\n" +
+            "        p.gia,\n" +
+            "        COUNT(dp.id_dat_phong) AS so_lan_dat,\n" +
+            "        ROW_NUMBER() OVER (ORDER BY COUNT(dp.id_dat_phong) DESC) AS row_num\n" +
+            "    FROM DatPhong dp\n" +
+            "    JOIN phong p ON dp.id_phong = p.id_phong\n" +
+            "    GROUP BY p.id_phong, p.img, p.ten_phong, p.gia\n" +
+            ")\n" +
+            "SELECT id_phong, img, ten_phong, gia\n" +
+            "FROM PhongDatNhieuNhat\n" +
+            "WHERE row_num <= 3;", nativeQuery = true)
+    List<Object[]> findTopPhongDuocDatNhieuNhat1();
+
 }

@@ -50,6 +50,8 @@ public interface DatPhongService {
 
     List<Object[]> getTopPhongDuocDatNhieuNhat();
 
+    List<Object[]> getTopPhongDuocDatNhieuNhat1();
+
     Long countDistinctCustomers();
 
     List<DatPhong> findByPhongAndThoiGian(Integer idPhong, LocalDateTime ngayNhan, LocalDateTime ngayTra );

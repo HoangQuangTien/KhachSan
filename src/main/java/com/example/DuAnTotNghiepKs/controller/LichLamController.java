@@ -1,137 +1,151 @@
-//package com.example.DuAnTotNghiepKs.controller;
-//
-//import com.example.DuAnTotNghiepKs.entity.LichLamViec;
-//import com.example.DuAnTotNghiepKs.entity.NhanVien;
-//import com.example.DuAnTotNghiepKs.repository.CaLamViecRepo;
-//import com.example.DuAnTotNghiepKs.repository.LichLamViecRepo;
-//import com.example.DuAnTotNghiepKs.repository.NhanVienRepo;
-//import jakarta.validation.Valid;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.ui.Model;
-//import org.springframework.validation.BindingResult;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//import java.util.Optional;
-//
-//@Controller
-//@RequestMapping("/admin")
-//public class LichLamController {
-//
-//    @Autowired
-//    CaLamViecRepo caLamViecRepo;
-//
-//    @Autowired
-//    NhanVienRepo nhanVienRepo;
-//    @Autowired
-//    private LichLamViecRepo lichLamViecRepo;
-//
-//    @ModelAttribute
-//    public void getModel(Model model){
-//        model.addAttribute("listNhanVien",nhanVienRepo.findAll());
-//        model.addAttribute("listCaLam",caLamViecRepo.findAll());
-//    }
-//
-//    @GetMapping("/quan-ly-lich-lam-viec")
-//    public String load(@ModelAttribute LichLamViec lichLamViec, Model model){
-//        List<LichLamViec> list = lichLamViecRepo.findAll();
-//        model.addAttribute("list",list);
-//        getModel(model);
-//        return "list/QuanLyNhanVien/home";
-//    }
-//
-//    @PostMapping("/add-lich-lam")
-//    public String save(@Valid @ModelAttribute LichLamViec lichLamViec, BindingResult result, Model model){
-//        Optional<LichLamViec> exitingma = lichLamViecRepo.findBymaLichLamViec(lichLamViec.getMaLichLamViec());
-//        if (exitingma.isPresent()){
-//            result.rejectValue("maLichLamViec","errors.maLichLamViec","Mã lịch làm việc đã tồn tại");
-//        }
-//        if (result.hasErrors()){
-//            model.addAttribute("lichLamViec",lichLamViec);
-//            model.addAttribute("list",lichLamViecRepo.findAll());
-//            getModel(model);
-//            return "lichLam/home";
-//        }
-//        lichLamViecRepo.save(lichLamViec);
-//        return "redirect:/admin/quan-ly-lich-lam-viec";
-//    }
-//
-//    @GetMapping("/viewUpdate-lich-lam")
-//    public String viewUpdate(@ModelAttribute LichLamViec lichLamViec,
-//                             @RequestParam(value = "idLichLamViec",required = false)Integer id,Model model){
-//        model.addAttribute("lichLamViec",lichLamViecRepo.findById(id));
-//        getModel(model);
-//        return "lichLam/update";
-//    }
-//
-//    @PostMapping("/update-lich-lam")
-//    public String updateLichLam(@Valid @ModelAttribute LichLamViec lichLamViec,BindingResult result,Model model){
-//        if (result.hasErrors()){
-//            model.addAttribute("lichLamViec",lichLamViec);
-//            model.addAttribute("list",lichLamViecRepo.findAll());
-//            getModel(model);
-//            return "lichLam/home";
-//        }
-//        lichLamViecRepo.save(lichLamViec);
-//        return "redirect:/admin/quan-ly-lich-lam-viec";
-//    }
-//
-//    @GetMapping("/delete-lich-lam")
-//    public String delete(@RequestParam(value = "idLichLamViec",required = false)Integer id){
-//        lichLamViecRepo.deleteById(id);
-//        return "redirect:/admin/quan-ly-lich-lam-viec";
-//    }
-//
-//    @PostMapping("/save-lich-lam")
-//    public String saveLichLam(@Valid @ModelAttribute LichLamViec lichLamViec, BindingResult errors, @RequestParam String action, Model model){
-//        boolean isUpdate = "update".equals(action) && lichLamViec.getIdLichLamViec() != null && nhanVienRepo.existsById(lichLamViec.getIdLichLamViec());
-//
-//        if (isUpdate) {
-//            // Update operation
-//            Optional<LichLamViec> existingLichLam = lichLamViecRepo.findById(lichLamViec.getIdLichLamViec());
-//
-//            if (existingLichLam.isPresent()) {
-//                LichLamViec existing = existingLichLam.get();
-//
-//                // Check if maLichLam is changing and if it already exists
-//                if (!existing.getMaLichLamViec().equals(lichLamViec.getMaLichLamViec())) {
-//                    Optional<LichLamViec> existingMa = lichLamViecRepo.findBymaLichLamViec(lichLamViec.getMaLichLamViec());
-//                    if (existingMa.isPresent()) {
-//                        errors.rejectValue("maLichLamViec", "error.lichLamViec", "Mã lich lam việc đã đã tồn tại");
-//                    }
-//                }
-//
-//
-//                if (errors.hasErrors()) {
-//                    model.addAttribute("lichLamViec", lichLamViec);
-//                    return "lichLam/home";
-//                }
-//
-//                // Update existing employee
-//                existing.setMaLichLamViec(lichLamViec.getMaLichLamViec());
-//                existing.setNgay(lichLamViec.getNgay());
-//                existing.setNhanVien(lichLamViec.getNhanVien());
-//                existing.setCaLamViec(lichLamViec.getCaLamViec());
-//                // Update other fields if needed
-//
-//                lichLamViecRepo.save(existing);
-//            } else {
-//                errors.reject("error.lichLamViec", "Lịch làm không tồn tại");
-//                model.addAttribute("lichLamViec", lichLamViec);
-//                return "lichLam/home";
+package com.example.DuAnTotNghiepKs.controller;
+
+import com.example.DuAnTotNghiepKs.DTO.CaLamViecDTO;
+import com.example.DuAnTotNghiepKs.DTO.LichLamViecDTO;
+import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
+import com.example.DuAnTotNghiepKs.entity.NhanVien;
+import com.example.DuAnTotNghiepKs.service.CaLamViecService;
+import com.example.DuAnTotNghiepKs.service.LichLamViecService;
+import com.example.DuAnTotNghiepKs.service.NhanVienService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@RequestMapping("/lich-lam-viec")
+public class LichLamController {
+
+    @Autowired
+    private LichLamViecService lichLamViecService;
+    @Autowired
+    private NhanVienService nhanVienService;
+    @Autowired
+    private ModelMapper modelMapper;
+    @Autowired
+    private CaLamViecService caLamViecService;
+
+    @GetMapping
+    public String loadAll(Model model) {
+//        List<LichLamViecDTO> lichLamViecDTOS = lichLamViecService.getAll();
+        List<NhanVienDTO> nhanVienList = nhanVienService.getAll(); // Lấy danh sách nhân viên
+        List<CaLamViecDTO> caLamViecList = caLamViecService.getAll(); // Lấy danh sách ca làm việc
+        model.addAttribute("nhanVienList", nhanVienList);
+        model.addAttribute("caLamViecList", caLamViecList);
+
+        return "list/QuanLyLichLamViec/lichLamViec";
+    }
+
+    @GetMapping("/load")
+    public ResponseEntity<List<LichLamViecDTO>> load() {
+        List<LichLamViecDTO> lichLamViecDTOS = lichLamViecService.getAll();
+        return ResponseEntity.ok(lichLamViecDTOS);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<Map<String, String>> addLich(
+            @RequestParam("ngay") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngay,
+            @RequestParam("nhanVien") Integer idNhanVien,
+            @RequestParam("caLamViec") String caLamViec) {
+
+        try {
+            // Kiểm tra các trường không được để trống
+            if (idNhanVien == null || caLamViec == null || caLamViec.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Các trường không được để trống"));
+            }
+
+            // Kiểm tra ngày không được nhỏ hơn ngày hiện tại
+            Date today = new Date();
+            if (ngay.before(today)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Ngày làm việc không được nhỏ hơn ngày hiện tại"));
+            }
+
+            // Tạo mã lịch làm việc mới
+            String maLichLamViec = generateMaLichLamViec();
+
+            // Tạo đối tượng LichLamViecDTO và set các thuộc tính
+            LichLamViecDTO lichLamViecDTO = new LichLamViecDTO();
+            lichLamViecDTO.setMaLichLamViec(maLichLamViec);
+            lichLamViecDTO.setIdNhanVien(idNhanVien);
+            lichLamViecDTO.setNgay(ngay);
+            lichLamViecDTO.setMaCaLamViec(caLamViec);
+
+            // Lưu đối tượng
+            lichLamViecService.save(lichLamViecDTO);
+
+            // Trả về phản hồi thành công
+            return ResponseEntity.ok(Map.of("success", "Thêm thành công"));
+        } catch (Exception e) {
+            System.out.println("Lỗi: " + e.getMessage());
+
+            // Trả về phản hồi lỗi
+            return ResponseEntity.badRequest().body(Map.of("error", "Đã xảy ra lỗi khi thêm: " + e.getMessage()));
+        }
+    }
+
+
+    @PostMapping("/update/{idLichLamViec}")
+    public ResponseEntity<Map<String, String>> update(
+            @PathVariable("idLichLamViec") Integer idLichLamViec,
+            @RequestBody Map<String, Object> requestBody
+    ) {
+        try {
+            // Lấy dữ liệu từ request body
+            String nhanVienString = (String) requestBody.get("nhanVien");
+            Integer idNhanVien = Integer.parseInt(nhanVienString);  // Ép kiểu từ String sang Integer
+
+            String maCaLamViec = (String) requestBody.get("caLamViec");
+            String ngayString = (String) requestBody.get("ngay");  // Lấy ngày dưới dạng chuỗi
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  // Định dạng ngày
+//            Date ngay = sdf.parse(ngayString);  // Chuyển đổi chuỗi thành đối tượng Date
+
+            // Kiểm tra các trường không được để trống
+            if (idNhanVien == null || maCaLamViec == null || maCaLamViec.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Các trường không được để trống"));
+            }
+
+            // Kiểm tra ngày không được nhỏ hơn ngày hiện tại
+//            Date today = new Date();
+//            if (ngay.before(today)) {
+//                return ResponseEntity.badRequest().body(Map.of("error", "Ngày làm việc không được nhỏ hơn ngày hiện tại"));
 //            }
-//        } else {
-//            // Add operation
-//            Optional<LichLamViec> existingMa = lichLamViecRepo.findBymaLichLamViec(lichLamViec.getMaLichLamViec());
-//            if (existingMa.isPresent()) {
-//                errors.rejectValue("maLichLamViec", "error.lichLamViec", "Mã lịch làm đã tồn tại");
-//            }
-//            if (errors.hasErrors()) {
-//                return "lichLam/home";
-//            }
-//            lichLamViecRepo.save(lichLamViec);
-//        }
-//        return "redirect:/admin/quan-ly-lich-lam-viec";
-//    }
-//}
+
+            // Lấy lịch làm việc hiện tại theo id
+            LichLamViecDTO lichLamViecDTO = lichLamViecService.findById(idLichLamViec);
+            lichLamViecDTO.setMaCaLamViec(maCaLamViec);
+            lichLamViecDTO.setIdNhanVien(idNhanVien);
+//            lichLamViecDTO.setNgay(ngay);  // Cập nhật ngày làm việc
+
+            // Lưu lại lịch làm việc đã chỉnh sửa
+            lichLamViecService.save(lichLamViecDTO);
+
+            // Trả về phản hồi thành công
+            return ResponseEntity.ok(Map.of("success", "Sửa lịch thành công"));
+        } catch (Exception e) {
+            System.out.println("Lỗi: " + e.getMessage());
+
+            // Trả về phản hồi lỗi
+            return ResponseEntity.badRequest().body(Map.of("error", "Đã xảy ra lỗi khi sửa: " + e.getMessage()));
+        }
+    }
+
+
+
+    private String generateMaLichLamViec() {
+        String prefix = "LLV";
+        LichLamViecDTO lichLamViecDTO = lichLamViecService.findTopByOrderByIdLichLamViecDesc();
+        int nextId = lichLamViecDTO != null ? (int) (lichLamViecDTO.getIdLichLamViec() + 1) : 1;
+        return prefix + String.format("%03d", nextId);
+    }
+
+
+}

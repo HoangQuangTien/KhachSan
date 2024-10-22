@@ -203,5 +203,13 @@ public class NhanVienService {
     }
 
 
+    public List<NhanVienDTO> getAll(){
+        List<NhanVien> nhanViens = nhanVienRepo.findAll();
+        return nhanViens.stream()
+                .map(nhanVien -> modelMapper.map(nhanVien,NhanVienDTO.class))
+                .collect(Collectors.toList());
+    }
+
+
 
 }

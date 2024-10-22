@@ -253,7 +253,7 @@
                 var caLamViec = info.event.extendedProps.caLamViec;
 
                 // Lấy danh sách nhân viên từ server
-                fetch('/api/nhan-vien')
+                fetch('/api/employees/api/nhan-vien')
                     .then(response => response.json())
                     .then(nhanVienData => {
                         console.log("Dữ liệu nhân viên:", nhanVienData);

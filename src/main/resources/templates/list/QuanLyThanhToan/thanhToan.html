@@ -131,7 +131,7 @@
             <div class="col-md-6">
                 <div class="py-4">
                     <div class="card p-4 shadow-sm">
-                        <h4 class=" d-flex justify-content-center" style="color: #0d4bdb;">Danh sách đã cọc</h4>
+                        <h4 class=" d-flex justify-content-center" style="color: black;">Danh sách đã cọc</h4>
                         <hr>
                         <div class="row">
                             <div class="col-md-12">
@@ -209,7 +209,7 @@
 
                 <div class="py-4">
                     <div class="card p-4 shadow-sm">
-                        <h4 class="d-flex justify-content-center" style="color: #0d4bdb;">Lịch Sử Thanh Toán</h4>
+                        <h4 class="d-flex justify-content-center" style="color:black;">Lịch Sử Thanh Toán</h4>
                         <hr>
                         <!-- Bảng hiển thị lịch sử thanh toán -->
                         <table class="table table-bordered">
@@ -261,8 +261,6 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
 
 
@@ -270,7 +268,7 @@
             <div class="col-md-6">
                 <div class="py-4">
                     <form th:action="@{/thanhToan/add}" method="post" th:object="${thanhToanDTO}" id="formId" class="card p-4 shadow-sm"  onsubmit="return false;">
-                        <h4 style="color: #0d4bdb">Thông tin hóa đơn</h4>
+                        <h4 style="color: black">Thông tin hóa đơn</h4>
                         <hr>
                         <input type="hidden" id="idDatPhong" th:field="*{idDatPhong}">
                         <input type="hidden" id="idPhong" th:field="*{idPhong}">

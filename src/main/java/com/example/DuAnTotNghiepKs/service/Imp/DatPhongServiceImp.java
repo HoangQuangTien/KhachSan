@@ -197,6 +197,12 @@ public class DatPhongServiceImp implements DatPhongService {
         return datPhongRepository.findTopPhongDuocDatNhieuNhat();
     }
 
+    @Override
+    public List<Object[]> getTopPhongDuocDatNhieuNhat1() {
+        // Sử dụng PageRequest để giới hạn số kết quả trả về
+        return datPhongRepository.findTopPhongDuocDatNhieuNhat1();
+    }
+
 
     @Override
     public Long countDistinctCustomers() {

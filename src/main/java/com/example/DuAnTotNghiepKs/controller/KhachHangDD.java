@@ -42,7 +42,7 @@ public class KhachHangDD {
 
     @GetMapping("/load-phong")
     public ResponseEntity<List<Object[]>> loadAllPhongKhachHang(){
-        List<Object[]> objects = datPhongService.getTopPhongDuocDatNhieuNhat();
+        List<Object[]> objects = datPhongService.getTopPhongDuocDatNhieuNhat1();
         return ResponseEntity.ok(objects);
     }
 
