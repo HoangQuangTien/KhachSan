@@ -22,20 +22,61 @@ public class LichLamVienImp implements LichLamViecService {
     private ModelMapper modelMapper;
 
     @Override
-    public List<LichLamViecDTO> getAll(){
+    public List<LichLamViecDTO> getAll() {
         List<LichLamViec> lichLamViecs = lichLamViecRepo.findAll();
         return lichLamViecs.stream()
-                .map(lichLamViec -> modelMapper.map(lichLamViec, LichLamViecDTO.class))
+                .map(lichLamViec -> {
+                    LichLamViecDTO dto = modelMapper.map(lichLamViec, LichLamViecDTO.class);
+
+                    // Kiểm tra dữ liệu
+                    System.out.println("Ca làm việc: " + lichLamViec.getCaLamViec());
+
+                    dto.setHoTen(lichLamViec.getNhanVien().getHoTen());
+                    dto.setTrangThai(lichLamViec.getNhanVien().getTrangThai());
+                    if (lichLamViec.getCaLamViec() != null) {
+                        dto.setTenCaLamViec(lichLamViec.getCaLamViec().getTenCaLamViec());
+                    } else {
+                        dto.setTenCaLamViec("Chưa gán ca");
+                    }
+
+                    dto.setNgay(lichLamViec.getNgay());
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<LichLamViecDTO> findByNhanVien(NhanVienDTO nhanVienDTO){
-        List<LichLamViec> lichLamViecs = lichLamViecRepo.findByNhanVien(nhanVienDTO);
-        return lichLamViecs.stream()
-                .map(lichLamViec -> modelMapper.map(lichLamViec,LichLamViecDTO.class))
-                .collect(Collectors.toList());
+    public LichLamViecDTO save(LichLamViecDTO lichLamViecDTO){
+        LichLamViec lichLamViec = modelMapper.map(lichLamViecDTO,LichLamViec.class);
+        lichLamViec = lichLamViecRepo.save(lichLamViec);
+        return modelMapper.map(lichLamViec, LichLamViecDTO.class);
     }
+
+    @Override
+    public LichLamViecDTO findById(Integer idLichLamViec) {
+        LichLamViec lichLamViec = lichLamViecRepo.findById(idLichLamViec)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch với id:"+idLichLamViec));
+
+        return modelMapper.map(lichLamViec, LichLamViecDTO.class);
+    }
+
+
+
+
+
+    @Override
+    public LichLamViecDTO findTopByOrderByIdLichLamViecDesc() {
+        LichLamViec lichLamViec = lichLamViecRepo.findTopByOrderByIdLichLamViecDesc();
+
+        if (lichLamViec == null) {
+            System.out.println("Không tìm thấy bản ghi nào trong bảng LichLamViec");
+            return null;
+        }
+
+        System.out.println(lichLamViec); // Log để kiểm tra
+        return modelMapper.map(lichLamViec, LichLamViecDTO.class);
+    }
+
 
 
 }

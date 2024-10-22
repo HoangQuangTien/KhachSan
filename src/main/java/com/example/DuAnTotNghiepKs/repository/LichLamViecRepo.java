@@ -16,4 +16,6 @@ import java.util.Optional;
 public interface LichLamViecRepo extends JpaRepository<LichLamViec, Integer> {
 
     List<LichLamViec> findByNhanVien(NhanVienDTO nhanVienDTO);
+
+    LichLamViec findTopByOrderByIdLichLamViecDesc();
 }

@@ -40,7 +40,7 @@ public class CaLamViec {
     @Column(name = "gio_ket_thuc")
     private Date gioKetThuc;
 
-    @OneToMany(mappedBy = "caLamViec")
+    @OneToMany(mappedBy = "caLamViec",fetch = FetchType.EAGER)
     private Set<LichLamViec> lichLamViecs;
 }
 

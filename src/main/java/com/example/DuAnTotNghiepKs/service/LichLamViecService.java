@@ -8,5 +8,11 @@ import java.util.List;
 public interface LichLamViecService {
     List<LichLamViecDTO> getAll();
 
-    List<LichLamViecDTO> findByNhanVien(NhanVienDTO nhanVienDTO);
+    LichLamViecDTO save(LichLamViecDTO lichLamViecDTO);
+
+    LichLamViecDTO findById(Integer id);
+
+
+
+    LichLamViecDTO findTopByOrderByIdLichLamViecDesc();
 }

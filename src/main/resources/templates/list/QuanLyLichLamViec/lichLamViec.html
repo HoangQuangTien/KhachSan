@@ -66,6 +66,28 @@
             background-color: #fd7e14; /* Màu cam cho sự kiện đang ở */
         }
 
+        .custom-event {
+            position: relative;
+        }
+
+        .split-event {
+            display: flex;
+            width: 100%;
+            height: 30px; /* Điều chỉnh chiều cao */
+        }
+
+        .ca-sang, .ca-chieu, .ca-toi {
+            flex: 1;
+            height: 30px;
+        }
+
+        .event-title {
+            text-align: center;
+            font-size: 12px;
+            padding-top: 5px;
+        }
+
+
     </style>
 </head>
 <body class="vertical light">
@@ -76,6 +98,12 @@
         <div class="container-fluid py-4">
             <h2 class="text-center mb-4">Lịch Làm Việc Nhân Viên</h2>
             <div class="d-flex justify-content-end align-items-center mb-4">
+                <div class="d-flex align-items-center me-3">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Thêm
+                    </button>
+                </div>
                 <div class="d-flex align-items-center me-3">
                     <div class="btn" style="background-color: #007bff; width: 20px; height: 20px; border-radius: 3px;"></div>
                     <span class="ms-2"><strong>Ca sáng</strong></span>
@@ -93,6 +121,58 @@
             <div id="calendar">
 
             </div>
+
+            <!-- Modal form thêm-->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Thêm lịch làm việc</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formAddLich">
+
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="idNgay" class="form-label">Ngày</label>
+                                        <input type="date" class="form-control" name="ngay" id="idNgay" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="nhanVien" class="form-label">Nhân viên</label>
+                                        <select name="nhanVien" id="nhanVien" class="form-select" required>
+                                            <option value="">Chọn nhân viên</option>
+                                            <option th:each="lichLam : ${nhanVienList}"
+                                                    th:if="${lichLam.trangThai}"
+                                                    th:value="${lichLam.idNhanVien}"
+                                                    th:text="${lichLam.hoTen}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="caLamViec" class="form-label">Ca làm</label>
+                                        <select name="caLamViec" id="caLamViec" class="form-select" required>
+                                            <option value="">Chọn ca làm</option>
+                                            <option th:each="lichLam : ${caLamViecList}"
+                                                    th:value="${lichLam.maCaLamViec}"
+                                                    th:text="${lichLam.tenCaLamViec}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-success">Thêm</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+<!--                            <button type="button" class="btn btn-primary">Lưu thay đổi</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
 
     </main>
@@ -103,51 +183,245 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/locales/vi.min.js'></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'vi',
-            initialView: 'dayGridMonth',
-            events: function(fetchInfo, successCallback, failureCallback) {
-                fetch('/admin/quan-ly-lich-lam-viec/load')
-                    .then(response => response.json())
-                    .then(events => {
-                        var formattedEvents = events.map(event => ({
+// <!-- nhạp lên dạng lich   -->
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'vi',
+        initialView: 'dayGridMonth',
+
+        events: function(fetchInfo, successCallback, failureCallback) {
+            fetch('/lich-lam-viec/load')
+                .then(response => response.json())
+                .then(events => {
+                    var formattedEvents = [];
+
+                    events.forEach(event => {
+                        formattedEvents.push({
                             id: event.id,
                             title: event.hoTen,
                             start: event.ngay,
-                            backgroundColor: event.caLamViec === 'Sáng' ? '#007bff' :
-                                event.caLamViec === 'Chiều' ? '#fd7e14' : '#a71d2a',
                             extendedProps: {
+                                idLichLamViec: event.idLichLamViec,
                                 maLichLamViec: event.maLichLamViec,
-                                caLamViec: event.caLamViec,
+                                caLamViec: event.maCaLamViec,
+                                tenCaLamViec:event.tenCaLamViec,
+                                idNhanVien: event.idNhanVien,
                                 status: event.status
-                            }
-                        }));
-                        successCallback(formattedEvents);
+                            },
+                            classNames: ['custom-event'],
+                        });
+                    });
+
+                    successCallback(formattedEvents);
+                })
+                .catch(error => {
+                    console.error('Có lỗi xảy ra khi tải lịch làm việc:', error);
+                    failureCallback(error);
+                });
+        },
+        eventContent: function(arg) {
+            var maCaLamViec = arg.event.extendedProps.caLamViec; // Lấy mã ca làm việc từ extendedProps
+            var backgroundColor;
+
+            // Kiểm tra mã ca làm việc và gán màu tương ứng
+            switch (maCaLamViec) {
+                case "CA01":
+                    backgroundColor = '#007bff'; // Màu cho ca sáng
+                    break;
+                case "CA02":
+                    backgroundColor = '#fd7e14'; // Màu cho ca chiều
+                    break;
+                case "CA03":
+                    backgroundColor = '#a71d2a'; // Màu cho ca tối
+                    break;
+                default:
+                    backgroundColor = 'transparent'; // Màu mặc định
+                    break;
+            }
+            return {
+                html: `
+                    <div class="full-event" style="background-color: ${backgroundColor};">
+                        <div class="event-title">${arg.event.title}</div>
+                    </div>
+                `
+            };
+        },
+        eventClick: function(info) {
+            console.log("Sự kiện được click:", info.event);
+            var ngayLamViec = new Date(info.event.startStr); // Ngày làm việc của sự kiện
+            var idLichLamViec = info.event.extendedProps.idLichLamViec;
+            var caLamViec = info.event.extendedProps.tenCaLamViec;
+            var today = new Date(); // Ngày hiện tại
+
+            // So sánh ngày làm việc với ngày hiện tại
+            if (ngayLamViec < today) {
+                // Trường hợp ngày làm việc đã qua, chỉ xem chi tiết
+                const chiTietHtml = `
+            <p><strong>Mã Lịch:</strong> ${info.event.extendedProps.maLichLamViec}</p>
+            <p><strong>Nhân viên:</strong> ${info.event.title}</p>
+            <p><strong>Ngày làm việc:</strong> ${ngayLamViec.toLocaleDateString()}</p>
+            <p><strong>Ca làm việc:</strong> ${caLamViec}</p>
+        `;
+                Swal.fire({
+                    title: 'Chi tiết lịch làm việc',
+                    html: chiTietHtml,
+                    icon: 'info',
+                    showCloseButton: true
+                });
+            } else {
+                // Trường hợp ngày làm việc chưa đến, cho phép sửa
+                fetch('/api/nhan-vien')
+                    .then(response => response.json())
+                    .then(nhanVienData => {
+                        console.log("Dữ liệu nhân viên:", nhanVienData);
+                        const idNhanVienHienTai = info.event.extendedProps.idNhanVien;
+
+                        return fetch('/api/ca-lam-viec').then(response => response.json()).then(caLamViecData => {
+                            const formHtml = `
+                        <form id="editLichForm">
+                            <input type="hidden" value="${idLichLamViec}" name="idLichLamViec" >
+                            <p><strong>Mã Lịch:</strong> ${info.event.extendedProps.maLichLamViec}</p>
+                            <p><strong>Ngày làm việc:</strong> ${ngayLamViec.toLocaleDateString()}</p>
+                            <div class="mb-3 d-flex align-items-center">
+                                <label for="nhanVien" class="form-label me-2">Nhân viên</label>
+                                <select name="nhanVien" id="nhanVien" class="form-select" required>
+                                    <option value="">Chọn nhân viên</option>
+                                    ${nhanVienData.map(nv => `
+                                        <option value="${nv.idNhanVien}" ${nv.idNhanVien === idNhanVienHienTai ? 'selected' : ''}>
+                                            ${nv.hoTen}
+                                        </option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="mb-3 d-flex align-items-center">
+                                <label for="caLamViec" class="form-label me-2">Ca làm việc</label>
+                                <select name="caLamViec" id="caLamViec" class="form-select" required>
+                                    <option value="">Chọn ca làm</option>
+                                    ${caLamViecData.map(ca => `
+                                        <option  value="${ca.maCaLamViec}" ${ca.maCaLamViec === caLamViec ? 'selected' : ''}>
+                                            ${ca.tenCaLamViec}
+                                        </option>`).join('')}
+                                </select>
+                            </div>
+                        </form>
+                    `;
+
+                            Swal.fire({
+                                title: 'Đổi ca cho nhân viên',
+                                html: formHtml,
+                                icon: 'info',
+                                showCancelButton: true,
+                                focusConfirm: false,
+                                preConfirm: () => {
+                                    const form = document.getElementById('editLichForm');
+                                    const nhanVien = form.nhanVien.value;
+                                    const caLamViec = form.caLamViec.value;
+
+                                    if (!nhanVien || !caLamViec) {
+                                        Swal.showValidationMessage('Vui lòng chọn nhân viên và ca làm việc');
+                                        return false;
+                                    }
+
+                                    return fetch(`/lich-lam-viec/update/${idLichLamViec}`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({ nhanVien, caLamViec }),
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Có lỗi xảy ra khi cập nhật');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            Swal.fire('Thành công!', data.success, 'success');
+                                        })
+                                        .then(() => {
+                                            location.reload();
+                                        })
+                                        .catch(error => {
+                                            Swal.fire('Lỗi', error.message, 'error');
+                                        });
+                                }
+                            });
+                        });
                     })
                     .catch(error => {
-                        console.error('Có lỗi xảy ra khi tải lịch làm việc:', error);
-                        failureCallback(error);
+                        Swal.fire('Lỗi', 'Không thể tải dữ liệu nhân viên và ca làm việc', 'error');
                     });
-            },
-            eventClick: function(info) {
-                var ngayLamViec = new Date(info.event.startStr);
-                var caLamViec = info.event.extendedProps.caLamViec;
-                Swal.fire({
-                    title: 'Thông tin lịch làm việc',
-                    html: `<strong>Mã Lịch:</strong> ${info.event.extendedProps.maLichLamViec}<br>
-                           <strong>Nhân viên:</strong> ${info.event.title}<br>
-                           <strong>Ngày làm việc:</strong> ${ngayLamViec.toLocaleString()}<br>
-                           <strong>Ca làm việc:</strong> ${caLamViec}`,
-                    icon: 'info',
+            }
+        }
+
+    });
+
+    calendar.render();
+});
+
+
+//     thêm lịch
+document.getElementById('formAddLich').addEventListener("submit", function (evt) {
+    evt.preventDefault();
+
+    const ngay = document.getElementById('idNgay').value.trim();
+    const nhanVien = document.querySelector('select[name="nhanVien"]').value;
+    const caLamViec = document.querySelector('select[name="caLamViec"]').value;
+
+    const form = document.getElementById('formAddLich');
+    const formData = new FormData(form);
+
+    if (!ngay || !nhanVien || !caLamViec) {
+        alert("Vui lòng điền đầy đủ thông tin.");
+    } else {
+        // Gửi dữ liệu lên server
+        fetch('/lich-lam-viec/add', {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Có lỗi xảy ra khi gửi dữ liệu'); // Kiểm tra mã trạng thái
+                }
+                return response.json(); // Chuyển đổi phản hồi thành JSON
+            })
+            .then(data => {
+                console.log('Success:', data);
+                return Swal.fire({
+                    title: 'Thành công',
+                    icon: 'success',
+                    text: data.success,
                     confirmButtonText: 'Đóng'
                 });
-            }
-        });
+            })
+            .then(() => {
+                location.reload(); // Reload lại trang sau khi thông báo được đóng
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Lỗi',
+                    icon: 'error',
+                    text: error.message, // Hiển thị thông báo lỗi
+                    confirmButtonText: 'Đóng'
+                });
+            });
+    }
+});
 
-        calendar.render();
-    });
+// sửa lịch
+document.getElementById('editLichForm').addEventListener("submit",function (evt){
+    evt.preventDefault();
+    const form = document.getElementById('editLichForm');
+    const formData = new FormData(form);
+
+    fetch("/lich-lam-viec/update")
+
+
+});
+
+
+
 
 
 </script>
