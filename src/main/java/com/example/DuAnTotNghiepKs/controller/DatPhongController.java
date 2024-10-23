@@ -6,6 +6,7 @@ import com.example.DuAnTotNghiepKs.entity.*;
 import com.example.DuAnTotNghiepKs.service.*;
 import com.example.DuAnTotNghiepKs.service.NhanVienService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Controller
@@ -230,7 +232,17 @@ public class DatPhongController {
             float tongTienPhong = 0;
             float tienCoc = 0;
 
-            long thoiGianChoPhepMillis = datPhongService.getThoiGianChoPhepDatPhong();
+
+            // Lấy giá trị thời gian cho phép từ bảng ThamSo dựa trên ID
+            Long idThamSo = 3L;
+            String thoiGianChoPhepStr = thamSoService.getValueById(idThamSo);
+
+            if (thoiGianChoPhepStr == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Tham số thời gian cho phép không tồn tại."));
+            }
+
+            // Chuyển đổi giá trị 'giaTri' từ chuỗi sang kiểu long
+            long thoiGianChoPhepMillis = TimeUnit.MINUTES.toMillis(Long.parseLong(thoiGianChoPhepStr));
 
             // Lưu danh sách các đối tượng DatPhong
             List<DatPhong> datPhongList = new ArrayList<>();
@@ -257,18 +269,15 @@ public class DatPhongController {
                 // Lấy thông tin đặt phòng đã tồn tại
                 List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra);
 
-                // Nếu có đặt phòng đã tồn tại, kiểm tra thời gian của người đặt trước
-                if (!existingBookings.isEmpty()) {
-                    for (DatPhong existingBooking : existingBookings) {
+                // Kiểm tra khoảng thời gian giữa các lần đặt phòng
+                for (DatPhong existingBooking : existingBookings) {
+                    // Kiểm tra nếu trạng thái của đặt phòng không phải "Đã Hủy"
+                    if (!existingBooking.getTinhTrang().equals("Đã Hủy")) {
                         LocalDateTime existingNgayTra = existingBooking.getNgayTra();
-
-                        // Chuyển đổi thời gian trả phòng của khách trước sang mili giây
                         long existingNgayTraMillis = existingNgayTra.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
-                        // Chuyển đổi thời gian nhận phòng mới sang mili giây
                         long ngayNhanMillis = ngayNhan.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-                        // Kiểm tra xem thời gian nhận phòng của khách mới có nằm trong khoảng thời gian chờ không
+                        // Kiểm tra khoảng thời gian giữa các lần đặt phòng
                         if (ngayNhanMillis - existingNgayTraMillis < thoiGianChoPhepMillis) {
                             return ResponseEntity.badRequest().body(Map.of("error", "Thời gian đặt của bạn không hợp lệ, trùng với người đặt trước."));
                         }
@@ -437,6 +446,16 @@ public ResponseEntity<?> getTop3PhongDuocDatNhieuNhat() {
     public ResponseEntity<Long> getDistinctCustomers() {
         Long totalDistinctCustomers = datPhongService.countDistinctCustomers();
         return ResponseEntity.ok(totalDistinctCustomers);
+    }
+
+
+    @GetMapping("/thong-ke-da-huy")
+    public ResponseEntity<Long> getCancelledBookingStats() {
+
+            Long cancelledCount = datPhongService.countCancelledBookings();
+
+            return ResponseEntity.ok(cancelledCount);
+
     }
 
 }

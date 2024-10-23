@@ -66,13 +66,15 @@
                         </div>
                         <div class="d-flex justify-content-center mt-4">
                             <button type="button" id="updateCustomerBtn" class="btn btn-primary me-2">Cập nhật thông tin</button>
+                            <a href="/nguoidicung" class="btn btn-secondary">Quay lại</a>
                         </div>
                     </div>
 
                     <div class="col-md-6 form-container">
                         <div class="mb-3">
                             <label class="form-label">Thêm người đi cùng</label>
-                            <input type="hidden" name="idDatPhong" id="idDatPhong" th:value="${id}"/>
+                            <input type="hidden" name="idDatPhong" id="idDatPhong" th:value="${datPhongDTO.idDatPhong}"/>
+
 
                             <div class="mb-3">
                                 <label for="fullname1" class="form-label">Họ và tên</label>
@@ -86,7 +88,6 @@
 
                             <div class="d-flex justify-content-center mt-4">
                                 <button type="button" id="addCustomerBtn" class="btn btn-success me-2">Thêm người đi cùng</button>
-                                <button type="button" class="btn btn-primary">Quay lại</button>
                             </div>
                         </div>
 
@@ -133,24 +134,23 @@
                             gioiTinh: gender,
                         })
                     })
-                        .then(response => response.text())
-                        .then(text => {
-                            try {
-                                const data = JSON.parse(text);
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Thành công!',
-                                    text: 'Cập nhật thông tin khách hàng thành công.',
-                                    confirmButtonText: 'OK'
-                                });
-                            } catch (error) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Lỗi!',
-                                    text: 'Thông báo từ server: ' + text,
-                                    confirmButtonText: 'OK'
+                        .then(response => {
+                            // Kiểm tra nếu phản hồi không thành công
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error(text); // Ném lỗi nếu phản hồi không thành công
                                 });
                             }
+                            return response.text(); // Trả về văn bản nếu thành công
+                        })
+                        .then(text => {
+                            // Hiển thị thông báo thành công
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: text, // Hiển thị thông báo từ server
+                                confirmButtonText: 'OK'
+                            });
                         })
                         .catch(error => {
                             Swal.fire({
@@ -160,6 +160,8 @@
                                 confirmButtonText: 'OK'
                             });
                         });
+
+
                 });
 
                 let soNguoiToiDa = 6;
@@ -250,7 +252,7 @@
                     }
 
                     // Gửi yêu cầu thêm người đi cùng
-                    fetch('/nguoidicung/them-nguoi-di-cung', {
+                    fetch('/them-nguoi-di-cung', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -267,7 +269,6 @@
                                     throw new Error(text);
                                 });
                             }
-
                             // Lưu thông tin người đi cùng vào Local Storage
                             if (!companions[idDatPhong]) {
                                 companions[idDatPhong] = [];

@@ -527,6 +527,7 @@
                         // Có thể cập nhật giao diện, ví dụ như reset form hoặc chuyển trang
                         $('#formAdd').modal('hide');
                         formElement.reset();
+                        location.reload();
                         // updateTable(data);
                     } else if (data.error) {
                         // Hiển thị thông báo lỗi từ backend
@@ -679,21 +680,21 @@
                 return;
             }
 
-            const imgFile = imgElement.files[0]; // Lấy tệp hình ảnh đầu tiên
-            if (imgFile) { // Kiểm tra nếu imgFile đã được chọn
-                const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
-                if (!allowedExtensions.exec(imgFile.name)) {
-                    showErrorToast('Chỉ cho phép định dạng ảnh JPG, JPEG, PNG.');
-                    return;
-                }
-                if (imgFile.size > 5 * 1024 * 1024) { // Giới hạn 5MB
-                    showErrorToast('Kích thước ảnh vượt quá 5MB.');
-                    return;
-                }
-            } else {
-                showErrorToast('Vui lòng chọn ảnh đại diện.');
-                return;
-            }
+            // const imgFile = imgElement.files[0]; // Lấy tệp hình ảnh đầu tiên
+            // if (imgFile) { // Kiểm tra nếu imgFile đã được chọn
+            //     const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+            //     if (!allowedExtensions.exec(imgFile.name)) {
+            //         showErrorToast('Chỉ cho phép định dạng ảnh JPG, JPEG, PNG.');
+            //         return;
+            //     }
+            //     if (imgFile.size > 5 * 1024 * 1024) { // Giới hạn 5MB
+            //         showErrorToast('Kích thước ảnh vượt quá 5MB.');
+            //         return;
+            //     }
+            // } else {
+            //     showErrorToast('Vui lòng chọn ảnh đại diện.');
+            //     return;
+            // }
 
 
             // Lấy đối tượng FormData từ biểu mẫu
@@ -719,11 +720,21 @@
                     });
                 })
                 .then(data => {
-                    console.log(data); // Ghi log dữ liệu nhận được
-                    alert(data.success);
+                    // Hiển thị thông báo khi cập nhật thành công
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Cập nhật thành công!',
+                        showConfirmButton: false,
+                        timer: 2500,
+                        toast: true
+                    });
                     form.reset();
                     $('#formUpdate').modal('hide');
-                    // updateTable(data);
+                    // Tải lại trang sau khi cập nhật thành công
+                    setTimeout(function() {
+                        location.reload(); // Tải lại toàn bộ trang sau khi thông báo đóng
+                    }, 1500); // Đợi 1 giây trước khi tải lại trang
                 })
                 .catch(error => {
                     console.error('Lỗi:', error.message); // Ghi log lỗi
@@ -1051,8 +1062,6 @@
             };
         }
     });
-
-
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>

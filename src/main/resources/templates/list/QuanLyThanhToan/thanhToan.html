@@ -368,15 +368,13 @@
                                 <label for="tienMat" class="form-check-label font-weight-bold">Tiền mặt</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false" class="form-check-input" onclick="toggleTienMatFields(false); generateQR(true)">
-                                <label for="chuyenKhoan" class="form-check-label font-weight-bold">Chuyển khoản</label>
+                                <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false" class="form-check-input" onclick="handleVirtualTransfer()">
+                                <label for="chuyenKhoan" class="form-check-label font-weight-bold">Chuyển khoản ảo</label>
                             </div>
                         </div>
 
-                        <div id="qrCode" style="display: none;">
-                            <label class="form-label">Mã QR Chuyển khoản:</label>
-                            <div id="qrcode-container"></div>
-                        </div>
+                        <div id="qrCodeDisplay"></div>
+
 
                         <div id="tienMatFields" class="border-bottom">
                             <div class="row">
@@ -977,9 +975,28 @@
             });
     });
 
+    function handleVirtualTransfer() {
+        const accountNumber = "2141703920"; // Số tài khoản BIDV
+        const amount = "100000"; // Số tiền
+        const note = "Thanh toán dịch vụ"; // Nội dung chuyển khoản
+        const bankName = "BIDV"; // Tên ngân hàng
 
+        displayQRCode(accountNumber, amount, note, bankName);
+    }
 
+    function displayQRCode(accountNumber, amount, note, bankName) {
+        // Định dạng thông tin cho mã QR của ngân hàng BIDV
+        const qrCodeData = `BIDV|${accountNumber}|${amount}|${note}`; // Định dạng với thông tin BIDV
 
+        // Tạo URL mã QR
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrCodeData)}&size=200x200`;
+
+        // Lấy phần tử để hiển thị mã QR
+        const qrCodeElement = document.getElementById("qrCodeDisplay");
+
+        // Hiển thị mã QR lên giao diện
+        qrCodeElement.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code">`;
+    }
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>

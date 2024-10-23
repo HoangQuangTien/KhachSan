@@ -253,5 +253,9 @@ public class DatPhongServiceImp implements DatPhongService {
     }
 
 
+    @Override
+    public long countCancelledBookings() {
+        return datPhongRepository.countCancelledBookings();
+    }
 
 }

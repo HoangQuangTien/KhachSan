@@ -4,12 +4,15 @@ import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.DTO.ThanhToanDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.ThanhToan;
+import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
 import com.example.DuAnTotNghiepKs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/thanhToan")
@@ -37,6 +42,10 @@ public class ThanhToanController {
 
     @Autowired
     private TaiKhoanService taiKhoanService;
+
+    @Autowired
+    private DatPhongRepo datPhongRepo; // Repository để truy cập dữ liệu đặt phòng
+
 
 
     @GetMapping
@@ -141,6 +150,7 @@ public class ThanhToanController {
         // Redirect về trang thanh toán
         return "redirect:/thanhToan";
     }
+
 
 
 

@@ -235,39 +235,41 @@ public class NhanVienController {
             @RequestParam("img") MultipartFile img,
             @RequestParam("trangThai") Boolean trangThai,
             @RequestParam("gioiTinh") String gioiTinh
-    ){
+    ) {
         try {
-
-            // Kiểm tra điều kiện
-            if (!isValidPhoneNumber(soDienThoai)){
-                return ResponseEntity.badRequest().body(Map.of("error","Số điện thoại phải là số và phải nhiều hơn 10 số."));
+            // Kiểm tra các điều kiện hợp lệ
+            if (!isValidPhoneNumber(soDienThoai)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Số điện thoại phải là số và phải nhiều hơn 10 số."));
             }
-            if (isEmailExistsUpDate(soDienThoai,idNhanVien)) {
+            if (isEmailExistsUpDate(soDienThoai, idNhanVien)) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Số điện thoại đã tồn tại."));
             }
-            if (isEmailExistsUpDate(email,idNhanVien)) {
+            if (isEmailExistsUpDate(email, idNhanVien)) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Email đã tồn tại."));
             }
-            if (!isValidEmail(email)){
-                return ResponseEntity.badRequest().body(Map.of("error","Email không đúng định dạng."));
+            if (!isValidEmail(email)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email không đúng định dạng."));
             }
-            if (!isMeaningfulEmail(email)){
-                return ResponseEntity.badRequest().body(Map.of("error","email phải có ý nghĩa."));
+            if (!isMeaningfulEmail(email)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "email phải có ý nghĩa."));
             }
             if (!isOver18(ngaySinh)) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Người dùng phải lớn hơn 18 tuổi."));
             }
-            if (!isOver200(ngaySinh)){
-                return ResponseEntity.badRequest().body(Map.of("error","Người dùng đã không được quá 200 tuổi"));
-            }
-            if (img.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Tệp ảnh không được để trống."));
+            if (!isOver200(ngaySinh)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Người dùng đã không được quá 200 tuổi"));
             }
 
+            // Lấy thông tin nhân viên hiện tại
+            Optional<NhanVien> existingNhanVien = nhanVienSerVice.findById(idNhanVien);
+            if (existingNhanVien == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Nhân viên không tồn tại."));
+            }
 
             TaiKhoanDTO taiKhoanDTO = new TaiKhoanDTO();
             taiKhoanDTO.setTenDangNhap(tenDangNhap);
             taiKhoanDTO.setMatKhau(matKhau);
+
             // Khởi tạo maNhanVien
             maNhanVien = generateMaNhanVien();
 
@@ -287,24 +289,25 @@ public class NhanVienController {
 
             // Xử lý ảnh
             if (img != null && !img.isEmpty()) {
-                String uploadDir = "src/main/resources/static"; // Hoặc đường dẫn khác
+                String uploadDir = "src/main/resources/static"; // Đường dẫn thư mục ảnh
                 String fileName = img.getOriginalFilename();
                 Path filePath = Paths.get(uploadDir, fileName);
                 Files.copy(img.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
                 nhanVienDTO.setImg("/img/" + fileName); // Cập nhật đường dẫn hình ảnh
+            } else {
+                // Không có ảnh mới, giữ lại ảnh cũ
+                nhanVienDTO.setImg(existingNhanVien.get().getImg());
             }
-            System.out.println("Nhân viên:"+nhanVienDTO);
+
             nhanVienSerVice.save(nhanVienDTO);
+            return ResponseEntity.ok(Map.of("success", "Sửa nhân viên thành công!"));
 
-
-            return ResponseEntity.ok(Map.of("success","Sửa nhân viên thành công!"));
-
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Lỗi:" + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", "Đã xảy ra lỗi: " + e.getMessage()));
         }
-
     }
+
 
     //validate
     private boolean isOver18(Date ngaySinh) {
@@ -363,16 +366,16 @@ public class NhanVienController {
         return existingEmployees.stream()
                 .anyMatch(employee -> employee.getEmail().equals(email) && !employee.getIdNhanVien().equals(idNhanVien));
     }
-
-    private boolean isPhoneExistsUpDate(String soDienThoai, Integer idNhanVien) {
-        // Lấy danh sách tất cả nhân viên từ cơ sở dữ liệu
-        List<NhanVienDTO> existingEmployees = nhanVienSerVice.findAll(); // Giả sử bạn có phương thức này
-
-        // Kiểm tra nếu email đã tồn tại, ngoại trừ email của nhân viên hiện tại
-        return existingEmployees.stream()
-                .anyMatch(employee -> employee.getSoDienThoai().equals(soDienThoai) && !employee.getIdNhanVien().equals(idNhanVien));
-    }
-
+//
+//    private boolean isPhoneExistsUpDate(String soDienThoai, Integer idNhanVien) {
+//        // Lấy danh sách tất cả nhân viên từ cơ sở dữ liệu
+//        List<NhanVienDTO> existingEmployees = nhanVienSerVice.findAll(); // Giả sử bạn có phương thức này
+//
+//        // Kiểm tra nếu email đã tồn tại, ngoại trừ email của nhân viên hiện tại
+//        return existingEmployees.stream()
+//                .anyMatch(employee -> employee.getSoDienThoai().equals(soDienThoai) && !employee.getIdNhanVien().equals(idNhanVien));
+//    }
+//
 
 
 

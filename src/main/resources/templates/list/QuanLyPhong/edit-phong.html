@@ -110,27 +110,22 @@
 
                                 <!-- Ảnh Phòng -->
 
+                                <!-- Hiển thị ảnh hiện tại -->
                                 <div class="row mb-3">
-
-                                    <div class="col-md-6 offset-md-3 text-center">
-
-                                        <img id="imgPreview" th:src="${phong.img}" alt="Ảnh phòng" class="img-thumbnail" style="max-width: 100%; height: auto;" />
-
+                                    <div class="col-md-6 offset-md-3">
+                                        <img id="imgPreview" th:src="@{${phong.img}}" alt="Ảnh phòng" class="img-thumbnail" style="max-width: 100%; height: auto;" />
                                     </div>
-
                                 </div>
 
                                 <!-- Chọn ảnh -->
-
                                 <div class="row mb-3">
-
                                     <div class="col-md-6 offset-md-3">
-
                                         <input type="file" id="imageInput" name="img" accept="image/*" class="form-control" onchange="previewImage(event)" />
-
                                     </div>
-
                                 </div>
+
+
+
 
                                 <div class="row mb-3">
 
@@ -212,39 +207,40 @@
 
                                     </div>
 
+<!--                                    <div class="col-md-6">-->
+
+<!--                                        <label for="gia" class="form-label">Giá</label>-->
+
+<!--                                        <select id="gia" name="loaiPhong.gia" class="form-control" required>-->
+
+<!--                                            <option value="300000" th:selected="${phong.loaiPhong.gia == 300000}">300,000 VNĐ</option>-->
+
+<!--                                            <option value="500000" th:selected="${phong.loaiPhong.gia == 500000}">500,000 VNĐ</option>-->
+
+<!--                                            <option value="700000" th:selected="${phong.loaiPhong.gia == 700000}">700,000 VNĐ</option>-->
+
+<!--                                            <option value="1400000" th:selected="${phong.loaiPhong.gia == 1400000}">1,400,000 VNĐ</option>-->
+
+<!--                                        </select>-->
+
+<!--                                    </div>-->
+
                                     <div class="col-md-6">
 
-                                        <label for="gia" class="form-label">Giá</label>
+                                        <label for="idLoaiPhong" class="form-label">Loại Phòng</label>
 
-                                        <select id="gia" name="gia" class="form-control" required>
+                                        <select id="idLoaiPhong" name="loaiPhong.idLoaiPhong" class="form-select" required>
 
-                                            <option value="300000" th:selected="${phong.gia == 300000}">300,000 VNĐ</option>
+                                            <option th:each="loaiPhong : ${loaiPhongs}" th:value="${loaiPhong.idLoaiPhong}" th:selected="${phong.loaiPhong != null && phong.loaiPhong.idLoaiPhong == loaiPhong.idLoaiPhong}" th:text="${loaiPhong.tenLoaiPhong}">
 
-                                            <option value="500000" th:selected="${phong.gia == 500000}">500,000 VNĐ</option>
-
-                                            <option value="700000" th:selected="${phong.gia == 700000}">700,000 VNĐ</option>
-
-                                            <option value="1400000" th:selected="${phong.gia == 1400000}">1,400,000 VNĐ</option>
+                                            </option>
 
                                         </select>
 
                                     </div>
-
                                 </div>
 
-                                <div class="mb-3">
 
-                                    <label for="idLoaiPhong" class="form-label">Loại Phòng</label>
-
-                                    <select id="idLoaiPhong" name="loaiPhong.idLoaiPhong" class="form-select" required>
-
-                                        <option th:each="loaiPhong : ${loaiPhongs}" th:value="${loaiPhong.idLoaiPhong}" th:selected="${phong.loaiPhong != null && phong.loaiPhong.idLoaiPhong == loaiPhong.idLoaiPhong}" th:text="${loaiPhong.tenLoaiPhong}">
-
-                                        </option>
-
-                                    </select>
-
-                                </div>
 
                                 <!--                                <div class="row mb-3">-->
 
@@ -327,28 +323,25 @@
 <script>
 
     function previewImage(event) {
-
-        const reader = new FileReader();
-
+        const imageInput = document.getElementById('imageInput');
         const imgPreview = document.getElementById('imgPreview');
 
-
-
-        reader.onload = function() {
-
-            if (reader.readyState === 2) {
-
-                imgPreview.src = reader.result;
-
-            }
-
+        // Kiểm tra xem có tệp nào được chọn không
+        if (imageInput.files && imageInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imgPreview.src = e.target.result; // Cập nhật ảnh xem trước với tệp được chọn
+            };
+            reader.readAsDataURL(imageInput.files[0]); // Chuyển đổi tệp hình ảnh thành URL
+        } else {
+            // Nếu không có tệp nào được chọn, giữ nguyên ảnh hiện tại
+            imgPreview.src = imgPreview.src; // Giữ lại đường dẫn cũ
         }
-
-
-
-        reader.readAsDataURL(event.target.files[0]);
-
     }
+
+
+
+
 
 </script>
 

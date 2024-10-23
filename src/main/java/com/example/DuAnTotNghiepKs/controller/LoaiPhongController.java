@@ -1,8 +1,10 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.LoaiPhongDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.LoaiPhong;
 import com.example.DuAnTotNghiepKs.service.LoaiPhongService;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,12 +22,23 @@ public class LoaiPhongController {
     @Autowired
     private LoaiPhongService loaiPhongService;
 
+    @Autowired
+    private TaiKhoanService taiKhoanService;
+
+
     @GetMapping
     public String listLoaiPhong(@RequestParam(value = "page", defaultValue = "0") int page,
                                 @RequestParam(value = "size", defaultValue = "5") int size,
                                 Model model) {
         Page<LoaiPhong> loaiPhongPage=loaiPhongService.getLoaiPhongPage(page,size);
         model.addAttribute("loaiPhongPage", loaiPhongPage);
+
+        //lấy id nhân viên
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
         return "list/QuanLyLoaiPhong/loaiphongs";
     }
 

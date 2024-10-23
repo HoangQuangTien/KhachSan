@@ -262,6 +262,7 @@ public class ThanhToanImp implements ThanhToanService {
                 .setFontSize(20)
                 .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))); // Sử dụng PdfFontFactory
 
+
         document.add(new Paragraph("Thông tin khách hàng: " + thanhToanDTO.getHoVaTen()));
         document.add(new Paragraph("Phòng: " + thanhToanDTO.getTenPhong()));
         document.add(new Paragraph("Tổng tiền: " + thanhToanDTO.getTongTien()));

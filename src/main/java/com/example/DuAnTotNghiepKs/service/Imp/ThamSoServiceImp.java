@@ -66,4 +66,19 @@ public class ThamSoServiceImp implements ThamSoService {
     }
 
 
+    @Override
+    // Phương thức lấy giá trị theo id
+    public String getValueById(Long id) {
+        ThamSo thamSo = thamSoRepo.findById(id).orElse(null);
+        return thamSo != null ? thamSo.getGiaTri() : null;
+    }
+
+
+    @Override
+    // Lấy ThamSo theo ID
+    public ThamSo getThamSoById(Long id) {
+        return thamSoRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Tham số không tồn tại với ID: " + id));
+    }
+
 }

@@ -66,6 +66,8 @@ public interface DatPhongService {
 
     DatPhong findById(Integer id);
 
+    long countCancelledBookings();
+
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();

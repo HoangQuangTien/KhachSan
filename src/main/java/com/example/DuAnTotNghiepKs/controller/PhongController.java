@@ -128,7 +128,6 @@ public class PhongController {
     }
 
     @PostMapping("/save")
-
     public String savePhong(@ModelAttribute Phong phong,PhongDTO phongDTO,
 
                             @RequestParam String action,
@@ -182,66 +181,21 @@ public class PhongController {
 
         } else if ("update".equals(action)) {
 
-            // Xử lý cập nhật
-
-            if (phong.getIdPhong() != null) {
-
-
-
-//                // Kiểm tra trạng thái của phòng
-
-//                if (phong.getTrangThai() != null && !phong.getTrangThai()) { // Trạng thái phòng không phải là "Còn phòng"
-
-//                    redirectAttributes.addFlashAttribute("errorMessage", "Chỉ được sửa tình trạng phòng khi phòng đó có trạng thái 'Còn phòng'!");
-
-//                    return "redirect:/phongs";
-
-//                }
-
-//
-
-//                // Kiểm tra tình trạng phòng
-
-//                if (phong.getTinhTrang() != null && phong.getTinhTrang()) { // Phòng có người đang ở
-
-//                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa vì phòng đang có người đang ở!");
-
-//                    return "redirect:/phongs";
-
-//                }
-
-
+            Phong existingPhong = phongService.getPhongById(phong.getIdPhong()).orElse(null);
+            if (existingPhong != null) {
+                // Giữ lại ảnh hiện tại nếu không có ảnh mới
+                if (phongDTO.getImg() == null || phongDTO.getImg().isEmpty()) {
+                    // Không có ảnh mới, giữ lại ảnh cũ
+                    phong.setImg(existingPhong.getImg());
+                } else {
+                    // Có ảnh mới, cập nhật đường dẫn ảnh mới
+                    phong.setImg("/img/" + phongDTO.getImg());
+                }
 
                 phong.setLoaiPhong(loaiPhongService.getLoaiPhongById(phong.getLoaiPhong().getIdLoaiPhong()).orElse(null));
 
-//            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
-
-//            phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
-
-//                if (!img.isEmpty()) {
-
-//                    String uploadDir = "src/main/resources/static/img"; // Hoặc đường dẫn khác
-
-//                    String imgName = img.getOriginalFilename();
-
-//                    Path filePath = Paths.get(uploadDir, imgName);
-
-//                    Files.copy(img.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-//                    // Lưu tệp vào một thư mục trên server, sau đó lưu tên file hoặc đường dẫn vào thuộc tính img
-
-//                    // Ví dụ:
-
-//                    phongDTO.setImg("img/" + imgName); // Đường dẫn file
-
-//                }
-
-                phong.setImg("/img/"+phongDTO.getImg());
-
                 phongService.updatePhong(phong);
-
                 redirectAttributes.addFlashAttribute("successMessage", "Cập nhật phòng thành công!");
-
             } else {
 
                 redirectAttributes.addFlashAttribute("errorMessage", "Phòng không tồn tại.");
@@ -249,16 +203,8 @@ public class PhongController {
             }
 
         } else {
-
             redirectAttributes.addFlashAttribute("errorMessage", "Action không hợp lệ.");
-
         }
-
-
-
-
-
-
 
         return "redirect:/phongs";
 
@@ -271,6 +217,7 @@ public class PhongController {
         model.addAttribute("loaiPhongs", loaiPhongService.getAllLoaiPhongs());
         model.addAttribute("tangs", tangService.getAllTangs());
         model.addAttribute("dienTichs", dienTichService.getAllDienTichPhongs());
+        System.out.println("Image URL: " + phong.getImg());
         return "list/QuanLyPhong/edit-phong";
     }
 

@@ -13,6 +13,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -97,63 +100,43 @@ public class ChiTietDatPhongController {
             errorMessage = "Ngày tháng không hợp lệ. Vui lòng nhập đúng định dạng yyyy-MM-dd.";
         }
 
-        List<DatPhong> datPhongs = new ArrayList<>();
+        Page<DatPhong> datPhongPage;
         List<ChiTietDatPhong> chiTietDatPhongs = new ArrayList<>();
 
         if (errorMessage == null) {
+            Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+
             // Lọc theo ngày nhận nếu có
             if (startDate != null && endDate != null) {
-                datPhongs = datPhongRepo.findByNgayNhanBetween(startDate, endDate);
+                datPhongPage = datPhongRepo.findByNgayNhanBetween(startDate, endDate, pageable);
             } else {
-                datPhongs = datPhongRepo.findAll();
+                datPhongPage = datPhongRepo.findAll(pageable);
             }
 
             // Lọc theo tình trạng nếu có
             if (!tinhTrangStr.isEmpty()) {
-                datPhongs = datPhongs.stream()
-                        .filter(datPhong -> datPhong.getTinhTrang().equals(tinhTrangStr))
-                        .collect(Collectors.toList());
+                datPhongPage = (Page<DatPhong>) datPhongPage.filter(datPhong -> datPhong.getTinhTrang().equals(tinhTrangStr));
             }
 
             // Tìm kiếm theo từ khóa
             if (!keyword.isEmpty()) {
-                datPhongs = datPhongRepo.findByKeyword(keyword);
+                datPhongPage = datPhongRepo.findByKeyword(keyword, pageable);
             }
 
             // Lấy chi tiết đặt phòng từ danh sách đặt phòng
-            chiTietDatPhongs = chiTietDatPhongRepo.findByDatPhongIn(datPhongs);
-
-//            // Đặt lại thời gian cho ngày nhận và trả
-//            datPhongs.forEach(datPhong -> {
-//                if (datPhong.getNgayNhan() != null) {
-//                    datPhong.setNgayNhan(setDefaultTimeTo7AM(datPhong.getNgayNhan()));
-//                }
-//                if (datPhong.getNgayTra() != null) {
-//                    datPhong.setNgayTra(setDefaultTimeTo7AM(datPhong.getNgayTra()));
-//                }
-//            });
+            chiTietDatPhongs = chiTietDatPhongRepo.findByDatPhongIn(datPhongPage.getContent());
 
             List<KhachHang> khachHangs = khachHangRepository.findAll();
             List<Phong> phongs = phongRepo.findAll();
-//            List<NhanVien> nhanViens = nhanVienRepo.findAll();
-
-            int startItem = (pageNo - 1) * pageSize;
-            List<ChiTietDatPhong> paginatedChiTietDatPhongs = chiTietDatPhongs.stream()
-                    .skip(startItem)
-                    .limit(pageSize)
-                    .collect(Collectors.toList());
-
-            int totalItems = chiTietDatPhongs.size();
-            int totalPages = (int) Math.ceil((double) totalItems / pageSize);
 
             // Thêm các thuộc tính vào model
-            model.addAttribute("data", paginatedChiTietDatPhongs);
-            model.addAttribute("datPhongs", datPhongs);
+            model.addAttribute("data", chiTietDatPhongs);
+            model.addAttribute("datPhongs", datPhongPage.getContent());
             model.addAttribute("khachHangs", khachHangs);
             model.addAttribute("phongs", phongs);
             model.addAttribute("currentPage", pageNo);
-            model.addAttribute("totalPages", totalPages);
-            model.addAttribute("totalItems", totalItems);
+            model.addAttribute("totalPages", datPhongPage.getTotalPages());
+            model.addAttribute("totalItems", datPhongPage.getTotalElements());
         } else {
             model.addAttribute("data", List.of());
             model.addAttribute("datPhongs", List.of());
@@ -170,6 +153,7 @@ public class ChiTietDatPhongController {
 
         return "list/QuanLyDatPhong/danhsachdatphong";
     }
+
 
 
     @GetMapping("/qrcode/{id}")
@@ -328,55 +312,6 @@ public class ChiTietDatPhongController {
     }
 
 
-//    @GetMapping("/edit-room/{id}")
-//    public String showEditRoomForm(@PathVariable("id") Integer id, Model model) {
-//        Optional<Phong> optionalPhong = phongService.getPhongById(id);
-//        if (optionalPhong.isPresent()) {
-//            Phong phong = optionalPhong.get();
-//            model.addAttribute("phong", phong);
-//            model.addAttribute("loaiPhongs", .getAllLoaiPhongs());
-//            model.addAttribute("tangs", tangService.getAllTangs());
-//        } else {
-//            model.addAttribute("errorMessage", "Không tìm thấy phòng với ID: " + id);
-//            return "error"; // Trả về trang lỗi nếu phòng không tìm thấy
-//        }
-//        return "list/QuanLyDatPhong/edit-phong";
-//    }
-//
-//
-//    @PostMapping("/update-room")
-//    public ResponseEntity<?> updateRoom(
-//            @RequestParam("roomId") Integer roomId,
-//            @RequestParam("tenPhong") String tenPhong,
-//            @RequestParam("loaiPhong") Integer loaiPhongId,
-//            @RequestParam("idTang") Integer idTang,
-//            @RequestParam("gia") Float gia) {
-//
-//        try {
-//            Phong phong = phongService.getPhongById(roomId)
-//                    .orElseThrow(() -> new RuntimeException("Phòng không tồn tại"));
-//            if (gia < phong.getGia()) {
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                        .body(Map.of("success", false, "message", "Giá mới phải lớn hơn hoặc bằng giá hiện tại"));
-//            }
-//            phong.setTenPhong(tenPhong);
-//            phong.setGia(gia);
-//            LoaiPhong loaiPhong = loaiPhongService.findById1(loaiPhongId)
-//                    .orElseThrow(() -> new RuntimeException("Không tìm thấy loại phòng với ID: " + loaiPhongId));
-//            phong.setLoaiPhong(loaiPhong);
-//            Tang tang = tangService.getTangById(idTang)
-//                    .orElseThrow(() -> new RuntimeException("Không tìm thấy tầng với ID: " + idTang));
-//            phong.setTang(tang);
-//            phongService.savePhong(phong);
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(Map.of("success", true, "message", "Phòng đã được cập nhật thành công"));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(Map.of("success", false, "message", "Đã xảy ra lỗi: " + e.getMessage()));
-//        }
-//    }
-
     @GetMapping("/edit-room")
     public String showEditRoomForm(@RequestParam("roomId") Integer id, Model model) {
         Optional<Phong> optionalPhong = phongService.getPhongById(id);
@@ -456,6 +391,20 @@ public class ChiTietDatPhongController {
             if (datPhongOpt.isPresent()) {
                 DatPhong datPhong = datPhongOpt.get();
                 datPhong.setPhong(phongMoi);
+//                datPhong.setTongTien(phongMoi.getGia()); // Cập nhật giá phòng
+//
+//                // Tính toán tiền cọc
+//                float tienCoc = phongMoi.getGia() * 0.8f; // Tiền cọc bằng 80% giá phòng
+//                datPhong.setTienCoc(tienCoc); // Giả sử có phương thức setTienCoc trong DatPhong
+//
+//                // Tính tổng tiền
+//                float tongTien = phongMoi.getGia(); // Tổng tiền bằng giá phòng
+//                float tienConLai = tongTien - tienCoc; // Tiền còn lại
+//
+//                // Giả sử bạn có các phương thức để lưu tổng tiền và tiền còn lại
+//                datPhong.setTongTien(tongTien); // Giả sử có phương thức setTongTien trong DatPhong
+//                datPhong.setTienConLai(tienConLai); // Giả sử có phương thức setTienConLai trong DatPhong
+
                 datPhongRepo.save(datPhong);
             }
             LichSuDatPhong lichSuDatPhong = new LichSuDatPhong();

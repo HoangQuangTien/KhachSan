@@ -34,7 +34,7 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
     @Query("SELECT COUNT(dp) FROM DatPhong dp")
     Long countTotalBookings();
 
-    List<DatPhong> findByNgayNhanBetween(LocalDateTime startDate, LocalDateTime endDate);
+    Page<DatPhong> findByNgayNhanBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);;
 
 
     @Query(value = "SELECT dp1.id_phong AS phongId, \n" +
@@ -85,14 +85,14 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
 
 
-        // Truy vấn để tìm các đơn đặt phòng theo id phòng và trùng thời gian
-        @Query("SELECT dp FROM DatPhong dp WHERE dp.phong.idPhong = :idPhong AND " +
-                "(:ngayNhan BETWEEN dp.ngayNhan AND dp.ngayTra OR " +
-                ":ngayTra BETWEEN dp.ngayNhan AND dp.ngayTra OR " +
-                "dp.ngayNhan BETWEEN :ngayNhan AND :ngayTra)")
-        List<DatPhong> findByPhongAndThoiGian(@Param("idPhong") Integer idPhong,
-                                              @Param("ngayNhan") LocalDateTime ngayNhan,
-                                              @Param("ngayTra") LocalDateTime ngayTra);
+    @Query("SELECT dp FROM DatPhong dp WHERE dp.phong.idPhong = :idPhong AND " +
+            "( (:ngayNhan BETWEEN dp.ngayNhan AND dp.ngayTra) OR " +
+            "(:ngayTra BETWEEN dp.ngayNhan AND dp.ngayTra) OR " +
+            "(dp.ngayNhan BETWEEN :ngayNhan AND :ngayTra) OR " +
+            "(dp.ngayTra BETWEEN :ngayNhan AND :ngayTra) )")
+    List<DatPhong> findByPhongAndThoiGian(@Param("idPhong") Integer idPhong,
+                                          @Param("ngayNhan") LocalDateTime ngayNhan,
+                                          @Param("ngayTra") LocalDateTime ngayTra);
 
 
 
@@ -119,7 +119,7 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "OR LOWER(k.soDienThoai) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(k.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(d.phong.maPhong) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<DatPhong> findByKeyword(@Param("keyword") String keyword);
+    Page<DatPhong> findByKeyword(String keyword, Pageable pageable);
 
 
 
@@ -143,4 +143,9 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "WHERE row_num <= 3;", nativeQuery = true)
     List<Object[]> findTopPhongDuocDatNhieuNhat1();
 
+
+    @Query(value = "SELECT COUNT(*) AS cancelled_count \n" +
+            "FROM DatPhong \n" +
+            "WHERE tinh_trang = N'Đã Hủy';",nativeQuery = true)
+    long countCancelledBookings();
 }

@@ -34,6 +34,7 @@
                 <th>Tâng</th>
                 <th>Dien Tích</th>
                 <th>Giá</th>
+                <th>Sức Chua</th>
                 <th>Hành Động</th>
             </tr>
             </thead>
@@ -47,6 +48,7 @@
                 <td th:text="${loaiPhong.tang.tenTang}"></td>
                 <td th:text="${loaiPhong.dienTich.tenDienTich}"></td>
                 <td th:text="${loaiPhong.gia}"></td>
+                <td th:text="${loaiPhong.sucChua}"></td>
                 <td>
                     <a th:href="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" class="btn btn-warning btn-sm">
                         <i class="bi bi-pen"></i> Sửa

@@ -53,11 +53,22 @@ public class NguoiDiCungRest {
         return "list/QuanLyDatPhong/nguoidicung"; // Đường dẫn tới trang HTML hiển thị danh sách đặt phòng
     }
 
-    @GetMapping("")
+    @GetMapping("/hien-thi-khach-di-cung")
     public String hienThiKhachDiCung(@RequestParam Integer id, Model model) {
+        System.out.println("ID nhận được: " + id); // In giá trị ID ra console để kiểm tra
+
         DatPhong datPhong = datPhongService.findById(id);
+
+        if (datPhong == null) {
+            System.out.println("Không tìm thấy Đặt Phòng với ID: " + id); // In thông báo nếu không tìm thấy
+            return "redirect:/error"; // Hoặc xử lý lỗi theo cách khác
+        }
+
+        System.out.println("Đặt phòng tìm thấy: " + datPhong); // In đối tượng Đặt Phòng ra console để kiểm tra
+        System.out.println("ID Đặt phòng: " + datPhong.getIdDatPhong()); // Kiểm tra ID đặt phòng
+
         DatPhongDTO datPhongDTO = new DatPhongDTO();
-        datPhongDTO.setIdDatPhong(datPhong.getIdDatPhong());
+        datPhongDTO.setIdDatPhong(datPhong.getIdDatPhong()); // Đây là chỗ cần kiểm tra giá trị
         datPhongDTO.setIdKhachHang(datPhong.getKhachHang().getId());
         datPhongDTO.setMaKhachHang(datPhong.getKhachHang().getMaKhachHang());
         datPhongDTO.setHoVaTen(datPhong.getKhachHang().getHoVaTen());
@@ -71,7 +82,8 @@ public class NguoiDiCungRest {
         return "list/QuanLyDatPhong/nguoidicungdetail";
     }
 
-    @PutMapping("/{id}")
+
+    @PutMapping("/nguoidicung/{id}")
     @Transactional
     public ResponseEntity<String> capNhatKhachHang(@PathVariable Integer id, @RequestBody KhachHangDTO khachHangDTO) {
         // Kiểm tra sự tồn tại của khách hàng

@@ -136,6 +136,34 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
+
+
+        .CancelledCountDisplay1 {
+            width: 220px;
+            height: 200px;
+            background: linear-gradient(135deg, #ff0000, #ff7f7f); /* Gradient màu đỏ */
+
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem; /* Kích thước chữ để cân đối với icon */
+            font-weight: bold;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #ff0000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .CancelledCountDisplay1:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+
+
+
         .container {
             display: flex;
             align-items: center; /* Căn chỉnh phần tử theo chiều dọc */
@@ -275,7 +303,7 @@
 
             </div>
 
-            <div id="">
+            <div id="CancelledCountDisplay" class="CancelledCountDisplay1">
 
             </div>
         </div>
@@ -538,6 +566,20 @@
             .then(data => {
                 console.log('Dữ liệu tổng số khách hàng:', data); // Kiểm tra dữ liệu
                 document.getElementById('customerCountDisplay').innerHTML = `<i class="fas fa-users icon"></i> ${data}`;
+            })
+            .catch(error => console.error('Lỗi khi lấy tổng số khách hàng đã đặt phòng:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        CancelledBookingStats();  // Tự động gọi hàm lấy tổng số khách hàng khi trang được tải
+    });
+    function CancelledBookingStats() {
+        fetch('/datphongs/thong-ke-da-huy')  // Gọi API để lấy tổng số khách hàng
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dữ liệu phong Bị hủy:', data); // Kiểm tra dữ liệu
+                document.getElementById('CancelledCountDisplay').innerHTML = `<i class="fas fa-trash-alt icon"></i>
+ ${data}`;
             })
             .catch(error => console.error('Lỗi khi lấy tổng số khách hàng đã đặt phòng:', error));
     }

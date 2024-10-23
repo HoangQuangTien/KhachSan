@@ -2,10 +2,7 @@ package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.*;
-import com.example.DuAnTotNghiepKs.service.DatPhongService;
-import com.example.DuAnTotNghiepKs.service.LichSuDatPhongService;
-import com.example.DuAnTotNghiepKs.service.PhongService;
-import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
+import com.example.DuAnTotNghiepKs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +36,9 @@ public class DanhSachDatPhong {
     @Autowired
     private TaiKhoanService taiKhoanService;
 
+    @Autowired
+    private ThamSoService thamSoService;
+
     @GetMapping()
     public String showDatPhongList(Model model) {
         // Lấy tất cả thông tin đặt phòng chưa check-in
@@ -70,6 +70,27 @@ public class DanhSachDatPhong {
             TaiKhoan taiKhoan = taiKhoanService.getTaiKhoanTuSession1();
             if (taiKhoan == null || taiKhoan.getNhanVien() == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Không tìm thấy thông tin nhân viên."));
+            }
+
+            // Lấy thời gian dự kiến nhận phòng từ đặt phòng
+            LocalDateTime ngayNhanPhong = datPhong.getNgayNhan();
+
+            // Lấy giá trị cho phép từ bảng tham số bằng id
+            Long thamSoId = 1L; // id của tham số check-in được phép trong bảng ThamSo
+            String checkinLeewayStr = thamSoService.getValueById(thamSoId);
+            if (checkinLeewayStr == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Tham số kiểm tra check-in chưa được cấu hình."));
+            }
+
+            // Chuyển đổi giá trị từ String sang Integer
+            Integer checkinLeewayMinutes = Integer.parseInt(checkinLeewayStr);
+
+            // Lấy thời gian hiện tại
+            LocalDateTime now = LocalDateTime.now();
+
+            // Kiểm tra nếu khách hàng check-in trước quá 5 phút (hoặc giá trị từ tham số)
+            if (now.isBefore(ngayNhanPhong.minusMinutes(checkinLeewayMinutes))) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Chỉ được phép check-in trước tối đa " + checkinLeewayMinutes + " phút."));
             }
 
             // Cập nhật thông tin check-in

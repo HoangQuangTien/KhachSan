@@ -1,8 +1,10 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.EventDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,8 +22,17 @@ public class DangLichController {
     @Autowired
     private DatPhongService datPhongService;
 
+    @Autowired
+    private TaiKhoanService taiKhoanService;
+
     @GetMapping
     public String showDangLichList(Model model) {
+        //lấy id nhân viên
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
         return "list/QuanLyDatPhong/dangLich"; // Đường dẫn đến trang HTML Thymeleaf
     }
 

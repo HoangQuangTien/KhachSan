@@ -16,4 +16,10 @@ public interface ThamSoService {
     void deleteById(Long id);
 
     String getThamSoValue(String tenThamSo);
+
+    // Phương thức lấy giá trị theo id
+    String getValueById(Long id);
+
+    // Lấy ThamSo theo ID
+    ThamSo getThamSoById(Long id);
 }
