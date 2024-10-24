@@ -1,17 +1,22 @@
 package com.example.DuAnTotNghiepKs.controller;
 
+import com.example.DuAnTotNghiepKs.DTO.ChiTietVaiTroDTO;
 import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
 import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/login")
@@ -20,36 +25,72 @@ public class LoginController {
     @Autowired
     private TaiKhoanService taiKhoanService;
 
+    private final PasswordEncoder passwordEncoder;
+
+    public LoginController(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     @GetMapping
     public String login() {
         return "list/DangNhap/login";
     }
 
-    @PostMapping
-    public ResponseEntity<?> login(@RequestParam String tenDangNhap, @RequestParam String matKhau) {
-        TaiKhoanDTO taiKhoanDTO = taiKhoanService.findByTenDangNhap(tenDangNhap);
+    @PostMapping("/login")
+    public String login(@Valid @ModelAttribute TaiKhoanDTO taiKhoanDTO, Model model) {
+        String tenDangNhap = taiKhoanDTO.getTenDangNhap();
+        String matKhau = taiKhoanDTO.getMatKhau();
 
-        // Kiểm tra tài khoản có tồn tại không
-        if (taiKhoanDTO == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Tài khoản không tồn tại"));
+        TaiKhoanDTO foundTaiKhoan = taiKhoanService.findByTenDangNhap(tenDangNhap);
+
+        // Kiểm tra nếu tài khoản không tồn tại
+        if (foundTaiKhoan == null) {
+            model.addAttribute("error", "Tên đăng nhập không tồn tại.");
+            return "list/DangNhap/login";
         }
 
-        // Kiểm tra mật khẩu
-        if (!taiKhoanDTO.getMatKhau().equals(matKhau)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Mật khẩu không chính xác"));
+        // Kiểm tra mật khẩu có khớp không
+        if (!foundTaiKhoan.getMatKhau().equals(matKhau)) {
+            model.addAttribute("error", "Mật khẩu không chính xác.");
+            return "list/DangNhap/login";
         }
 
-        // Lấy thông tin nhân viên từ TaiKhoanDTO
-        NhanVienDTO nhanVienDTO = taiKhoanDTO.getNhanVienDTO();
+        Set<ChiTietVaiTroDTO> roles = foundTaiKhoan.getChiTietVaiTros();
 
-        // Kiểm tra thông tin nhân viên
-        if (nhanVienDTO == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Thông tin nhân viên không tồn tại"));
-        }
-        // Chuyển hướng tới trang chủ với thông tin nhân viên
-        return ResponseEntity.ok(Map.of("nhanVienDto", nhanVienDTO)); // Chỉ trả về thông tin nhân viên nếu cần
+
+        // Lấy vai trò đầu tiên
+        String role = roles.stream()
+                .map(chiTietVaiTroDto -> chiTietVaiTroDto.getVaiTroDTO().getTenVaiTro())
+                .findFirst()
+                .orElse(null);
+
+        // Log giá trị của role
+        System.out.println("Vai trò: " + role);
+
+        // Logic để chuyển hướng dựa trên vai trò
+        String redirectUrl = switch (role) {
+            case "ADMIN" -> "/thongke";
+            case "EMPLOYEE" -> "/datphongs";
+            case "CUSTOMER" -> "/khach-hang";
+            default -> "/khach-hang"; // Mặc định nếu vai trò không xác định
+        };
+
+        // Nếu hợp lệ, thực hiện đăng nhập và chuyển hướng đến URL dựa trên vai trò
+        return "redirect:" + redirectUrl;
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 

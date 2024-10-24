@@ -15,14 +15,14 @@
         <nav class="vertnav navbar navbar-light">
             <!-- Brand Logo -->
             <div class="w-100 d-flex">
-                <a class="navbar-brand mx-auto mt-2 flex-fill text-center" >
+                <a class="navbar-brand mx-auto mt-2 flex-fill text-center">
                     <img alt="Logo" class="navbar-brand-img brand-sm" style="width: 140px" th:src="@{/img/logo.jpg}">
                 </a>
             </div>
 
             <!-- Main Navigation -->
             <ul class="navbar-nav flex-fill w-100 mb-3">
-                <li class="nav-item">
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                     <a class="nav-link pl-3" th:href="@{/thongke}">
                         <i class="fa fa-pie-chart"></i>
                         <span class="ml-3 item-text">Thống Kê</span>
@@ -31,7 +31,7 @@
             </ul>
 
             <ul class="navbar-nav flex-fill w-100 mb-3">
-                <li class="nav-item">
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                     <a class="nav-link pl-3" th:href="@{/loaiphongs}">
                         <i class="fe fe-users"></i>
                         <span class="ml-3 item-text">Loại Phòng</span>
@@ -41,7 +41,7 @@
 
             <!-- Main Navigation -->
             <ul class="navbar-nav flex-fill w-100 mb-3">
-                <li class="nav-item">
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                     <a class="nav-link pl-3" th:href="@{/phongs}">
                         <i class='fas fa-door-open'></i>
                         <span class="ml-3 item-text">Phòng</span>
@@ -51,7 +51,8 @@
 
             <ul class="navbar-nav flex-fill w-100 mb-3">
                 <li class="nav-item dropdown">
-                    <a class="nav-link pl-3 dropdown-toggle" data-toggle="collapse" href="#account-management1" aria-expanded="false">
+                    <a class="nav-link pl-3 dropdown-toggle" data-toggle="collapse" href="#account-management1"
+                       aria-expanded="false">
                         <i class="fa fa-calendar"></i>
                         <span class="ml-3 item-text">Quản lý Đặt Phòng</span>
                     </a>
@@ -95,7 +96,7 @@
                             <a class="nav-link pl-3" th:href="@{/danhsachdatphong}">
                                 <i class="material-icons">list Room</i>
 
-<!--                                <span class="ml-3 item-text">Danh Sách Đặt Phòng</span>-->
+                                <!--                                <span class="ml-3 item-text">Danh Sách Đặt Phòng</span>-->
                             </a>
                         </li>
 
@@ -114,8 +115,8 @@
             </ul>
 
 
-            <ul class="navbar-nav flex-fill w-100 mb-3">
-                <li class="nav-item">
+            <ul class="navbar-nav flex-fill w-100 mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <li class="nav-item dropdown" >
                     <a class="nav-link pl-3" th:href="@{/admin/quan-ly-khuyen-mai}">
                         <i class="fa fa-gift"></i>
                         <span class="ml-3 item-text">Quản Lý Khuyến Mại</span>
@@ -124,9 +125,8 @@
             </ul>
 
 
-
-            <ul class="navbar-nav flex-fill w-100 mb-3">
-                <li class="nav-item">
+            <ul class="navbar-nav flex-fill w-100 mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <li class="nav-item dropdown" >
                     <a class="nav-link pl-3" th:href="@{/thamSo}">
                         <i class='fas fa-robot'></i>
                         <span class="ml-3 item-text">Quản Lý Tham Số</span>
@@ -137,35 +137,38 @@
 
             <!-- Account Management -->
             <ul class="navbar-nav flex-fill w-100 mb-3">
-                <li class="nav-item dropdown">
-                    <a class="nav-link pl-3 dropdown-toggle" data-toggle="collapse" href="#account-management" aria-expanded="false">
-                        <i class="fe fe-users"></i>
-                        <span class="ml-3 item-text">Quản lý tài khoản</span>
-                    </a>
-                    <ul class="collapse list-unstyled pl-4 w-100" id="account-management">
-                        <li class="nav-item">
-                            <a class="nav-link pl-3" th:href="@{/quan-ly-khach-hang}">
-                                <i class="fe fe-user"></i>
-                                <span class="ml-1 item-text">Quản lý khách hàng</span>
-                            </a>
-                        </li>
-                        <a aria-expanded="false" class="dropdown-toggle nav-link pl-3" data-toggle="collapse" href="#layouts">
+
+                <a class="nav-link pl-3 dropdown-toggle" data-toggle="collapse" href="#account-management"
+                   aria-expanded="false">
+                    <i class="fe fe-users"></i>
+                    <span class="ml-3 item-text">Quản lý tài khoản</span>
+                </a>
+                <ul class="collapse list-unstyled pl-4 w-100" id="account-management">
+                    <li class="nav-item">
+                        <a class="nav-link pl-3" th:href="@{/quan-ly-khach-hang}">
+                            <i class="fe fe-user"></i>
+                            <span class="ml-1 item-text">Quản lý khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                        <a aria-expanded="false" class="dropdown-toggle nav-link pl-3" data-toggle="collapse"
+                           href="#layouts">
                             <i class="fas fa-user"></i>
                             <span class="ml-3 item-text">Quản lý nhân viên</span>
                         </a>
-                        <ul class="collapse list-unstyled pl-4 w-100" id="layouts">
-                            <li class="nav-item">
-                                <a class="nav-link pl-3" th:href="@{/lich-lam-viec}">
-                                    <span class="ml-1 item-text">Quản lý lịch làm việc</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link pl-3" th:href="@{/admin/quan-ly-nhan-vien}">
-                                    <span class="ml-1 item-text">Quản lý nhân viên</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </ul>
+                </ul>
+                <ul class="collapse list-unstyled pl-4 w-100" id="layouts">
+                    <li class="nav-item">
+                        <a class="nav-link pl-3" th:href="@{/lich-lam-viec}">
+                            <span class="ml-1 item-text">Quản lý lịch làm việc</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pl-3" th:href="@{/admin/quan-ly-nhan-vien}">
+                            <span class="ml-1 item-text">Quản lý nhân viên</span>
+                        </a>
+                    </li>
+                </ul>
                 </li>
             </ul>
 

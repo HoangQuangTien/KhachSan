@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,26 +52,34 @@ public class TaiKhoanService {
                 System.out.println("Không tìm thấy nhân viên cho tài khoản: " + taiKhoan.getTenDangNhap());
             }
 
+            // Kiểm tra chi tiết vai trò có NULL không
+            Set<ChiTietVaiTroDTO> chiTietVaiTroDTOs = (taiKhoan.getChiTietVaiTros() != null)
+                    ? taiKhoan.getChiTietVaiTros().stream()
+                    .map(chiTietVaiTro -> new ChiTietVaiTroDTO(
+                            chiTietVaiTro.getIdChiTietVaiTro(),
+                            chiTietVaiTro.getMaChoTietVaiTro(),
+                            new VaiTroDTO(
+                                    chiTietVaiTro.getVaiTro().getIdVaiTro(),
+                                    chiTietVaiTro.getVaiTro().getMaVaiTro(),
+                                    chiTietVaiTro.getVaiTro().getTenVaiTro()
+                            )
+                    ))
+                    .collect(Collectors.toSet())
+                    : Collections.emptySet(); // Trả về Set rỗng nếu không có vai trò nào
+
             // Trả về đối tượng TaiKhoanDTO với tất cả các trường đúng kiểu
             return new TaiKhoanDTO(
                     taiKhoan.getTenDangNhap(),
                     taiKhoan.getMatKhau(),
                     nhanVienDTO, // Đảm bảo rằng bạn thêm nhanVienDTO vào đây
-                    taiKhoan.getChiTietVaiTros().stream()
-                            .map(chiTietVaiTro -> new ChiTietVaiTroDTO(
-                                    chiTietVaiTro.getIdChiTietVaiTro(),
-                                    chiTietVaiTro.getMaChoTietVaiTro(),
-                                    new VaiTroDTO(chiTietVaiTro.getVaiTro().getIdVaiTro(),
-                                            chiTietVaiTro.getVaiTro().getMaVaiTro(),
-                                            chiTietVaiTro.getVaiTro().getTenVaiTro())
-                            ))
-                            .collect(Collectors.toSet()) // Đảm bảo rằng bạn đang trả về một Set<ChiTietVaiTroDTO>
+                    chiTietVaiTroDTOs
             );
         } else {
             System.out.println("Không tìm thấy tài khoản với tên đăng nhập: " + tenDangNhap);
             throw new UsernameNotFoundException("Tên đăng nhập không tồn tại: " + tenDangNhap);
         }
     }
+
 
 
     //convert to dto

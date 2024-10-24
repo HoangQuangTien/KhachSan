@@ -1,10 +1,10 @@
 package com.example.DuAnTotNghiepKs.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.DuAnTotNghiepKs.DTO.ChiTietVaiTroDTO;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Set;
 
 
 @AllArgsConstructor
@@ -24,6 +24,10 @@ public class VaiTro {
 
     @Column(name = "ten_vai_tro")
     private String tenVaiTro;
+
+    @OneToMany(mappedBy = "vaiTro",fetch = FetchType.EAGER)
+    private Set<ChiTietVaiTro> chiTietVaiTros;
+
 
 
 }

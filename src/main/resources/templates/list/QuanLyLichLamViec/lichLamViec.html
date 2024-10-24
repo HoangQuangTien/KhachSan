@@ -251,8 +251,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("Sự kiện được click:", info.event);
             var ngayLamViec = new Date(info.event.startStr); // Ngày làm việc của sự kiện
             var idLichLamViec = info.event.extendedProps.idLichLamViec;
-            var caLamViec = info.event.extendedProps.tenCaLamViec;
+            var tenCaLamViec = info.event.extendedProps.tenCaLamViec; // Kiểm tra lại biến ca làm việc
             var today = new Date(); // Ngày hiện tại
+
+            console.log("Tên ca làm việc:", tenCaLamViec); // Kiểm tra xem tenCaLamViec có giá trị không
 
             // So sánh ngày làm việc với ngày hiện tại
             if (ngayLamViec < today) {
@@ -261,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <p><strong>Mã Lịch:</strong> ${info.event.extendedProps.maLichLamViec}</p>
             <p><strong>Nhân viên:</strong> ${info.event.title}</p>
             <p><strong>Ngày làm việc:</strong> ${ngayLamViec.toLocaleDateString()}</p>
-            <p><strong>Ca làm việc:</strong> ${caLamViec}</p>
+            <p><strong>Ca làm việc:</strong> ${tenCaLamViec}</p>
         `;
                 Swal.fire({
                     title: 'Chi tiết lịch làm việc',
@@ -278,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const idNhanVienHienTai = info.event.extendedProps.idNhanVien;
 
                         return fetch('/api/ca-lam-viec').then(response => response.json()).then(caLamViecData => {
+                            console.log("Dữ liệu ca làm việc:", caLamViecData); // Log dữ liệu ca làm việc để kiểm tra
                             const formHtml = `
                         <form id="editLichForm">
                             <input type="hidden" value="${idLichLamViec}" name="idLichLamViec" >
@@ -298,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <select name="caLamViec" id="caLamViec" class="form-select" required>
                                     <option value="">Chọn ca làm</option>
                                     ${caLamViecData.map(ca => `
-                                        <option  value="${ca.maCaLamViec}" ${ca.maCaLamViec === caLamViec ? 'selected' : ''}>
+                                        <option  value="${ca.maCaLamViec}" ${ca.maCaLamViec === info.event.extendedProps.caLamViec ? 'selected' : ''}>
                                             ${ca.tenCaLamViec}
                                         </option>`).join('')}
                                 </select>
@@ -353,6 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
             }
         }
+
 
     });
 
