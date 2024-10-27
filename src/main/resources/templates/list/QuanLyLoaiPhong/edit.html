@@ -33,6 +33,10 @@
     <input type="number" th:field="*{gia}" step="0.1" />
     <div class="error"  th:if="${#fields.hasErrors('gia')}" th:errors="*{gia}"></div><br/>
 
+    <label>Suc Chua:</label>
+    <input type="number" th:field="*{sucChua}" />
+    <div class="error"  th:if="${#fields.hasErrors('sucChua')}" th:errors="*{sucChua}"></div><br/>
+
     <div style="display: flex;">
         <a href="/loaiphongs"><button type="button" style="background-color: gray;">Quay lại</button></a>
         <button type="submit" class="luu"> Lưu Thay Đổi</button>

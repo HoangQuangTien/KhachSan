@@ -215,10 +215,11 @@
                             <form id="form-update-employee" enctype="multipart/form-data" class="form-update-employee"
                                   th:action="@{/quan-ly-nhan-vien/update}"
                                   method="post">
-                                <input type="text" name="idNhanVien" id="idNhanVienDetail">
+                                <input type="hidden" name="idNhanVien" id="idNhanVienDetail">
                                 <input type="hidden" name="maNhanVien" id="maNhanVienDetail">
-                                <input type="text" name="tenDangNhap" id="tenDangNhapDetail">
-                                <input type="text" name="matKhau" id="matKhauDetail">
+                                <input type="hidden" name="tenDangNhap" id="tenDangNhapDetail">
+                                <input type="hidden" name="matKhau" id="matKhauDetail">
+
 
 
                                 <!-- Hàng 1: Họ tên, Số điện thoại, Email -->
@@ -730,7 +731,7 @@
                         toast: true
                     });
                     form.reset();
-                    $('#formUpdate').modal('hide');
+
                     // Tải lại trang sau khi cập nhật thành công
                     setTimeout(function() {
                         location.reload(); // Tải lại toàn bộ trang sau khi thông báo đóng

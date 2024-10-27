@@ -67,29 +67,10 @@ public class KhachHangDD {
 
         return ResponseEntity.ok(phongDTOs);
     }
-
-    public List<Phong> getPhongsByLoaiPhong1(Integer loaiPhongId) {
-        return phongRepo.findByLoaiPhong_IdLoaiPhongAndTrangThaiTrue(loaiPhongId);
+    @GetMapping("/hangphongdetail")
+    public String showRoomDetailPage() {
+        return "List/KhachHang/hangphongdetail";
     }
-    public PhongDTO convertToPhongDTO(Phong phong) {
-        PhongDTO dto = new PhongDTO();
-        dto.setIdPhong(phong.getIdPhong());
-        dto.setTenPhong(phong.getTenPhong());
-        dto.setMaPhong(phong.getMaPhong());
-        dto.setMoTa(phong.getMoTa());
-        dto.setTinhTrang(phong.getTinhTrang());
-        dto.setTrangThai(phong.getTrangThai());
-        dto.setGia(phong.getGia());
 
-        // Kiểm tra và thiết lập các thuộc tính liên quan đến LoaiPhong
-        if (phong.getLoaiPhong() != null) {
-            dto.setIdLoaiPhong(phong.getLoaiPhong().getIdLoaiPhong());
-            dto.setTenLoaiPhong(phong.getLoaiPhong().getTenLoaiPhong());
-            dto.setGiaLoaiPhong(phong.getLoaiPhong().getGia());
-            dto.setSoNguoiToiDa(phong.getLoaiPhong().getSoNguoiToiDa()); // Thêm dòng này
-        }
-
-        return dto;
-    }
 
 }

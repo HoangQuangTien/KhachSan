@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -37,7 +38,6 @@ public interface KhuyenMaiRepo extends JpaRepository<KhuyenMai,Integer> {
 
     List<KhuyenMai> findByTrangThai(String trangThai);
 
-
-
-
+    @Query("SELECT k FROM KhuyenMai k WHERE k.ngayKetThuc >= :today")
+    List<KhuyenMai> findAllActiveVouchers(@Param("today") Date today);
 }

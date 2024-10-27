@@ -42,7 +42,7 @@ public class PhongDTO {
 
         private String img;
 
-
+        private Integer soNguoiToiDa;
 
 //        private float tenDienTich;
 

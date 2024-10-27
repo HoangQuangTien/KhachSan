@@ -1,8 +1,11 @@
 package com.example.DuAnTotNghiepKs.service;
 
 import com.example.DuAnTotNghiepKs.entity.ChiTietDatPhong;
+import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
+import com.example.DuAnTotNghiepKs.repository.KhuyenMaiRepo;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,6 +25,9 @@ public class EmailService {
 
     @Autowired
     private QrCodeService qrCodeService;
+
+    @Autowired
+    private KhuyenMaiRepo khuyenMaiRepo;
 
     private String formatDateTime(LocalDateTime dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -134,4 +140,35 @@ public class EmailService {
         // Send the email
         emailSender.send(message);
     }
+
+
+
+
+    public void guimail(String toEmail, String subject, String body) throws MessagingException {
+        MimeMessage mimeMessage = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+        helper.setFrom("conbotthoiok@gmail.com");
+        helper.setTo(toEmail);
+        helper.setSubject(subject);
+        helper.setText(body, true);
+        emailSender.send(mimeMessage);
+
+    }
+
+    public KhuyenMai layvoucher(Integer id){
+        return  khuyenMaiRepo.findById(id).orElse(null);
+    }
+
+
+
+    @SneakyThrows
+    public void sendEmail(String to, String subject, String body) {
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(body, true); // true để chỉ định nội dung là HTML
+        emailSender.send(message);
+    }
 }
+

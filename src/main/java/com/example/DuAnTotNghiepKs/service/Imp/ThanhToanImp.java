@@ -4,7 +4,6 @@ import com.example.DuAnTotNghiepKs.DTO.ThanhToanDTO;
 
 import com.example.DuAnTotNghiepKs.entity.*;
 import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
-import com.example.DuAnTotNghiepKs.repository.TaiKhoanRepo;
 import com.example.DuAnTotNghiepKs.repository.ThamSoRepo;
 import com.example.DuAnTotNghiepKs.repository.ThanhToanRepo;
 import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
@@ -275,8 +274,13 @@ public class ThanhToanImp implements ThanhToanService {
 
 
 
-
-
+    @Override
+    public List<ThanhToanDTO> search(String query, Date ngayThanhToan) {
+        List<ThanhToan> results = thanhToanRepository.searchByKhachHangOrNhanVienAndNgayThanhToan(query, ngayThanhToan);
+        return results.stream()
+                .map(thanhToan -> modelMapper.map(thanhToan, ThanhToanDTO.class))
+                .collect(Collectors.toList());
+    }
 
 
 }

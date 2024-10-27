@@ -191,6 +191,9 @@ public class KhuyenMaiService {
 
 
 
+    public List<KhuyenMai> getActiveVouchers() {
+        return khuyenMaiRepository.findAllActiveVouchers(new Date());
+    }
 
 
 }

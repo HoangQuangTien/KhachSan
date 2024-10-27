@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 public interface ThanhToanService {
@@ -23,4 +24,6 @@ public interface ThanhToanService {
     long getThoiGianChoPhepChuyenTrangThai();
 
     byte[] createInvoicePDF(ThanhToanDTO thanhToanDTO) throws IOException;
+
+    List<ThanhToanDTO> search(String query, Date ngayThanhToan);
 }

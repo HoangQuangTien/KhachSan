@@ -1,6 +1,7 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
+import com.example.DuAnTotNghiepKs.service.KhachHangService;
 import com.example.DuAnTotNghiepKs.service.KhuyenMaiService;
 import jakarta.servlet.ServletRequest;
 import jakarta.validation.Valid;
@@ -29,6 +30,9 @@ public class KhuyenMaiController {
     @Autowired
     private KhuyenMaiService khuyenMaiService;
 
+    @Autowired
+    private KhachHangService khachHangService;
+
 //    @Autowired
 //    private KhuyenMaiRepo khuyenMaiRepo;
 
@@ -40,7 +44,14 @@ public class KhuyenMaiController {
 
         Sort sort = Sort.by(Sort.Direction.DESC, "ngayKetThuc");
         Page<KhuyenMai> khuyenMaiPage = khuyenMaiService.getKhuyenMaiPage(page, size,sort);
+
+        // Lấy danh sách khuyến mãi còn hạn
+        List<KhuyenMai> activeVouchers = khuyenMaiService.getActiveVouchers();
+
         model.addAttribute("khuyenMaiPage", khuyenMaiPage);
+        model.addAttribute("listKH", khachHangService.getAll());
+        model.addAttribute("Voucher", new KhuyenMai());
+        model.addAttribute("activeVouchers", activeVouchers);
         return "list/QuanLyKhuyenMai/KhuyenMai";
     }
 
@@ -112,8 +123,7 @@ public class KhuyenMaiController {
             @RequestParam("ngayKetThuc") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayKetThuc,
 //            @RequestParam("trangThai") String trangThai,
 //            @RequestParam("loaiGiam") Boolean loaiGiam)
-            @RequestParam("loaiGiam") String loaiGiamStr,
-            @RequestParam("trangThai") String trangThai
+            @RequestParam("loaiGiam") String loaiGiamStr
 
 //            ServletRequest servletRequest
     ) {
@@ -140,21 +150,6 @@ public class KhuyenMaiController {
             if (ngayBatDau.after(ngayKetThuc)) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Ngày bắt đầu phải trước ngày kết thúc."));
             }
-//            if (img.isEmpty()) {
-//                return ResponseEntity.badRequest().body(Map.of("error", "Tệp ảnh không được để trống."));
-//            }
-//            // Tạo đường dẫn thư mục static/img
-//            String uploadDir = "src/main/resources/static/img";
-//            String fileName = img.getOriginalFilename();
-//            Path filePath = Paths.get(uploadDir, fileName);
-//
-//            // Lưu file ảnh vào hệ thống
-//            Files.copy(img.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // Tạo đối tượng khuyến mãi và lưu vào cơ sở dữ liệu
-            // Lấy giá trị trangThai từ form
-//            String trangThai = servletRequest.getParameter("trangThai");
-//            Boolean loaiGiam = Boolean.valueOf(servletRequest.getParameter("loaiGiam"));
             KhuyenMai khuyenMai = new KhuyenMai();
             khuyenMai.setMaKhuyenMai(maKhuyenMai);
             khuyenMai.setTenKhuyenMai(tenKhuyenMai);
@@ -177,13 +172,16 @@ public class KhuyenMaiController {
             } else if ("tienMat".equals(loaiGiam)) {
                 khuyenMai.setLoaiGiam(false); // Tiền mặt
             }
-            // Gán trạng thái dựa trên radio button
-            if ("conHan".equals(trangThai)) {
-                khuyenMai.setTrangThai("Còn hạn");
-            } else if ("hetHan".equals(trangThai)) {
-                khuyenMai.setTrangThai("Hết hạn");
-            } else if ("sapDienRa".equals(trangThai)) {
+
+
+            // Thiết lập trạng thái tự động dựa trên ngày hiện tại so với ngày bắt đầu và ngày kết thúc.
+            Date today = new Date();
+            if (today.before(ngayBatDau)) {
                 khuyenMai.setTrangThai("Sắp diễn ra");
+            } else if (today.after(ngayKetThuc)) {
+                khuyenMai.setTrangThai("Hết hạn");
+            } else {
+                khuyenMai.setTrangThai("Còn hạn");
             }
 
 
@@ -205,7 +203,7 @@ public class KhuyenMaiController {
 
     @PostMapping("/update/{id}")
     public ResponseEntity<?> updateKhuyenMai(
-            @RequestParam("id") Integer id,
+            @PathVariable("id") Integer id,
             @RequestParam("maKhuyenMai") String maKhuyenMai,
             @RequestParam("tenKhuyenMai") String tenKhuyenMai,
             @RequestParam("moTa") String moTa,
@@ -232,7 +230,6 @@ public class KhuyenMaiController {
             }
 
             // Cập nhật thông tin khuyến mãi
-            khuyenMai.setIdKhuyenMai(id);
             khuyenMai.setMaKhuyenMai(maKhuyenMai);
             khuyenMai.setTenKhuyenMai(tenKhuyenMai);
             khuyenMai.setMoTa(moTa);
@@ -251,18 +248,18 @@ public class KhuyenMaiController {
                 khuyenMai.setLoaiGiam(false); // Tiền mặt
             }
 
-            // Cập nhật trạng thái
-            String trangThai = servletRequest.getParameter("trangThai");
-            if ("conHan".equals(trangThai)) {
-                khuyenMai.setTrangThai("Còn hạn");
-            } else if ("hetHan".equals(trangThai)) {
-                khuyenMai.setTrangThai("Hết hạn");
-            } else if ("sapDienRa".equals(trangThai)) {
+            // Tự động thiết lập trạng thái khuyến mãi
+            Date today = new Date();
+            if (today.before(ngayBatDau)) {
                 khuyenMai.setTrangThai("Sắp diễn ra");
+            } else if (today.after(ngayKetThuc)) {
+                khuyenMai.setTrangThai("Hết hạn");
+            } else {
+                khuyenMai.setTrangThai("Còn hạn");
             }
 
             // Lưu khuyến mãi
-            khuyenMaiService.saveKhuyenMai(khuyenMai);
+            khuyenMaiService.updateKhuyenMai(id,khuyenMai);
 
             return ResponseEntity.ok(Map.of("success", "Cập nhật khuyến mãi thành công!"));
         } catch (Exception e) {
@@ -273,28 +270,6 @@ public class KhuyenMaiController {
 
 
 
-
-
-//    @PostMapping("/add")
-//    public String addKhuyenMai(@ModelAttribute KhuyenMai khuyenMai,Model model){
-//        khuyenMaiService.saveKhuyenMai(khuyenMai);
-//        return"redirect:/khuyenmaii";
-//    }
-//    @PostMapping("/add")
-//    public String addKhuyenMai(@Valid @ModelAttribute KhuyenMai khuyenMai, BindingResult result, Model model) {
-//        // Kiểm tra lỗi xác thực
-//        if (result.hasErrors()) {
-//            // Nếu có lỗi, trả về lại trang với thông báo lỗi và dữ liệu đã nhập
-//            model.addAttribute("khuyenMai", khuyenMai);
-//            return "addKM"; // Thay đổi tên trang HTML tương ứng với trang hiện tại của bạn
-//        }
-//
-//        // Nếu không có lỗi, lưu khuyến mãi vào cơ sở dữ liệu
-//        khuyenMaiService.saveKhuyenMai(khuyenMai);
-//
-//        // Redirect đến trang danh sách khuyến mãi sau khi thêm thành công
-//        return "redirect:/khuyenmaii";
-//    }
 
 
 

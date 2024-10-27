@@ -97,6 +97,7 @@ public class LoaiPhongController {
             existingLoaiPhong.setSoLuongGiuong(loaiPhong.getSoLuongGiuong());
             existingLoaiPhong.setSoNguoiToiDa(loaiPhong.getSoNguoiToiDa());
             existingLoaiPhong.setGia(loaiPhong.getGia());
+            existingLoaiPhong.setSucChua(loaiPhong.getSucChua());
             loaiPhongService.saveLoaiPhong(existingLoaiPhong);
             return "redirect:/loaiphongs";
         } else {

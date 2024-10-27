@@ -115,7 +115,7 @@
             <div class="d-flex justify-content-end align-items-center mb-4">
                 <div class="d-flex align-items-center me-3">
                     <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                         Thêm
                     </button>
                 </div>

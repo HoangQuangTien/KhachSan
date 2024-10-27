@@ -24,12 +24,6 @@ public class ThongKeController {
 
 
     @GetMapping("/thongke")
-//    public String getThongKePage() {
-//        return "list/QuanLyThongKe/thongke"; // Nếu sử dụng Thymeleaf hoặc trả về view template
-//    }
-//
-//
-//    @GetMapping
     public String getIdleRoomStatistics(Model model) {
         List<IdleRoomDTO> idleRooms = datPhongService.getIdleRoomTimes();
         model.addAttribute("idleRooms", idleRooms);

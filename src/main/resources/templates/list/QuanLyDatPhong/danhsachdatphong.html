@@ -205,6 +205,7 @@
         <button type="submit" class="btn btn-success btn-custom" formaction="/danhsachdatphong/xuat-excel">
             <i class="fas fa-file-excel"></i> Xuất Excel
         </button>
+
         </form>
 
 
@@ -459,6 +460,37 @@
 
     </main>
 </div>
+<script>
+    function searchDatPhong() {
+        var keyword = document.getElementById('keyword').value.toLowerCase();
+        var rows = document.querySelectorAll('#dataTable-1 tbody tr');
+
+        var hasResults = false; // Biến để kiểm tra có kết quả hay không
+
+        rows.forEach(function(row) {
+            // Lấy dữ liệu từ các ô trong hàng
+            var maDatPhong = row.cells[1].innerText.toLowerCase();
+            var khachHang = row.cells[2].innerText.toLowerCase();
+
+            // Kiểm tra xem từ khóa có trong mã đặt phòng hoặc tên khách hàng không
+            if (maDatPhong.includes(keyword) || khachHang.includes(keyword)) {
+                row.style.display = ''; // Hiện hàng
+                hasResults = true; // Có kết quả
+            } else {
+                row.style.display = 'none'; // Ẩn hàng
+            }
+        });
+
+        // Ẩn toàn bộ bảng nếu không có kết quả
+        var tableCardBody = document.getElementById('tableCardBody');
+        if (hasResults) {
+            tableCardBody.style.display = ''; // Hiện bảng
+        } else {
+            tableCardBody.style.display = 'none'; // Ẩn bảng nếu không có kết quả
+        }
+    }
+
+</script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

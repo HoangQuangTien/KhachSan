@@ -292,8 +292,6 @@
     </div>
 </div>
 
-<!-- Vùng để chèn nội dung form liên hệ -->
-<div id="contactContainer"></div>
 
 
 <!-- Box Chat -->
@@ -600,107 +598,25 @@
 </script>
 
 <script>
+
     document.addEventListener('DOMContentLoaded', function () {
         const roomClassesButton = document.getElementById('room-classes-button');
         const roomClassList = document.getElementById('room-class-list');
-        const roomsSection = document.getElementById('top-rooms-section');
-        const topRoomsList = document.getElementById('top-rooms-list');
-
-        // Toggle hiển thị danh sách loại phòng
         roomClassesButton.addEventListener('click', function () {
             roomClassList.style.display = roomClassList.style.display === 'block' ? 'none' : 'block';
         });
-
-        // Xử lý sự kiện click trên từng mục loại phòng
         const roomClassItems = roomClassList.querySelectorAll('li');
         roomClassItems.forEach(item => {
             item.addEventListener('click', function () {
-                const roomTypeId = this.dataset.loaiPhongId; // Lấy ID loại phòng từ thuộc tính data
-                loadRoomsByType(roomTypeId); // Sử dụng ID để tải phòng
-                roomClassList.style.display = 'none'; // Đóng danh sách sau khi chọn
+                const roomTypeId = this.dataset.loaiPhongId;
+                window.location.href = `/hangphongdetail?loaiPhongId=${roomTypeId}`;
+
+                // Đóng danh sách sau khi chọn
+                roomClassList.style.display = 'none';
             });
         });
-
-        // Hàm tải phòng theo loại
-        function loadRoomsByType(roomTypeId) {
-            topRoomsList.innerHTML = '<p>Đang tải phòng...</p>'; // Hiện thông báo tải dữ liệu
-            fetch(`/phong-theo-loai?loaiPhongId=${roomTypeId}`)
-                .then(response => {
-                    console.log('Response:', response);
-                    if (!response.ok) {
-                        throw new Error('Không thể tải danh sách phòng. Vui lòng thử lại sau.');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Data received:', data);
-                    displayRooms(data); // Gọi hàm hiển thị danh sách phòng
-                })
-                .catch(error => {
-                    console.error('Có lỗi xảy ra khi tải dữ liệu phòng:', error);
-                    topRoomsList.innerHTML = '<p class="text-center text-danger">Có lỗi xảy ra khi tải dữ liệu phòng. Vui lòng thử lại sau.</p>';
-                });
-
-            roomsSection.style.display = 'block'; // Hiện phần danh sách phòng
-        }
-
-
-        // Hàm hiển thị danh sách phòng
-        function displayRooms(rooms) {
-            topRoomsList.innerHTML = ''; // Xóa nội dung cũ
-            if (!Array.isArray(rooms) || rooms.length === 0) {
-                topRoomsList.innerHTML = '<p class="text-center">Không có phòng nào được tìm thấy.</p>';
-                return;
-            }
-
-            rooms.forEach(room => {
-                console.log("Dữ liệu phòng nhận được:", room); // Kiểm tra toàn bộ dữ liệu phòng
-
-                const roomCard = document.createElement('div');
-                roomCard.classList.add('col-md-4', 'mb-4');
-
-                // Kiểm tra và lấy tên loại phòng
-                let roomType = room.tenLoaiPhong ? room.tenLoaiPhong.trim() : 'Không xác định';
-                console.log("Loại phòng sau khi trim:", roomType);
-
-                let imageUrl;
-                // Xác định hình ảnh dựa trên loại phòng
-                switch (roomType) {
-                    case "Standard":
-                        imageUrl = "/img/Executive-double_2.jpg";
-                        break;
-                    case "Superior":
-                        imageUrl = "/img/khach-san-muong-thanh-luxuru-ha-long-3.jpg";
-                        break;
-                    case "Family suite":
-                        imageUrl = "/img/hang-phong-grand-suite-4.jpg";
-                        break;
-                    case "Deluxe":
-                        imageUrl = "/img/anhks.jpg";
-                        break;
-                    default:
-                        imageUrl = "/img/logo.jpg"; // Hình ảnh mặc định
-                        console.warn("Hình ảnh mặc định được sử dụng cho loại phòng:", roomType);
-                        break;
-                }
-                roomCard.innerHTML = `
-    <div class="card room-card">
-        <img src="${imageUrl}" class="card-img-top" alt="${room.tenPhong}">
-        <div class="card-body text-center">
-            <h5 class="card-title">${room.tenPhong} (Phòng ${room.soNguoiToiDa} người)</h5>
-            <p class="card-text">Giá: ${room.gia.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
-            <a class="btn btn-primary">Đặt ngay</a>
-        </div>
-    </div>
-
-
-
-                `;
-                topRoomsList.appendChild(roomCard); // Thêm thẻ phòng vào danh sách
-            });
-        }
-
     });
+
 
 </script>
 

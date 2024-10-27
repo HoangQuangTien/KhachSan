@@ -148,4 +148,11 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "FROM DatPhong \n" +
             "WHERE tinh_trang = N'Đã Hủy';",nativeQuery = true)
     long countCancelledBookings();
+
+
+    @Query("SELECT d FROM DatPhong d JOIN d.khachHang k WHERE " +
+            "LOWER(k.hoVaTen) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR LOWER(d.maDatPhong) LIKE LOWER(CONCAT('%', :query, '%'))")
+    Page<DatPhong> searchByNameOrPhone(@Param("query") String query, Pageable pageable);
+
 }

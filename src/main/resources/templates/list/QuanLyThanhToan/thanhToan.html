@@ -145,7 +145,7 @@
                                          th:data-tenphong="${datPhong.phong.tenPhong}"
                                          th:data-thoigian="${datPhong.ngayNhan} + ' - ' + ${datPhong.ngayTra}"
                                          th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}"
-                                         th:data-giaphong="${datPhong.phong.gia}"
+                                         th:data-giaphong="${datPhong.loaiPhong.gia}"
                                          th:data-tiencoc="${datPhong.tienCoc}"
                                          th:data-tienconlai="${datPhong.tienConLai}"
                                          class="card mb-3"
@@ -207,6 +207,15 @@
 
 
 
+                <!-- Search -->
+                <div class="form-group"
+                     style="flex-grow: 1; display: flex; align-items: center;">
+                    <label class="mr-2" for="search">Tìm kiếm</label>
+                    <input class="form-control" id="search"
+                           oninput="searchThanhToan(this.value)"
+                           placeholder="Tìm kiếm theo mã hoặc tên" style="flex-grow: 1;"
+                           type="text">
+                </div>
                 <div class="py-4">
                     <div class="card p-4 shadow-sm">
                         <h4 class="d-flex justify-content-center" style="color:black;">Lịch Sử Thanh Toán</h4>
@@ -303,7 +312,7 @@
                                 <input type="text" name="ngayCheckIn" id="ngayCheckIn" class="form-control form-control-sm">
                             </div>
                             <div class="col-6 mb-3">
-                                <label for="giaPhong" class="form-label font-weight-bold">Tổng Giá phòng</label>
+                                <label for="giaPhong" class="form-label font-weight-bold">Giá phòng</label>
                                 <div class="input-group">
                                     <input type="text" name="gia" id="giaPhong" class="form-control form-control-sm">
                                     <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
@@ -319,12 +328,12 @@
                                     <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
                                 </div>
                             </div>
+
                             <div class="col-6 mb-3">
-                                <label for="giaDichVu" class="form-label font-weight-bold">Tiền dịch vụ</label>
-                                <div class="input-group">
-                                    <input type="text" id="giaDichVu" class="form-control form-control-sm">
-                                    <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
-                                </div>
+                                <label for="khuyenMaiSelect">Khuyến mãi:</label>
+                                <select id="khuyenMaiSelect" class="form-control" aria-label="Chọn mã khuyến mãi">
+                                    <option value="">--Chọn mã khuyến mãi--</option>
+                                </select>
                             </div>
                         </div>
 
@@ -335,12 +344,6 @@
                                     <input type="text" name="tienCoc" id="tienCoc" class="form-control form-control-sm">
                                     <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
                                 </div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <label for="khuyenMaiSelect">Khuyến mãi:</label>
-                                <select id="khuyenMaiSelect" class="form-control" aria-label="Chọn mã khuyến mãi">
-                                    <option value="">--Chọn mã khuyến mãi--</option>
-                                </select>
                             </div>
                         </div>
 
@@ -795,6 +798,9 @@
         // Thêm lớp 'bg-light' vào thẻ card đang được click
         cardElement.classList.add('bg-light');
 
+        console.log("Giá Phòng:", giaPhong); // Đây là giá phòng bạn cần lấy
+
+
     }
 
     function phuPhiChange(selectElement) {
@@ -997,6 +1003,68 @@
         // Hiển thị mã QR lên giao diện
         qrCodeElement.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code">`;
     }
+
+    function searchThanhToan() {
+        const searchQuery = document.getElementById('search').value.trim(); // Lấy giá trị từ ô tìm kiếm
+        const ngayThanhToan = document.getElementById('ngayThanhToan').value; // Lấy giá trị từ ô ngày thanh toán
+
+        // Kiểm tra nếu cả hai trường đều trống thì không thực hiện tìm kiếm
+        if (searchQuery === '' && ngayThanhToan === '') {
+            console.log('Cả trường tìm kiếm và ngày thanh toán đều trống.');
+            return;
+        }
+
+        console.log('Search query:', searchQuery); // Log giá trị tìm kiếm để debug
+        console.log('Ngày thanh toán:', ngayThanhToan); // Log ngày thanh toán để debug
+
+        // Gửi yêu cầu GET tới API, bao gồm cả ngày thanh toán nếu có
+        fetch('/api/km/search?query=' + encodeURIComponent(searchQuery) + '&ngayThanhToan=' + encodeURIComponent(ngayThanhToan), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.length === 0) {
+                    console.log('Không tìm thấy kết quả.');
+                    // Hiển thị thông báo không tìm thấy kết quả
+                } else {
+                    updateTableBody(data); // Gọi hàm cập nhật bảng dữ liệu với dữ liệu trả về từ server
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi tìm kiếm:', error);
+            });
+    }
+
+
+
+
+    function updateTableBody(data) {
+        var tableBody = document.getElementById('transactionTableBody');
+        tableBody.innerHTML = ''; // Xóa dữ liệu cũ trước khi cập nhật
+
+        data.forEach(function (thanhToan) {
+            var row = '<tr>' +
+                '<td>' + (thanhToan.tenPhong || 'N/A') + '</td>' + // Tên phòng
+                '<td>' + (thanhToan.hoVaTen || 'N/A') + '</td>' + // Tên khách hàng
+                '<td>' + (thanhToan.tongTien || '0.00') + '</td>' + // Tổng tiền
+                '<td>' + (thanhToan.tinhTrang ? 'Đã Thanh Toán' : 'Chưa Thanh Toán') + '</td>' + // Tình trạng thanh toán
+                '<td>' + (thanhToan.hoTen || 'N/A') + '</td>' + // Tên nhân viên
+                '<td>' + (thanhToan.ngayThanhToan ? new Date(thanhToan.ngayThanhToan).toLocaleDateString() : 'N/A') + '</td>' + // Ngày thanh toán
+                '</tr>';
+
+            tableBody.innerHTML += row; // Thêm hàng mới vào bảng
+        });
+    }
+
+
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>

@@ -1,6 +1,7 @@
 package com.example.DuAnTotNghiepKs.rest;
 
 
+import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
 import com.example.DuAnTotNghiepKs.DTO.ThanhToanDTO;
 import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
 import com.example.DuAnTotNghiepKs.service.KhuyenMaiService;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -42,5 +44,12 @@ public class ThanhToanRest {
     public ResponseEntity<List<KhuyenMai>> getAllActiveKhuyenMai() {
         List<KhuyenMai> khuyenMaiList = khuyenMaiService.getAllActiveKhuyenMai();
         return new ResponseEntity<>(khuyenMaiList, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ThanhToanDTO>> search(@RequestParam String query ,Date ngayThanhToan) {
+        List<ThanhToanDTO> results = thanhToanService.search(query,ngayThanhToan);
+        return ResponseEntity.ok(results);
     }
 }

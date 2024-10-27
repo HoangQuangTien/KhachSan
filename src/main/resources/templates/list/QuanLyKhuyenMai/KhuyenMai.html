@@ -8,139 +8,126 @@
     <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!--&lt;!&ndash;    <style>&ndash;&gt;-->
-    <!--        /*body {*/-->
-    <!--        /*    background-color: #f8f9fa;*/-->
-    <!--        /*}*/-->
-    <!--        /*.wrapper {*/-->
-    <!--        /*    padding: 20px;*/-->
-    <!--        /*}*/-->
-    <!--        /*.modal-header {*/-->
-    <!--        /*    background-color: #ffc107;*/-->
-    <!--        /*    color: white;*/-->
-    <!--        /*}*/-->
-    <!--        /*.btn-warning-custom {*/-->
-    <!--        /*    background-color: #ffc107;*/-->
-    <!--        /*    border-color: #ffc107;*/-->
-    <!--        /*}*/-->
-    <!--        /*.btn-warning-custom:hover {*/-->
-    <!--        /*    background-color: #e0a800;*/-->
-    <!--        /*    border-color: #e0a800;*/-->
-    <!--        /*}*/-->
-    <!--        /*.table-warning th {*/-->
-    <!--        /*    background-color: #ffeeba;*/-->
-    <!--        /*}*/-->
-    <!--        /*.table-hover tbody tr:hover {*/-->
-    <!--        /*    background-color: #ffeeba;*/-->
-    <!--        /*}*/-->
-    <!--        /*h2 {*/-->
-    <!--        /*    font-weight: bold;*/-->
-    <!--        /*}*//* CSS for modal */-->
-    <!--        /* Đặt chiều rộng tối đa của modal */-->
-    <!--&lt;!&ndash;        </style>&ndash;&gt;-->
+
+
 
     <style>
-        .modal-dialog {
-            max-width: 800px;
-            margin: 1.75rem auto;
+        /* Tăng kích thước modal Sửa Khuyến Mãi */
+        .editModal .modal-lg {
+            max-width: 60%;
         }
 
-        /* Tạo khoảng cách padding cho nội dung modal */
-        .modal-content {
+        /* Định dạng khoảng cách trong modal Sửa Khuyến Mãi */
+        .editModal .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Định dạng cho các trường đầu vào và nhãn trong modal Sửa Khuyến Mãi */
+        .editModal .form-label,
+        .editModal .form-control,
+        .editModal .form-select {
+            font-size: 1rem;
+        }
+
+        /* Định dạng cho textarea để không thể thay đổi kích thước trong modal Sửa Khuyến Mãi */
+        .editModal textarea.form-control {
+            resize: none;
+        }
+    </style>
+
+    <style>
+        /* Tăng kích thước modal Thêm Khuyến Mãi */
+        .addModal .modal-lg {
+            max-width: 50%;
+        }
+
+        /* Định dạng khoảng cách trong modal Thêm Khuyến Mãi */
+        .addModal .modal-body {
+            padding: 2rem; /* Tăng khoảng cách để tránh chèn chúc */
+        }
+
+        /* Định dạng cho các trường đầu vào và nhãn trong modal Thêm Khuyến Mãi */
+        .addModal .form-label {
+            font-weight: bold; /* Làm nổi bật nhãn */
+            margin-bottom: 0.5rem; /* Khoảng cách giữa nhãn và trường nhập */
+        }
+
+        .addModal .form-control,
+        .addModal .form-select {
+            font-size: 1rem; /* Kích thước chữ */
+            margin-bottom: 1rem; /* Khoảng cách giữa các trường */
+        }
+
+        /* Định dạng cho textarea để không thể thay đổi kích thước trong modal Thêm Khuyến Mãi */
+        .addModal textarea.form-control {
+            resize: none; /* Không cho phép thay đổi kích thước textarea */
+            height: 100px; /* Đặt chiều cao cố định cho textarea */
+        }
+
+        /* Định dạng cho các nút trong modal */
+        .addModal .btn-warning-custom {
+            background-color: #ff9800; /* Màu nền nút */
+            color: #fff; /* Màu chữ nút */
+            border: none; /* Bỏ viền nút */
+            padding: 0.5rem 1.5rem; /* Kích thước padding */
+            font-size: 1rem; /* Kích thước chữ */
+            margin-top: 1rem; /* Khoảng cách phía trên nút */
+        }
+
+        .addModal .btn-warning-custom:hover {
+            background-color: #e68900; /* Màu nền khi hover */
+        }
+
+        /* Định dạng cho thông báo lỗi */
+        .addModal .alert-danger {
+            font-size: 0.875rem; /* Kích thước chữ thông báo lỗi */
+            margin-bottom: 1rem; /* Khoảng cách dưới thông báo lỗi */
+        }
+
+        .table-container {
+            background-color: #fff;
             padding: 20px;
-            border-radius: 8px; /* Tạo góc bo tròn cho modal */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Tùy chỉnh tiêu đề modal */
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: bold;
+        .table-container h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
         }
 
-        /* Căn chỉnh các form input */
-        .form-group {
-            margin-bottom: 1.5rem; /* Khoảng cách giữa các nhóm form */
-        }
-
-        .form-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem; /* Tạo khoảng cách giữa các cột */
-        }
-
-        /* Đảm bảo các input có chiều rộng đầy đủ */
-        .form-group input,
-        .form-group select {
+        table {
             width: 100%;
-            padding: 0.75rem;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border-collapse: collapse;
         }
 
-        /* Căn chỉnh radio button và label */
-        .form-group-radio {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-top: 1rem;
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
         }
 
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        table th {
+            background-color: #f4f4f9;
         }
 
-        /* Tùy chỉnh nút lưu */
-        .btn-warning-custom {
-            background-color: #ffc107;
-            border-color: #ffc107;
-            color: #fff;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
+        table tr:hover {
+            background-color: #f9f9f9;
         }
 
-        .btn-warning-custom:hover {
-            background-color: #e0a800;
-            border-color: #d39e00;
-        }
 
-        /* Tùy chỉnh nút tạo mã */
-        .btn-outline-secondary {
-            border-color: #6c757d;
-            color: #6c757d;
-        }
-
-        .btn-outline-secondary:hover {
-            background-color: #6c757d;
-            color: #fff;
-        }
-
-        /* Căn chỉnh nhãn (label) */
-        label {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        /* Tạo màu nền khi modal mở */
-        .modal-backdrop.show {
-            opacity: 0.5;
-        }
-
-        .table th {
-            background-color: #f8f9fa; /* Màu nền nhẹ cho tiêu đề */
-        }
-
-        .table td {
-            vertical-align: middle; /* Căn giữa nội dung ô */
+        .filter-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
     </style>
+
+
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <head th:include="fragment/head :: head"></head>
 </head>
@@ -151,13 +138,16 @@
 <main class="main-content" role="main">
     <div class="container-fluid">
         <div class="row justify-content-center">
+            <h2 class="mb-2 page-title">Khuyến Mại</h2>
             <div class="col-12">
-                <h2 class="mb-2 page-title">Quản lý khuyến mãi</h2>
                 <p class="card-text"></p>
                 <div class="row my-4">
                     <div class="main-container">
+                        <div class="filter-container">
+                            <h3><i class="fa-solid fa-filter" style="color: #000000;"></i> Bộ lọc</h3>
+                            <hr>
                         <!-- Form tìm kiếm -->
-                        <form th:action="@{/quan-ly-khuyen-mai/search}" method="GET"
+                        <form th:action="@{/admin/quan-ly-khuyen-mai/search}" method="GET"
                               class="form-inline my-2 my-lg-0">
                             <!-- Input tìm kiếm -->
                             <div class="form-group mr-3">
@@ -184,213 +174,167 @@
                             </div>
 
                             <!-- Nút tìm kiếm -->
-                            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                            <button type="submit" class="btn btn-dark me-1">Tìm kiếm</button>
+                            <button type="reset" class="btn btn-dark">Reset</button>
                         </form>
 
-
-                        <!--                        &lt;!&ndash; Nút thêm khuyến mãi &ndash;&gt;-->
-                        <!--                        <div class="mt-5">-->
-                        <!--                            <a href="/admin/quan-ly-khuyen-mai/view-add" >-->
-
-                        <!--                                <button type="button" ><i class="bi bi-plus-circle"></i> Thêm Khuyến Mãi</button>-->
-                        <!--                            </a>-->
-                        <!--                        </div>-->
-
+                        </div>
                         <!-- Nút mở modal thêm Khuyen mai -->
-                        <div class="mb-3">
-                            <button type="button" class="btn btn-warning-custom" data-bs-toggle="modal"
+                        <div class="mb-3 d-flex justify-content-end">
+                            <a type="button" class="btn btn-success me-1" data-bs-toggle="modal"
                                     data-bs-target="#addKhuyenMaiModal">
-                                <i class="fas fa-plus"></i> Thêm Khuyen Mai
-                            </button>
+                                <i class="fas fa-plus" style="color: #fcfcfc; top: 20px"></i>
+                            </a>
+
+                            <a data-bs-toggle="modal" data-bs-target="#add" class="btn btn-success ">
+                                <i class="fa-regular fa-paper-plane" style="color: #fcfcfc; top: 20px"></i>
+                            </a>
+                        </div>
+
+                        <div class="table-container">
+                            <h3><i class="fa-solid fa-list" style="color: #000000;"></i> Danh sách giảm giá</h3>
+
+                            <!-- Bảng danh sách khuyến mãi -->
+                            <table>
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Mã Khuyến Mãi</th>
+                                    <th>Tên Khuyến Mãi</th>
+                                    <!--                                <th>Mô Tả</th>-->
+                                    <th>Giảm Giá</th>
+<!--                                    <th>Ngày Bắt Đầu</th>-->
+<!--                                    <th>Ngày Kết Thúc</th>-->
+                                    <th>Loại Giảm</th>
+                                    <th>Số Lượng</th>
+                                    <th>Giảm Tối Thiểu</th>
+                                    <th>Giảm Tối Đa</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Hành Động</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="khuyenMai : ${khuyenMaiPage.content}">
+                                    <td th:text="${khuyenMai.maKhuyenMai}">Mã KM</td>
+                                    <td th:text="${khuyenMai.tenKhuyenMai}">Tên KM</td>
+                                    <!--                                <td th:text="${khuyenMai.moTa}">Mô Tả</td>-->
+                                    <td th:text="${khuyenMai.giamGia}">Giảm Giá</td>
+<!--                                    <td th:text="${#dates.format(khuyenMai.ngayBatDau,'dd-MM-yyyy')}">Ngày Bắt Đầu</td>-->
+<!--                                    <td th:text="${#dates.format(khuyenMai.ngayKetThuc,'dd-MM-yyyy')}">Ngày Kết Thúc</td>-->
+                                    <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
+                                    <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
+                                    <td th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
+                                    <td th:text="${khuyenMai.giamToiDa}">Giảm Tối Đa</td>
+                                    <td th:text="${khuyenMai.trangThai}">Trạng Thái</td>
+                                    <td>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
+                                                th:data-idKhuyenMai="${khuyenMai.idKhuyenMai}"
+                                                th:data-maKhuyenMai="${khuyenMai.maKhuyenMai}"
+                                                th:data-tenKhuyenMai="${khuyenMai.tenKhuyenMai}"
+                                                th:data-moTa="${khuyenMai.moTa}"
+                                                th:data-giamGia="${khuyenMai.giamGia}"
+                                                th:data-soLuong="${khuyenMai.soLuong}"
+                                                th:data-giamToiThieu="${khuyenMai.giamToiThieu}"
+                                                th:data-giamToiDa="${khuyenMai.giamToiDa}"
+                                                th:data-ngayBatDau="${#dates.format(khuyenMai.ngayBatDau,'yyyy-MM-dd')}"
+                                                th:data-ngayKetThuc="${#dates.format(khuyenMai.ngayKetThuc,'yyyy-MM-dd')}"
+                                                th:data-loaiGiam="${khuyenMai.loaiGiam ? 'phanTram' : 'tienMat'}"
+                                                th:data-trangThai="${khuyenMai.trangThai == 'conHan' ? 'conHan' :
+                                    (khuyenMai.trangThai == 'hetHan' ? 'hetHan' : 'sapDienRa')}"
+
+                                                onclick="setModalData(this)">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </button>
+
+                                        <br>
+                                        <form th:action="@{/admin/quan-ly-khuyen-mai/delete/{id}(id=${khuyenMai.idKhuyenMai})}"
+                                              method="post" style="display:inline;">
+                                        </form>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
 
 
-                        <!-- Bảng danh sách khuyến mãi -->
-                        <table class="table table-striped table-bordered">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Mã Khuyến Mãi</th>
-                                <th>Tên Khuyến Mãi</th>
-                                <th>Mô Tả</th>
-                                <th>Giảm Giá</th>
-                                <th>Ngày Bắt Đầu</th>
-                                <th>Ngày Kết Thúc</th>
-                                <th>Loại Giảm</th>
-                                <th>Số Lượng</th>
-                                <th>Giảm Tối Thiểu</th>
-                                <th>Giảm Tối Đa</th>
-                                <th>Trạng Thái</th>
-                                <th>Hành Động</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="khuyenMai : ${khuyenMaiPage.content}">
-                                <td th:text="${khuyenMai.maKhuyenMai}">Mã KM</td>
-                                <td th:text="${khuyenMai.tenKhuyenMai}">Tên KM</td>
-                                <td th:text="${khuyenMai.moTa}">Mô Tả</td>
-                                <td th:text="${khuyenMai.giamGia}">Giảm Giá</td>
-                                <td th:text="${#dates.format(khuyenMai.ngayBatDau,'dd-MM-yyyy')}">Ngày Bắt Đầu</td>
-                                <td th:text="${#dates.format(khuyenMai.ngayKetThuc,'dd-MM-yyyy')}">Ngày Kết Thúc</td>
-                                <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
-                                <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
-                                <td th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
-                                <td th:text="${khuyenMai.giamToiDa}">Giảm Tối Đa</td>
-                                <td th:text="${khuyenMai.trangThai}">Trạng Thái</td>
-                                <td>
-                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
-                                            th:data-idKhuyenMai="${khuyenMai.idKhuyenMai}"
-                                            th:data-maKhuyenMai="${khuyenMai.maKhuyenMai}"
-                                            th:data-tenKhuyenMai="${khuyenMai.tenKhuyenMai}"
-                                            th:data-moTa="${khuyenMai.moTa}"
-                                            th:data-giamGia="${khuyenMai.giamGia}"
-                                            th:data-soLuong="${khuyenMai.soLuong}"
-                                            th:data-giamToiThieu="${khuyenMai.giamToiThieu}"
-                                            th:data-giamToiDa="${khuyenMai.giamToiDa}"
-                                            th:data-ngayBatDau="${#dates.format(khuyenMai.ngayBatDau,'yyyy-MM-dd')}"
-                                            th:data-ngayKetThuc="${#dates.format(khuyenMai.ngayKetThuc,'yyyy-MM-dd')}"
-                                            th:data-loaiGiam="${khuyenMai.loaiGiam ? 'phanTram' : 'tienMat'}"
-                                            th:data-trangThai="${khuyenMai.trangThai}"
-                                            onclick="setModalData(this)">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </button>
-
-                                    <!--                                    <a href="#" class="btn btn-warning open-update-modal" data-id="${khuyenMai.id}" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal">-->
-                                    <!--                                        Sửa-->
-                                    <!--                                    </a>-->
-
-
-                                    <br>
-                                    <form th:action="@{/quan-ly-khuyen-mai/delete/{id}(id=${khuyenMai.idKhuyenMai})}"
-                                          method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-danger"
-                                                onclick="return confirm('Bạn có chắc chắn muốn xóa không?')">
-                                            <i class="fas fa-trash"></i> Xóa
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
 
                         <!-- Modal thêm khuyến mãi -->
-                        <div class="modal fade" id="addKhuyenMaiModal" tabindex="-1"
-                             aria-labelledby="addKhuyenMaiModalLabel" aria-hidden="true">
+                        <div class="modal fade addModal" id="addKhuyenMaiModal" tabindex="-1" aria-labelledby="addKhuyenMaiModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="addKhuyenMaiModalLabel">Thêm Khuyến Mãi</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
 
                                     <div class="modal-body">
                                         <div id="error-message" class="alert alert-danger d-none"></div>
-                                        <!-- Thêm thông báo lỗi -->
-                                        <form th:action="@{/admin/quan-ly-khuyen-mai/add}" method="POST"
-                                              id="form-add-promotion">
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="maKhuyenMai">Mã Khuyến Mãi:</label>
-                                                    <div class="input-group">
-                                                        <input type="text" id="maKhuyenMai" name="maKhuyenMai"
-                                                               class="form-control" placeholder="Mã khuyến mãi"/>
-                                                        <div class="input-group-append">
-                                                            <button type="button" class="btn btn-outline-secondary"
-                                                                    onclick="generateMaKhuyenMai()">
-                                                                <i class="fas fa-sync-alt"></i> Tạo mã
-                                                            </button>
+                                        <form th:action="@{/quan-ly-khuyen-mai/add}" method="POST" id="form-add-promotion">
+                                            <div class="row"> <!-- Sử dụng row để tạo hàng -->
+                                                <div class="col-md-6"> <!-- Cột trái -->
+                                                    <div class="form-group">
+                                                        <label for="maKhuyenMai">Mã Khuyến Mãi:</label>
+                                                        <div class="input-group">
+                                                            <input type="text" id="maKhuyenMai" name="maKhuyenMai" class="form-control" placeholder="Mã khuyến mãi"/>
+                                                            <div class="input-group-append">
+                                                                <button type="button" class="btn btn-outline-secondary" onclick="generateMaKhuyenMai()">
+                                                                    <i class="fas fa-sync-alt"></i> Tạo mã
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="form-group col-md-6">
-                                                    <label for="tenKhuyenMai">Tên Khuyến Mãi:</label>
-                                                    <input type="text" id="tenKhuyenMai" name="tenKhuyenMai"
-                                                           class="form-control" placeholder="Tên khuyến mãi"/>
-                                                </div>
-                                            </div>
+                                                    <div class="form-group">
+                                                        <label for="tenKhuyenMai">Tên Khuyến Mãi:</label>
+                                                        <input type="text" id="tenKhuyenMai" name="tenKhuyenMai" class="form-control" placeholder="Tên khuyến mãi"/>
+                                                    </div>
 
-                                            <div class="form-row">
-                                                <div class="form-group col-md-12">
-                                                    <label for="moTa">Mô Tả:</label>
-                                                    <input type="text" id="moTa" name="moTa" class="form-control"
-                                                           placeholder="Mô tả"/>
-                                                </div>
-                                            </div>
+                                                    <div class="form-group">
+                                                        <label for="moTa">Mô Tả:</label>
+                                                        <input type="text" id="moTa" name="moTa" class="form-control" placeholder="Mô tả"/>
+                                                    </div>
 
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="soLuong">Số lượng:</label>
-                                                    <input type="number" id="soLuong" name="soLuong"
-                                                           class="form-control" placeholder="Số lượng"/>
-                                                    <!--                                                    <span id="soLuongError" class="text-danger"></span>-->
-                                                </div>
+                                                    <div class="form-group">
+                                                        <label for="soLuong">Số lượng:</label>
+                                                        <input type="number" id="soLuong" name="soLuong" class="form-control" placeholder="Số lượng"/>
+                                                    </div>
 
-                                                <div class="form-group col-md-6">
-                                                    <label for="giamGia">Giảm Giá:</label>
-                                                    <input type="number" step="0.01" id="giamGia" name="giamGia"
-                                                           class="form-control" placeholder="Giảm giá"/>
-                                                </div>
-                                            </div>
+                                                    <div class="form-group">
+                                                        <label for="giamGia">Giảm Giá:</label>
+                                                        <input type="number" step="0.01" id="giamGia" name="giamGia" class="form-control" placeholder="Giảm giá"/>
+                                                    </div>
+                                                </div> <!-- Kết thúc cột trái -->
 
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="ngayBatDau">Ngày Bắt Đầu:</label>
-                                                    <input type="date" id="ngayBatDau" name="ngayBatDau"
-                                                           class="form-control" placeholder="Ngay bắt đâu"/>
-                                                </div>
+                                                <div class="col-md-6"> <!-- Cột phải -->
+                                                    <div class="form-group">
+                                                        <label for="ngayBatDau">Ngày Bắt Đầu:</label>
+                                                        <input type="date" id="ngayBatDau" name="ngayBatDau" class="form-control"/>
+                                                    </div>
 
-                                                <div class="form-group col-md-6">
-                                                    <label for="ngayKetThuc">Ngày Kết Thúc:</label>
-                                                    <input type="date" id="ngayKetThuc" name="ngayKetThuc"
-                                                           class="form-control" placeholder="Ngay kết thúc"/>
-                                                </div>
-                                            </div>
+                                                    <div class="form-group">
+                                                        <label for="ngayKetThuc">Ngày Kết Thúc:</label>
+                                                        <input type="date" id="ngayKetThuc" name="ngayKetThuc" class="form-control"/>
+                                                    </div>
 
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="loaiGiam">Loại Giảm:</label>
-                                                    <select id="loaiGiam" name="loaiGiam" class="form-control">
-                                                        <option value="true">Phần trăm</option>
-                                                        <option value="false">Tiền mặt</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                                    <div class="form-group">
+                                                        <label for="loaiGiam">Loại Giảm:</label>
+                                                        <select id="loaiGiam" name="loaiGiam" class="form-control">
+                                                            <option value="true">Phần trăm</option>
+                                                            <option value="false">Tiền mặt</option>
+                                                        </select>
+                                                    </div>
 
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="giamToiThieu">Giảm tối thiểu:</label>
-                                                    <input type="number" id="giamToiThieu" name="giamToiThieu"
-                                                           class="form-control"/>
-                                                </div>
+                                                    <div class="form-group">
+                                                        <label for="giamToiThieu">Giảm tối thiểu:</label>
+                                                        <input type="number" id="giamToiThieu" name="giamToiThieu" class="form-control"/>
+                                                    </div>
 
-                                                <div class="form-group col-md-6">
-                                                    <label for="giamToiDa">Giảm tối đa:</label>
-                                                    <input type="number" id="giamToiDa" name="giamToiDa"
-                                                           class="form-control"/>
-                                                </div>
-                                            </div>
+                                                    <div class="form-group">
+                                                        <label for="giamToiDa">Giảm tối đa:</label>
+                                                        <input type="number" id="giamToiDa" name="giamToiDa" class="form-control"/>
+                                                    </div>
 
-                                            <div class="form-group-radio">
-                                                <div class="form-check">
-                                                    <label>Trạng thái:</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input id="conHan" type="radio" class="form-check-input"
-                                                           value="conHan" name="trangThai" checked/>
-                                                    <label for="conHan">Còn hạn</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input id="sapDienRa" type="radio" value="sapDienRa"
-                                                           class="form-check-input" name="trangThai"/>
-                                                    <label for="sapDienRa">Sắp diễn ra</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input id="hetHan" type="radio" class="form-check-input"
-                                                           value="hetHan" name="trangThai"/>
-                                                    <label for="hetHan">Hết hạn</label>
-                                                </div>
-                                            </div>
+                                                </div> <!-- Kết thúc cột phải -->
+                                            </div> <!-- Kết thúc hàng -->
 
                                             <button type="submit" class="btn btn-warning-custom">Lưu</button>
                                         </form>
@@ -399,67 +343,139 @@
                             </div>
                         </div>
 
+
+
+                        <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable  modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                            <i class="fa-solid fa-list" style="color: #000000;"></i>
+                                            Danh sách khách hàng
+                                        </h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <button id="selectAllBtn" class="btn btn-primary" onclick="toggleSelectAll()">Chọn tất cả</button>
+                                        <div class="search-container">
+                                            <input type="text" id="modalSearchInput" placeholder="Tìm kiếm khách hàng..." class="search-box">
+                                            <button class="btn btn-primary" onclick="searchInModal()"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="voucherId">Chọn Voucher</label>
+                                            <select class="form-control" id="voucherId" name="voucherId">
+                                                <option value="" disabled selected>-- Chọn Voucher --</option>
+                                                <option th:each="voucher : ${activeVouchers}"
+                                                        th:value="${voucher.idKhuyenMai}"
+                                                        th:text="${voucher.maKhuyenMai} + ' - ' + ${voucher.tenKhuyenMai}"></option>
+                                            </select>
+                                        </div>
+
+                                        <table>
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Tên khách hàng</th>
+                                                <th>Email</th>
+<!--                                                <th>Trạng thái</th>-->
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="kh,i: ${listKH}">
+                                                <td>
+                                                    <input class="form-check-input" type="checkbox" value="" id="checkbox${i.count}">
+                                                </td>
+                                                <td th:text="${kh.hoVaTen }"></td>
+                                                <td th:text="${kh.email}"></td>
+
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Hủy</button>
+                                        <button type="button" class="btn btn-primary" id="sendEmailBtn">Gửi</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Modal sửa khuyến mãi -->
-                        <div class="modal fade" id="editKhuyenMaiModal" tabindex="-1" aria-labelledby="editKhuyenMaiModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+                        <div class="modal fade editModal" id="editKhuyenMaiModal" tabindex="-1" aria-labelledby="editKhuyenMaiModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg"> <!-- Chỉnh modal lớn hơn -->
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="editKhuyenMaiModalLabel">Sửa Khuyến Mãi</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form id="editKhuyenMaiForm" method="post" th:action="@{/admin/quan-ly-khuyen-mai/update/{id}(id=${editId})}">
-                                            <input type="text" id="editId" name="id" />
-                                            <div class="mb-3">
-                                                <label for="editMaKhuyenMai" class="form-label">Mã Khuyến Mãi</label>
-                                                <input type="text" class="form-control" id="editMaKhuyenMai" name="maKhuyenMai" required />
+                                        <form id="editKhuyenMaiForm" onsubmit="return updateKhuyenMai(event)">
+                                            <input type="hidden" id="editId" name="id" />
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editMaKhuyenMai" class="form-label">Mã Khuyến Mãi</label>
+                                                    <input type="text" class="form-control" id="editMaKhuyenMai" name="maKhuyenMai" required />
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editTenKhuyenMai" class="form-label">Tên Khuyến Mãi</label>
+                                                    <input type="text" class="form-control" id="editTenKhuyenMai" name="tenKhuyenMai" required />
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editMoTa" class="form-label">Mô Tả</label>
+                                                    <textarea class="form-control" id="editMoTa" name="moTa" required></textarea>
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="editTenKhuyenMai" class="form-label">Tên Khuyến Mãi</label>
-                                                <input type="text" class="form-control" id="editTenKhuyenMai" name="tenKhuyenMai" required />
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editSoLuong" class="form-label">Số Lượng</label>
+                                                    <input type="number" class="form-control" id="editSoLuong" name="soLuong" required />
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editGiamGia" class="form-label">Giảm Giá</label>
+                                                    <input type="number" class="form-control" id="editGiamGia" name="giamGia" required />
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editGiamToiThieu" class="form-label">Giảm Tối Thiểu</label>
+                                                    <input type="number" class="form-control" id="editGiamToiThieu" name="giamToiThieu" required />
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="editMoTa" class="form-label">Mô Tả</label>
-                                                <textarea class="form-control" id="editMoTa" name="moTa" required></textarea>
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editGiamToiDa" class="form-label">Giảm Tối Đa</label>
+                                                    <input type="number" class="form-control" id="editGiamToiDa" name="giamToiDa" required />
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editNgayBatDau" class="form-label">Ngày Bắt Đầu</label>
+                                                    <input type="date" class="form-control" id="editNgayBatDau" name="ngayBatDau" required />
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="editNgayKetThuc" class="form-label">Ngày Kết Thúc</label>
+                                                    <input type="date" class="form-control" id="editNgayKetThuc" name="ngayKetThuc" required />
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="editSoLuong" class="form-label">Số Lượng</label>
-                                                <input type="number" class="form-control" id="editSoLuong" name="soLuong" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editGiamGia" class="form-label">Giảm Giá</label>
-                                                <input type="number" class="form-control" id="editGiamGia" name="giamGia" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editGiamToiThieu" class="form-label">Giảm Tối Thiểu</label>
-                                                <input type="number" class="form-control" id="editGiamToiThieu" name="giamToiThieu" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editGiamToiDa" class="form-label">Giảm Tối Đa</label>
-                                                <input type="number" class="form-control" id="editGiamToiDa" name="giamToiDa" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editNgayBatDau" class="form-label">Ngày Bắt Đầu</label>
-                                                <input type="date" class="form-control" id="editNgayBatDau" name="ngayBatDau" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editNgayKetThuc" class="form-label">Ngày Kết Thúc</label>
-                                                <input type="date" class="form-control" id="editNgayKetThuc" name="ngayKetThuc" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editLoaiGiam" class="form-label">Loại Giảm</label>
-                                                <select class="form-select" id="editLoaiGiam" name="loaiGiam" required>
-                                                    <option value="phanTram">Phần Trăm</option>
-                                                    <option value="tienMat">Tiền Mặt</option>
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editTrangThai" class="form-label">Trạng Thái</label>
-                                                <select class="form-select" id="editTrangThai" name="trangThai" required>
-                                                    <option value="conHan">Còn Hạn</option>
-                                                    <option value="hetHan">Hết Hạn</option>
-                                                    <option value="sapDienRa">Sắp Diễn Ra</option>
-                                                </select>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="editLoaiGiam" class="form-label">Loại Giảm</label>
+                                                    <select class="form-select" id="editLoaiGiam" name="loaiGiam" required>
+                                                        <option value="phanTram">Phần Trăm</option>
+                                                        <option value="tienMat">Tiền Mặt</option>
+                                                    </select>
+                                                </div>
+<!--                                                <div class="col-md-6 mb-3">-->
+<!--                                                    <label class="form-label">Trạng Thái</label>-->
+<!--                                                    <div>-->
+<!--                                                        <input type="radio" id="conHann" name="trangThai" value="conHan" required>-->
+<!--                                                        <label for="conHann">Còn Hạn</label>-->
+<!--                                                    </div>-->
+<!--                                                    <div>-->
+<!--                                                        <input type="radio" id="hetHann" name="trangThai" value="hetHan" required>-->
+<!--                                                        <label for="hetHann">Hết Hạn</label>-->
+<!--                                                    </div>-->
+<!--                                                    <div>-->
+<!--                                                        <input type="radio" id="sapDienRaa" name="trangThai" value="sapDienRa" required>-->
+<!--                                                        <label for="sapDienRaa">Sắp Diễn Ra</label>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
                                             </div>
                                             <button type="submit" class="btn btn-primary">Cập Nhật</button>
                                         </form>
@@ -467,89 +483,14 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!--                        &lt;!&ndash; Modal sửa khuyến mãi &ndash;&gt;-->
-                        <!--                        <div class="modal fade" id="editKhuyenMaiModal" tabindex="-1" aria-labelledby="editKhuyenMaiModalLabel" aria-hidden="true">-->
-                        <!--                            <div class="modal-dialog">-->
-                        <!--                                <div class="modal-content">-->
-                        <!--                                    <div class="modal-header">-->
-                        <!--                                        <h5 class="modal-title" id="editKhuyenMaiModalLabel">Sửa Khuyến Mãi</h5>-->
-                        <!--                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
-                        <!--                                    </div>-->
-                        <!--                                    <div class="modal-body">-->
-                        <!--                                        <form id="editKhuyenMaiForm" method="post" onsubmit="return updateKhuyenMai(event)">-->
-                        <!--                                            <input type="hidden" id="editId" name="id" />-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editMaKhuyenMai" class="form-label">Mã Khuyến Mãi</label>-->
-                        <!--                                                <input type="text" class="form-control" id="editMaKhuyenMai" name="maKhuyenMai" required />-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editTenKhuyenMai" class="form-label">Tên Khuyến Mãi</label>-->
-                        <!--                                                <input type="text" class="form-control" id="editTenKhuyenMai" name="tenKhuyenMai" required />-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editMoTa" class="form-label">Mô Tả</label>-->
-                        <!--                                                <textarea class="form-control" id="editMoTa" name="moTa" required></textarea>-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editSoLuong" class="form-label">Số Lượng</label>-->
-                        <!--                                                <input type="number" class="form-control" id="editSoLuong" name="soLuong" required />-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editGiamGia" class="form-label">Giảm Giá</label>-->
-                        <!--                                                <input type="number" class="form-control" id="editGiamGia" name="giamGia" required />-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editGiamToiThieu" class="form-label">Giảm Tối Thiểu</label>-->
-                        <!--                                                <input type="number" class="form-control" id="editGiamToiThieu" name="giamToiThieu" required />-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editGiamToiDa" class="form-label">Giảm Tối Đa</label>-->
-                        <!--                                                <input type="number" class="form-control" id="editGiamToiDa" name="giamToiDa" required />-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editNgayBatDau" class="form-label">Ngày Bắt Đầu</label>-->
-                        <!--                                                <input type="date" class="form-control" id="editNgayBatDau" name="ngayBatDau" required />-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editNgayKetThuc" class="form-label">Ngày Kết Thúc</label>-->
-                        <!--                                                <input type="date" class="form-control" id="editNgayKetThuc" name="ngayKetThuc" required />-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editLoaiGiam" class="form-label">Loại Giảm</label>-->
-                        <!--                                                <select class="form-select" id="editLoaiGiam" name="loaiGiam" required>-->
-                        <!--                                                    <option value="phanTram">Phần Trăm</option>-->
-                        <!--                                                    <option value="tienMat">Tiền Mặt</option>-->
-                        <!--                                                </select>-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="mb-3">-->
-                        <!--                                                <label for="editTrangThai" class="form-label">Trạng Thái</label>-->
-                        <!--                                                <select class="form-select" id="editTrangThai" name="trangThai" required>-->
-                        <!--                                                    <option value="conHan">Còn Hạn</option>-->
-                        <!--                                                    <option value="hetHan">Hết Hạn</option>-->
-                        <!--                                                    <option value="sapDienRa">Sắp Diễn Ra</option>-->
-                        <!--                                                </select>-->
-                        <!--                                            </div>-->
-                        <!--                                            <button type="submit" class="btn btn-primary">Cập Nhật</button>-->
-                        <!--                                        </form>-->
-                        <!--                                    </div>-->
-                        <!--                                </div>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
-
-
-
-
-
-
                         <!-- Phân trang -->
 
                         <div class="pagination">
                             <a class="prev" th:if="${khuyenMaiPage.hasPrevious()}"
-                               th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number - 1}, size=${khuyenMaiPage.size})}">&laquo;</a>
+                               th:href="@{/admin/quan-ly-khuyen-mai(page=${khuyenMaiPage.number - 1}, size=${khuyenMaiPage.size})}">&laquo;</a>
                             <span class="current-page" th:text="${khuyenMaiPage.number + 1}"></span>
                             <a class="next" th:if="${khuyenMaiPage.hasNext()}"
-                               th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number + 1}, size=${khuyenMaiPage.size})}">&raquo;</a>
+                               th:href="@{/admin/quan-ly-khuyen-mai(page=${khuyenMaiPage.number + 1}, size=${khuyenMaiPage.size})}">&raquo;</a>
                         </div>
                     </div>
                 </div>
@@ -570,128 +511,78 @@
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('form-add-promotion').addEventListener('submit', function (event) {
+        const formElement = document.getElementById('form-add-promotion');
+
+        formElement.addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            // Lấy các phần tử input từ form
-            const maKhuyenMaiElement = document.getElementById('maKhuyenMai');
-            const tenKhuyenMaiElement = document.getElementById('tenKhuyenMai');
-            const soLuongElement = document.getElementById('soLuong');
-            const giamGiaElement = document.getElementById('giamGia');
-            const loaiGiamElement = document.getElementById('loaiGiam');
-            const giamToiThieuElement = document.getElementById('giamToiThieu');
-            const giamToiDaElement = document.getElementById('giamToiDa');
-            const moTaElement = document.getElementById('moTa');
-            const ngayBatDauElement = document.getElementById('ngayBatDau');
-            const ngayKetThucElement = document.getElementById('ngayKetThuc');
+            // Lấy và kiểm tra các phần tử input từ form
+            const fields = {
+                maKhuyenMai: formElement.maKhuyenMai.value.trim(),
+                tenKhuyenMai: formElement.tenKhuyenMai.value.trim(),
+                soLuong: parseInt(formElement.soLuong.value, 10),
+                giamGia: parseFloat(formElement.giamGia.value),
+                loaiGiam: formElement.loaiGiam.value,
+                giamToiThieu: parseFloat(formElement.giamToiThieu.value),
+                giamToiDa: parseFloat(formElement.giamToiDa.value),
+                moTa: formElement.moTa.value.trim(),
+                ngayBatDau: new Date(formElement.ngayBatDau.value),
+                ngayKetThuc: new Date(formElement.ngayKetThuc.value)
+            };
 
-            // Kiểm tra từng phần tử có tồn tại và không rỗng
-            if (!maKhuyenMaiElement.value.trim() ||
-                !tenKhuyenMaiElement.value.trim() || !soLuongElement.value.trim() ||
-                !giamGiaElement.value.trim() || !giamToiThieuElement.value.trim() ||
-                !giamToiDaElement.value.trim() || !moTaElement.value.trim() ||
-                !ngayBatDauElement.value.trim() || !ngayKetThucElement.value.trim()) {
+            // Kiểm tra đầu vào
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (Object.values(fields).some(value => !value && value !== 0)) {
                 showErrorToast('Vui lòng điền đầy đủ thông tin.');
                 return;
             }
-
-            // Kiểm tra mã khuyến mãi
-            const maKhuyenMaiValue = maKhuyenMaiElement.value.trim();
-            if (!maKhuyenMaiValue) {
-                showErrorToast('Mã khuyến mãi không được để trống.');
-                return;
-            }
-
-            // Kiểm tra tên khuyến mãi
-            const tenKhuyenMaiValue = tenKhuyenMaiElement.value.trim();
-            if (!tenKhuyenMaiValue) {
-                showErrorToast('Tên khuyến mãi không được để trống.');
-                return;
-            }
-
-            // Kiểm tra số lượng
-            const soLuong = parseInt(soLuongElement.value, 10);
-            if (isNaN(soLuong) || soLuong <= 0) {
+            if (fields.soLuong <= 0) {
                 showErrorToast('Số lượng phải lớn hơn 0.');
                 return;
             }
-
-            // Kiểm tra giảm giá
-            const giamGia = parseFloat(giamGiaElement.value);
-            if (isNaN(giamGia) || giamGia < 0) {
-                showErrorToast('Giảm giá phải lớn hơn hoặc bằng 0.');
+            if (fields.giamGia < 0 || fields.giamToiThieu < 0) {
+                showErrorToast('Giảm giá và giá tối thiểu phải lớn hơn hoặc bằng 0.');
                 return;
             }
-
-            // Kiểm tra giá tối thiểu
-            const giamToiThieu = parseFloat(giamToiThieuElement.value);
-            if (isNaN(giamToiThieu) || giamToiThieu < 0) {
-                showErrorToast('Giá tối thiểu không được âm.');
-                return;
-            }
-
-            // Kiểm tra giá tối đa
-            const giamToiDa = parseFloat(giamToiDaElement.value);
-            if (isNaN(giamToiDa) || giamToiDa < giamToiThieu) {
+            if (fields.giamToiDa < fields.giamToiThieu) {
                 showErrorToast('Giá tối đa phải lớn hơn hoặc bằng giá tối thiểu.');
                 return;
             }
-
-            // Kiểm tra mô tả
-            const moTa = moTaElement.value.trim();
-            if (!moTa) {
-                showErrorToast('Mô tả không được để trống.');
-                return;
-            }
-
-            // Kiểm tra ngày bắt đầu
-            const ngayBatDau = new Date(ngayBatDauElement.value);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Đặt giờ để so sánh ngày chính xác
-            if (isNaN(ngayBatDau.getTime()) || ngayBatDau < today) {
+            if (isNaN(fields.ngayBatDau) || fields.ngayBatDau < today) {
                 showErrorToast('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.');
                 return;
             }
-
-            // Kiểm tra ngày kết thúc
-            const ngayKetThuc = new Date(ngayKetThucElement.value);
-            if (isNaN(ngayKetThuc.getTime()) || ngayKetThuc < ngayBatDau) {
+            if (isNaN(fields.ngayKetThuc) || fields.ngayKetThuc < fields.ngayBatDau) {
                 showErrorToast('Ngày kết thúc phải lớn hơn ngày bắt đầu.');
                 return;
             }
 
-            // Nếu không có lỗi, gửi form
-            const formElement = document.getElementById('form-add-promotion');
-            const form = new FormData(formElement);
-
-            fetch('/quan-ly-khuyen-mai/add', {
-                method: 'POST',
-                body: form,
-            })
-                .then(response => {
-                    // if (!response.ok) {
-                    //     throw new Error('HTTP status: ' + response.status);
-                    // }
-                    return response.json();
-                })
-                .then(data => {
-                    // Xử lý kết quả thành công
-                    console.log(data.content);
-                    if (data.success) {
-                        showSuccessToast('Thêm thành công');
-                        location.reload();
-                    } else if (data.error) {
-                        // Hiển thị thông báo lỗi từ backend
-                        showErrorToast(data.error);
-                    }
-                })
-                .catch(error => {
-                    // Xử lý khi có lỗi xảy ra
-                    showErrorToast('Đã có lỗi xảy ra: ' + error.message);
-                    console.log(error.message);
+            // Gửi dữ liệu nếu hợp lệ
+            try {
+                const formData = new FormData(formElement);
+                const response = await fetch('/quan-ly-khuyen-mai/add', {
+                    method: 'POST',
+                    body: formData,
                 });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Thêm khuyến mãi thành công!');
+                    $('#addKhuyenMaiModal').modal('hide');
+                    formElement.reset();
+                    // updateTable(data); // Cập nhật bảng nếu cần
+                } else if (data.error) {
+                    showErrorToast(data.error);
+                }
+            } catch (error) {
+                showErrorToast('Đã có lỗi xảy ra: ' + error.message);
+                console.error(error.message);
+            }
         });
     });
+
 
     function showSuccessToast(message) {
         Toastify({
@@ -776,7 +667,9 @@
                 document.getElementById('ngayKetThuc').value = data.ngayKetThuc.split('T')[0]; // Chỉ lấy ngày
                 document.getElementById('loaiGiam').value = data.loaiGiam ? 'phanTram' : 'tienMat';
                 document.getElementById('trangThai').value = data.trangThai;
-
+                // document.getElementById('trangThaiConHan').checked = khuyenMai.trangThai === 'Còn hạn';
+                // document.getElementById('trangThaiHetHan').checked = khuyenMai.trangThai === 'Hết hạn';
+                // document.getElementById('trangThaiSapDienRa').checked = khuyenMai.trangThai === 'Sắp diễn ra';
                 // Mở modal
                 $('#updateModal').modal('show');
             })
@@ -784,13 +677,13 @@
     }
 
 
-    document.getElementById('editKhuyenMaiForm').addEventListener("submit", function (event){
+    function updateKhuyenMai(event) {
         event.preventDefault(); // Ngăn chặn hành động mặc định của form
 
         const formData = new FormData(document.getElementById('editKhuyenMaiForm'));
         const id = document.getElementById('editId').value;
 
-        fetch(`/quan-ly-khuyen-mai/update/${id}`, {
+        fetch(`/admin/quan-ly-khuyen-mai/update/${id}`, {
             method: 'POST',
             body: formData
         })
@@ -798,324 +691,116 @@
             .then(data => {
                 if (data.success) {
                     alert(data.success);
-                    location.reload();
+                    // Đóng modal
+                    $('#editKhuyenMaiModal').modal('hide');
+                    // Cập nhật lại danh sách khuyến mãi nếu cần
                 } else {
-                    showErrorToast(data.error);
+                    alert(data.error);
                 }
             })
             .catch(error => console.error('Error:', error));
 
         return false; // Ngăn chặn việc gửi form mặc định
-    })
+    }
+
+    function toggleSelectAll() {
+        const checkboxes = document.querySelectorAll('.form-check-input');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+        checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
+
+        // Đổi nội dung nút sau khi bấm
+        selectAllBtn.textContent = allChecked ? 'Chọn tất cả' : 'Bỏ chọn tất cả';
+    }
 
 
-    //
-    // function setModalData(button) {
-    //     document.getElementById('editId').value = button.getAttribute('data-idKhuyenMai');
-    //     document.getElementById('editMaKhuyenMai').value = button.getAttribute('data-maKhuyenMai');
-    //     document.getElementById('editTenKhuyenMai').value = button.getAttribute('data-tenKhuyenMai');
-    //     document.getElementById('editMoTa').value = button.getAttribute('data-moTa');
-    //     document.getElementById('editSoLuong').value = button.getAttribute('data-soLuong');
-    //     document.getElementById('editGiamGia').value = button.getAttribute('data-giamGia');
-    //     document.getElementById('editGiamToiThieu').value = button.getAttribute('data-giamToiThieu');
-    //     document.getElementById('editGiamToiDa').value = button.getAttribute('data-giamToiDa');
-    //     document.getElementById('editNgayBatDau').value = button.getAttribute('data-ngayBatDau');
-    //     document.getElementById('editNgayKetThuc').value = button.getAttribute('data-ngayKetThuc');
-    //     document.getElementById('editLoaiGiam').value = button.getAttribute('data-loaiGiam');
-    //     document.getElementById('editTrangThai').value = button.getAttribute('data-trangThai');
-    //
-    // }
+    function searchInModal() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("modalSearchInput");
+        filter = input.value.toUpperCase();
+        table = document.querySelector(".modal-body table");
+        tr = table.getElementsByTagName("tr");
 
-    // const trangThai = button.getAttribute('data-trangThai');
-    // document.querySelector(`input[name="trangThai"][value="${trangThai}"]`).checked = true;
+        // Lặp qua tất cả các hàng, ẩn những hàng không khớp với tìm kiếm
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1]; // Cột Tên khách hàng (hoặc thay bằng cột bạn muốn tìm kiếm)
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
 
+    document.getElementById('sendEmailBtn').addEventListener('click', function() {
+        const selectedKhachHangList = []; // Danh sách khách hàng đã chọn
+        const checkboxes = document.querySelectorAll('.form-check-input:checked'); // Tìm tất cả checkbox đã được chọn
 
-    // $('#editKhuyenMaiModal').on('show.bs.modal', function (event) {
-    //     var button = $(event.relatedTarget); // Nút kích hoạt modal
-    //
-    //     // Lấy giá trị từ các thuộc tính data-*
-    //     var ngayBatDau = button.data('ngaybatdau');
-    //     var ngayKetThuc = button.data('ngayketthuc');
-    //     var trangThai = button.data('trangthai');
-    //
-    //     // Gán các giá trị vào form
-    //     var modal = $(this);
-    //     modal.find('#editNgayBatDau').val(ngayBatDau);
-    //     modal.find('#editNgayKetThuc').val(ngayKetThuc);
-    //
-    //     // Cập nhật radio button cho trạng thái
-    //     if(trangThai === 'Còn hạn') {
-    //         modal.find('#editTrangThaiConHan').prop('checked', true);
-    //     } else if(trangThai === 'Sắp diễn ra') {
-    //         modal.find('#editTrangThaiSapDienRa').prop('checked', true);
-    //     } else {
-    //         modal.find('#editTrangThaiHetHan').prop('checked', true);
-    //     }
-    // });
-    // $('#editKhuyenMaiModal').on('show.bs.modal', function (event) {
-    //     var button = $(event.relatedTarget); // Nút kích hoạt modal
-    //
-    //     // Lấy giá trị từ các thuộc tính data-*
-    //     var maKhuyenMai = button.data('makhuyenmai');
-    //     var tenKhuyenMai = button.data('tenkhuyenmai');
-    //     var moTa = button.data('mota');
-    //     var soLuong = button.data('soluong');
-    //     var giamGia = button.data('giamgia');
-    //     var giamToiThieu = button.data('giamtoithieu');
-    //     var giamToiDa = button.data('giamtoida');
-    //     var ngayBatDau = button.data('ngaybatdau');
-    //     var ngayKetThuc = button.data('ngayketthuc');
-    //     var loaiGiam = button.data('loaigiam');
-    //     var trangThai = button.data('trangthai');
-    //
-    //     // Gán các giá trị vào form
-    //     var modal = $(this);
-    //     modal.find('#editMaKhuyenMai').val(maKhuyenMai);
-    //     modal.find('#editTenKhuyenMai').val(tenKhuyenMai);
-    //     modal.find('#editMoTa').val(moTa);
-    //     modal.find('#editSoLuong').val(soLuong);
-    //     modal.find('#editGiamGia').val(giamGia);
-    //     modal.find('#editGiamToiThieu').val(giamToiThieu);
-    //     modal.find('#editGiamToiDa').val(giamToiDa);
-    //     modal.find('#editNgayBatDau').val(ngayBatDau);
-    //     modal.find('#editNgayKetThuc').val(ngayKetThuc);
-    //     modal.find('#editLoaiGiam').val(loaiGiam); // Cần chắc chắn có <select> cho loại giảm
-    //
-    //     // Cập nhật radio button cho trạng thái
-    //     if (trangThai === 'Còn hạn') {
-    //         modal.find('#editTrangThaiConHan').prop('checked', true);
-    //     } else if (trangThai === 'Sắp diễn ra') {
-    //         modal.find('#editTrangThaiSapDienRa').prop('checked', true);
-    //     } else {
-    //         modal.find('#editTrangThaiHetHan').prop('checked', true);
-    //     }
-    // });
+        // Lặp qua từng checkbox đã chọn
+        checkboxes.forEach(checkbox => {
+            const row = checkbox.closest('tr'); // Lấy hàng tương ứng với checkbox
+            const khachHang = {
+                hoVaTen: row.querySelector('td:nth-child(2)').innerText, // Lấy tên khách hàng từ cột thứ hai
+                email: row.querySelector('td:nth-child(3)').innerText // Lấy email từ cột thứ ba
+            };
+            console.log(khachHang); // Hiển thị thông tin khách hàng trong console
+            selectedKhachHangList.push(khachHang); // Thêm khách hàng vào danh sách đã chọn
+        });
 
+        const voucherId = document.getElementById('voucherId').value; // Lấy mã voucher
 
-    // document.getElementById("khuyenMaiForm").onsubmit = function(event) {
-    //     // Ngăn chặn gửi form mặc định
-    //     event.preventDefault();
-    //     document.getElementById("khuyenMaiForm").onsubmit = function(event) {
-    //         // Ngăn chặn gửi form mặc định
-    //         event.preventDefault();
-    //         // Lấy giá trị từ các trường
-    //         var maKhuyenMai = document.getElementById("maKhuyenMai").value.trim();
-    //         var tenKhuyenMai = document.getElementById("tenKhuyenMai").value.trim();
-    //         var soLuong = parseInt(document.getElementById("soLuong").value, 10);
-    //         var giamGia = parseFloat(document.getElementById("giamGia").value);
-    //         var giaMin = parseFloat(document.getElementById("giaMin").value);
-    //         var giaMax = parseFloat(document.getElementById("giaMax").value);
-    //         var moTa = document.getElementById("moTa").value.trim();
-    //         var ngayBatDau = new Date(document.getElementById("ngayBatDau").value);
-    //         var ngayKetThuc = new Date(document.getElementById("ngayKetThuc").value);
-    //         var today = new Date();
-    //         today.setHours(0, 0, 0, 0); // Đặt giờ để so sánh ngày chính xác
-    //
-    //         // Xóa thông báo lỗi cũ
-    //         document.getElementById("maKhuyenMaiError").innerText = "";
-    //         document.getElementById("tenKhuyenMaiError").innerText = "";
-    //         document.getElementById("soLuongError").innerText = "";
-    //         document.getElementById("giamGiaError").innerText = "";
-    //         document.getElementById("giamGError").innerText = "";
-    //         document.getElementById("giaToiThieuError").innerText = "";
-    //         document.getElementById("giaToiDaError").innerText = "";
-    //         document.getElementById("moTaError").innerText = "";
-    //         document.getElementById("ngayBatDauError").innerText = "";
-    //         document.getElementById("ngayKetThucError").innerText = "";
-    //
-    //         // Kiểm tra mã khuyến mãi
-    //         if (!maKhuyenMai) {
-    //             document.getElementById("maKhuyenMaiError").innerText = "Mã khuyến mãi không được để trống.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Kiểm tra tên khuyến mãi
-    //         if (!tenKhuyenMai) {
-    //             document.getElementById("tenKhuyenMaiError").innerText = "Tên khuyến mãi không được để trống.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Kiểm tra số lượng
-    //         if (isNaN(soLuong) || soLuong <= 0) {
-    //             document.getElementById("soLuongError").innerText = "Số lượng phải lớn hơn 0.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Kiểm tra giảm giá
-    //         if (isNaN(giamGia) || giamGia < 0) { // Cho phép giảm giá bằng 0
-    //             document.getElementById("giamGiaError").innerText = "Giảm giá phải lớn hơn hoặc bằng 0.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Kiểm tra giá tối thiểu
-    //         if (isNaN(giaMin) || giaMin < 0) {
-    //             document.getElementById("giaToiThieuError").innerText = "Giá tối thiểu không được âm.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Kiểm tra giá tối đa
-    //         if (isNaN(giaMax) || giaMax < giaMin) {
-    //             document.getElementById("giaToiDaError").innerText = "Giá tối đa phải lớn hơn hoặc bằng giá tối thiểu.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Kiểm tra mô tả
-    //         if (!moTa) {
-    //             document.getElementById("moTaError").innerText = "Mô tả không được để trống.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Kiểm tra ngày bắt đầu
-    //         if (isNaN(ngayBatDau.getTime()) || ngayBatDau < today) {
-    //             document.getElementById("ngayBatDauError").innerText = "Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Kiểm tra ngày kết thúc
-    //         if (isNaN(ngayKetThuc.getTime()) || ngayKetThuc < ngayBatDau) {
-    //             document.getElementById("ngayKetThucError").innerText = "Ngày kết thúc phải lớn hơn ngày bắt đầu.";
-    //             return; // Ngừng thực hiện nếu có lỗi
-    //         }
-    //
-    //         // Nếu không có lỗi, gửi form
-    //         this.submit();
-    //     }};
+        // Kiểm tra xem có khách hàng nào được chọn và mã voucher không
+        if (selectedKhachHangList.length === 0 || !voucherId) {
+            alert("Vui lòng chọn ít nhất một khách hàng và một mã voucher.");
+            return; // Dừng thực thi nếu không đủ điều kiện
+        }
 
-    // document.getElementById("khuyenMaiForm").onsubmit = function(event) {
-    //     // Ngăn chặn gửi form mặc định
-    //     event.preventDefault();
-    //
-    //     // Lấy giá trị từ các trường
-    //     var maKhuyenMai = document.getElementById("maKhuyenMai").value.trim();
-    //     var tenKhuyenMai = document.getElementById("tenKhuyenMai").value.trim();
-    //     var soLuong = parseInt(document.getElementById("soLuong").value, 10);
-    //     var giamGia = parseFloat(document.getElementById("giamGia").value);
-    //     var ngayBatDau = new Date(document.getElementById("ngayBatDau").value);
-    //     var ngayKetThuc = new Date(document.getElementById("ngayKetThuc").value);
-    //     var today = new Date();
-    //
-    //     // Xóa thông báo lỗi cũ
-    //     document.getElementById("maKhuyenMaiError").innerText = "";
-    //     document.getElementById("tenKhuyenMaiError").innerText = "";
-    //     document.getElementById("soLuongError").innerText = "";
-    //     document.getElementById("giamGiaError").innerText = "";
-    //     document.getElementById("ngayBatDauError").innerText = "";
-    //     document.getElementById("ngayKetThucError").innerText = "";
-    //
-    //     // Kiểm tra mã khuyến mãi
-    //     if (!maKhuyenMai) {
-    //         document.getElementById("maKhuyenMaiError").innerText = "Mã khuyến mãi không được để trống.";
-    //         return; // Ngừng thực hiện nếu có lỗi
-    //     }
-    //
-    //     // Kiểm tra tên khuyến mãi
-    //     if (!tenKhuyenMai) {
-    //         document.getElementById("tenKhuyenMaiError").innerText = "Tên khuyến mãi không được để trống.";
-    //         return; // Ngừng thực hiện nếu có lỗi
-    //     }
-    //
-    //     // Kiểm tra số lượng
-    //     if (isNaN(soLuong) || soLuong <= 0) {
-    //         document.getElementById("soLuongError").innerText = "Số lượng phải lớn hơn 0.";
-    //         return; // Ngừng thực hiện nếu có lỗi
-    //     }
-    //
-    //     // Kiểm tra giảm giá
-    //     if (isNaN(giamGia) || giamGia <= 0) {
-    //         document.getElementById("giamGiaError").innerText = "Giảm giá phải lớn hơn 0.";
-    //         return; // Ngừng thực hiện nếu có lỗi
-    //     }
-    //
-    //     // Kiểm tra ngày bắt đầu
-    //     if (ngayBatDau < today) {
-    //         document.getElementById("ngayBatDauError").innerText = "Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.";
-    //         return; // Ngừng thực hiện nếu có lỗi
-    //     }
-    //
-    //     // Kiểm tra ngày kết thúc
-    //     if (ngayKetThuc < ngayBatDau) {
-    //         document.getElementById("ngayKetThucError").innerText = "Ngày kết thúc phải lớn hơn ngày bắt đầu.";
-    //         return; // Ngừng thực hiện nếu có lỗi
-    //     }
-    //
-    //     // Nếu không có lỗi, gửi form
-    //     this.submit();
-    // };
+        // Gửi dữ liệu qua API
+        fetch('/api/sendemails', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                voucherId: voucherId, // Gửi mã voucher
+                khachHangList: selectedKhachHangList // Gửi danh sách khách hàng
+            })
+        })
+            .then(response => {
+                // Kiểm tra nếu phản hồi không phải JSON
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json(); // Nếu là JSON, parse dữ liệu như bình thường
+                } else {
+                    return response.text(); // Nếu không phải JSON, trả về text
+                }
+            })
+            .then(data => {
+                if (typeof data === 'string') {
+                    alert(data); // Hiển thị thông báo khi dữ liệu trả về là chuỗi văn bản
+                } else {
+                    alert('Email đã được gửi thành công'); // Hiển thị thông báo gửi email thành công
+                }
+                $('#add').modal('hide'); // Đóng modal
 
-    // $(document).ready(function() {
-    //     if (${hasErrors}) {
-    //         $('#addKhuyenMaiModal').modal('show');
-    //     }
-    // });
+                // Reset các trường và bỏ chọn checkbox
+                document.getElementById('voucherId').value = ''; // Reset dropdown voucher
+                checkboxes.forEach(checkbox => checkbox.checked = false); // Bỏ chọn tất cả các checkbox
+                document.getElementById('modalSearchInput').value = ''; // Xóa nội dung tìm kiếm
+                const rows = document.querySelectorAll('.modal-body table tr');
+                rows.forEach(row => row.style.display = ''); // Hiển thị lại tất cả các hàng trong bảng
 
-    //
-    // document.addEventListener("KhuyenMaiForm", function() {
-    //     document.querySelector("form").onsubmit = function(event) {
-    //         // Ngăn chặn gửi form mặc định
-    //         event.preventDefault();
-    // document.getElementById("khuyenMaiForm").addEventListener("submit", function(event) {
-    //     event.preventDefault(); // Ngăn việc gửi form
-    //
-    //     // Lấy giá trị từ các trường
-    //     var maKhuyenMai = document.getElementById("maKhuyenMai").value;
-    //     var tenKhuyenMai = document.getElementById("tenKhuyenMai").value;
-    //     var soLuong = document.getElementById("soLuong").value;
-    //     var giamGia = document.getElementById("giamGia").value;
-    //     var ngayBatDau = new Date(document.getElementById("ngayBatDau").value);
-    //     var ngayKetThuc = new Date(document.getElementById("ngayKetThuc").value);
-    //     var today = new Date();
-    //     var errors = [];
-    //
-    //     // Xóa thông báo lỗi trước đó
-    //     const errorMessageDiv = document.getElementById("error-message");
-    //     errorMessageDiv.classList.add("d-none");
-    //     errorMessageDiv.innerHTML = "";
-    //
-    //     // Kiểm tra mã khuyến mãi
-    //     if (maKhuyenMai.trim() === "") {
-    //         errors.push("Mã khuyến mãi không được để trống.");
-    //     }
-    //
-    //     // Kiểm tra tên khuyến mãi
-    //     if (tenKhuyenMai.trim() === "") {
-    //         errors.push("Tên khuyến mãi không được để trống.");
-    //     }
-    //
-    //     // Kiểm tra số lượng
-    //     if (soLuong <= 0) {
-    //         errors.push("Số lượng phải lớn hơn 0.");
-    //     }
-    //
-    //     // Kiểm tra giảm giá
-    //     if (giamGia < 0) {
-    //         errors.push("Giảm giá không được âm.");
-    //     }
-    //
-    //     // Kiểm tra ngày bắt đầu
-    //     if (ngayBatDau < today) {
-    //         errors.push("Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.");
-    //     }
-    //
-    //     // Kiểm tra ngày kết thúc
-    //     if (ngayKetThuc < ngayBatDau) {
-    //         errors.push("Ngày kết thúc phải lớn hơn ngày bắt đầu.");
-    //     }
-    //
-    //     // // Hiển thị thông báo lỗi nếu có
-    //     // if (errors.length > 0) {
-    //     //     alert(errors.join("\n"));
-    //     //     return; // Ngừng thực hiện nếu có lỗi
-    //     // }
-    //     //
-    //     // // Nếu không có lỗi, gửi form
-    //     // this.submit();
-    //     // Nếu có lỗi, hiển thị thông báo
-    //     if (errors.length > 0) {
-    //         errorMessageDiv.innerHTML = errors.join("<br/>");
-    //         errorMessageDiv.classList.remove("d-none");
-    //     } else {
-    //         // Nếu không có lỗi, gửi form
-    //         this.submit();
+            })
+            .catch(error => {
+                alert('Lỗi: ' + error.message); // Hiển thị thông báo lỗi nếu có
+                console.error('Error:', error); // In lỗi ra console
+            });
+    });
+
 </script>
 
 </body>

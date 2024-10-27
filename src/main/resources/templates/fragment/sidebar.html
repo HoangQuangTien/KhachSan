@@ -21,7 +21,7 @@
             </div>
 
             <!-- Main Navigation -->
-            <ul class="navbar-nav flex-fill w-100 mb-3">
+            <ul class="navbar-nav flex-fill w-100 mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                 <li class="nav-item">
                     <a class="nav-link pl-3" th:href="@{/thongke}">
                         <i class="fa fa-pie-chart"></i>
@@ -77,7 +77,7 @@
                                 <span class="ml-3 item-text">NguoiDiCung</span>
                             </a>
                         </li>
-                        
+
                         <li class="nav-item">
                             <a class="nav-link pl-3" th:href="@{/danhsach}">
                                 <i class="fa fa-check"></i>
@@ -127,14 +127,15 @@
 
 
 
-            <ul class="navbar-nav flex-fill w-100 mb-3">
-                <li class="nav-item">
+            <ul class="navbar-nav flex-fill w-100 mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <li class="nav-item" >
                     <a class="nav-link pl-3" th:href="@{/thamSo}">
                         <i class='fas fa-robot'></i>
                         <span class="ml-3 item-text">Quản Lý Tham Số</span>
                     </a>
                 </li>
             </ul>
+
 
             <ul class="navbar-nav flex-fill w-100 mb-3">
                 <li class="nav-item">
@@ -146,7 +147,7 @@
             </ul>
 
             <!-- Account Management -->
-            <ul class="navbar-nav flex-fill w-100 mb-3">
+            <ul class="navbar-nav flex-fill w-100 mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                 <li class="nav-item dropdown">
                     <a class="nav-link pl-3 dropdown-toggle" data-toggle="collapse" href="#account-management" aria-expanded="false">
                         <i class="fe fe-users"></i>

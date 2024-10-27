@@ -272,15 +272,11 @@
 
         }
 
-
-
         .btn-warning:hover {
 
             background-color: #e0a800;
 
         }
-
-
 
         /* Responsive Design */
 
@@ -578,7 +574,7 @@
 
                                 <button type="button" class="btn btn-warning" data-bs-toggle="modal"
 
-                                        data-bs-target="#addModal">
+                                        data-bs-target="#addModal" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
 
                                     <i class="fas fa-plus me-2"></i> Tạo mới
 
@@ -772,7 +768,7 @@
 
                                     <!-- Nút Sửa -->
 
-                                    <a th:href="@{/edit(id=${phong.idPhong})}" class="btn btn-outline-warning btn-sm">
+                                    <a th:href="@{/edit(id=${phong.idPhong})}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="btn btn-outline-warning btn-sm">
                                         <i class='fas fa-pen-alt'></i> Sửa
                                     </a>
 
