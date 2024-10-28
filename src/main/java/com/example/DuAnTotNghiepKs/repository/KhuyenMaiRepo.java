@@ -38,6 +38,9 @@ public interface KhuyenMaiRepo extends JpaRepository<KhuyenMai,Integer> {
 
     List<KhuyenMai> findByTrangThai(String trangThai);
 
-    @Query("SELECT k FROM KhuyenMai k WHERE k.ngayKetThuc >= :today")
+    @Query(value = "SELECT * FROM KhuyenMai \n" +
+            "WHERE ngay_ket_thuc >= '2024-10-28' \n" +
+            "AND trang_thai = N'Còn Hạn'", nativeQuery = true)
     List<KhuyenMai> findAllActiveVouchers(@Param("today") Date today);
+
 }

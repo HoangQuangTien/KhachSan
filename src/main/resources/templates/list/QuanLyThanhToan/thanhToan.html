@@ -243,7 +243,7 @@
                         </table>
 
                         <!-- Phân trang -->
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 <span>Trang hiện tại: <span th:text="${currentPage + 1}"></span></span>
                                 <span>Tổng số trang: <span th:text="${totalPages}"></span></span>
@@ -258,16 +258,17 @@
                                 <div th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
                                     <a th:href="@{/hienThi(page=${i}, size=${pageSize})}"
                                        class="btn btn-outline-primary mx-1"
-                                       th:class="${i == currentPage} ? 'active'"
-                                       th:text="${i + 1}"></a>
+                                       th:class="${i == currentPage} ? 'active'">
+                                        th:text="${i + 1}"></a>
                                 </div>
 
                                 <!-- Trang tiếp -->
-                                <a th:href="@{/hienThi(page=${currentPage + 1}, size=${pageSize})}"
+                                <a th:href="@{/thanhToan(page=${currentPage + 1}, size=${pageSize})}"
                                    th:if="${currentPage < totalPages - 1}" class="btn btn-primary ms-2">Trang Tiếp</a>
-                            </div>
 
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -330,12 +331,19 @@
                             </div>
 
                             <div class="col-6 mb-3">
-                                <label for="khuyenMaiSelect">Khuyến mãi:</label>
-                                <select id="khuyenMaiSelect" class="form-control" aria-label="Chọn mã khuyến mãi">
-                                    <option value="">--Chọn mã khuyến mãi--</option>
+                                <label for="voucherId">Khuyen Mai </label>
+                                <select class="form-control" id="voucherId" name="voucherId"  onchange="tinhTongTien()">
+                                    <option value="" disabled selected>-- Chọn Khuyen Mai --</option>
+                                    <option th:each="voucher : ${activeVouchers}"
+                                            th:value="${voucher.idKhuyenMai}"
+                                            th:data-muc-giam="${voucher.giamGia}"
+                                            th:data-so-luong="${voucher.soLuong}"
+                                            th:data-loai-giam="${voucher.loaiGiam ? 1 : 0}"
+                                            th:text="${voucher.maKhuyenMai} + ' - ' + ${voucher.tenKhuyenMai}"></option>
                                 </select>
                             </div>
                         </div>
+
 
                         <div class="row border-bottom pb-2 mb-3">
                             <div class="col-6 mb-3">
@@ -856,18 +864,71 @@
                 confirmButtonText: 'OK'
             });
             return false; // Ngăn form gửi
-        } else {
-            // Nếu hợp lệ, hiển thị thông báo thành công và submit form
-            Swal.fire({
-                title: 'Thành công!',
-                text: 'Thanh toán thành công!',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            }).then(function() {
-                document.getElementById("formId").submit(); // Gửi form sau khi nhấn OK
-            });
         }
+
+        // Lấy mã khuyến mại đã chọn (nếu có)
+        var voucherSelect = document.getElementById('voucherId');
+        var selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
+        var idKhuyenMai = selectedOption ? selectedOption.value : null; // Nếu không chọn mã thì null
+
+        // Nếu có mã khuyến mại được chọn, kiểm tra số lượng mã khuyến mại
+        if (idKhuyenMai) {
+            var soLuongKhuyenMai = selectedOption.getAttribute('data-so-luong');
+
+            // Kiểm tra số lượng mã khuyến mại
+            if (soLuongKhuyenMai <= 0) {
+                // Nếu mã khuyến mại đã hết hiệu lực
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Mã khuyến mại đã hết hiệu lực!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return; // Ngăn không gửi form
+            }
+        }
+
+        // Nếu tất cả các điều kiện đều hợp lệ, hiển thị thông báo thành công
+        Swal.fire({
+            title: 'Thành công!',
+            text: 'Thanh toán thành công!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then(function() {
+            // Gọi hàm cập nhật số lượng mã khuyến mại sau khi thanh toán
+            if (idKhuyenMai) {
+                fetch(`/api/vouchers/update/${idKhuyenMai}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error('Không thể cập nhật số lượng khuyến mại');
+                        }
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            alert("Số lượng mã khuyến mại đã được cập nhật!");
+                        } else {
+                            alert(data.message || "Có lỗi xảy ra khi cập nhật số lượng khuyến mại.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi:', error);
+                        alert("Có lỗi xảy ra khi cập nhật số lượng khuyến mại.");
+                    });
+            }
+
+            // Gửi form sau khi nhấn OK
+            document.getElementById("formId").submit();
+        });
     }
+
+
 
 
 
@@ -875,13 +936,38 @@
     function tinhTongTien() {
         var tienPhuPhi = parseFloat(document.getElementById('tienPhuPhi').value) || 0;
         var tongSoTien = parseFloat(document.getElementById('tienConLai').value) || 0;
-        //
-        // // Cộng phụ phí vào tổng số tiền
-        var tongTien = tongSoTien + tienPhuPhi;
 
-        // Cập nhật ô input với giá trị mới của tổng tiền
+        var voucherSelect = document.getElementById('voucherId');
+        var selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
+
+        var giamGia = 0;
+        if (selectedOption.value) {
+            // Lấy mức giảm và loại giảm
+            var mucGiam = parseFloat(selectedOption.getAttribute('data-muc-giam')) || 0;
+            var loaiGiamStr = selectedOption.getAttribute('data-loai-giam');
+            var loaiGiam = loaiGiamStr === "true";  // `true` cho phần trăm, `false` cho tiền mặt
+
+            console.log("Mức giảm:", mucGiam);
+            console.log("Loại giảm:", loaiGiam);
+
+            // Tính giảm giá theo loại giảm
+            if (loaiGiam) { // Nếu là giảm theo phần trăm
+                giamGia = (mucGiam / 100) * tongSoTien;
+                console.log("Giảm giá theo phần trăm:", giamGia);
+            } else { // Nếu là giảm theo tiền mặt
+                giamGia = mucGiam;
+                console.log("Giảm giá theo tiền mặt:", giamGia);
+            }
+
+            // Đảm bảo giảm giá không vượt quá tổng tiền
+            giamGia = Math.min(giamGia, tongSoTien + tienPhuPhi);
+        }
+
+        var tongTien = tongSoTien + tienPhuPhi - giamGia;
         document.getElementById("tienConLai").value = tongTien.toFixed(2);
+        console.log("Tổng tiền sau giảm:", tongTien);
     }
+
 
 
 

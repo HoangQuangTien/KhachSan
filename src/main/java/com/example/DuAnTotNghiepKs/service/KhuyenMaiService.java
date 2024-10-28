@@ -7,11 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -194,6 +194,39 @@ public class KhuyenMaiService {
     public List<KhuyenMai> getActiveVouchers() {
         return khuyenMaiRepository.findAllActiveVouchers(new Date());
     }
+
+
+
+
+
+    public ResponseEntity<Map<String, Object>> capNhatSoLuong(Integer id) {
+        Optional<KhuyenMai> khuyenMaiOptional = khuyenMaiRepository.findById(id);
+        Map<String, Object> response = new HashMap<>();
+
+        if (khuyenMaiOptional.isPresent()) {
+            KhuyenMai khuyenMai = khuyenMaiOptional.get();
+            int soLuongHienTai = khuyenMai.getSoLuong();
+            System.out.println("Số lượng hiện tại trước khi cập nhật: " + soLuongHienTai);
+
+            if (soLuongHienTai > 0) {
+                khuyenMai.setSoLuong(soLuongHienTai - 1); // Giảm số lượng đi 1
+                khuyenMaiRepository.save(khuyenMai); // Lưu vào database
+                System.out.println("Số lượng sau khi cập nhật: " + (soLuongHienTai - 1)); // Log sau khi cập nhật
+                response.put("success", true);
+                return ResponseEntity.ok(response); // Trả về thành công
+            } else {
+                response.put("success", false);
+                response.put("message", "Số lượng khuyến mãi đã hết.");
+            }
+        } else {
+            response.put("success", false);
+            response.put("message", "Không tìm thấy khuyến mãi với ID đã cho.");
+        }
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+
 
 
 }

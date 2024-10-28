@@ -95,19 +95,19 @@ public class DanhSachDatPhong {
             // Lấy thời gian dự kiến nhận phòng từ đặt phòng
 
 
-            LocalDateTime ngayTraPhong = datPhong.getNgayTra(); // Lấy ngày trả phòng
-
-            if (ngayTraPhong.isAfter(now) && datPhong.getNhanVienCheckIn() == null) {
-                // Nếu ngày trả phòng lớn hơn hiện tại và chưa check-in
-                datPhong.setTinhTrang("Đã hủy"); // Cập nhật trạng thái đặt phòng thành "Đã hủy"
-                datPhongService.saveDatPhong1(datPhong);
-
-                Phong phong = datPhong.getPhong();
-                phong.setTrangThai(true); // Đặt trạng thái phòng thành có sẵn
-                phongService.savePhong(phong); // Lưu lại trạng thái phòng
-
-                return ResponseEntity.ok(Map.of("success", "Đặt phòng đã bị hủy do quas thoi gian check-in."));
-            }
+//            LocalDateTime ngayTraPhong = datPhong.getNgayTra(); // Lấy ngày trả phòng
+//
+//            if (ngayTraPhong.isAfter(now) && datPhong.getNhanVienCheckIn() == null) {
+//                // Nếu ngày trả phòng lớn hơn hiện tại và chưa check-in
+//                datPhong.setTinhTrang("Đã Hủy"); // Cập nhật trạng thái đặt phòng thành "Đã hủy"
+//                datPhongService.saveDatPhong1(datPhong);
+//
+//                Phong phong = datPhong.getPhong();
+//                phong.setTrangThai(true); // Đặt trạng thái phòng thành có sẵn
+//                phongService.savePhong(phong); // Lưu lại trạng thái phòng
+//
+//                return ResponseEntity.ok(Map.of("success", "Đặt phòng đã bị hủy do quas thoi gian check-in."));
+//            }
             // Cập nhật thông tin check-in
             NhanVien nhanVienCheckIn = taiKhoan.getNhanVien();
             datPhong.setNhanVienCheckIn(nhanVienCheckIn); // Lưu đối tượng NhanVien

@@ -26,7 +26,7 @@ public class EmailRest{
         String voucherId = emailRequest.getVoucherId();
         List<KhachHang> customers = emailRequest.getKhachHangList();
 
-        String subject = "Nhận mã Voucher từ Panda-Shirt nào bạn ơi";
+        String subject = "Nhận mã Voucher từ DragonBall HOTEL nào bạn ơi";
         String MaVC = emailService.layvoucher(Integer.parseInt(voucherId)).getMaKhuyenMai();
         String Mota = emailService.layvoucher(Integer.parseInt(voucherId)).getMoTa();
         String MG = String.valueOf(emailService.layvoucher(Integer.parseInt(voucherId)).getGiamGia());
