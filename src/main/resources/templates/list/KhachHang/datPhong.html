@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DragonBall Hotel</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/styleKH.css}"/>
+
+
+</head>
+<style>
+    .border-container {
+        border: 1px solid #ccc; /* Màu viền và độ dày */
+        border-radius: 8px; /* Làm tròn các góc */
+        padding: 15px; /* Khoảng cách giữa viền và nội dung */
+        background-color: #f9f9f9; /* Màu nền */
+    }
+    .price-container {
+        text-align: center; /* Căn giữa văn bản */
+        margin-top: 10px; /* Tạo khoảng cách phía trên */
+    }
+    .room-title {
+        font-size: 24px; /* Kích thước chữ lớn hơn */
+        font-weight: bold; /* Chữ đậm */
+        text-align: left; /* Căn trái văn bản */
+        background: linear-gradient(to right, orange 50%, black 50%); /* Gạch đỏ nửa chữ từ bên trái */
+        -webkit-background-clip: text; /* Clip nền cho chữ */
+        color: transparent; /* Ẩn màu chữ để chỉ hiển thị nền */
+        margin: 10px 0; /* Tạo khoảng cách trên và dưới */
+        padding-bottom: 5px; /* Khoảng cách dưới chữ để không chèn vào gạch */
+        display: inline-block; /* Để gạch chỉ dưới phần văn bản */
+    }
+
+
+    .room-title::after {
+        content: ''; /* Tạo nội dung giả */
+        display: block; /* Hiển thị như một khối */
+        height: 2px; /* Độ dày của gạch */
+        background-color: red; /* Màu gạch */
+        position: absolute; /* Định vị tuyệt đối */
+        bottom: 0; /* Gạch ở dưới cùng */
+        left: 0; /* Bắt đầu từ bên trái */
+        width: 50%; /* Chiều rộng của gạch là 50% */
+    }
+
+    .room-detail-container {
+        display: flex;
+        justify-content: center; /* Căn giữa toàn bộ nội dung */
+        align-items: center; /* Căn giữa theo chiều dọc */
+        padding: 20px; /* Khoảng cách bên trong */
+    }
+
+    .room-info {
+        display: flex; /* Hiển thị theo hàng ngang */
+        justify-content: center; /* Căn giữa theo chiều ngang */
+        align-items: center; /* Căn giữa theo chiều dọc */
+    }
+
+    .image-container {
+        flex: 1; /* Tự động chiếm không gian */
+        margin-right: 10px; /* Khoảng cách giữa hình ảnh và form */
+    }
+
+    .booking-form {
+        flex: 1; /* Tự động chiếm không gian */
+        max-width: 400px; /* Chiều rộng tối đa của form */
+        width: 100%; /* Đảm bảo form chiếm toàn bộ không gian */
+    }
+
+    .form-group {
+        margin-bottom: 10px; /* Khoảng cách giữa các trường */
+    }
+
+
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+    .room-info {
+        display: flex;
+        justify-content: center; /* Căn giữa các phần tử con theo chiều ngang */
+        align-items: center; /* Căn giữa các phần tử con theo chiều dọc */
+    }
+
+    .booking-form {
+        margin: 10px; /* Khoảng cách giữa các phần tử xung quanh */
+        background-color: #f8f9fa; /* Màu nền cho form */
+        border: 1px solid #ced4da; /* Viền cho form */
+        border-radius: 5px; /* Bo góc */
+        padding: 20px; /* Khoảng cách bên trong form */
+        max-width: 400px; /* Chiều rộng tối đa của form */
+        width: 100%; /* Chiều rộng 100% để chiếm toàn bộ không gian có sẵn */
+    }
+
+
+    .booking-form h4 {
+        margin-bottom: 20px; /* Khoảng cách dưới tiêu đề */
+        text-align: center; /* Căn giữa tiêu đề */
+    }
+
+    .form-group {
+        margin-bottom: 15px; /* Khoảng cách giữa các trường trong form */
+    }
+
+    .form-control {
+        height: 40px; /* Chiều cao cho các ô nhập liệu */
+        border-radius: 5px; /* Bo góc cho các ô nhập liệu */
+        border: 1px solid #ced4da; /* Viền nhẹ cho ô nhập liệu */
+    }
+
+    .form-control:focus {
+        border-color: #80bdff; /* Màu viền khi ô được chọn */
+        outline: none; /* Xóa viền mặc định */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Đổ bóng cho ô nhập liệu */
+    }
+
+    .btn-warning {
+        background-color: #ffc107; /* Màu nền cho nút */
+        color: #fff; /* Màu chữ */
+        border: none; /* Không có viền */
+        border-radius: 5px; /* Bo góc cho nút */
+        padding: 10px; /* Khoảng cách bên trong nút */
+        cursor: pointer; /* Con trỏ khi hover */
+        transition: background-color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800; /* Màu nền khi hover */
+    }
+
+
+
+    .image-container {
+        max-width: 100%;
+        height: auto;
+    }
+
+
+    /* Style cho form đặt phòng */
+    .booking-form {
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    /* Định dạng cho footer */
+    footer {
+        background-color: #343a40;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    /* Bố cục cho carousel */
+    #carouselExample {
+        height: 100vh;
+    }
+
+    .overlay {
+        background: rgba(0, 0, 0, 0.5);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+<body>
+<div class="container-fluid p-0 position-relative">
+    <!-- Background Image -->
+    <!-- Carousel -->
+    <div id="carouselExample" class="carousel slide" data-ride="carousel" data-interval="2000">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img th:src="@{/img/296817374_1015897554.jpg}" class="d-block w-100" alt="Slide 1" style="height: 100vh; object-fit: cover;">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/img/phong-khach-san-dep-de-chup-anh-o-ha-noi-3.jpg}" class="d-block w-100" alt="Slide 2" style="height: 100vh; object-fit: cover;">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/img/anhPhongKS1.jpg}" class="d-block w-100" alt="Slide 3" style="height: 100vh; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+
+    <img th:src="@{/img/logo-Photoroom.png}" class="logo position-absolute" alt="Logo">
+    <!-- Overlay content -->
+    <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center" style="background: rgba(0, 0, 0, 0.5);">
+
+        <!-- Title -->
+        <h1 class="text-white mb-3 text-center">Chào Mừng Đến Với DragonBall HOTEL</h1>
+
+        <!-- Subtitle -->
+        <p class="text-white mb-4 text-center">Tìm kiếm để so sánh giá cả và khám phá ưu đãi tuyệt vời</p>
+
+        <!-- Search Bar -->
+        <form class="search-bar p-4 bg-white rounded shadow-sm d-flex align-items-center justify-content-between">
+            <!-- Location Search -->
+            <div class="input-group me-2 w-25">
+        <span class="input-group-text bg-transparent border-0">
+            <i class="bi bi-search"></i>
+        </span>
+                <input type="text" class="form-control border-0" placeholder="Loại Phòng" aria-label="Search location">
+            </div>
+
+            <!-- Check-in & Check-out Section -->
+            <div class="check-in-out d-flex align-items-center">
+                <!-- Check-in -->
+                <div class="input-group me-2">
+                    <input type="datetime-local" id="checkin" class="form-control border-0" placeholder="Nhận phòng">
+                </div>
+
+                <!-- Check-out -->
+                <div class="input-group me-2">
+                    <input type="datetime-local" id="checkout" class="form-control border-0" placeholder="Trả phòng">
+                </div>
+            </div>
+
+
+            <!-- Guests -->
+            <div class="input-group me-2 w-25">
+                <input type="text" class="form-control border-0" placeholder="So nguoi">
+            </div>
+
+            <!-- Search Button -->
+            <button class="btn btn-primary px-4">Tìm</button>
+        </form>
+
+
+        <!-- Login Button -->
+        <div class="login-button-container position-absolute top-0 end-0 m-3">
+            <a href="/login" class="btn btn-outline-light">Đăng Nhập</a>
+        </div>
+
+        <div class="Home-button-container d-flex align-items-center position-absolute top-0 end-0 m-3">
+            <!-- Trang Chủ -->
+            <a href="/khach-hang" class="text-link mb-2 p-2">Trang Chủ</a>
+            <!-- Giới Thiệu -->
+            <a href="/about" class="text-link mb-2 p-2">Giới Thiệu</a>
+            <!-- Hạng Phòng -->
+            <div class="room-class-container">
+                <div id="room-classes-button" class="text-link mb-2 p-2" style="cursor: pointer;">Hạng Phòng</div>
+                <ul id="room-class-list" class="dropdown-menu" style="list-style: none; padding: 0; margin: 0;">
+                    <li data-loai-phong-id="1">Standard</li>
+                    <li data-loai-phong-id="2">Superior</li>
+                    <li data-loai-phong-id="3">Family suite</li>
+                    <li data-loai-phong-id="4">Deluxe</li>
+                </ul>
+            </div>
+
+
+
+        </div>
+    </div>
+
+    <!-- Các nút chọn ngôn ngữ -->
+    <div class="language-buttons d-flex top-0 end-0">
+        <div id="vi-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;" >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" alt="Cờ Việt Nam" style="width: 20px; height: 15px; margin-right: 5px;">
+            Tiếng Việt
+        </div>
+        <div id="en-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;">
+            <img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="Cờ Anh" style="width: 20px; height: 15px; margin-right: 5px;">
+            English
+        </div>
+    </div>
+</div>
+<div class="room-detail-container d-flex justify-content-center">
+    <div class="room-details">
+        <div class="room-info d-flex justify-content-center align-items-center">
+            <div class="image-container flex-fill me-3 border-container">
+                <p class="room-title">
+                    <b th:text="${phong.tenPhong}"></b>
+                </p>
+                <p>
+                    <span>Phòng:</span>
+                    <span th:text="${phong.tenPhong}"></span>
+                    <span th:text="${phong.moTa}"></span>
+                </p>
+                <img src="/img/anhPhongKS1.jpg" alt="" style="max-width: 100%; height: auto;">
+                <div class="price-container text-center">
+                    <p>
+                        <span>Chỉ với</span>
+                        <span th:text="${phong.gia} + ' VNĐ'"></span>
+                        <span> cho 1 đêm</span>
+                    </p>
+                    <input type="hidden" id="pricePerNight" th:value="${phong.gia}" /> <!-- Sửa lại th:value -->
+                    <p>
+                        <span>Sức chứa tối đa gồm:</span>
+                        <span th:text="${phong.soNguoiToiDa}"></span>
+                        <span>người</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="booking-form flex-fill">
+        <h4>ĐẶT PHÒNG</h4>
+        <form th:action="@{/dat-phong}" method="post" id="idDatPhong">
+            <div class="form-group">
+                <label for="checkin">Ngày đến</label>
+                <input type="date" class="form-control" id="checkinDate" name="ngayNhan" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout">Ngày đi</label>
+                <input type="date" class="form-control" id="checkoutDate" name="ngayTra" required>
+            </div>
+            <div class="form-group">
+                <label for="SDT">Căn cước công dân</label>
+                <input type="number" class="form-control" id="SDT" name="cccd" required>
+            </div>
+            <div class="form-group">
+                <label for="deposit">Số tiền cọc (80%):</label>
+                <input type="text" class="form-control" id="deposit" name="gia" readonly>
+            </div>
+            <input type="text" name="idPhong" th:value="${phong.idPhong}" />
+            <input type="text" name="idLoaiPhong" th:value="${phong.idLoaiPhong}" />
+            <input type="text" name="id" th:value="${idKhachHang}" />
+            <input type="text" name="maDatPhong" />
+            <button type="submit" class="btn btn-warning btn-block">ĐẶT PHÒNG</button>
+        </form>
+    </div>
+</div>
+
+
+
+<footer class="bg-dark text-white py-4 mt-2">
+    <div class="container">
+        <div class="row">
+            <!-- Google Maps Embed (Left) -->
+            <div class="col-md-6">
+                <h5 class="text-white">Vị trí của chúng tôi</h5>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4337.097401206077!2d105.74389980195575!3d21.045412325554775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313455b3f6710da1%3A0x240105831b77a1a2!2zVHLGsOG7nW5nIENhbyDEkeG6s25nIEZQVCBQb2x5dGVjaG5pYw!5e0!3m2!1sen!2s!4v1728742407402!5m2!1sen!2s" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+
+            </div>
+
+            <!-- Contact Info (Right) -->
+            <div class="col-md-6">
+                <h5 class="text-white" id="footerContact">Thông tin liên hệ</h5>
+                <p class="mb-0" id="footerAddress">Địa chỉ: P. Kiều Mai, Phúc Diễn, Từ Liêm, Hà Nội</p>
+                <p id="footerEmail">Email: contact@dragonballhotel.com</p>
+                <p id="footerPhone">Phone: +84 397156204</p>
+                <ul class="list-inline">
+                    <li class="list-inline-item"><a href="#" class="text-white">Facebook</a></li>
+                    <li class="list-inline-item"><a href="#" class="text-white">Instagram</a></li>
+                    <li class="list-inline-item"><a href="#" class="text-white">Twitter</a></li>
+                </ul>
+            </div>
+
+        </div>
+        <!-- Divider -->
+        <div class="divider"></div>
+        <!-- Copyright Section -->
+        <div class="text-center mt-4">
+            <p class="copyright mb-0">&copy; 2024 DragonBall Hotel. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+<script>
+    document.getElementById('idDatPhong').addEventListener("submit", function (event) {
+        // Ngăn chặn gửi biểu mẫu để thực hiện kiểm tra
+        event.preventDefault();
+
+        // Lấy các giá trị từ biểu mẫu
+        const checkinDate = document.getElementById('checkinDate').value;
+        const checkoutDate = document.getElementById('checkoutDate').value;
+        const cccd = document.getElementById('SDT').value;
+        const idPhong = document.querySelector('input[name="idPhong"]').value; // Lấy ID phòng từ input
+        const idLoaiPhong = document.querySelector('input[name="idLoaiPhong"]').value; // Lấy ID loại phòng
+        const maDatPhong = document.querySelector('input[name="maDatPhong"]').value; // Lấy mã đặt phòng từ input
+
+        // Kiểm tra các giá trị
+        if (!checkinDate || !checkoutDate || !cccd) {
+            alert("Vui lòng điền đầy đủ thông tin.");
+            return;
+        }
+
+        // Tính toán tiền cọc (giá phòng giả định)
+        const giaPhong = 100000; // Thay đổi giá phòng thực tế
+        const soNgay = (new Date(checkoutDate) - new Date(checkinDate)) / (1000 * 60 * 60 * 24); // Số ngày ở
+
+        // Kiểm tra nếu số ngày <= 0
+        if (soNgay <= 0) {
+            alert("Ngày trả phải lớn hơn ngày nhận.");
+            return;
+        }
+
+        const tienCoc = (giaPhong * soNgay) * 0.8;
+
+        // Cập nhật tiền cọc vào biểu mẫu
+        document.getElementById('deposit').value = tienCoc.toFixed(2);
+
+        // Gửi yêu cầu đặt phòng
+        fetch('/dat-phong', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                idLoaiPhong: [idLoaiPhong], // ID loại phòng
+                idPhong: idPhong, // ID phòng
+                ngayNhan: checkinDate, // Ngày nhận
+                ngayTra: checkoutDate, // Ngày trả
+                cccd: cccd, // CCCD
+                maDatPhong: maDatPhong // Mã đặt phòng
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Mã lỗi: ' + response.status); // Ném lỗi nếu không thành công
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.redirect) {
+                    // Nếu phản hồi có redirect, chuyển hướng
+                    window.location.href = data.redirect;
+                } else if (data.error) {
+                    // Nếu có lỗi, hiển thị thông báo lỗi
+                    alert(data.error);
+                } else if (data.success) {
+                    // Nếu đặt phòng thành công, hiển thị thông báo thành công
+                    alert(data.success);
+                }
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra:', error);
+                alert("Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại sau.");
+            });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const pricePerNight = parseFloat(document.getElementById('pricePerNight').value); // Lấy giá phòng
+
+        document.getElementById('checkinDate').addEventListener('change', calculateDeposit);
+        document.getElementById('checkoutDate').addEventListener('change', calculateDeposit);
+
+        function calculateDeposit() {
+            const checkin = document.getElementById('checkinDate').value;
+            const checkout = document.getElementById('checkoutDate').value;
+
+            if (checkin && checkout) {
+                const checkinDate = new Date(checkin);
+                const checkoutDate = new Date(checkout);
+                const diffTime = Math.abs(checkoutDate - checkinDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays > 0) {
+                    const totalCost = diffDays * pricePerNight; // Tổng chi phí
+                    const depositAmount = totalCost * 0.8; // Tiền cọc (80%)
+
+                    // Cập nhật giá trị vào ô tiền cọc
+                    document.getElementById('deposit').value = depositAmount.toLocaleString('vi-VN') + ' VNĐ';
+                } else {
+                    document.getElementById('deposit').value = ''; // Nếu ngày không hợp lệ, xóa giá trị
+                }
+            } else {
+                document.getElementById('deposit').value = ''; // Xóa giá trị nếu chưa có ngày
+            }
+        }
+    });
+</script>
+</body>
+</html>

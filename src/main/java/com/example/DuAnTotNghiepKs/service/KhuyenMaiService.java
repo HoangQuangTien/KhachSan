@@ -226,6 +226,24 @@ public class KhuyenMaiService {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @Scheduled(fixedRate = 60000) // mỗi phút một lần
+    public void updateKhuyenMaiStatus() {
+        List<KhuyenMai> khuyenMais = khuyenMaiRepository.findAll();
+        Date now = new Date();
+
+        for (KhuyenMai khuyenMai : khuyenMais) {
+            if (now.before(khuyenMai.getNgayBatDau())) {
+                khuyenMai.setTrangThai("Sắp diễn ra");
+            } else if (now.after(khuyenMai.getNgayKetThuc())) {
+                khuyenMai.setTrangThai("Hết hạn");
+            } else {
+                khuyenMai.setTrangThai("Còn hạn");
+            }
+        }
+
+        khuyenMaiRepository.saveAll(khuyenMais); // lưu lại tất cả khuyến mãi đã cập nhật
+    }
+
 
 
 

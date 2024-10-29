@@ -205,36 +205,28 @@
         <p class="text-white mb-4 text-center">Tìm kiếm để so sánh giá cả và khám phá ưu đãi tuyệt vời</p>
 
         <!-- Search Bar -->
-        <form class="search-bar p-4 bg-white rounded shadow-sm d-flex align-items-center justify-content-between">
-            <!-- Location Search -->
-            <div class="input-group me-2 w-25">
-        <span class="input-group-text bg-transparent border-0">
-            <i class="bi bi-search"></i>
-        </span>
-                <input type="text" class="form-control border-0" placeholder="Loại Phòng" aria-label="Search location">
-            </div>
-
+        <form  onsubmit="return validateDates()"  action="/searchh" method="GET" class="search-bar p-4 bg-white rounded shadow-sm d-flex align-items-center justify-content-between">
             <!-- Check-in & Check-out Section -->
             <div class="check-in-out d-flex align-items-center">
                 <!-- Check-in -->
                 <div class="input-group me-2">
-                    <input type="datetime-local" id="checkin" class="form-control border-0" placeholder="Nhận phòng">
+                    <input type="datetime-local" id="ngayNhan" name="ngayNhan"  class="form-control border-0" placeholder="Nhận phòng" required>
                 </div>
 
                 <!-- Check-out -->
                 <div class="input-group me-2">
-                    <input type="datetime-local" id="checkout" class="form-control border-0" placeholder="Trả phòng">
+                    <input type="datetime-local" id="ngayTra" name="ngayTra" class="form-control border-0" placeholder="Trả phòng" required>
                 </div>
             </div>
 
-
             <!-- Guests -->
             <div class="input-group me-2 w-25">
-                <input type="text" class="form-control border-0" placeholder="So nguoi">
+                <input type="number" id="soLuongNguoi" name="soLuongNguoi" min="1"  class="form-control border-0" placeholder="So nguoi" required>
             </div>
-
             <!-- Search Button -->
             <button class="btn btn-primary px-4">Tìm</button>
+
+
         </form>
 
 
@@ -282,6 +274,55 @@
 
     </div>
 
+</div>
+<!--VÙng để chèn phòng đã tìm-->
+<div class="row room-list d-flex flex-wrap mt-4"  style="margin-top: 30px;"  >
+    <div th:if="${message}">-->
+        <p th:text="${message}" style="color: red;"></p>
+    </div>
+    <div th:each="phong : ${phongs}" class="col-md-4 mb-3">
+        <div class="card shadow" th:classappend="${phong.trangThai} ? 'border-success' : 'border-danger'">
+            <div class="card-body" th:style="${phong.trangThai} ? 'background-color: #d4edda;' : 'background-color: #f8d7da;'">
+                <!-- Ảnh và phần overlay chỉ chứa tên phòng và giá -->
+                <div class="overlay position-relative">
+                    <img th:src="${phong.img}" width="100%" alt="Ảnh phòng">
+                    <div class="overlay-content position-absolute bottom-0 w-100 bg-dark bg-opacity-50 text-white p-2">
+                        <h5 class="mb-1" th:text="${phong.tenPhong}"></h5>
+                        <p class="mb-0" th:text="'Giá: ' + ${phong.loaiPhong.gia}"></p>
+                    </div>
+                </div>
+
+                <!-- Các thuộc tính khác được đưa ra ngoài ảnh -->
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <p class="card-text"><strong>Số Người Tối Đa: </strong><span th:text="${phong.loaiPhong.getSoNguoiToiDa()}"></span></p>
+                    </div>
+                    <div class="col-6">
+                        <p class="card-text"><strong>Diện Tích: </strong><span th:text="${phong.loaiPhong.dienTich.tenDienTich}"></span></p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <p class="card-text"><strong>Tầng: </strong><span th:text="${phong.loaiPhong.tang.tenTang}"></span></p>
+                    </div>
+                    <div class="col-6">
+                        <p class="card-text"><strong>Mã: </strong><span th:text="${phong.maPhong}"></span></p>
+                    </div>
+                </div>
+
+                <!-- Mô Tả -->
+                <p class="card-text"><strong>Mô Tả: </strong><span th:text="${phong.moTa}"></span></p>
+                <a th:href="@{/view-dat-phong(roomId=${phong.idPhong})}">
+                    <button class="btn btn-success">Đặt phòng</button>
+                </a>
+
+                <!-- Tình Trạng -->
+                <!--                <p class="card-text"><strong>Tình Trạng: </strong><span th:text="${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></span></p>-->
+
+            </div>
+        </div>
+    </div>
 </div>
 
 <!--Vùng để load phòng-->

@@ -8,10 +8,13 @@ import com.example.DuAnTotNghiepKs.service.PhongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +49,24 @@ public class KhachHangDD {
         return ResponseEntity.ok(objects);
     }
 
+    @GetMapping("/searchh")
+    public String searchPhong(@RequestParam("ngayNhan") String ngayNhanStr,
+                              @RequestParam("ngayTra") String ngayTraStr,
+                              @RequestParam("soLuongNguoi") Integer soLuongNguoi,
+                              Model model) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDateTime ngayNhan = LocalDateTime.parse(ngayNhanStr, formatter);
+        LocalDateTime ngayTra = LocalDateTime.parse(ngayTraStr, formatter);
 
+        // Validate ngày trả không được trước ngày nhận
+        if (ngayTra.isBefore(ngayNhan)) {
+            model.addAttribute("error", "Ngày trả không được trước ngày nhận.");
+            return "list/KhachHang/khachHang"; // View hiển thị lỗi
+        }
+        List<Phong> phongs = phongService.searchPhongs(ngayNhan, ngayTra, soLuongNguoi);
+        model.addAttribute("phongs", phongs);
+        return "list/KhachHang/khachHang"; // Tên của view hiển thị danh sách phòng
+    }
 
     @GetMapping("/phong-theo-loai")
     public ResponseEntity<List<PhongDTO>> getRoomsByRoomType(@RequestParam(value = "loaiPhongId", required = false) Integer loaiPhongId) {
@@ -70,6 +90,11 @@ public class KhachHangDD {
     @GetMapping("/hangphongdetail")
     public String showRoomDetailPage() {
         return "List/KhachHang/hangphongdetail";
+    }
+
+    // Phương thức tìm kiếm phòng theo ngày và số lượng người
+    public List<Phong> searchPhongs(LocalDateTime ngayNhan, LocalDateTime ngayTra, Integer soLuongNguoi) {
+        return phongRepo.findAvailablePhongs(ngayNhan, ngayTra, soLuongNguoi);
     }
 
 

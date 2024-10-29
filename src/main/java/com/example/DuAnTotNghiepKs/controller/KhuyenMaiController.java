@@ -1,6 +1,8 @@
 package com.example.DuAnTotNghiepKs.controller;
 
+import com.example.DuAnTotNghiepKs.DTO.KhuyenMaiDTO;
 import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
+import com.example.DuAnTotNghiepKs.repository.KhuyenMaiRepo;
 import com.example.DuAnTotNghiepKs.service.KhachHangService;
 import com.example.DuAnTotNghiepKs.service.KhuyenMaiService;
 import jakarta.servlet.ServletRequest;
@@ -33,8 +35,8 @@ public class KhuyenMaiController {
     @Autowired
     private KhachHangService khachHangService;
 
-//    @Autowired
-//    private KhuyenMaiRepo khuyenMaiRepo;
+    @Autowired
+    private KhuyenMaiRepo khuyenMaiRepo;
 
     @GetMapping()
     public String showKhuyenMaiPage(
@@ -328,22 +330,30 @@ public class KhuyenMaiController {
 //    }
 
     @GetMapping("/search")
-    public String searchKhuyenMai(
+    @ResponseBody
+    public Page<KhuyenMaiDTO> search(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
-            @RequestParam(value = "trangThai") String trangThai,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "5") int size,
-            Model model) {
+            @RequestParam(value = "trangThai", required = false) String trangThai,
+            @RequestParam(value = "size", defaultValue = "5") int size) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "ngayKetThuc"));
-        Page<KhuyenMai> khuyenMaiPage = khuyenMaiService.searchKhuyenMai(keyword, trangThai, page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<KhuyenMai> khuyenMaiPage = khuyenMaiRepo.searchKhuyenmai1(keyword, trangThai, pageable);
 
-        model.addAttribute("khuyenMaiPage", khuyenMaiPage);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("trangThai", trangThai);
-
-        return "list/QuanLyKhuyenMai/KhuyenMai";
+        return khuyenMaiPage.map(this::convertToKhuyenMaiDTO);
     }
+
+    private KhuyenMaiDTO convertToKhuyenMaiDTO(KhuyenMai khuyenMai) {
+        return new KhuyenMaiDTO(
+                khuyenMai.getIdKhuyenMai(),
+                khuyenMai.getMaKhuyenMai(),
+                khuyenMai.getTenKhuyenMai(),
+                khuyenMai.getMoTa(),
+                khuyenMai.getTrangThai()
+        );
+    }
+
+
 
 
 

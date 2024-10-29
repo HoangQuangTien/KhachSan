@@ -32,7 +32,7 @@ import java.util.Set;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = { "/api", "/login","khach-hang",
+    private final String[] PUBLIC_ENDPOINTS = { "/api", "/login","khach-hang","searchh","view-dat-phong","dat-phong",
             "/load-phong","/img/**","/css/**","/js/**","lien-he","hangphongdetail","phong-theo-loai"};
     private final String[] ADMIN_ENDPOINTS= {"/thongke"};
     private final String[] EMPLOYEE_ENDPOINTS = {"/"};

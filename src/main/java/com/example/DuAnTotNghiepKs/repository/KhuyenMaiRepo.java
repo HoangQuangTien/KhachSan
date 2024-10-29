@@ -43,4 +43,9 @@ public interface KhuyenMaiRepo extends JpaRepository<KhuyenMai,Integer> {
             "AND trang_thai = N'Còn Hạn'", nativeQuery = true)
     List<KhuyenMai> findAllActiveVouchers(@Param("today") Date today);
 
+    @Query("SELECT km FROM KhuyenMai km " +
+            "WHERE (:keyword IS NULL OR :keyword = '' OR km.maKhuyenMai LIKE %:keyword% OR km.tenKhuyenMai LIKE %:keyword% OR km.moTa LIKE %:keyword%) " +
+            "AND (:trangThai IS NULL OR :trangThai = '' OR km.trangThai = :trangThai)")
+    Page<KhuyenMai> searchKhuyenmai1(@Param("keyword") String keyword, @Param("trangThai") String trangThai, Pageable pageable);
+
 }

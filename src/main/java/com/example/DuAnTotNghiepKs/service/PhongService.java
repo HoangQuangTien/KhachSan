@@ -197,5 +197,11 @@ public class PhongService {
     public List<Phong> getAvailableRoomsForEdit(Integer currentRoomId, LocalDateTime startDate, LocalDateTime endDate) {
         return phongRepository.findAvailableRoomsForTimeRange(currentRoomId, startDate, endDate);
     }
+
+    // tìm kiếm phòng theo ngày ,số lượng người
+    public List<Phong> searchPhongs(LocalDateTime ngayNhan, LocalDateTime ngayTra, Integer soLuongNguoi) {
+        return phongRepository.findAvailablePhongs(ngayNhan, ngayTra, soLuongNguoi);
+    }
+
 }
 

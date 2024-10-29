@@ -59,6 +59,14 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
                                                @Param("startDate") LocalDateTime startDate,
                                                @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT p FROM Phong p WHERE p.trangThai = true AND p.idPhong NOT IN (" +
+            "SELECT dp.phong.idPhong FROM DatPhong dp WHERE " +
+            "((dp.ngayCheckIn <= :ngayTra AND dp.ngayTra >= :ngayNhan))" +
+            ") AND p.loaiPhong.soNguoiToiDa = :soLuongNguoi")
+    List<Phong> findAvailablePhongs(@Param("ngayNhan") LocalDateTime ngayNhan,
+                                    @Param("ngayTra") LocalDateTime ngayTra,
+                                    @Param("soLuongNguoi") Integer soLuongNguoi);
+
 
 }
 
