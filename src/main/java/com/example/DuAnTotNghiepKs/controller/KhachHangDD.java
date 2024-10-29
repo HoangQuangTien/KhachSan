@@ -49,6 +49,11 @@ public class KhachHangDD {
         return ResponseEntity.ok(objects);
     }
 
+    @GetMapping("/about")
+    public String gioiThieu(){
+        return "list/KhachHang/gioiThieu";
+    }
+
     @GetMapping("/searchh")
     public String searchPhong(@RequestParam("ngayNhan") String ngayNhanStr,
                               @RequestParam("ngayTra") String ngayTraStr,
