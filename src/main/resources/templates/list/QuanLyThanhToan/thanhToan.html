@@ -338,7 +338,7 @@
                                             th:value="${voucher.idKhuyenMai}"
                                             th:data-muc-giam="${voucher.giamGia}"
                                             th:data-so-luong="${voucher.soLuong}"
-                                            th:data-loai-giam="${voucher.loaiGiam ? 'true' : 'false'}"
+                                            th:data-loai-giam="${voucher.loaiGiam ? 1 : 0}"
                                             th:text="${voucher.maKhuyenMai} + ' - ' + ${voucher.tenKhuyenMai}"></option>
                                 </select>
                             </div>

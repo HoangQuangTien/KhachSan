@@ -57,60 +57,6 @@ public class KhuyenMaiController {
         return "list/QuanLyKhuyenMai/KhuyenMai";
     }
 
-//    @GetMapping()
-//    public String showKhuyenMaiPage(Model model) {
-//        List<KhuyenMai> khuyenMais = khuyenMaiService.getAllKhuyenMai();
-//        model.addAttribute("khuyenMais",khuyenMais);
-//        return "khuyenmai";
-//    }
-
-//    @GetMapping
-//    public List<KhuyenMai> getAllKhuyenMai() {
-//        return khuyenMaiService.getAllKhuyenMai();
-//
-//    }
-
-//    @GetMapping("/view-add")
-//    public String  showAdd(Model model) {
-//        model.addAttribute("khuyenMai", new KhuyenMai());
-//        return "list/QuanLyKhuyenMai/add";
-//
-//    }
-
-//    @PostMapping("/add")
-//    public String addKhuyenMai(@ModelAttribute @Valid KhuyenMai khuyenMai, BindingResult result) {
-//
-//
-//        // Ngày hiện tại
-//        LocalDate today = LocalDate.now();
-//        LocalDate ngayBatDau = khuyenMai.getNgayBatDau() != null ?
-//                khuyenMai.getNgayBatDau().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null;
-//        LocalDate ngayKetThuc = khuyenMai.getNgayKetThuc() != null ?
-//                khuyenMai.getNgayKetThuc().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null;
-//
-//        // Kiểm tra ngày bắt đầu phải lớn hơn ngày hiện tại
-//        if (ngayBatDau != null && ngayBatDau.isBefore(today)) {
-//            result.rejectValue("ngayBatDau", "error.khuyenMai", "Ngày bắt đầu phải lớn hơn ngày hiện tại");
-//        }
-//
-//        // Kiểm tra ngày kết thúc phải lớn hơn ngày bắt đầu
-//        if (ngayKetThuc != null && ngayBatDau != null && ngayKetThuc.isBefore(ngayBatDau)) {
-//            result.rejectValue("ngayKetThuc", "error.khuyenMai", "Ngày kết thúc phải lớn hơn ngày bắt đầu");
-//        }
-//
-//        if (result.hasErrors()) {
-//            return "redirect:/admin/quan-ly-khuyen-mai";
-//        }
-//        if (khuyenMaiService.existsByMaKhuyenMai(khuyenMai.getMaKhuyenMai())) {
-//            result.rejectValue("maKhuyenMai", "error.khuyenMai", "Mã khuyến mãi đã tồn tại");
-//            return "redirect:/admin/quan-ly-khuyen-mai";
-//        }
-//        khuyenMai.getMaKhuyenMai();
-//        khuyenMaiService.saveKhuyenMai(khuyenMai);
-//        return "redirect:/admin/quan-ly-khuyen-mai";
-//    }
-
-
 
     @PostMapping("/add")
     public ResponseEntity<?> save(

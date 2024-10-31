@@ -272,7 +272,7 @@ public class DatPhongController {
                 // Kiểm tra khoảng thời gian giữa các lần đặt phòng
                 for (DatPhong existingBooking : existingBookings) {
                     // Kiểm tra nếu trạng thái của đặt phòng không phải "Đã Hủy"
-                    if (!existingBooking.getTinhTrang().equals("Đã Hủy")) {
+                    if (!existingBooking.getTinhTrang().equals("Đã Hủy") && !existingBooking.getTrangThai()) {
                         LocalDateTime existingNgayTra = existingBooking.getNgayTra();
                         long existingNgayTraMillis = existingNgayTra.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
                         long ngayNhanMillis = ngayNhan.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
