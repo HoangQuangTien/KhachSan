@@ -769,6 +769,7 @@
         });
     }
 
+    let selectedCard= null
 
     // Hàm này điền dữ liệu vào các input fields trong form
     function showForm(idDatPhong, idPhong, idLoaiPhong, hoVaTen,
@@ -805,6 +806,9 @@
 
         // Thêm lớp 'bg-light' vào thẻ card đang được click
         cardElement.classList.add('bg-light');
+
+        // Lưu trữ thông tin thẻ phòng đã chọn
+        selectedCard = cardElement;
 
         console.log("Giá Phòng:", giaPhong); // Đây là giá phòng bạn cần lấy
 
@@ -888,6 +892,15 @@
             }
         }
 
+        if (!selectedCard) {
+            // Hiển thị thông báo nếu chưa chọn phòng
+            Swal.fire({
+                icon: 'warning',
+                title: 'Chưa chọn phòng!',
+                text: 'Vui lòng chọn phòng trước khi thanh toán.',
+                confirmButtonText: 'OK'
+            });
+        }else {
         // Nếu tất cả các điều kiện đều hợp lệ, hiển thị thông báo thành công
         Swal.fire({
             title: 'Thành công!',
@@ -926,6 +939,7 @@
             // Gửi form sau khi nhấn OK
             document.getElementById("formId").submit();
         });
+        }
     }
 
 

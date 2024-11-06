@@ -33,6 +33,9 @@ public class TaiKhoan {
     @OneToOne(mappedBy = "taiKhoan", cascade = CascadeType.ALL)
     private NhanVien nhanVien; // Đảm bảo thuộc tính này có mặt
 
+    @OneToOne(mappedBy = "taiKhoan",cascade = CascadeType.ALL)
+    private KhachHang khachHang;
+
     @OneToMany(mappedBy = "taiKhoan",fetch = FetchType.EAGER)
     private Set<ChiTietVaiTro> chiTietVaiTros;
 }

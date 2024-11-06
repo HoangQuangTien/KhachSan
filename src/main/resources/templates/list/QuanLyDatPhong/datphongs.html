@@ -653,45 +653,61 @@
                 console.log(`${key}: ${value}`);
             }
 
-            fetch('/datphongs/create', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => Promise.reject(err));
-                    }
-                    return response.json();
-                })
-                .then(result => {
-                    if (result.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Đặt phòng thành công!',
-                            text: result.success,
-                            showConfirmButton: true
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Lỗi!',
-                            text: result.error,
-                            showConfirmButton: true
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi khi gửi yêu cầu đặt phòng:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Lỗi!',
-                        text: 'Đã xảy ra lỗi khi gửi yêu cầu đặt phòng. Vui lòng thử lại sau.',
-                        showConfirmButton: true
-                    });
-                });
+            Swal.fire({
+                title: 'Bạn chắc chắn muốn đặt phòng chứ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
+            }).then((swalResult) => {
+                if (swalResult.isConfirmed) {
+                    // Nếu người dùng chọn "Có", gửi yêu cầu đặt phòng
+                    const formElement = document.getElementById('datPhongForm');
+                    const formData = new FormData(formElement);
 
+                    fetch('/datphongs/create', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => Promise.reject(err));
+                            }
+                            return response.json();
+                        })
+                        .then(result => {
+                            if (result.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đặt phòng thành công!',
+                                    text: result.success,
+                                    showConfirmButton: true
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi!',
+                                    text: result.error,
+                                    showConfirmButton: true
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi gửi yêu cầu đặt phòng:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: 'Đã xảy ra lỗi khi gửi yêu cầu đặt phòng. Vui lòng thử lại sau.',
+                                showConfirmButton: true
+                            });
+                        });
+                } else if (swalResult.isDismissed) {
+                    // Người dùng chọn "Không", không thực hiện hành động nào
+                    console.log('Người dùng đã hủy hành động đặt phòng.');
+                }
+            });
             event.preventDefault(); // Ngăn submit form để gửi dữ liệu bằng fetch
         });
 

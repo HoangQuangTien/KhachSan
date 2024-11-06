@@ -24,6 +24,8 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -32,9 +34,9 @@ import java.util.Set;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = { "/api", "/login","khach-hang","searchh","view-dat-phong","dat-phong","about",
-            "/load-phong","/img/**","/css/**","/js/**","/assetsKhachHang/**","lien-he","hangphongdetail","phong-theo-loai"};
-    private final String[] ADMIN_ENDPOINTS= {"/thongke"};
+    private final String[] PUBLIC_ENDPOINTS = {"/api", "/login", "khach-hang", "searchh", "view-dat-phong", "dat-phong", "about",
+            "/load-phong", "/img/**", "/css/**", "/js/**", "/assetsKhachHang/**", "lien-he", "hangphongdetail", "phong-theo-loai"};
+    private final String[] ADMIN_ENDPOINTS = {"/thongke"};
     private final String[] EMPLOYEE_ENDPOINTS = {"/"};
 
 
@@ -92,9 +94,6 @@ public class SecurityConfig {
     }
 
 
-
-
-
     @Bean
     public UserDetailsService userDetailsService(TaiKhoanService taiKhoanService) {
         return tenDangNhap -> {
@@ -133,10 +132,6 @@ public class SecurityConfig {
     }
 
 
-
-
-
-
     @Bean
     public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -146,10 +141,24 @@ public class SecurityConfig {
     }
 
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         //dùng để mã hóa mật khẩu
         return new BCryptPasswordEncoder(8);
     }
+
+
+    @Configuration
+    public class WebConfig implements WebMvcConfigurer {
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping("/**")
+                    .allowedOrigins("http://localhost:8080")
+                    .allowedHeaders("*")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowCredentials(true);
+        }
+
+    }
+
 }

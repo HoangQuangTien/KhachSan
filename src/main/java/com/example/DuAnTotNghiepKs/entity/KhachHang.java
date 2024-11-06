@@ -64,6 +64,9 @@ public class KhachHang {
     @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DatPhong> datPhongs = new HashSet<>();
 
+    @OneToOne
+    @JoinColumn(name = "ten_dang_nhap") // Tên cột khóa ngoại trong bảng KhachHang
+    private TaiKhoan taiKhoan;
 
 //    @OneToMany(mappedBy = "datPhong", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private Set<ChiTietDatPhong> chiTietDatPhongs = new HashSet<>();

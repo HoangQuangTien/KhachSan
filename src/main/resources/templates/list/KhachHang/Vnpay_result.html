@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KẾT QUẢ THANH TOÁN</title>
+    <!-- Bootstrap core CSS -->
+    <link href="/assets/assets1/bootstrap.min.css" rel="stylesheet"/>
+    <!-- Custom styles for this template -->
+    <link href="/assets/assets1/jumbotron-narrow.css" rel="stylesheet">
+    <script src="/assets/assets1/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header clearfix">
+        <h3 class="text-muted">KẾT QUẢ THANH TOÁN</h3>
+    </div>
+    <div class="table-responsive">
+        <div class="form-group">
+            <label>Mã giao dịch thanh toán:</label>
+            <label th:text="${vnp_TxnRef}"></label>
+        </div>
+        <div class="form-group">
+            <label>Số tiền:</label>
+            <label th:text="${vnp_Amount}"></label>
+        </div>
+        <div class="form-group">
+            <label>Mô tả giao dịch:</label>
+            <label th:text="${vnp_OrderInfo}"></label>
+        </div>
+        <div class="form-group">
+            <label>Mã lỗi thanh toán:</label>
+            <label th:text="${vnp_ResponseCode}"></label>
+        </div>
+        <div class="form-group">
+            <label>Mã giao dịch tại CTT VNPAY-QR:</label>
+            <label th:text="${vnp_TransactionNo}"></label>
+        </div>
+        <div class="form-group">
+            <label>Mã ngân hàng thanh toán:</label>
+            <label th:text="${vnp_BankCode}"></label>
+        </div>
+        <div class="form-group">
+            <label>Thời gian thanh toán:</label>
+            <label th:text="${vnp_PayDate}"></label>
+        </div>
+        <div class="form-group">
+            <label>Tình trạng giao dịch:</label>
+            <label>
+                <span th:if="${isValidSignature}">
+                    <span th:text="${vnp_TransactionStatus == '00' ? 'Thành công' : 'Không thành công'}"></span>
+                </span>
+                <span th:unless="${isValidSignature}">
+                    Chữ ký không hợp lệ
+                </span>
+            </label>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; VNPAY 2020</p>
+    </footer>
+</div>
+</body>
+</html>
+
+Vnpay_ipn.html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán VNPAY</title>
+    <link rel="stylesheet" href="/assets/assets1/bootstrap.min.css">
+    <script src="/assets/assets1/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Xử Lý Thanh Toán</h1>
+    <div id="response-message"></div>
+</div>
+
+<script>
+    // Hàm xử lý phản hồi từ VNPAY
+    function handleVNPAYResponse(response) {
+        let message;
+        switch (response.RspCode) {
+            case "00":
+                message = "Xác nhận thanh toán thành công.";
+                break;
+            case "01":
+                message = "Đơn hàng không tồn tại.";
+                break;
+            case "02":
+                message = "Đơn hàng đã được xác nhận.";
+                break;
+            case "04":
+                message = "Số tiền không hợp lệ.";
+                break;
+            case "97":
+                message = "Sai checksum.";
+                break;
+            default:
+                message = "Có lỗi xảy ra.";
+        }
+        document.getElementById('response-message').innerHTML = message;
+    }
+
+    // Giả lập phản hồi từ VNPAY
+    const mockResponse = {
+        RspCode: "00", // Thay đổi giá trị này để kiểm tra các trường hợp khác
+        Message: "Confirm Success"
+    };
+
+    // Gọi hàm xử lý với phản hồi giả lập
+    handleVNPAYResponse(mockResponse);
+</script>
+</body>
+</html>
+

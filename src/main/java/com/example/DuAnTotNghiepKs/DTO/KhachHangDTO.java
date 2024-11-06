@@ -40,5 +40,20 @@ public class KhachHangDTO {
     private String trangThai;
     private List<DiaChiKhachHangDTO> diaChi; // Danh sách địa chỉ
 
+    private String tenDangNhap;
+    private String matKhau;
 
+    public KhachHangDTO(Integer id, String maKhachHang, String hoVaTen, String email, boolean gioiTinh, String soDienThoai, LocalDateTime createdAt, LocalDateTime updatedAt, Boolean deletedAt, String tenDangNhap, String matKhau) {
+        this.id = id;
+        this.maKhachHang = maKhachHang;
+        this.hoVaTen = hoVaTen;
+        this.email = email;
+        this.gioiTinh = gioiTinh;
+        this.soDienThoai = soDienThoai;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.deletedAt = deletedAt;
+        this.tenDangNhap = tenDangNhap;
+        this.matKhau = matKhau;
+    }
 }

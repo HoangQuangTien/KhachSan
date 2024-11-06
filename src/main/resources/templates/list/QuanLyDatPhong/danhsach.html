@@ -81,11 +81,13 @@
         <table>
             <thead>
             <tr>
-                <th>Mã Đặt Phòng</th>
+<!--                <th>Mã Đặt Phòng</th>-->
                 <th>Khách Hàng</th>
                 <th>Số Điện Thoại</th>
                 <th>Phòng</th>
+                <th>CCCD</th>
                 <th>Ngày Nhận</th>
+
                 <th>Ngày Trả</th>
                 <th>Hành Động</th>
             </tr>
@@ -93,10 +95,11 @@
             <tbody>
             <!-- Duyệt qua danh sách đặt phòng và hiển thị -->
             <tr th:each="datPhong : ${datPhongs}" th:id="'datPhong-' + ${datPhong.idDatPhong}">
-                <td th:text="${datPhong.maDatPhong}"></td>
+<!--                <td th:text="${datPhong.maDatPhong}"></td>-->
                 <td th:text="${datPhong.khachHang.hoVaTen}"></td>
                 <td th:text="${datPhong.khachHang.soDienThoai}"></td>
                 <td th:text="${datPhong.phong.tenPhong}"></td>
+                <td th:text="${datPhong.cccd}"></td>
                 <td th:text="${datPhong.ngayNhan}"></td>
                 <td th:text="${datPhong.ngayTra}"></td>
 
