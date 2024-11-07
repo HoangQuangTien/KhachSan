@@ -312,23 +312,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const signUpButton = document.getElementById('signUp');
-        const signInButton = document.getElementById('signIn');
-        const container = document.getElementById('container');
+    const signUpButton = document.getElementById('signUp');
+    const signInButton = document.getElementById('signIn');
+    const container = document.getElementById('container');
 
-        // Chuyển sang màn hình đăng nhập
-        signInButton.addEventListener('click', () => {
-            console.log("Sign In button clicked");
-            container.classList.add("right-panel-active");
-        });
+    signUpButton.addEventListener('click', () => {
+        container.classList.add("right-panel-active");
+    });
 
-// Chuyển sang màn hình đăng ký
-        signUpButton.addEventListener('click', () => {
-            console.log("Sign Up button clicked");
-            container.classList.remove("right-panel-active");
-        });
-
+    signInButton.addEventListener('click', () => {
+        container.classList.remove("right-panel-active");
     });
 
 
