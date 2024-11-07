@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán VNPAY</title>
+    <link rel="stylesheet" href="/assets/assets1/bootstrap.min.css">
+    <script src="/assets/assets1/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Xử Lý Thanh Toán</h1>
+    <div id="response-message"></div>
+</div>
+
+<script>
+    // Hàm xử lý phản hồi từ VNPAY
+    function handleVNPAYResponse(response) {
+        let message;
+        switch (response.RspCode) {
+            case "00":
+                message = "Xác nhận thanh toán thành công.";
+                break;
+            case "01":
+                message = "Đơn hàng không tồn tại.";
+                break;
+            case "02":
+                message = "Đơn hàng đã được xác nhận.";
+                break;
+            case "04":
+                message = "Số tiền không hợp lệ.";
+                break;
+            case "97":
+                message = "Sai checksum.";
+                break;
+            default:
+                message = "Có lỗi xảy ra.";
+        }
+        document.getElementById('response-message').innerHTML = message;
+    }
+
+    // Giả lập phản hồi từ VNPAY
+    const mockResponse = {
+        RspCode: "00", // Thay đổi giá trị này để kiểm tra các trường hợp khác
+        Message: "Confirm Success"
+    };
+
+    // Gọi hàm xử lý với phản hồi giả lập
+    handleVNPAYResponse(mockResponse);
+</script>
+</body>
+</html>

@@ -38,14 +38,17 @@ public interface KhuyenMaiRepo extends JpaRepository<KhuyenMai,Integer> {
 
     List<KhuyenMai> findByTrangThai(String trangThai);
 
+
     @Query(value = "SELECT * FROM KhuyenMai \n" +
             "WHERE ngay_ket_thuc >= '2024-10-28' \n" +
             "AND trang_thai = N'Còn Hạn'", nativeQuery = true)
     List<KhuyenMai> findAllActiveVouchers(@Param("today") Date today);
 
-    @Query("SELECT km FROM KhuyenMai km " +
-            "WHERE (:keyword IS NULL OR :keyword = '' OR km.maKhuyenMai LIKE %:keyword% OR km.tenKhuyenMai LIKE %:keyword% OR km.moTa LIKE %:keyword%) " +
-            "AND (:trangThai IS NULL OR :trangThai = '' OR km.trangThai = :trangThai)")
-    Page<KhuyenMai> searchKhuyenmai1(@Param("keyword") String keyword, @Param("trangThai") String trangThai, Pageable pageable);
+//    @Query("SELECT km FROM KhuyenMai km " +
+//            "WHERE (:keyword IS NULL OR :keyword = '' OR km.maKhuyenMai LIKE %:keyword% OR km.tenKhuyenMai LIKE %:keyword% OR km.moTa LIKE %:keyword%) " +
+//            "AND (:trangThai IS NULL OR :trangThai = '' OR km.trangThai = :trangThai)")
+//    Page<KhuyenMai> searchKhuyenmai1(@Param("keyword") String keyword, @Param("trangThai") String trangThai, Pageable pageable);
 
+
+    Page<KhuyenMai> findByMaKhuyenMaiContainingOrTenKhuyenMaiContainingAndTrangThai(String maKhuyenMai, String tenKhuyenMai, String trangThai, Pageable pageable);
 }

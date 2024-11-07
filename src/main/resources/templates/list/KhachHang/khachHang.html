@@ -347,6 +347,63 @@
     <div id="top-rooms-list" class="row"></div>
 </div>
 
+<!-- Form Danh sách phòng đã chọn -->
+<div id="chosen-rooms-container" class="mt-4" style="max-width: 300px; max-height: 400px; overflow-y: auto; border: 1px solid #ccc; border-radius: 8px; padding: 15px;">
+    <h5>Phòng đã chọn:</h5>
+    <ul id="chosen-rooms" class="list-group">
+        <!-- Các phòng đã chọn sẽ được hiển thị tại đây -->
+    </ul>
+    <div class="d-flex justify-content-end mt-3">
+        <button id="book-button" class="btn btn-success" onclick="bookSelectedRooms()">Đặt phòng</button>
+    </div>
+</div>
+
+<h4 class="text-center mb-4">Danh sách phòng trống (<span th:text="${phongTrong.size()}"></span>)</h4>
+
+<!-- Danh sách phòng trống -->
+<div class="row justify-content-center">
+    <div th:each="phong : ${phongTrong}" class="col-lg-3 col-md-4 col-sm-6 mb-4">
+        <div class="card shadow h-100" th:classappend="${phong.trangThai} ? 'border-success' : 'border-danger'">
+            <!-- Image Section -->
+            <div class="card-img-top">
+                <img th:src="${phong.img}" class="card-img" alt="Ảnh phòng của ${phong.tenPhong}" style="object-fit: cover; height: 200px;">
+            </div>
+
+            <!-- Information Section -->
+            <div class="card-body d-flex flex-column justify-content-between p-2 text-white bg-dark">
+                <!-- Tên phòng -->
+                <h5 class="card-title text-truncate" th:text="${phong.tenPhong}" style="font-size: 1.1rem;"></h5>
+
+                <!-- Giá -->
+                <p class="card-text mb-1" style="font-size: 0.9rem;">
+                    <strong>Giá:</strong>
+                    <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> VND
+                </p>
+
+                <!-- Số giường và số người tối đa -->
+                <div class="d-flex justify-content-between mb-1" style="font-size: 0.9rem;">
+                    <p class="card-text mb-0 " style="font-size: 0.9rem;"><strong>Số Giường:</strong> <span th:text="${phong.loaiPhong.soLuongGiuong}"></span></p>
+                    <p class="card-text mb-0" style="font-size: 0.9rem;"><strong>Số Người Tối Đa:</strong> <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span></p>
+                </div>
+
+                <!-- Mô tả phòng -->
+                <p class="card-text mb-1" style="font-size: 0.9rem;"><strong>Mô Tả:</strong> <span th:text="${phong.moTa}"></span></p>
+
+                <!-- Checkbox để chọn phòng -->
+                <div class="form-check mt-2" style="font-size: 0.9rem;">
+                    <input type="checkbox" class="form-check-input" th:id="'select-' + ${phong.idPhong}" th:value="${phong.idPhong}"
+                           th:attr="data-room-name=${phong.tenPhong},data-room-price=${phong.loaiPhong.gia}" onchange="toggleRoomSelection(this)">
+                    <label class="form-check-label" th:for="'select-' + ${phong.idPhong}">Chọn phòng</label>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
 
 <footer class="bg-dark text-white py-4 mt-2">
     <div class="container">
@@ -658,6 +715,62 @@
         });
     });
 
+
+
+
+    let selectedRoomIds = [];
+
+    function toggleRoomSelection(checkbox) {
+        const roomId = checkbox.value;
+        const roomName = checkbox.getAttribute('data-room-name');
+        const roomPrice = checkbox.getAttribute('data-room-price');
+        const chosenRooms = document.getElementById('chosen-rooms');
+        const chosenRoomsContainer = document.getElementById('chosen-rooms-container');
+
+        if (checkbox.checked) {
+            // Thêm phòng vào danh sách đã chọn
+            selectedRoomIds.push(roomId);
+            const roomItem = document.createElement('div');
+            roomItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            roomItem.id = 'chosen-room-' + roomId;
+            roomItem.innerHTML = `
+                <span><strong>${roomName}</strong> - ${roomPrice} VND</span>
+                <button class="btn btn-danger btn-sm" onclick="removeRoom('${roomId}')">Xóa</button>
+            `;
+            chosenRooms.appendChild(roomItem);
+
+            // Hiện form danh sách phòng đã chọn nếu có phòng được chọn
+            chosenRoomsContainer.style.display = 'block';
+        } else {
+            // Xóa phòng khỏi danh sách đã chọn
+            removeRoom(roomId);
+        }
+    }
+
+    function removeRoom(roomId) {
+        // Loại bỏ phòng khỏi danh sách selectedRoomIds
+        selectedRoomIds = selectedRoomIds.filter(id => id !== roomId);
+        const roomItem = document.getElementById('chosen-room-' + roomId);
+        const checkbox = document.getElementById('select-' + roomId);
+        if (roomItem) roomItem.remove();
+        if (checkbox) checkbox.checked = false; // Bỏ chọn checkbox khi xóa phòng
+
+        // Ẩn form danh sách phòng đã chọn nếu không còn phòng nào
+        if (selectedRoomIds.length === 0) {
+            document.getElementById('chosen-rooms-container').style.display = 'none';
+        }
+    }
+
+    function bookSelectedRooms() {
+        if (selectedRoomIds.length > 0) {
+            // Xây dựng URL với danh sách ID phòng đã chọn
+            const roomIdsParam = selectedRoomIds.join(',');
+            window.location.href = `/view-dat-phong?roomId=${roomIdsParam}`;
+            console.log('idPhong' + roomIdsParam)
+        } else {
+            alert("Vui lòng chọn ít nhất một phòng để đặt!");
+        }
+    }
 
 </script>
 

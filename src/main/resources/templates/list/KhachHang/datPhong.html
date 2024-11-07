@@ -289,13 +289,13 @@
                 <div class="price-container text-center">
                     <p>
                         <span>Chỉ với</span>
-                        <span th:text="${phong.gia} + ' VNĐ'"></span>
+                        <span th:text="${phong.getGiaLoaiPhong()} + ' VNĐ'"></span>
                         <span> cho 1 đêm</span>
                     </p>
                     <input type="hidden" id="pricePerNight" th:value="${phong.gia}" /> <!-- Sửa lại th:value -->
                     <p>
                         <span>Sức chứa tối đa gồm:</span>
-                        <span th:text="${phong.soNguoiToiDa}"></span>
+                        <span th:text="${phong.getSoNguoiToiDa()}"></span>
                         <span>người</span>
                     </p>
                 </div>
@@ -307,27 +307,50 @@
         <form th:action="@{/dat-phong}" method="post" id="idDatPhong">
             <div class="form-group">
                 <label for="checkin">Ngày đến</label>
-                <input type="date" class="form-control" id="checkinDate" name="ngayNhan" required>
+                <input type="datetime-local" class="form-control" id="checkinDate" name="ngayNhan" required>
             </div>
             <div class="form-group">
                 <label for="checkout">Ngày đi</label>
-                <input type="date" class="form-control" id="checkoutDate" name="ngayTra" required>
+                <input type="datetime-local" class="form-control" id="checkoutDate" name="ngayTra" required>
             </div>
             <div class="form-group">
                 <label for="SDT">Căn cước công dân</label>
-                <input type="number" class="form-control" id="SDT" name="cccd" required>
+                <input type="text" class="form-control" id="SDT" name="cccd" required pattern="\d{9}|\d{12}" title="Vui lòng nhập CCCD đúng định dạng (9 hoặc 12 chữ số)">
             </div>
             <div class="form-group">
                 <label for="deposit">Số tiền cọc (80%):</label>
                 <input type="text" class="form-control" id="deposit" name="gia" readonly>
             </div>
-            <input type="text" name="idPhong" th:value="${phong.idPhong}" />
-            <input type="text" name="idLoaiPhong" th:value="${phong.idLoaiPhong}" />
-            <input type="text" name="id" th:value="${idKhachHang}" />
-            <input type="text" name="maDatPhong" />
-            <button type="submit" class="btn btn-warning btn-block">ĐẶT PHÒNG</button>
+<!--            <div class="form-group">-->
+<!--                <label for="amount">Số tiền đặt cọc:</label>-->
+                <input type="hidden" class="form-control" id="amount" name="amount" readonly>
+<!--            </div>-->
+            <div class="form-group">
+                <label for="pay">Phương thức thanh toán</label> <br>
+                <input type="radio" id="pay" name="bankCode" value="VNBANK" checked>
+                <label for="pay" class="text-danger-dark">VnPay</label>
+            </div>
+
+            <div class="form-group">
+                <h5>Chọn ngôn ngữ giao diện thanh toán:</h5>
+                <input type="radio" checked id="language-vn" name="language" value="vn">
+                <label for="language-vn">Tiếng việt</label><br>
+                <input type="radio" id="language-en" name="language" value="en">
+                <label for="language-en">Tiếng anh</label><br>
+            </div>
+
+            <!-- Trường ẩn để gửi idPhong và idLoaiPhong -->
+            <input type="hidden" name="idPhong" th:value="${phong.idPhong}" />
+            <input type="hidden" name="idLoaiPhong" th:value="${phong.idLoaiPhong}" />
+
+            <!-- Hiển thị idKhachHang nếu có -->
+            <input type="hidden" name="idKhachHang" th:value="${idKhachHang}" th:if="${idKhachHang != null}" />
+
+            <button type="submit" class="btn btn-warning btn-block">ĐẶT TRƯỚC</button>
         </form>
     </div>
+
+
 </div>
 
 
@@ -367,77 +390,74 @@
     </div>
 </footer>
 <script>
-    document.getElementById('idDatPhong').addEventListener("submit", function (event) {
-        // Ngăn chặn gửi biểu mẫu để thực hiện kiểm tra
-        event.preventDefault();
 
-        // Lấy các giá trị từ biểu mẫu
-        const checkinDate = document.getElementById('checkinDate').value;
-        const checkoutDate = document.getElementById('checkoutDate').value;
-        const cccd = document.getElementById('SDT').value;
-        const idPhong = document.querySelector('input[name="idPhong"]').value; // Lấy ID phòng từ input
-        const idLoaiPhong = document.querySelector('input[name="idLoaiPhong"]').value; // Lấy ID loại phòng
-        const maDatPhong = document.querySelector('input[name="maDatPhong"]').value; // Lấy mã đặt phòng từ input
+    document.getElementById("idDatPhong").addEventListener("submit", function(event) {
+        event.preventDefault(); // Ngăn chặn việc gửi form mặc định
 
-        // Kiểm tra các giá trị
-        if (!checkinDate || !checkoutDate || !cccd) {
-            alert("Vui lòng điền đầy đủ thông tin.");
+        // Lấy giá trị từ các trường trong form
+        let idLoaiPhong = document.querySelector('input[name="idLoaiPhong"]').value;
+        let idPhong = document.querySelector('input[name="idPhong"]').value;
+        let amount = document.querySelector('input[name="amount"]').value; // Lấy giá trị amount
+        let bankCode = document.querySelector('input[name="bankCode"]:checked') ? document.querySelector('input[name="bankCode"]:checked').value : '';
+
+        // Kiểm tra sự tồn tại của select trước khi lấy giá trị
+        let languageElement = document.querySelector('select[name="language"]');
+        let language = languageElement ? languageElement.value : ''; // Gán giá trị hoặc để trống nếu không tồn tại
+
+        let ngayNhan = document.querySelector('input[name="ngayNhan"]').value;
+        let ngayTra = document.querySelector('input[name="ngayTra"]').value;
+        let cccd = document.querySelector('input[name="cccd"]').value;
+        let idKhachHang = document.querySelector('input[name="idKhachHang"]').value;
+
+        // Kiểm tra nếu các trường quan trọng không rỗng
+        if (!idPhong || !ngayNhan || !ngayTra || !cccd || !idKhachHang) {
+            alert("Các trường ID phòng, ngày nhận, ngày trả, CCCD và ID khách hàng không được để trống!");
             return;
         }
 
-        // Tính toán tiền cọc (giá phòng giả định)
-        const giaPhong = 100000; // Thay đổi giá phòng thực tế
-        const soNgay = (new Date(checkoutDate) - new Date(checkinDate)) / (1000 * 60 * 60 * 24); // Số ngày ở
-
-        // Kiểm tra nếu số ngày <= 0
-        if (soNgay <= 0) {
-            alert("Ngày trả phải lớn hơn ngày nhận.");
-            return;
-        }
-
-        const tienCoc = (giaPhong * soNgay) * 0.8;
-
-        // Cập nhật tiền cọc vào biểu mẫu
-        document.getElementById('deposit').value = tienCoc.toFixed(2);
-
-        // Gửi yêu cầu đặt phòng
+        // Gửi yêu cầu đến API
         fetch('/dat-phong', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: JSON.stringify({
-                idLoaiPhong: [idLoaiPhong], // ID loại phòng
-                idPhong: idPhong, // ID phòng
-                ngayNhan: checkinDate, // Ngày nhận
-                ngayTra: checkoutDate, // Ngày trả
-                cccd: cccd, // CCCD
-                maDatPhong: maDatPhong // Mã đặt phòng
+            body: new URLSearchParams({
+                'idLoaiPhong' : idLoaiPhong,
+                'idPhong': idPhong,
+                'amount': amount,
+                'bankCode': bankCode,
+                'language': language,
+                'ngayNhan': ngayNhan,
+                'ngayTra': ngayTra,
+                'cccd': cccd,
+                'idKhachHang': idKhachHang
             })
         })
             .then(response => {
+                console.log('Response status:', response.status);
                 if (!response.ok) {
-                    throw new Error('Mã lỗi: ' + response.status); // Ném lỗi nếu không thành công
+                    return response.json().then(errData => {
+                        throw new Error('Network response was not ok: ' + errData.message); // Giả sử server trả về message
+                    });
                 }
                 return response.json();
             })
             .then(data => {
-                if (data.redirect) {
-                    // Nếu phản hồi có redirect, chuyển hướng
-                    window.location.href = data.redirect;
-                } else if (data.error) {
-                    // Nếu có lỗi, hiển thị thông báo lỗi
-                    alert(data.error);
-                } else if (data.success) {
-                    // Nếu đặt phòng thành công, hiển thị thông báo thành công
-                    alert(data.success);
+                console.log(data);
+                if (data.code === "00") {
+                    alert('Đặt phòng thành công');
+                    // Có thể thực hiện chuyển hướng đến trang thanh toán hoặc thông báo thành công
+                    window.location.href = data.data; // Nếu có URL chuyển hướng
+                } else {
+                    alert('Lỗi: ' + data.error);
                 }
             })
             .catch(error => {
-                console.error('Có lỗi xảy ra:', error);
-                alert("Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại sau.");
+                alert('Có lỗi xảy ra: ' + error.message);
+                console.error('Error:', error);
             });
     });
+
 
     document.addEventListener('DOMContentLoaded', function () {
         const pricePerNight = parseFloat(document.getElementById('pricePerNight').value); // Lấy giá phòng
@@ -458,17 +478,23 @@
                 if (diffDays > 0) {
                     const totalCost = diffDays * pricePerNight; // Tổng chi phí
                     const depositAmount = totalCost * 0.8; // Tiền cọc (80%)
-
+                    // Cập nhật giá trị vào ô tiền cọc
+                    document.getElementById('amount').value = depositAmount; // Lưu giá trị thôi
                     // Cập nhật giá trị vào ô tiền cọc
                     document.getElementById('deposit').value = depositAmount.toLocaleString('vi-VN') + ' VNĐ';
                 } else {
                     document.getElementById('deposit').value = ''; // Nếu ngày không hợp lệ, xóa giá trị
+                    // Cập nhật giá trị vào ô tiền cọc
+                    document.getElementById('amount').value = ''; // Lưu giá trị thô
                 }
             } else {
                 document.getElementById('deposit').value = ''; // Xóa giá trị nếu chưa có ngày
             }
         }
     });
+
+
+
 </script>
 </body>
 </html>

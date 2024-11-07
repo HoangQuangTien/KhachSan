@@ -15,6 +15,7 @@ public class TaiKhoanDTO {
     private String tenDangNhap;
     private String matKhau;
     private NhanVienDTO nhanVienDTO;
+    private KhachHangDTO khachHangDTO;
     private Set<ChiTietVaiTroDTO> chiTietVaiTros; // Chuyển đổi từ ChiTietVaiTro sang DTO
 
     //tạm thời cho nhân viên
@@ -28,4 +29,7 @@ public class TaiKhoanDTO {
         this.matKhau = matKhau;
         this.chiTietVaiTros = chiTietVaiTros;
     }
+
+
+
 }

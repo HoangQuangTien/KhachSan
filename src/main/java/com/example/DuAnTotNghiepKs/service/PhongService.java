@@ -137,6 +137,7 @@ public class PhongService {
             dto.setIdLoaiPhong(phong.getLoaiPhong().getIdLoaiPhong());
             dto.setTenLoaiPhong(phong.getLoaiPhong().getTenLoaiPhong());
             dto.setGiaLoaiPhong(phong.getLoaiPhong().getGia());
+            dto.setSoNguoiToiDa(phong.getLoaiPhong().getSoNguoiToiDa());
         }
 
         return dto;
@@ -201,6 +202,16 @@ public class PhongService {
     // tìm kiếm phòng theo ngày ,số lượng người
     public List<Phong> searchPhongs(LocalDateTime ngayNhan, LocalDateTime ngayTra, Integer soLuongNguoi) {
         return phongRepository.findAvailablePhongs(ngayNhan, ngayTra, soLuongNguoi);
+    }
+
+
+    public List<Phong> getAllByTrangThai(){
+        boolean trangThai = false;
+        return phongRepository.findByTrangThai(trangThai);
+    }
+
+    public Phong getPhongById1(Integer roomId) {
+        return phongRepository.findById(roomId).orElse(null);
     }
 
 }

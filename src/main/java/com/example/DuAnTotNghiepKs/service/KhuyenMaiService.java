@@ -164,15 +164,29 @@ public class KhuyenMaiService {
         Pageable pageable = PageRequest.of(page, size,sort);
         return khuyenMaiRepository.getAllBy(pageable);
     }
-    public Page<KhuyenMai> searchKhuyenMai(String keyword, String trangThai, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return khuyenMaiRepository.searchKhuyenMai(keyword, keyword, trangThai, pageable);
+    public Page<KhuyenMai> searchKhuyenMai(String keyword, String trangThai, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort); // Tạo pageable với số trang và kích thước
+
+        // Nếu không có từ khóa tìm kiếm
+        if (keyword == null || keyword.isEmpty()) {
+            // Nếu có trạng thái, tìm theo trạng thái
+            if (trangThai != null && !trangThai.isEmpty()) {
+                return (Page<KhuyenMai>) khuyenMaiRepository.findByTrangThai(trangThai);
+            }
+            // Nếu không có trạng thái, trả về tất cả
+            return khuyenMaiRepository.findAll(pageable);
+        }
+
+        // Nếu có từ khóa và trạng thái
+        return khuyenMaiRepository.findByMaKhuyenMaiContainingOrTenKhuyenMaiContainingAndTrangThai(
+                keyword, keyword, trangThai, pageable);
     }
 
 
     public List<KhuyenMai> getAllActiveKhuyenMai() {
         return khuyenMaiRepository.findByTrangThai("Còn hạn"); // "active" có thể thay đổi theo trạng thái thực tế bạn sử dụng
     }
+
 
 
     // Chạy mỗi ngày vào lúc 00:00 để kiểm tra trạng thái khuyến mãi
@@ -243,6 +257,7 @@ public class KhuyenMaiService {
 
         khuyenMaiRepository.saveAll(khuyenMais); // lưu lại tất cả khuyến mãi đã cập nhật
     }
+
 
 
 

@@ -207,21 +207,31 @@
 
 
 
-                <!-- Search -->
-                <div class="form-group"
-                     style="flex-grow: 1; display: flex; align-items: center;">
-                    <label class="mr-2" for="search">Tìm kiếm</label>
-                    <input class="form-control" id="search"
-                           oninput="searchThanhToan(this.value)"
-                           placeholder="Tìm kiếm theo mã hoặc tên" style="flex-grow: 1;"
-                           type="text">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <!-- Tạo nhóm input với icon tìm kiếm -->
+                            <div class="input-group-prepend">
+                <span class="input-group-text bg-primary text-white">
+                    <i class="fas fa-search"></i>
+                </span>
+                            </div>
+                            <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Tìm kiếm" oninput="searchChekin()" aria-label="Tìm kiếm">
+                        </div>
+                        <!-- Thêm text mô tả để người dùng biết họ đang tìm kiếm gì -->
+                        <small id="keywordHelp" class="form-text text-muted">Nhập số điện thoại, CCCD để tìm kiếm thông tin.</small>
+                    </div>
                 </div>
-                <div class="py-4">
+
+                <div id="resultArea">
+                    <!-- Kết quả tìm kiếm sẽ được cập nhật ở đây -->
+                </div>
+                <div class="">
                     <div class="card p-4 shadow-sm">
                         <h4 class="d-flex justify-content-center" style="color:black;">Lịch Sử Thanh Toán</h4>
                         <hr>
                         <!-- Bảng hiển thị lịch sử thanh toán -->
-                        <table class="table table-bordered">
+                        <table class="table table-bordered" id="dataTable-1">
                             <thead class="thead-light">
                             <tr>
                                 <th>Mã</th>
@@ -1163,6 +1173,37 @@
             tableBody.innerHTML += row; // Thêm hàng mới vào bảng
         });
     }
+
+
+    function searchChekin() {
+        var keyword = document.getElementById('keyword').value.trim().toLowerCase(); // Loại bỏ khoảng trắng thừa
+
+        var rows = document.querySelectorAll('#dataTable-1 tbody tr');
+
+        var hasResults = false; // Biến để kiểm tra có kết quả hay không
+
+        rows.forEach(function(row) {
+            var  hoVaTen  = row.cells[3].innerText.toLowerCase();
+            var maThanhToan = row.cells[0].innerText.toLowerCase();
+            var ngayThanhToan = row.cells[1].innerText.toLowerCase();
+            // Kiểm tra xem từ khóa có trong mã đặt phòng hoặc tên khách hàng không
+            if (maThanhToan.includes(keyword) || hoVaTen.includes(keyword) || ngayThanhToan.includes(keyword)) {
+                row.style.display = ''; // Hiện hàng
+                hasResults = true; // Có kết quả
+            } else {
+                row.style.display = 'none'; // Ẩn hàng
+            }
+        });
+
+        // Ẩn toàn bộ bảng nếu không có kết quả
+        var tableCardBody = document.getElementById('tableCardBody');
+        if (hasResults) {
+            tableCardBody.style.display = ''; // Hiện bảng
+        } else {
+            tableCardBody.style.display = 'none'; // Ẩn bảng nếu không có kết quả
+        }
+    }
+
 
 
 </script>

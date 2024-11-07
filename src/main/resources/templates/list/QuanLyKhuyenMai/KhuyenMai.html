@@ -138,384 +138,351 @@
 <main class="main-content" role="main">
     <div class="container-fluid">
         <div class="row justify-content-center">
-            <h2 class="mb-2 page-title">Khuyến Mại</h2>
             <div class="col-12">
+                <h2 class="mb-2 page-title">Quản lý khuyến mãi</h2>
                 <p class="card-text"></p>
-                <div class="row my-4">
-                    <div class="main-container">
-                        <div class="filter-container">
-                            <h3><i class="fa-solid fa-filter" style="color: #000000;"></i> Bộ lọc</h3>
-                            <hr>
-                        <!-- Form tìm kiếm -->
-                        <form th:action="@{/admin/quan-ly-khuyen-mai/search}" method="GET"
-                              class="form-inline my-2 my-lg-0">
-                            <!-- Input tìm kiếm -->
-                            <div class="form-group mr-3">
-                                <input type="text" class="form-controll" name="keyword" placeholder="Tìm kiếm..."/>
-                            </div>
+                <div class="d-flex align-items-center mb-3 p-2 border rounded bg-light">
+                    <!-- Ô tìm kiếm với icon -->
+                    <div class="input-group me-3" style="width: 550px;">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search"></i></span>
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm"
+                               onkeyup="searchKhuyenMai()" class="form-control border-start-0" />
+                    </div>
 
-                            <!-- Radio buttons -->
-                            <div class="form-groupp mr-3">
-                                <label class="mr-2">
-                                    <input type="radio" class="form-check-input" name="trangThai" value="Còn hạn"
-                                           th:checked="${trangThai} == 'Còn hạn'">
-                                    Còn hạn
-                                </label>
-                                <label class="mr-2">
-                                    <input type="radio" class="form-check-input" name="trangThai" value="Sắp diễn ra"
-                                           th:checked="${trangThai} == 'Sắp diễn ra'">
-                                    Sắp diễn ra
-                                </label>
-                                <label>
-                                    <input type="radio" class="form-check-input" name="trangThai" value="Hết hạn"
-                                           th:checked="${trangThai} == 'Hết hạn'">
-                                    Hết hạn
-                                </label>
-                            </div>
+                    <!-- Dropdown trạng thái với icon -->
+                    <div class="input-group" style="width: 350px;">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-filter"></i></span>
+                        <select id="trangThai" name="trangThai" class="form-control border-start-0" onchange="searchKhuyenMai()">
+                            <option value="">Tất cả</option>
+                            <option value="Còn hạn" th:selected="${param.trangThai eq 'Còn hạn'}">Còn hạn</option>
+                            <option value="Sắp diễn ra" th:selected="${param.trangThai eq 'Sắp diễn ra'}">Sắp diễn ra</option>
+                            <option value="Hết hạn" th:selected="${param.trangThai eq 'Hết hạn'}">Hết hạn</option>
+                        </select>
+                    </div>
+                </div>
 
-                            <!-- Nút tìm kiếm -->
-                            <button type="submit" class="btn btn-dark me-1">Tìm kiếm</button>
-                            <button type="reset" class="btn btn-dark">Reset</button>
-                        </form>
 
-                        </div>
-                        <!-- Nút mở modal thêm Khuyen mai -->
-                        <div class="mb-3 d-flex justify-content-end">
-                            <a type="button" class="btn btn-success me-1" data-bs-toggle="modal"
-                                    data-bs-target="#addKhuyenMaiModal">
-                                <i class="fas fa-plus" style="color: #fcfcfc; top: 20px"></i>
-                            </a>
 
-                            <a data-bs-toggle="modal" data-bs-target="#add" class="btn btn-success ">
-                                <i class="fa-regular fa-paper-plane" style="color: #fcfcfc; top: 20px"></i>
-                            </a>
-                        </div>
 
-                        <div class="table-container">
-                            <h3><i class="fa-solid fa-list" style="color: #000000;"></i> Danh sách giảm giá</h3>
 
-                            <!-- Bảng danh sách khuyến mãi -->
-                            <table>
-                                <thead class="table-light">
-                                <tr>
-                                    <th>Mã Khuyến Mãi</th>
-                                    <th>Tên Khuyến Mãi</th>
-                                    <!--                                <th>Mô Tả</th>-->
-                                    <th>Giảm Giá</th>
-<!--                                    <th>Ngày Bắt Đầu</th>-->
-<!--                                    <th>Ngày Kết Thúc</th>-->
-                                    <th>Loại Giảm</th>
-                                    <th>Số Lượng</th>
-                                    <th>Giảm Tối Thiểu</th>
-                                    <th>Giảm Tối Đa</th>
-                                    <th>Trạng Thái</th>
-                                    <th>Hành Động</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="khuyenMai : ${khuyenMaiPage.content}">
-                                    <td th:text="${khuyenMai.maKhuyenMai}">Mã KM</td>
-                                    <td th:text="${khuyenMai.tenKhuyenMai}">Tên KM</td>
-                                    <!--                                <td th:text="${khuyenMai.moTa}">Mô Tả</td>-->
-                                    <td th:text="${khuyenMai.giamGia}">Giảm Giá</td>
-<!--                                    <td th:text="${#dates.format(khuyenMai.ngayBatDau,'dd-MM-yyyy')}">Ngày Bắt Đầu</td>-->
-<!--                                    <td th:text="${#dates.format(khuyenMai.ngayKetThuc,'dd-MM-yyyy')}">Ngày Kết Thúc</td>-->
-                                    <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
-                                    <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
-                                    <td th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
-                                    <td th:text="${khuyenMai.giamToiDa}">Giảm Tối Đa</td>
-                                    <td th:text="${khuyenMai.trangThai}">Trạng Thái</td>
-                                    <td>
-                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
-                                                th:data-idKhuyenMai="${khuyenMai.idKhuyenMai}"
-                                                th:data-maKhuyenMai="${khuyenMai.maKhuyenMai}"
-                                                th:data-tenKhuyenMai="${khuyenMai.tenKhuyenMai}"
-                                                th:data-moTa="${khuyenMai.moTa}"
-                                                th:data-giamGia="${khuyenMai.giamGia}"
-                                                th:data-soLuong="${khuyenMai.soLuong}"
-                                                th:data-giamToiThieu="${khuyenMai.giamToiThieu}"
-                                                th:data-giamToiDa="${khuyenMai.giamToiDa}"
-                                                th:data-ngayBatDau="${#dates.format(khuyenMai.ngayBatDau,'yyyy-MM-dd')}"
-                                                th:data-ngayKetThuc="${#dates.format(khuyenMai.ngayKetThuc,'yyyy-MM-dd')}"
-                                                th:data-loaiGiam="${khuyenMai.loaiGiam ? 'phanTram' : 'tienMat'}"
-                                                th:data-trangThai="${khuyenMai.trangThai == 'conHan' ? 'conHan' :
+                <!-- Nút mở modal thêm Khuyến Mãi -->
+                <div class="mb-3 d-flex justify-content-end">
+                    <a type="button" class="btn btn-success me-1" data-bs-toggle="modal" data-bs-target="#addKhuyenMaiModal">
+                        <i class="fas fa-plus" style="color: #fcfcfc; top: 20px"></i>
+                    </a>
+
+                    <a data-bs-toggle="modal" data-bs-target="#add" class="btn btn-success">
+                        <i class="fa-regular fa-paper-plane" style="color: #fcfcfc; top: 20px"></i>
+                    </a>
+                </div>
+
+                <div class="table-container">
+                    <h3><i class="fa-solid fa-list" style="color: #000000;"></i> Danh sách giảm giá</h3>
+
+                    <!-- Bảng danh sách khuyến mãi -->
+                    <table class="table table-striped table-bordered" id="resultsContainer">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Mã Khuyến Mãi</th>
+                            <th>Tên Khuyến Mãi</th>
+                            <th>Giảm Giá</th>
+                            <th>Loại Giảm</th>
+                            <th>Số Lượng</th>
+                            <th>Giảm Tối Thiểu</th>
+                            <th>Giảm Tối Đa</th>
+                            <th>Trạng Thái</th>
+                            <th>Hành Động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="khuyenMaiTableBody">
+                        <tr th:each="khuyenMai : ${khuyenMaiPage.content}">
+                            <td th:text="${khuyenMai.maKhuyenMai}">Mã KM</td>
+                            <td th:text="${khuyenMai.tenKhuyenMai}">Tên KM</td>
+                            <td th:text="${khuyenMai.giamGia}">Giảm Giá</td>
+                            <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
+                            <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
+                            <td th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
+                            <td th:text="${khuyenMai.giamToiDa}">Giảm Tối Đa</td>
+                            <td th:text="${khuyenMai.trangThai}">Trạng Thái</td>
+                            <td>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
+                                        th:data-idKhuyenMai="${khuyenMai.idKhuyenMai}"
+                                        th:data-maKhuyenMai="${khuyenMai.maKhuyenMai}"
+                                        th:data-tenKhuyenMai="${khuyenMai.tenKhuyenMai}"
+                                        th:data-moTa="${khuyenMai.moTa}"
+                                        th:data-giamGia="${khuyenMai.giamGia}"
+                                        th:data-soLuong="${khuyenMai.soLuong}"
+                                        th:data-giamToiThieu="${khuyenMai.giamToiThieu}"
+                                        th:data-giamToiDa="${khuyenMai.giamToiDa}"
+                                        th:data-ngayBatDau="${#dates.format(khuyenMai.ngayBatDau,'yyyy-MM-dd')}"
+                                        th:data-ngayKetThuc="${#dates.format(khuyenMai.ngayKetThuc,'yyyy-MM-dd')}"
+                                        th:data-loaiGiam="${khuyenMai.loaiGiam ? 'phanTram' : 'tienMat'}"
+                                        th:data-trangThai="${khuyenMai.trangThai == 'conHan' ? 'conHan' :
                                     (khuyenMai.trangThai == 'hetHan' ? 'hetHan' : 'sapDienRa')}"
 
-                                                onclick="setModalData(this)">
-                                            <i class="fas fa-edit"></i> Sửa
-                                        </button>
+                                        onclick="setModalData(this)">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </button>
 
-                                        <br>
-                                        <form th:action="@{/admin/quan-ly-khuyen-mai/delete/{id}(id=${khuyenMai.idKhuyenMai})}"
-                                              method="post" style="display:inline;">
-                                        </form>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            <!-- Phân trang -->
-                            <div class="pagination-container mt-2">
-                                <nav aria-label="Page navigation">
-                                    <ul class="pagination justify-content-center">
-                                        <!-- Trang trước -->
-                                        <li class="page-item" th:classappend="${!khuyenMaiPage.hasPrevious()} ? 'disabled'">
-                                            <a class="page-link" th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number - 1}, size=${khuyenMaiPage.size})}" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
+                                <br>
+                                <form th:action="@{/admin/quan-ly-khuyen-mai/delete/{id}(id=${khuyenMai.idKhuyenMai})}"
+                                      method="post" style="display:inline;">
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                                        <!-- Các trang -->
-                                        <li th:each="pageNum : ${#numbers.sequence(0, khuyenMaiPage.totalPages - 1)}"
-                                            th:classappend="${pageNum == khuyenMaiPage.number} ? 'active'" class="page-item">
-                                            <a class="page-link" th:href="@{/quan-ly-khuyen-mai(page=${pageNum}, size=${khuyenMaiPage.size})}"
-                                               th:text="${pageNum + 1}">1</a>
-                                        </li>
 
-                                        <!-- Trang sau -->
-                                        <li class="page-item" th:classappend="${!khuyenMaiPage.hasNext()} ? 'disabled'">
-                                            <a class="page-link" th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number + 1}, size=${khuyenMaiPage.size})}" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
+
+                <!-- Modal thêm khuyến mãi -->
+                <div class="modal fade" id="addKhuyenMaiModal" tabindex="-1" aria-labelledby="addKhuyenMaiModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addKhuyenMaiModalLabel">Thêm Khuyến Mãi</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
+                            <div class="modal-body">
+                                <div id="error-message" class="alert alert-danger d-none"></div>
+                                <!-- Form thêm khuyến mãi -->
+                                <form th:action="@{/admin/quan-ly-khuyen-mai/add}" method="POST" id="form-add-promotion">
 
-                        </div>
-
-
-                        <!-- Modal thêm khuyến mãi -->
-                        <div class="modal fade addModal" id="addKhuyenMaiModal" tabindex="-1" aria-labelledby="addKhuyenMaiModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="addKhuyenMaiModalLabel">Thêm Khuyến Mãi</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-
-                                    <div class="modal-body">
-                                        <div id="error-message" class="alert alert-danger d-none"></div>
-                                        <form th:action="@{/quan-ly-khuyen-mai/add}" method="POST" id="form-add-promotion">
-                                            <div class="row"> <!-- Sử dụng row để tạo hàng -->
-                                                <div class="col-md-6"> <!-- Cột trái -->
-                                                    <div class="form-group">
-                                                        <label for="maKhuyenMai">Mã Khuyến Mãi:</label>
-                                                        <div class="input-group">
-                                                            <input type="text" id="maKhuyenMai" name="maKhuyenMai" class="form-control" placeholder="Mã khuyến mãi"/>
-                                                            <div class="input-group-append">
-                                                                <button type="button" class="btn btn-outline-secondary" onclick="generateMaKhuyenMai()">
-                                                                    <i class="fas fa-sync-alt"></i> Tạo mã
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="tenKhuyenMai">Tên Khuyến Mãi:</label>
-                                                        <input type="text" id="tenKhuyenMai" name="tenKhuyenMai" class="form-control" placeholder="Tên khuyến mãi"/>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="moTa">Mô Tả:</label>
-                                                        <input type="text" id="moTa" name="moTa" class="form-control" placeholder="Mô tả"/>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="soLuong">Số lượng:</label>
-                                                        <input type="number" id="soLuong" name="soLuong" class="form-control" placeholder="Số lượng"/>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="giamGia">Giảm Giá:</label>
-                                                        <input type="number" step="0.01" id="giamGia" name="giamGia" class="form-control" placeholder="Giảm giá"/>
-                                                    </div>
-                                                </div> <!-- Kết thúc cột trái -->
-
-                                                <div class="col-md-6"> <!-- Cột phải -->
-                                                    <div class="form-group">
-                                                        <label for="ngayBatDau">Ngày Bắt Đầu:</label>
-                                                        <input type="date" id="ngayBatDau" name="ngayBatDau" class="form-control"/>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="ngayKetThuc">Ngày Kết Thúc:</label>
-                                                        <input type="date" id="ngayKetThuc" name="ngayKetThuc" class="form-control"/>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="loaiGiam">Loại Giảm:</label>
-                                                        <select id="loaiGiam" name="loaiGiam" class="form-control">
-                                                            <option value="true">Phần trăm</option>
-                                                            <option value="false">Tiền mặt</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="giamToiThieu">Giảm tối thiểu:</label>
-                                                        <input type="number" id="giamToiThieu" name="giamToiThieu" class="form-control"/>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="giamToiDa">Giảm tối đa:</label>
-                                                        <input type="number" id="giamToiDa" name="giamToiDa" class="form-control"/>
-                                                    </div>
-
-                                                </div> <!-- Kết thúc cột phải -->
-                                            </div> <!-- Kết thúc hàng -->
-
-                                            <button type="submit" class="btn btn-warning-custom">Lưu</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                        <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-scrollable  modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="exampleModalLabel">
-                                            <i class="fa-solid fa-list" style="color: #000000;"></i>
-                                            Danh sách khách hàng
-                                        </h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <button id="selectAllBtn" class="btn btn-primary" onclick="toggleSelectAll()">Chọn tất cả</button>
-                                        <div class="search-container">
-                                            <input type="text" id="modalSearchInput" placeholder="Tìm kiếm khách hàng..." class="search-box">
-                                            <button class="btn btn-primary" onclick="searchInModal()"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="maKhuyenMai">Mã Khuyến Mãi:</label>
+                                            <div class="input-group">
+                                                <input type="text" id="maKhuyenMai" name="maKhuyenMai"
+                                                       class="form-control" placeholder="Mã khuyến mãi"/>
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="generateMaKhuyenMai()">
+                                                        <i class="fas fa-sync-alt"></i> Tạo mã
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="voucherId">Chọn Voucher</label>
-                                            <select class="form-control" id="voucherId" name="voucherId">
-                                                <option value="" disabled selected>-- Chọn Voucher --</option>
-                                                <option th:each="voucher : ${activeVouchers}"
-                                                        th:value="${voucher.idKhuyenMai}"
-                                                        th:text="${voucher.maKhuyenMai} + ' - ' + ${voucher.tenKhuyenMai}"></option>
+
+                                        <div class="form-group col-md-6">
+                                            <label for="tenKhuyenMai">Tên Khuyến Mãi:</label>
+                                            <input type="text" id="tenKhuyenMai" name="tenKhuyenMai" class="form-control" placeholder="Tên khuyến mãi"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-12">
+                                            <label for="moTa">Mô Tả:</label>
+                                            <input type="text" id="moTa" name="moTa" class="form-control" placeholder="Mô tả"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="soLuong">Số lượng:</label>
+                                            <input type="number" id="soLuong" name="soLuong" class="form-control" placeholder="Số lượng"/>
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label for="giamGia">Giảm Giá:</label>
+                                            <input type="number" step="0.01" id="giamGia" name="giamGia" class="form-control" placeholder="Giảm giá"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="ngayBatDau">Ngày Bắt Đầu:</label>
+                                            <input type="datetime-local" id="ngayBatDau" name="ngayBatDau" class="form-control" placeholder="Ngày bắt đầu"/>
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label for="ngayKetThuc">Ngày Kết Thúc:</label>
+                                            <input type="datetime-local" id="ngayKetThuc" name="ngayKetThuc" class="form-control" placeholder="Ngày kết thúc"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="loaiGiam">Loại Giảm:</label>
+                                            <select id="loaiGiam" name="loaiGiam" class="form-control">
+                                                <option value="true">Phần trăm</option>
+                                                <option value="false">Tiền mặt</option>
                                             </select>
                                         </div>
+                                    </div>
 
-                                        <table>
-                                            <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Tên khách hàng</th>
-                                                <th>Email</th>
-                                                <!--                                                <th>Trạng thái</th>-->
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr th:each="kh,i: ${listKH}">
-                                                <td>
-                                                    <input class="form-check-input" type="checkbox" value="" id="checkbox${i.count}">
-                                                </td>
-                                                <td th:text="${kh.hoVaTen }"></td>
-                                                <td th:text="${kh.email}"></td>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="giamToiThieu">Giảm tối thiểu:</label>
+                                            <input type="number" id="giamToiThieu" name="giamToiThieu" class="form-control"/>
+                                        </div>
 
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="form-group col-md-6">
+                                            <label for="giamToiDa">Giảm tối đa:</label>
+                                            <input type="number" id="giamToiDa" name="giamToiDa" class="form-control"/>
+                                        </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Hủy</button>
-                                        <button type="button" class="btn btn-primary" id="sendEmailBtn">Gửi</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Modal sửa khuyến mãi -->
-                        <div class="modal fade editModal" id="editKhuyenMaiModal" tabindex="-1" aria-labelledby="editKhuyenMaiModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg"> <!-- Chỉnh modal lớn hơn -->
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editKhuyenMaiModalLabel">Sửa Khuyến Mãi</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form id="editKhuyenMaiForm" onsubmit="return updateKhuyenMai(event)">
-                                            <input type="hidden" id="editId" name="id" />
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editMaKhuyenMai" class="form-label">Mã Khuyến Mãi</label>
-                                                    <input type="text" class="form-control" id="editMaKhuyenMai" name="maKhuyenMai" required />
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editTenKhuyenMai" class="form-label">Tên Khuyến Mãi</label>
-                                                    <input type="text" class="form-control" id="editTenKhuyenMai" name="tenKhuyenMai" required />
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editMoTa" class="form-label">Mô Tả</label>
-                                                    <textarea class="form-control" id="editMoTa" name="moTa" required></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editSoLuong" class="form-label">Số Lượng</label>
-                                                    <input type="number" class="form-control" id="editSoLuong" name="soLuong" required />
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editGiamGia" class="form-label">Giảm Giá</label>
-                                                    <input type="number" class="form-control" id="editGiamGia" name="giamGia" required />
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editGiamToiThieu" class="form-label">Giảm Tối Thiểu</label>
-                                                    <input type="number" class="form-control" id="editGiamToiThieu" name="giamToiThieu" required />
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editGiamToiDa" class="form-label">Giảm Tối Đa</label>
-                                                    <input type="number" class="form-control" id="editGiamToiDa" name="giamToiDa" required />
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editNgayBatDau" class="form-label">Ngày Bắt Đầu</label>
-                                                    <input type="date" class="form-control" id="editNgayBatDau" name="ngayBatDau" required />
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="editNgayKetThuc" class="form-label">Ngày Kết Thúc</label>
-                                                    <input type="date" class="form-control" id="editNgayKetThuc" name="ngayKetThuc" required />
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="editLoaiGiam" class="form-label">Loại Giảm</label>
-                                                    <select class="form-select" id="editLoaiGiam" name="loaiGiam" required>
-                                                        <option value="phanTram">Phần Trăm</option>
-                                                        <option value="tienMat">Tiền Mặt</option>
-                                                    </select>
-                                                </div>
-                                                <!--                                                <div class="col-md-6 mb-3">-->
-                                                <!--                                                    <label class="form-label">Trạng Thái</label>-->
-                                                <!--                                                    <div>-->
-                                                <!--                                                        <input type="radio" id="conHann" name="trangThai" value="conHan" required>-->
-                                                <!--                                                        <label for="conHann">Còn Hạn</label>-->
-                                                <!--                                                    </div>-->
-                                                <!--                                                    <div>-->
-                                                <!--                                                        <input type="radio" id="hetHann" name="trangThai" value="hetHan" required>-->
-                                                <!--                                                        <label for="hetHann">Hết Hạn</label>-->
-                                                <!--                                                    </div>-->
-                                                <!--                                                    <div>-->
-                                                <!--                                                        <input type="radio" id="sapDienRaa" name="trangThai" value="sapDienRa" required>-->
-                                                <!--                                                        <label for="sapDienRaa">Sắp Diễn Ra</label>-->
-                                                <!--                                                    </div>-->
-                                                <!--                                                </div>-->
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">Cập Nhật</button>
-                                        </form>
-                                    </div>
-                                </div>
+                                    <button type="submit" class="btn btn-warning-custom">Lưu</button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
 
+
+                <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable  modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                    <i class="fa-solid fa-list" style="color: #000000;"></i>
+                                    Danh sách khách hàng
+                                </h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <button id="selectAllBtn" class="btn btn-primary" onclick="toggleSelectAll()">Chọn tất cả</button>
+                                <div class="search-container">
+                                    <input type="text" id="modalSearchInput" placeholder="Tìm kiếm khách hàng..." class="search-box">
+                                    <button class="btn btn-primary" onclick="searchInModal()"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+                                </div>
+                                <div class="form-group">
+                                    <label for="voucherId">Chọn Voucher</label>
+                                    <select class="form-control" id="voucherId" name="voucherId">
+                                        <option value="" disabled selected>-- Chọn Voucher --</option>
+                                        <option th:each="voucher : ${activeVouchers}"
+                                                th:value="${voucher.idKhuyenMai}"
+                                                th:text="${voucher.maKhuyenMai} + ' - ' + ${voucher.tenKhuyenMai}"></option>
+                                    </select>
+                                </div>
+
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tên khách hàng</th>
+                                        <th>Email</th>
+                                        <!--                                                <th>Trạng thái</th>-->
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="kh,i: ${listKH}">
+                                        <td>
+                                            <input class="form-check-input" type="checkbox" value="" id="checkbox${i.count}">
+                                        </td>
+                                        <td th:text="${kh.hoVaTen }"></td>
+                                        <td th:text="${kh.email}"></td>
+
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Hủy</button>
+                                <button type="button" class="btn btn-primary" id="sendEmailBtn">Gửi</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal sửa khuyến mãi -->
+                <div class="modal fade editModal" id="editKhuyenMaiModal" tabindex="-1" aria-labelledby="editKhuyenMaiModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg"> <!-- Chỉnh modal lớn hơn -->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editKhuyenMaiModalLabel">Sửa Khuyến Mãi</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editKhuyenMaiForm" onsubmit="return updateKhuyenMai(event)">
+                                    <input type="hidden" id="editId" name="id" />
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editMaKhuyenMai" class="form-label">Mã Khuyến Mãi</label>
+                                            <input type="text" class="form-control" id="editMaKhuyenMai" name="maKhuyenMai" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editTenKhuyenMai" class="form-label">Tên Khuyến Mãi</label>
+                                            <input type="text" class="form-control" id="editTenKhuyenMai" name="tenKhuyenMai" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editMoTa" class="form-label">Mô Tả</label>
+                                            <textarea class="form-control" id="editMoTa" name="moTa" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editSoLuong" class="form-label">Số Lượng</label>
+                                            <input type="number" class="form-control" id="editSoLuong" name="soLuong" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editGiamGia" class="form-label">Giảm Giá</label>
+                                            <input type="number" class="form-control" id="editGiamGia" name="giamGia" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editGiamToiThieu" class="form-label">Giảm Tối Thiểu</label>
+                                            <input type="number" class="form-control" id="editGiamToiThieu" name="giamToiThieu" required />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editGiamToiDa" class="form-label">Giảm Tối Đa</label>
+                                            <input type="number" class="form-control" id="editGiamToiDa" name="giamToiDa" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editNgayBatDau" class="form-label">Ngày Bắt Đầu</label>
+                                            <input type="date" class="form-control" id="editNgayBatDau" name="ngayBatDau" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="editNgayKetThuc" class="form-label">Ngày Kết Thúc</label>
+                                            <input type="date" class="form-control" id="editNgayKetThuc" name="ngayKetThuc" required />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="editLoaiGiam" class="form-label">Loại Giảm</label>
+                                            <select class="form-select" id="editLoaiGiam" name="loaiGiam" required>
+                                                <option value="phanTram">Phần Trăm</option>
+                                                <option value="tienMat">Tiền Mặt</option>
+                                            </select>
+                                        </div>
+                                        <!--                                                <div class="col-md-6 mb-3">-->
+                                        <!--                                                    <label class="form-label">Trạng Thái</label>-->
+                                        <!--                                                    <div>-->
+                                        <!--                                                        <input type="radio" id="conHann" name="trangThai" value="conHan" required>-->
+                                        <!--                                                        <label for="conHann">Còn Hạn</label>-->
+                                        <!--                                                    </div>-->
+                                        <!--                                                    <div>-->
+                                        <!--                                                        <input type="radio" id="hetHann" name="trangThai" value="hetHan" required>-->
+                                        <!--                                                        <label for="hetHann">Hết Hạn</label>-->
+                                        <!--                                                    </div>-->
+                                        <!--                                                    <div>-->
+                                        <!--                                                        <input type="radio" id="sapDienRaa" name="trangThai" value="sapDienRa" required>-->
+                                        <!--                                                        <label for="sapDienRaa">Sắp Diễn Ra</label>-->
+                                        <!--                                                    </div>-->
+                                        <!--                                                </div>-->
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Cập Nhật</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Phân trang -->
+
+                <div class="pagination">
+                    <a class="prev" th:if="${khuyenMaiPage.hasPrevious()}"
+                       th:href="@{/admin/quan-ly-khuyen-mai(page=${khuyenMaiPage.number - 1}, size=${khuyenMaiPage.size})}">&laquo;</a>
+                    <span class="current-page" th:text="${khuyenMaiPage.number + 1}"></span>
+                    <a class="next" th:if="${khuyenMaiPage.hasNext()}"
+                       th:href="@{/admin/quan-ly-khuyen-mai(page=${khuyenMaiPage.number + 1}, size=${khuyenMaiPage.size})}">&raquo;</a>
+                </div>
             </div>
         </div>
+
+    </div>
+    </div>
     </div>
 </main>
 
@@ -819,6 +786,49 @@
                 console.error('Error:', error); // In lỗi ra console
             });
     });
+    function searchKhuyenMai() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase(); // Từ khóa tìm kiếm
+        const selectedTrangThai = document.getElementById('trangThai').value; // Trạng thái đã chọn
+        const page = 0; // Trang đầu tiên
+        const size = 5; // Số lượng bản ghi trên mỗi trang
+
+        // Gọi API với từ khóa tìm kiếm và trạng thái
+        fetch(`/quan-ly-khuyen-mai/search?keyword=${encodeURIComponent(keyword)}&trangThai=${encodeURIComponent(selectedTrangThai)}&page=${page}&size=${size}`)
+            .then(response => response.json())
+            .then(data => {
+                displayKhuyenMais(data.content); // Hiển thị danh sách khuyến mãi từ phản hồi
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    function displayKhuyenMais(khuyenMais) {
+        const tableBody = document.getElementById('khuyenMaiTableBody');
+        tableBody.innerHTML = '';
+        khuyenMais.forEach(khuyenMai => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${khuyenMai.maKhuyenMai}</td>
+            <td>${khuyenMai.tenKhuyenMai}</td>
+            <td>${khuyenMai.giamGia}</td>
+            <td>${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}</td>
+            <td>${khuyenMai.soLuong}</td>
+            <td>${khuyenMai.giamToiThieu}</td>
+            <td>${khuyenMai.giamToiDa}</td>
+            <td>${khuyenMai.trangThai}</td>
+            <td>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
+                                                onclick="setModalData(this)">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </button>
+
+        `;
+            tableBody.appendChild(row); // Thêm hàng mới vào bảng
+        });
+
+        // Hiện hoặc ẩn bảng dựa trên có kết quả hay không
+        const originalTableContainer = document.querySelector('.table-container');
+        originalTableContainer.style.display = khuyenMais.length > 0 ? 'block' : 'none';
+    }
 
 </script>
 

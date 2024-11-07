@@ -135,24 +135,28 @@ public class DatPhongController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Dữ liệu không hợp lệ!"));
             }
 
-            // Kiểm tra khách hàng đã tồn tại dựa trên email
-            KhachHangDTO existingByEmail = khachHangService.findByEmail(khachHangDTO.getEmail());
-            if (existingByEmail != null && !existingByEmail.getId().equals(khachHangDTO.getId())) {
-                // Trả về thông tin khách hàng tồn tại nếu không phải là khách hàng hiện tại
-                return ResponseEntity.ok(Map.of(
-                        "message", "Khách hàng với email đã tồn tại.",
-                        "khachHang", existingByEmail
-                ));
-            }
+            if (khachHangDTO.getId() == null) {
+                khachHangDTO.setMaKhachHang(khachHangService.generateMaKhachHang()); // Tạo mã khách hàng mới
+            } else {
+                // Kiểm tra khách hàng đã tồn tại dựa trên email
+                KhachHangDTO existingByEmail = khachHangService.findByEmail(khachHangDTO.getEmail());
+                if (existingByEmail != null && !existingByEmail.getId().equals(khachHangDTO.getId())) {
+                    // Trả về thông tin khách hàng tồn tại nếu không phải là khách hàng hiện tại
+                    return ResponseEntity.ok(Map.of(
+                            "message", "Khách hàng với email đã tồn tại.",
+                            "khachHang", existingByEmail
+                    ));
+                }
 
-            // Kiểm tra khách hàng đã tồn tại dựa trên số điện thoại
-            KhachHangDTO existingByPhone = khachHangService.findBySoDienThoai(khachHangDTO.getSoDienThoai());
-            if (existingByPhone != null && !existingByPhone.getId().equals(khachHangDTO.getId())) {
-                // Trả về thông tin khách hàng tồn tại nếu không phải là khách hàng hiện tại
-                return ResponseEntity.ok(Map.of(
-                        "message", "Khách hàng với số điện thoại đã tồn tại.",
-                        "khachHang", existingByPhone
-                ));
+                // Kiểm tra khách hàng đã tồn tại dựa trên số điện thoại
+                KhachHangDTO existingByPhone = khachHangService.findBySoDienThoai(khachHangDTO.getSoDienThoai());
+                if (existingByPhone != null && !existingByPhone.getId().equals(khachHangDTO.getId())) {
+                    // Trả về thông tin khách hàng tồn tại nếu không phải là khách hàng hiện tại
+                    return ResponseEntity.ok(Map.of(
+                            "message", "Khách hàng với số điện thoại đã tồn tại.",
+                            "khachHang", existingByPhone
+                    ));
+                }
             }
 
             // Lưu thông tin khách hàng mới hoặc cập nhật thông tin
@@ -318,6 +322,7 @@ public class DatPhongController {
             // Lưu tất cả các đối tượng DatPhong vào cơ sở dữ liệu
             for (DatPhong datPhong : datPhongList) {
                 datPhongService.saveDatPhong(datPhong);
+
 
                 // Lưu thông tin chi tiết đặt phòng
                 ChiTietDatPhong chiTietDatPhong = new ChiTietDatPhong();

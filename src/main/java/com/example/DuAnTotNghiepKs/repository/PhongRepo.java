@@ -68,5 +68,9 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
                                     @Param("soLuongNguoi") Integer soLuongNguoi);
 
 
+    @Query("SELECT p FROM Phong p WHERE p.trangThai = true")
+    List<Phong> findByTrangThai(Boolean trangThai);
+
+
 }
 

@@ -78,9 +78,19 @@
 <main role="main" class="main-content">
     <div class="container-fluid">
         <h1>Danh sách đặt phòng chưa check-in</h1>
-        <table>
+        <table id="dataTable-1">
             <thead>
             <tr>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="keyword">Tìm kiếm:</label>
+                        <input type="text" id="keyword" name="keyword" class="form-control"
+                               placeholder="Tìm kiếm SĐT, CCCD..." oninput="searchChekin()">
+                    </div>
+                </div>
+                <div id="resultArea">
+                    <!-- Kết quả tìm kiếm sẽ được cập nhật ở đây -->
+                </div>
 <!--                <th>Mã Đặt Phòng</th>-->
                 <th>Khách Hàng</th>
                 <th>Số Điện Thoại</th>
@@ -324,6 +334,35 @@
                     });
             }
         });
+    }
+
+    function searchChekin() {
+        var keyword = document.getElementById('keyword').value.trim().toLowerCase(); // Loại bỏ khoảng trắng thừa
+        var rows = document.querySelectorAll('#dataTable-1 tbody tr');
+
+        var hasResults = false; // Biến để kiểm tra có kết quả hay không
+
+        rows.forEach(function(row) {
+
+            var cccd = row.cells[1].innerText.toLowerCase();
+            var  hoVaTen  = row.cells[0].innerText.toLowerCase();
+            var soDienThoai = row.cells[3].innerText.toLowerCase();
+            // Kiểm tra xem từ khóa có trong mã đặt phòng hoặc tên khách hàng không
+            if (cccd.includes(keyword) || hoVaTen.includes(keyword) || soDienThoai.includes(keyword) ) {
+                row.style.display = ''; // Hiện hàng
+                hasResults = true; // Có kết quả
+            } else {
+                row.style.display = 'none'; // Ẩn hàng
+            }
+        });
+
+        // Ẩn toàn bộ bảng nếu không có kết quả
+        var tableCardBody = document.getElementById('tableCardBody');
+        if (hasResults) {
+            tableCardBody.style.display = ''; // Hiện bảng
+        } else {
+            tableCardBody.style.display = 'none'; // Ẩn bảng nếu không có kết quả
+        }
     }
 
 </script>

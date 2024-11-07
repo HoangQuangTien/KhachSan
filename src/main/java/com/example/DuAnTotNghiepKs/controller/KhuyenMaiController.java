@@ -67,8 +67,8 @@ public class KhuyenMaiController {
             @RequestParam("giamGia") Float giamGia,
             @RequestParam("giamToiThieu") Float giamToiThieu,
             @RequestParam("giamToiDa") Float giamToiDa,
-            @RequestParam("ngayBatDau") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayBatDau,
-            @RequestParam("ngayKetThuc") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayKetThuc,
+            @RequestParam("ngayBatDau") @DateTimeFormat(pattern = ("yyyy-MM-dd'T'HH:mm")) Date ngayBatDau,
+            @RequestParam("ngayKetThuc") @DateTimeFormat(pattern = ("yyyy-MM-dd'T'HH:mm")) Date ngayKetThuc,
 //            @RequestParam("trangThai") String trangThai,
 //            @RequestParam("loaiGiam") Boolean loaiGiam)
             @RequestParam("loaiGiam") String loaiGiamStr
@@ -276,33 +276,17 @@ public class KhuyenMaiController {
 //    }
 
     @GetMapping("/search")
-    @ResponseBody
-    public Page<KhuyenMaiDTO> search(
-            @RequestParam(value = "keyword", defaultValue = "") String keyword,
-            @RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<Page<KhuyenMai>> searchKhuyenMai(
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "trangThai", required = false) String trangThai,
+            @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<KhuyenMai> khuyenMaiPage = khuyenMaiRepo.searchKhuyenmai1(keyword, trangThai, pageable);
+        Sort sort = Sort.by(Sort.Direction.DESC, "ngayKetThuc"); // Sắp xếp theo ngày kết thúc
+        Page<KhuyenMai> khuyenMaiPage = khuyenMaiService.searchKhuyenMai(keyword, trangThai, page, size, sort);
 
-        return khuyenMaiPage.map(this::convertToKhuyenMaiDTO);
+        return ResponseEntity.ok(khuyenMaiPage); // Trả về trang kết quả
     }
-
-    private KhuyenMaiDTO convertToKhuyenMaiDTO(KhuyenMai khuyenMai) {
-        return new KhuyenMaiDTO(
-                khuyenMai.getIdKhuyenMai(),
-                khuyenMai.getMaKhuyenMai(),
-                khuyenMai.getTenKhuyenMai(),
-                khuyenMai.getMoTa(),
-                khuyenMai.getTrangThai()
-        );
-    }
-
-
-
-
-
 
 
 }

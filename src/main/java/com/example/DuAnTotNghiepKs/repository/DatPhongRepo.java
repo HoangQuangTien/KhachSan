@@ -155,4 +155,10 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "OR LOWER(d.maDatPhong) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<DatPhong> searchByNameOrPhone(@Param("query") String query, Pageable pageable);
 
+
+    @Query("SELECT d FROM DatPhong d JOIN d.khachHang k WHERE " +
+            "LOWER(k.hoVaTen) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR LOWER(d.maDatPhong) LIKE LOWER(CONCAT('%', :query, '%'))")
+    Page<DatPhong> searchBy(@Param("query") String query, Pageable pageable);
+
 }

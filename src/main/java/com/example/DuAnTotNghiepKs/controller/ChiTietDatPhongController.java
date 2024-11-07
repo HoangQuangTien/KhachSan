@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -77,6 +78,7 @@ public class ChiTietDatPhongController {
             @RequestParam(name = "tinhTrang", defaultValue = "") String tinhTrangStr,
             Model model
     ) {
+        // Các biến xử lý ngày và thông báo lỗi
         LocalDateTime startDate = null;
         LocalDateTime endDate = null;
         String errorMessage = null;
@@ -106,8 +108,10 @@ public class ChiTietDatPhongController {
         if (errorMessage == null) {
             Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
 
-            // Lọc theo ngày nhận nếu có
-            if (startDate != null && endDate != null) {
+            // Lọc theo từ khóa nếu có
+            if (!keyword.isEmpty()) {
+                datPhongPage = datPhongRepo.searchBy(keyword, pageable);
+            } else if (startDate != null && endDate != null) {
                 datPhongPage = datPhongRepo.findByNgayNhanBetween(startDate, endDate, pageable);
             } else {
                 datPhongPage = datPhongRepo.findAll(pageable);
@@ -115,12 +119,10 @@ public class ChiTietDatPhongController {
 
             // Lọc theo tình trạng nếu có
             if (!tinhTrangStr.isEmpty()) {
-                datPhongPage = (Page<DatPhong>) datPhongPage.filter(datPhong -> datPhong.getTinhTrang().equals(tinhTrangStr));
-            }
-
-            // Tìm kiếm theo từ khóa
-            if (!keyword.isEmpty()) {
-                datPhongPage = datPhongRepo.findByKeyword(keyword, pageable);
+                List<DatPhong> filteredDatPhongs = datPhongPage.stream()
+                        .filter(datPhong -> datPhong.getTinhTrang().equals(tinhTrangStr))
+                        .collect(Collectors.toList());
+                datPhongPage = new PageImpl<>(filteredDatPhongs, pageable, filteredDatPhongs.size());
             }
 
             // Lấy chi tiết đặt phòng từ danh sách đặt phòng
@@ -151,8 +153,9 @@ public class ChiTietDatPhongController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("errorMessage", errorMessage);
 
-        return "list/QuanLyDatPhong/danhsachdatphong";
+        return "list/QuanLyDatPhong/danhsachdatphong"; // Trả về view chính
     }
+
 
 
 

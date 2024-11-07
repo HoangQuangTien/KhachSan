@@ -1,9 +1,11 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.ChiTietVaiTroDTO;
+import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
 import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
 import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,60 +21,64 @@ import java.util.Map;
 import java.util.Set;
 
 @Controller
-@RequestMapping("/login")
+
 public class LoginController {
 
     @Autowired
     private TaiKhoanService taiKhoanService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    @GetMapping
+    @GetMapping("/login")
     public String login() {
+//        // Ví dụ: Lưu roomId vào session trước khi điều hướng đến trang đăng nhập
+//        session.setAttribute("roomId", roomId);
         return "list/DangNhap/login";
     }
 
-    @PostMapping()
-    public String login(@Valid @ModelAttribute TaiKhoanDTO taiKhoanDTO, Model model) {
+    @PostMapping("/login")
+    public String login(@Valid @ModelAttribute TaiKhoanDTO taiKhoanDTO, Model model, HttpSession session) {
         String tenDangNhap = taiKhoanDTO.getTenDangNhap();
         String matKhau = taiKhoanDTO.getMatKhau();
 
+        // Tìm tài khoản
         TaiKhoanDTO foundTaiKhoan = taiKhoanService.findByTenDangNhap(tenDangNhap);
 
-        // Kiểm tra nếu tài khoản không tồn tại
         if (foundTaiKhoan == null) {
             model.addAttribute("error", "Tên đăng nhập không tồn tại.");
             return "list/DangNhap/login";
         }
 
-        // Kiểm tra mật khẩu có khớp không
-        if (!foundTaiKhoan.getMatKhau().equals(matKhau)) {
+        // Kiểm tra mật khẩu
+        if (!passwordEncoder.matches(matKhau, foundTaiKhoan.getMatKhau())) {
             model.addAttribute("error", "Mật khẩu không chính xác.");
             return "list/DangNhap/login";
         }
 
-        Set<ChiTietVaiTroDTO> roles = foundTaiKhoan.getChiTietVaiTros();
+        // Lấy thông tin khách hàng
+        KhachHangDTO khachHangDTO = foundTaiKhoan.getKhachHangDTO();
+        if (khachHangDTO == null) {
+            model.addAttribute("error", "Không tìm thấy thông tin khách hàng.");
+            return "list/DangNhap/login";
+        }
 
+        // Lưu thông tin người dùng vào session
+//        session.setAttribute("loggedInUser", khachHangDTO);
 
-        // Lấy vai trò đầu tiên
-        String role = roles.stream()
-                .map(chiTietVaiTroDto -> chiTietVaiTroDto.getVaiTroDTO().getTenVaiTro())
-                .findFirst()
-                .orElse(null);
+        // Lấy roomId từ session
+//        Integer roomId = (Integer) session.getAttribute("roomId");
 
-        // Log giá trị của role
-        System.out.println("Vai trò: " + role);
+        // Chuyển hướng đến trang chi tiết phòng nếu roomId có
+//        if (roomId != null) {
+//            return "redirect:/showRoomDetailPhong?roomId=" + roomId;
+//        }
 
-        // Logic để chuyển hướng dựa trên vai trò
-        String redirectUrl = switch (role) {
-            case "ADMIN" -> "/thongke";
-            case "EMPLOYEE" -> "/datphongs";
-            case "CUSTOMER" -> "/khach-hang";
-            default -> "/khach-hang"; // Mặc định nếu vai trò không xác định
-        };
-
-        // Nếu hợp lệ, thực hiện đăng nhập và chuyển hướng đến URL dựa trên vai trò
-        return "redirect:" + redirectUrl;
+        return "redirect:/"; // Trở về trang chính
     }
+
+
+
 
 
 }

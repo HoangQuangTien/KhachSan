@@ -158,10 +158,10 @@
                             <input type="hidden" name="idPhong" id="idPhong">
 
                             <!-- Mã đặt phòng -->
-                            <div class="mb-3">
-                                <label for="maDatPhong" class="form-label">Mã Đặt Phòng:</label>
-                                <input type="text" class="form-control" id="maDatPhong" name="maDatPhong" placeholder="Mã đặt phòng">
-                            </div>
+
+
+                            <input type="hidden" class="form-control" id="maDatPhong" name="maDatPhong">
+
 
                             <!-- Ngày nhận và ngày trả -->
                             <div class="row mb-3">
@@ -210,10 +210,9 @@
                         <div class="card-body">
                             <h4 class="mb-3 text-center">Thông Tin Khách Hàng</h4>
                             <form id="customerForm">
-                                <div class="mb-3">
-                                    <label for="maKhachHang" class="form-label">Mã:</label>
-                                    <input type="text" class="form-control form-control-sm" id="maKhachHang" name="maKhachHang" placeholder="Mã(Được Null)" >
-                                </div>
+
+                                <input type="hidden"  id="maKhachHang" name="maKhachHang">
+
                                 <div class="mb-3">
                                     <label for="hoVaTen" class="form-label">Họ và Tên:</label>
                                     <input type="text" class="form-control form-control-sm" id="hoVaTen" name="hoVaTen" placeholder="Họ và tên" required>

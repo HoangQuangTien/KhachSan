@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<h4>Danh sách phòng trống(<span th:text="${phongTrong.size()}"></span>)</h4>
+<div class="d-flex justify-content-center align-items-start" >
+    <!-- Danh sách phòng trống -->
+    <div class="flex-fill">
+        <div th:each="phong : ${phongTrong}" class="col-9 mb-3">
+            <div class="card shadow d-flex flex-row align-items-stretch" th:classappend="${phong.trangThai} ? 'border-success' : 'border-danger'">
+                <!-- Image Section (Left) -->
+                <div class="col-md-4 p-0">
+                    <div class="position-relative h-100">
+                        <img th:src="${phong.img}" class="img-fluid h-100 w-100" alt="Ảnh phòng của ${phong.tenPhong}" style="object-fit: cover; max-height: 150px;">
+                        <div class="overlay-content position-absolute bottom-0 w-100 bg-dark bg-opacity-50 text-white p-2">
+                            <h5 class="mb-1" th:text="${phong.tenPhong}"></h5>
+                            <p class="mb-0" th:text="'Giá: ' + ${phong.loaiPhong.gia} + ' VND'"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Information Section (Right) -->
+                <div class="col-md-8 p-3 d-flex flex-column justify-content-between" th:style="${phong.trangThai} ? 'background-color: #d4edda;' : 'background-color: #f8d7da;'">
+                    <div>
+                        <h5 class="card-title" th:text="${phong.tenPhong}"></h5>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <p class="card-text"><strong>Số Giường: </strong><span th:text="${phong.loaiPhong.soLuongGiuong}"></span></p>
+                            </div>
+                            <div class="col-6">
+                                <p class="card-text"><strong>Số Người Tối Đa: </strong><span th:text="${phong.loaiPhong.soNguoiToiDa}"></span></p>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                    <div>
+                        <p class="card-text"><strong>Mô Tả: </strong><span th:text="${phong.moTa}"></span></p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <input type="checkbox" th:id="'select-' + ${phong.idPhong}" th:value="${phong.idPhong}"
+                                   th:attr="data-room-name=${phong.tenPhong},data-room-price=${phong.loaiPhong.gia}"
+                                   onchange="toggleRoomSelection(this)">
+                            <label th:for="'select-' + ${phong.idPhong}">Chọn phòng</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Danh sách phòng đã chọn -->
+    <div id="chosen-rooms-container" class="mt-4" style="max-width: 250px; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; border-radius: 5px; padding: 10px;">
+        <h5>Phòng đã chọn:</h5>
+        <div id="chosen-rooms" class="list-group">
+            <!-- Các phòng đã chọn sẽ được hiển thị tại đây -->
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+            <button id="book-button" class="btn btn-success" onclick="bookSelectedRooms()">Đặt phòng</button>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    let selectedRoomIds = [];
+
+    function toggleRoomSelection(checkbox) {
+        const roomId = checkbox.value;
+        const roomName = checkbox.getAttribute('data-room-name');
+        const roomPrice = checkbox.getAttribute('data-room-price');
+        const chosenRooms = document.getElementById('chosen-rooms');
+        const chosenRoomsContainer = document.getElementById('chosen-rooms-container');
+
+        if (checkbox.checked) {
+            // Thêm phòng vào danh sách đã chọn
+            selectedRoomIds.push(roomId);
+            const roomItem = document.createElement('div');
+            roomItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            roomItem.id = 'chosen-room-' + roomId;
+            roomItem.innerHTML = `
+                <span><strong>${roomName}</strong> - ${roomPrice} VND</span>
+                <button class="btn btn-danger btn-sm" onclick="removeRoom('${roomId}')">Xóa</button>
+            `;
+            chosenRooms.appendChild(roomItem);
+
+            // Hiện form danh sách phòng đã chọn nếu có phòng được chọn
+            chosenRoomsContainer.style.display = 'block';
+        } else {
+            // Xóa phòng khỏi danh sách đã chọn
+            removeRoom(roomId);
+        }
+    }
+
+    function removeRoom(roomId) {
+        // Loại bỏ phòng khỏi danh sách selectedRoomIds
+        selectedRoomIds = selectedRoomIds.filter(id => id !== roomId);
+        const roomItem = document.getElementById('chosen-room-' + roomId);
+        const checkbox = document.getElementById('select-' + roomId);
+        if (roomItem) roomItem.remove();
+        if (checkbox) checkbox.checked = false; // Bỏ chọn checkbox khi xóa phòng
+
+        // Ẩn form danh sách phòng đã chọn nếu không còn phòng nào
+        if (selectedRoomIds.length === 0) {
+            document.getElementById('chosen-rooms-container').style.display = 'none';
+        }
+    }
+
+    function bookSelectedRooms() {
+        if (selectedRoomIds.length > 0) {
+            // Xây dựng URL với danh sách ID phòng đã chọn
+            const roomIdsParam = selectedRoomIds.join(',');
+            window.location.href = `/view-dat-phong?roomId=${roomIdsParam}`;
+            console.log('idPhong' + roomIdsParam)
+        } else {
+            alert("Vui lòng chọn ít nhất một phòng để đặt!");
+        }
+    }
+</script>
+</html>

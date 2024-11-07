@@ -5,6 +5,7 @@ import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 
 import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
+import com.example.DuAnTotNghiepKs.repository.KhachHangRepository;
 import com.example.DuAnTotNghiepKs.repository.PhongRepo;
 import com.example.DuAnTotNghiepKs.repository.ThamSoRepo;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
@@ -29,6 +30,10 @@ public class DatPhongServiceImp implements DatPhongService {
 
     @Autowired
     private ThamSoRepo thamSoRepo;
+
+    @Autowired
+    private KhachHangRepository khachHangRepository;
+
 
 
 
@@ -257,5 +262,7 @@ public class DatPhongServiceImp implements DatPhongService {
     public long countCancelledBookings() {
         return datPhongRepository.countCancelledBookings();
     }
+
+
 
 }
