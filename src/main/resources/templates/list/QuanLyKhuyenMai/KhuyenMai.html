@@ -787,7 +787,7 @@
             });
     });
     function searchKhuyenMai() {
-        const keyword = document.getElementById('searchInput').value.toLowerCase(); // Từ khóa tìm kiếm
+        const keyword = document.getElementById('searchInput').value.trim().toLowerCase(); // Từ khóa tìm kiếm
         const selectedTrangThai = document.getElementById('trangThai').value; // Trạng thái đã chọn
         const page = 0; // Trang đầu tiên
         const size = 5; // Số lượng bản ghi trên mỗi trang

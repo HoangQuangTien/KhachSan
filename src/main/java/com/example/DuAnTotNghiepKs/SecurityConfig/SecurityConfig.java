@@ -39,7 +39,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = { "/api", "/login","khach-hang","view-dat-phong","/thanh-toan-khach-hang","/dat-phong","/vnpay",
             "/assets1/**","vnpay_pay","vnpay_result","vnpay-create","https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-            "/load-phong","/img/**","/css/**","/js/**","lien-he","/searchh"};
+            "/load-phong","/img/**","/css/**","/js/**","lien-he","/searchh","/about","/listPhong","/phong-theo-loai"};
     private final String[] ADMIN_ENDPOINTS= {"thongke"};
     private final String[] EMPLOYEE_ENDPOINTS= {"quan-ly-khach-hang/**"};
 
@@ -48,7 +48,7 @@ public class SecurityConfig {
 //        return new WebMvcConfigurer() {
 //            @Override
 //            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/**")
+//               registry.addMapping("/**")
 //                        .allowedOrigins("http://localhost:8080") // Địa chỉ frontend
 //                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 //                        .allowedHeaders("*")

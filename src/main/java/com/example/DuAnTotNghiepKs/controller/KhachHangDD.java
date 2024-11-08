@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping
 @Controller
@@ -386,6 +387,30 @@ public class KhachHangDD {
     @GetMapping("/listPhong")
     public String listphong(){
         return "list/KhachHang/ListPhong";
+    }
+
+    @GetMapping("/phong-theo-loai")
+    public ResponseEntity<List<PhongDTO>> getRoomsByRoomType(@RequestParam(value = "loaiPhongId", required = false) Integer loaiPhongId) {
+        if (loaiPhongId == null || loaiPhongId <= 0) {
+            return ResponseEntity.ok(Collections.emptyList()); // Trả về [] nếu loaiPhongId không hợp lệ
+        }
+
+        List<Phong> phongs = phongService.getPhongsByLoaiPhong1(loaiPhongId);
+
+        if (phongs.isEmpty()) {
+            System.out.println("Không tìm thấy phòng nào cho loại phòng ID: " + loaiPhongId); // Thêm log này
+            return ResponseEntity.ok(Collections.emptyList()); // Trả về [] nếu không tìm thấy phòng nào
+        }
+
+        List<PhongDTO> phongDTOs = phongs.stream()
+                .map(phongService::convertToPhongDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(phongDTOs);
+    }
+    @GetMapping("/hangphongdetail")
+    public String showRoomDetailPage() {
+        return "List/KhachHang/hangphongdetail";
     }
 
 }
