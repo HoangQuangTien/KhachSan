@@ -58,6 +58,9 @@ public class DatPhongController {
     @Autowired
     private TaiKhoanService taiKhoanService;
 
+    @Autowired
+    private NguoiDiCungService nguoiDiCungService;
+
 
     // Hiển thị trang đặt phòng
     @GetMapping()
@@ -462,5 +465,23 @@ public ResponseEntity<?> getTop3PhongDuocDatNhieuNhat() {
             return ResponseEntity.ok(cancelledCount);
 
     }
+
+
+    @DeleteMapping("/xoaCCCD/{idDatPhong}")
+    public ResponseEntity<?> xoaCCCD(@PathVariable Integer idDatPhong) {
+        try {
+            boolean result = datPhongService.xoaCCCD(idDatPhong);
+            if (result) {
+                return ResponseEntity.ok().body("CCCD đã được xóa thành công.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy đặt phòng với ID này.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra khi xóa CCCD.");
+        }
+    }
+
+
+
 
 }

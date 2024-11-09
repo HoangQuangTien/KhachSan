@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping
@@ -40,14 +42,12 @@ public class NguoiDiCungRest {
     public String showDatPhongList(Model model) {
         // Lấy tất cả thông tin đặt phòng chưa check-in
         List<DatPhong> datPhongs = datPhongService.getDatPhongChuaCheckIn();
-
-        // Truyền danh sách đặt phòng vào model
         model.addAttribute("datPhongs", datPhongs);
 
         TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
         if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
             model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
-            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg());
         }
 
         return "list/QuanLyDatPhong/nguoidicung"; // Đường dẫn tới trang HTML hiển thị danh sách đặt phòng
@@ -55,20 +55,13 @@ public class NguoiDiCungRest {
 
     @GetMapping("/hien-thi-khach-di-cung")
     public String hienThiKhachDiCung(@RequestParam Integer id, Model model) {
-        System.out.println("ID nhận được: " + id); // In giá trị ID ra console để kiểm tra
-
         DatPhong datPhong = datPhongService.findById(id);
-
         if (datPhong == null) {
-            System.out.println("Không tìm thấy Đặt Phòng với ID: " + id); // In thông báo nếu không tìm thấy
             return "redirect:/error"; // Hoặc xử lý lỗi theo cách khác
         }
 
-        System.out.println("Đặt phòng tìm thấy: " + datPhong); // In đối tượng Đặt Phòng ra console để kiểm tra
-        System.out.println("ID Đặt phòng: " + datPhong.getIdDatPhong()); // Kiểm tra ID đặt phòng
-
         DatPhongDTO datPhongDTO = new DatPhongDTO();
-        datPhongDTO.setIdDatPhong(datPhong.getIdDatPhong()); // Đây là chỗ cần kiểm tra giá trị
+        datPhongDTO.setIdDatPhong(datPhong.getIdDatPhong());
         datPhongDTO.setIdKhachHang(datPhong.getKhachHang().getId());
         datPhongDTO.setMaKhachHang(datPhong.getKhachHang().getMaKhachHang());
         datPhongDTO.setHoVaTen(datPhong.getKhachHang().getHoVaTen());
@@ -79,7 +72,11 @@ public class NguoiDiCungRest {
         model.addAttribute("datPhongDTO", datPhongDTO);
         model.addAttribute("idDatPhong", datPhongDTO.getIdDatPhong());
 
-        return "list/QuanLyDatPhong/nguoidicungdetail";
+        // Lấy danh sách người đi cùng từ cơ sở dữ liệu
+        List<NguoiDiCungDTO> nguoiDiCungList = nguoiDiCungService.findByDatPhongId(id);
+        model.addAttribute("nguoiDiCungList", nguoiDiCungList); // Truyền danh sách vào model
+
+        return "list/QuanLyDatPhong/nguoidicungdetail"; // Đường dẫn tới trang hiển thị danh sách người đi cùng
     }
 
 
@@ -109,24 +106,6 @@ public class NguoiDiCungRest {
         }
     }
 
-
-//    @PutMapping("/{id}")
-//    public ResponseEntity<String> updateNguoiDiCung(@PathVariable Integer id, @RequestBody NguoiDiCungDTO nguoiDiCungDTO) {
-//        if (nguoiDiCungDTO == null) {
-//            return ResponseEntity.badRequest().body("Dữ liệu đầu vào không hợp lệ.");
-//        }
-//        try {
-//            if (!nguoiDiCungService.existsById(id)) {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Người đi cùng không tồn tại.");
-//            }
-//            nguoiDiCungService.updateNguoiDiCung(id, nguoiDiCungDTO);
-//            return ResponseEntity.ok("Cập nhật thông tin người đi cùng thành công.");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
-//        }
-//    }
-
-
     @GetMapping("/check-dat-phong/{id}")
     public ResponseEntity<String> checkDatPhong(@PathVariable Integer id) {
         DatPhong datPhong = datPhongService.findById(id);
@@ -140,12 +119,10 @@ public class NguoiDiCungRest {
     }
 
     @PostMapping("/them-nguoi-di-cung")
-    public ResponseEntity<String> themNguoiDiCung(@RequestBody NguoiDiCungDTO nguoiDiCungDTO) {
-        // Kiểm tra mã đặt phòng
+    public ResponseEntity<?> themNguoiDiCung(@RequestBody NguoiDiCungDTO nguoiDiCungDTO) {
         Integer datPhongId = nguoiDiCungDTO.getDatPhongId();
-        System.out.println("Mã đặt phòng nhận được: " + datPhongId);
 
-        // Kiểm tra tính hợp lệ của mã đặt phòng
+        // Kiểm tra mã đặt phòng
         if (datPhongId == null || datPhongId <= 0) {
             return ResponseEntity.badRequest().body("Mã đặt phòng không hợp lệ!");
         }
@@ -160,24 +137,49 @@ public class NguoiDiCungRest {
         int soNguoiToiDa = datPhong.getLoaiPhong().getSoNguoiToiDa();
         int soNguoiHienTai = nguoiDiCungService.countByDatPhongId(datPhongId);
 
-        // Điều chỉnh điều kiện: Nếu số người hiện tại < 1, thì cho phép thêm người đi cùng
-        // Bởi vì khi thêm người đi cùng, chúng ta cho rằng có 1 khách hàng chính
         if (soNguoiHienTai >= (soNguoiToiDa - 1)) { // Giảm 1 vì đã có 1 khách hàng chính
             return ResponseEntity.badRequest().body("Số người đi cùng đã đạt giới hạn cho loại phòng này!");
         }
 
+        // Tạo đối tượng người đi cùng và lưu vào cơ sở dữ liệu
         NguoiDiCung nguoiDiCung = new NguoiDiCung();
         nguoiDiCung.setTenNguoiDiCung(nguoiDiCungDTO.getTenNguoiDiCung());
         nguoiDiCung.setSoCmnd(nguoiDiCungDTO.getSoCmnd());
         nguoiDiCung.setDatPhong(datPhong);
 
         try {
-            nguoiDiCungService.save(nguoiDiCung);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra khi thêm người đi cùng: " + e.getMessage());
-        }
+            nguoiDiCungService.save(nguoiDiCung); // Lưu vào CSDL
 
-        return ResponseEntity.ok("Thêm người đi cùng thành công!");
+            // Trả về NguoiDiCungDTO để cập nhật vào form
+            NguoiDiCungDTO responseDTO = new NguoiDiCungDTO();
+            responseDTO.setTenNguoiDiCung(nguoiDiCung.getTenNguoiDiCung());
+            responseDTO.setSoCmnd(nguoiDiCung.getSoCmnd());
+            responseDTO.setDatPhongId(datPhongId);
+
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Có lỗi xảy ra khi thêm người đi cùng: " + e.getMessage());
+        }
+    }
+    @GetMapping("/check-cccd/{cmnd}")
+    public ResponseEntity<Map<String, Boolean>> checkCccd(@PathVariable String cmnd) {
+        boolean exists = nguoiDiCungService.isCccdExists(cmnd);  // Kiểm tra CCCD trong cơ sở dữ liệu
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @DeleteMapping("/xoaTatCaCCCD/{idDatPhong}")
+    public ResponseEntity<?> xoaTatCaCCCD(@PathVariable Long idDatPhong) {
+        try {
+            nguoiDiCungService.xoaTatCaCCCDTheoIdDatPhong(idDatPhong);
+            return ResponseEntity.ok().body("Xóa tất cả CCCD thành công");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi xóa CCCD: " + e.getMessage());
+        }
     }
 
 

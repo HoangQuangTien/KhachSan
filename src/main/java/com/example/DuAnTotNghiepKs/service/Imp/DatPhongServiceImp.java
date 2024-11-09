@@ -264,5 +264,18 @@ public class DatPhongServiceImp implements DatPhongService {
     }
 
 
+    @Override
+    public boolean xoaCCCD(Integer idDatPhong) {
+        Optional<DatPhong> datPhongOptional = datPhongRepository.findById(idDatPhong);
+        if (datPhongOptional.isPresent()) {
+            DatPhong datPhong = datPhongOptional.get();
+            datPhong.setCccd(null); // Xóa CCCD
+            datPhongRepository.save(datPhong); // Lưu thay đổi
+            return true;
+        }
+        return false; // Không tìm thấy đặt phòng
+    }
+
+
 
 }

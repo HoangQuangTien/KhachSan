@@ -429,7 +429,7 @@
 
                         <input type="hidden" name="tinhTrang" id="daThanhToan" value="true">
                         <div>
-                            <button type="submit" class="btn btn-success" onclick="return kiemTraThanhToan()">
+                            <button type="submit" class="btn btn-success" onclick="kiemTraThanhToan(document.getElementById('idDatPhong').value)">
                                 <i class="fas fa-dollar-sign"></i> Thanh toán
                             </button>
                         </div>
@@ -854,11 +854,14 @@
         document.getElementById("tienThua").value = tienThua > 0 ? tienThua.toFixed(2) : 0;
     }
 
-    function kiemTraThanhToan() {
-        var soTienKhachDua = parseFloat(document.getElementById("soTienKhachDua").value) || 0;
-        var tongSoTien = parseFloat(document.getElementById("tienConLai").value) || 0;
+    function kiemTraThanhToan(idDatPhong) {
 
-        // Kiểm tra nếu số chữ số của "soTienKhachDua" lớn hơn 10
+        console.log("ID Đặt Phòng:", idDatPhong); // Kiểm tra xem ID đặt phòng có được truyền vào không
+
+        const soTienKhachDua = parseFloat(document.getElementById("soTienKhachDua").value) || 0;
+        const tongSoTien = parseFloat(document.getElementById("tienConLai").value) || 0;
+
+        // Kiểm tra số chữ số của "soTienKhachDua" không quá 10
         if (soTienKhachDua.toString().length > 10) {
             Swal.fire({
                 title: 'Lỗi!',
@@ -866,10 +869,10 @@
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
-            return false; // Ngăn form gửi
+            return false; // Ngăn không gửi form
         }
 
-        // Kiểm tra nếu số tiền khách đưa ít hơn tổng số tiền cần thanh toán thì thông báo lỗi
+        // Kiểm tra số tiền khách đưa ít hơn tổng số tiền cần thanh toán
         if (soTienKhachDua < tongSoTien) {
             Swal.fire({
                 title: 'Lỗi!',
@@ -877,21 +880,18 @@
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
-            return false; // Ngăn form gửi
+            return false; // Ngăn không gửi form
         }
 
-        // Lấy mã khuyến mại đã chọn (nếu có)
-        var voucherSelect = document.getElementById('voucherId');
-        var selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
-        var idKhuyenMai = selectedOption ? selectedOption.value : null; // Nếu không chọn mã thì null
+        // Lấy mã khuyến mãi đã chọn (nếu có)
+        const voucherSelect = document.getElementById('voucherId');
+        const selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
+        const idKhuyenMai = selectedOption ? selectedOption.value : null;
 
-        // Nếu có mã khuyến mại được chọn, kiểm tra số lượng mã khuyến mại
+        // Kiểm tra mã khuyến mãi
         if (idKhuyenMai) {
-            var soLuongKhuyenMai = selectedOption.getAttribute('data-so-luong');
-
-            // Kiểm tra số lượng mã khuyến mại
+            const soLuongKhuyenMai = parseInt(selectedOption.getAttribute('data-so-luong'), 10);
             if (soLuongKhuyenMai <= 0) {
-                // Nếu mã khuyến mại đã hết hiệu lực
                 Swal.fire({
                     title: 'Lỗi!',
                     text: 'Mã khuyến mại đã hết hiệu lực!',
@@ -902,23 +902,25 @@
             }
         }
 
+        // Kiểm tra nếu chưa chọn phòng
         if (!selectedCard) {
-            // Hiển thị thông báo nếu chưa chọn phòng
             Swal.fire({
                 icon: 'warning',
                 title: 'Chưa chọn phòng!',
                 text: 'Vui lòng chọn phòng trước khi thanh toán.',
                 confirmButtonText: 'OK'
             });
-        }else {
-        // Nếu tất cả các điều kiện đều hợp lệ, hiển thị thông báo thành công
+            return; // Ngăn không gửi form
+        }
+
+        // Hiển thị thông báo thành công và thực hiện các yêu cầu API
         Swal.fire({
             title: 'Thành công!',
             text: 'Thanh toán thành công!',
             icon: 'success',
             confirmButtonText: 'OK'
         }).then(function() {
-            // Gọi hàm cập nhật số lượng mã khuyến mại sau khi thanh toán
+            // Cập nhật số lượng mã khuyến mại nếu có mã khuyến mãi
             if (idKhuyenMai) {
                 fetch(`/api/vouchers/update/${idKhuyenMai}`, {
                     method: 'POST',
@@ -926,33 +928,62 @@
                         'Content-Type': 'application/json'
                     }
                 })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        } else {
-                            throw new Error('Không thể cập nhật số lượng khuyến mại');
-                        }
-                    })
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            alert("Số lượng mã khuyến mại đã được cập nhật!");
+                            console.log("Số lượng mã khuyến mại đã được cập nhật!");
                         } else {
-                            alert(data.message || "Có lỗi xảy ra khi cập nhật số lượng khuyến mại.");
+                            console.error(data.message || "Có lỗi xảy ra khi cập nhật số lượng khuyến mại.");
                         }
                     })
                     .catch(error => {
-                        console.error('Lỗi:', error);
-                        alert("Có lỗi xảy ra khi cập nhật số lượng khuyến mại.");
+                        console.error("Lỗi khi cập nhật số lượng mã khuyến mại:", error);
                     });
             }
 
-            // Gửi form sau khi nhấn OK
+            // Xóa CCCD của đặt phòng
+            fetch(`/datphongs/xoaCCCD/${idDatPhong}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("CCCD đã được xóa thành công.");
+                    } else {
+                        throw new Error('Không thể xóa CCCD');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi xóa CCCD:', error);
+                });
+
+            // Xóa CCCD từ bảng NguoiDiCung
+            fetch(`/xoaTatCaCCCD/${idDatPhong}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("CCCD trong bảng NguoiDiCung đã được xóa thành công.");
+                    } else {
+                        throw new Error('Không thể xóa CCCD trong bảng NguoiDiCung');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi xóa CCCD trong bảng NguoiDiCung:', error);
+                });
+
+
+            // Gửi form sau khi các yêu cầu hoàn thành
             document.getElementById("formId").submit();
         });
-        }
+
+
     }
-
-
 
 
 

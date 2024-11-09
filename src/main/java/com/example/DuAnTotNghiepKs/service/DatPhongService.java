@@ -70,6 +70,9 @@ public interface DatPhongService {
 
 
 
+    boolean xoaCCCD(Integer idDatPhong);
+
+
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();
 

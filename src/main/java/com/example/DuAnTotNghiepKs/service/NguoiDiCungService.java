@@ -67,4 +67,17 @@ public class NguoiDiCungService {
     }
 
 
+    // Phương thức kiểm tra sự tồn tại của số CCCD trong cơ sở dữ liệu
+    public boolean isCccdExists(String cccd) {
+        // Kiểm tra xem số CCCD đã tồn tại trong cơ sở dữ liệu chưa
+        return nguoiDiCungRepo.existsBySoCmnd(cccd);
+    }
+
+    public void xoaTatCaCCCDTheoIdDatPhong(Long idDatPhong) {
+        nguoiDiCungRepo.xoaTatCaCCCDTheoIdDatPhong(idDatPhong);
+    }
+
+
+
+
 }

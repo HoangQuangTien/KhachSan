@@ -9,21 +9,24 @@
             margin-bottom: 20px;
         }
         .companion-form {
-            border: 2px solid #000; /* Border cho từng người đi cùng */
+            border: 2px solid #000;
             border-radius: 5px;
             padding: 10px;
             margin-top: 10px;
-            background-color: #f9f9f9; /* Màu nền nhẹ */
+            background-color: #f9f9f9;
         }
         .companion-header {
             font-weight: bold;
             margin-bottom: 5px;
         }
-    </style>
+        .companion-form strong {
+            font-size: 1.2em; /* Làm cho số thứ tự lớn hơn một chút */
+            color: #007bff; /* Màu sắc cho số thứ tự */
+        }
 
-    <head th:include="fragment/head :: head"></head>
+    </style>
 </head>
-<body class="vertical  light  ">
+<body class="vertical light">
 <div class="wrapper">
     <div th:include="fragment/navbar :: navbar"></div>
     <div th:include="fragment/sidebar :: sidebar"></div>
@@ -75,7 +78,6 @@
                             <label class="form-label">Thêm người đi cùng</label>
                             <input type="hidden" name="idDatPhong" id="idDatPhong" th:value="${datPhongDTO.idDatPhong}"/>
 
-
                             <div class="mb-3">
                                 <label for="fullname1" class="form-label">Họ và tên</label>
                                 <input type="text" class="form-control" id="fullname1" name="tenNguoiDiCung" required>
@@ -91,8 +93,63 @@
                             </div>
                         </div>
 
-                        <div id="companionFormsContainer"></div>
+                        <div id="companionFormsContainer">
+                            <h4>Danh sách người đi cùng:</h4>
+                            <div th:each="nguoiDiCung, stat : ${nguoiDiCungList}">
+                                <div class="companion-form mb-2">
+                                    <div class="companion-header">
+                                        <span class="companion-number">Người đi cùng [[${stat.index + 1}]]:</span> <!-- Số thứ tự -->
+                                    </div>
+                                    <div class="companion-details">
+                                        Họ và tên: <input type="text" class="form-control" th:value="${nguoiDiCung.tenNguoiDiCung}" disabled/><br>
+                                        Số CCCD: <input type="text" class="form-control" th:value="${nguoiDiCung.soCmnd}" disabled/><br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <style>
+                            /* Khung bao quanh người đi cùng */
+                            .companion-form {
+                                border: 2px solid #007bff;
+                                border-radius: 10px;
+                                padding: 15px;
+                                background-color: #f9f9f9;
+                                margin-bottom: 15px;
+                                box-sizing: border-box;
+                            }
 
+                            /* Tiêu đề của mỗi người đi cùng */
+                            .companion-header {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                margin-bottom: 10px;
+                            }
+
+                            .companion-number {
+                                background-color: #007bff;
+                                color: white;
+                                font-weight: bold;
+                                padding: 5px 10px;
+                                border-radius: 5px;
+                            }
+
+                            /* Phần chi tiết thông tin người đi cùng */
+                            .companion-details {
+                                margin-top: 10px;
+                            }
+
+                            .companion-details input {
+                                margin-bottom: 10px;
+                            }
+
+                            /* Container của danh sách người đi cùng với chiều cao cố định và scroll */
+                            #companionFormsContainer {
+                                max-height: 400px;  /* Giới hạn chiều cao */
+                                overflow-y: auto;   /* Thêm cuộn dọc nếu vượt quá chiều cao */
+                                padding-right: 10px;  /* Dự phòng cho thanh cuộn */
+                            }
+                        </style>
                     </div>
                 </div>
             </form>
@@ -108,7 +165,42 @@
                     const genderInput = document.querySelector('input[name="gioiTinh"]:checked');
                     const idKhachHang = document.querySelector('input[name="idKhachHang"]').value;
 
-                    // Kiểm tra dữ liệu nhập
+                    // Kiểm tra tên không chứa số hoặc ký tự đặc biệt
+                    const nameRegex = /^[A-Za-zÀ-ỹ\s]+$/;
+                    if (!nameRegex.test(fullname)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Lỗi tên!',
+                            text: 'Tên không được chứa số hoặc ký tự đặc biệt.',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    // Kiểm tra email đúng định dạng
+                    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    if (!emailRegex.test(email)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Lỗi email!',
+                            text: 'Vui lòng nhập đúng định dạng email.',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    // Kiểm tra số điện thoại là 10 chữ số
+                    const phoneRegex = /^\d{10}$/;
+                    if (!phoneRegex.test(phone)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Lỗi số điện thoại!',
+                            text: 'Số điện thoại phải có 10 chữ số.',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
                     if (!fullname || !email || !phone || !genderInput) {
                         Swal.fire({
                             icon: 'warning',
@@ -119,9 +211,8 @@
                         return;
                     }
 
-                    const gender = genderInput.value === "true"; // Chuyển đổi thành boolean
+                    const gender = genderInput.value === "true";
 
-                    // Gửi yêu cầu cập nhật thông tin khách hàng
                     fetch('/nguoidicung/' + idKhachHang, {
                         method: 'PUT',
                         headers: {
@@ -135,165 +226,14 @@
                         })
                     })
                         .then(response => {
-                            // Kiểm tra nếu phản hồi không thành công
-                            if (!response.ok) {
-                                return response.text().then(text => {
-                                    throw new Error(text); // Ném lỗi nếu phản hồi không thành công
-                                });
-                            }
-                            return response.text(); // Trả về văn bản nếu thành công
+                            if (!response.ok) throw new Error("Lỗi cập nhật thông tin khách hàng");
+                            return response.text();
                         })
                         .then(text => {
-                            // Hiển thị thông báo thành công
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Thành công!',
-                                text: text, // Hiển thị thông báo từ server
-                                confirmButtonText: 'OK'
-                            });
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi!',
-                                text: 'Có lỗi xảy ra: ' + error.message,
-                                confirmButtonText: 'OK'
-                            });
-                        });
-
-
-                });
-
-                let soNguoiToiDa = 6;
-                let idDatPhong = document.getElementById('idDatPhong').value;
-                let companions = JSON.parse(localStorage.getItem('companions')) || {};
-
-                document.addEventListener("DOMContentLoaded", function () {
-                    const companionFormsContainer = document.getElementById('companionFormsContainer');
-
-                    // Hiển thị người đi cùng từ Local Storage cho phòng cụ thể
-                    if (companions[idDatPhong]) {
-                        companions[idDatPhong].forEach((companion, index) => {
-                            const companionDiv = document.createElement('div');
-                            companionDiv.classList.add('companion-form', 'mb-2');
-                            companionDiv.innerHTML = `
-                <strong>Người đi cùng ${index + 1}:</strong><br>
-                Họ và tên: <input type="text" class="form-control" value="${companion.fullname}" disabled/><br>
-                Số CCCD: <input type="text" class="form-control" value="${companion.cmnd}" disabled/><br>
-            `;
-                            companionFormsContainer.appendChild(companionDiv);
-                        });
-                    }
-
-                    // Kiểm tra số người tối đa
-                    const currentCompanionCount = companions[idDatPhong] ? companions[idDatPhong].length : 0;
-                    const maxCompanionsAllowed = soNguoiToiDa - 1; // Giới hạn số người đi cùng tối đa (giảm 1 vì 1 người phải là khách hàng)
-
-                    console.log("Số người đi cùng hiện tại:", currentCompanionCount);
-                    console.log("Số người đi cùng tối đa cho phép:", maxCompanionsAllowed);
-
-
-                });
-
-                document.getElementById('addCustomerBtn').addEventListener('click', function() {
-                    const newFullname = document.getElementById('fullname1').value.trim();
-                    const newCmnd = document.getElementById('Cmnd').value.trim();
-
-                    // Kiểm tra thông tin người đi cùng
-                    if (!newFullname) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Thiếu thông tin!',
-                            text: 'Họ và tên không được để trống!',
-                            confirmButtonText: 'OK'
-                        });
-                        return;
-                    }
-                    if (!newCmnd) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Thiếu thông tin!',
-                            text: 'Số CCCD không được để trống!',
-                            confirmButtonText: 'OK'
-                        });
-                        return;
-                    }
-                    if (newCmnd.length !== 12 || isNaN(newCmnd)) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Lỗi CCCD!',
-                            text: 'Số CCCD phải là 12 số!',
-                            confirmButtonText: 'OK'
-                        });
-                        return;
-                    }
-
-                    // Kiểm tra số người tối đa
-                    if (companions[idDatPhong] && companions[idDatPhong].length >= soNguoiToiDa) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Quá tải!',
-                            text: 'Phòng quá tải! Không thể thêm người đi cùng.',
-                            confirmButtonText: 'OK'
-                        });
-                        return;
-                    }
-
-                    // Kiểm tra trùng lặp
-                    const isDuplicate = companions[idDatPhong] && companions[idDatPhong].some(companion => companion.cmnd === newCmnd);
-                    if (isDuplicate) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Trùng lặp!',
-                            text: 'Người đi cùng với số CCCD này đã tồn tại!',
-                            confirmButtonText: 'OK'
-                        });
-                        return;
-                    }
-
-                    // Gửi yêu cầu thêm người đi cùng
-                    fetch('/them-nguoi-di-cung', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            tenNguoiDiCung: newFullname,
-                            soCmnd: newCmnd,
-                            datPhongId: parseInt(idDatPhong, 10)
-                        })
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                return response.text().then(text => {
-                                    throw new Error(text);
-                                });
-                            }
-                            // Lưu thông tin người đi cùng vào Local Storage
-                            if (!companions[idDatPhong]) {
-                                companions[idDatPhong] = [];
-                            }
-                            companions[idDatPhong].push({ fullname: newFullname, cmnd: newCmnd });
-                            localStorage.setItem('companions', JSON.stringify(companions));
-
-                            // Thêm người đi cùng vào giao diện
-                            const companionDiv = document.createElement('div');
-                            companionDiv.classList.add('companion-form', 'mb-2');
-                            companionDiv.innerHTML = `
-            <strong>Người đi cùng:</strong><br>
-            Họ và tên: <input type="text" class="form-control" value="${newFullname}" disabled/><br>
-            Số CCCD: <input type="text" class="form-control" value="${newCmnd}" disabled/><br>
-        `;
-                            companionFormsContainer.appendChild(companionDiv);
-
-                            // Xóa nội dung form nhập người đi cùng
-                            document.getElementById('fullname1').value = '';
-                            document.getElementById('Cmnd').value = '';
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Thành công!',
-                                text: 'Thêm người đi cùng thành công!',
+                                text: text,
                                 confirmButtonText: 'OK'
                             });
                         })
@@ -306,13 +246,106 @@
                             });
                         });
                 });
+                document.getElementById('addCustomerBtn').addEventListener('click', function() {
+                    const newFullname = document.getElementById('fullname1').value.trim();
+                    const newCmnd = document.getElementById('Cmnd').value.trim();
+                    const idDatPhong = document.getElementById('idDatPhong').value;
 
+                    // Kiểm tra tên không chứa số hoặc ký tự đặc biệt
+                    const nameRegex = /^[A-Za-zÀ-ỹ\s]+$/;
+                    if (!nameRegex.test(newFullname)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Lỗi tên!',
+                            text: 'Tên không được chứa số hoặc ký tự đặc biệt.',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    // Kiểm tra CCCD phải có đúng 12 chữ số
+                    const cmndRegex = /^\d{12}$/;
+                    if (!cmndRegex.test(newCmnd)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Lỗi CCCD!',
+                            text: 'Số CCCD phải là 12 chữ số.',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    // Kiểm tra trùng lặp số CCCD
+                    fetch('/check-cccd/' + newCmnd)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Không thể kiểm tra số CCCD');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.exists) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Lỗi CCCD!',
+                                    text: 'Số CCCD này đã tồn tại trong hệ thống.',
+                                    confirmButtonText: 'OK'
+                                });
+                                return;
+                            }
+
+                            // Nếu CCCD không trùng, tiếp tục thêm người đi cùng
+                            fetch('/them-nguoi-di-cung', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ tenNguoiDiCung: newFullname, soCmnd: newCmnd, datPhongId: parseInt(idDatPhong, 10) })
+                            })
+                                .then(response => {
+                                    if (!response.ok) throw new Error("Người đi cùng đã quá giới hạn");
+                                    return response.json();
+                                })
+                                .then(companion => {
+                                    const companionDiv = document.createElement('div');
+                                    companionDiv.classList.add('companion-form', 'mb-2');
+                                    companionDiv.innerHTML = `
+                    <strong>Người đi cùng:</strong><br>
+                    Họ và tên: <input type="text" class="form-control" value="${companion.tenNguoiDiCung}" disabled/><br>
+                    Số CCCD: <input type="text" class="form-control" value="${companion.soCmnd}" disabled/><br>
+                `;
+                                    document.getElementById('companionFormsContainer').appendChild(companionDiv);
+                                    document.getElementById('fullname1').value = '';
+                                    document.getElementById('Cmnd').value = '';
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thành công!',
+                                        text: 'Thêm người đi cùng thành công!',
+                                        confirmButtonText: 'OK'
+                                    });
+                                })
+                                .catch(error => {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Lỗi!',
+                                        text: error.message,
+                                        confirmButtonText: 'OK'
+                                    });
+                                });
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: error.message,
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                });
             </script>
         </div>
     </main>
     <div th:include="fragment/modal :: modal"></div>
 </div>
-</body>
 <script th:include="fragment/script :: script"></script>
+</body>
 </html>
-
