@@ -12,6 +12,7 @@ import lombok.*;
 @Table(name = "ChiTietVaiTro")
 public class ChiTietVaiTro {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_chi_tiet_vai_tro")
     private Integer idChiTietVaiTro;
 

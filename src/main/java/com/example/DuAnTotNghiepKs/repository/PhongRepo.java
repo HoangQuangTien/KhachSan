@@ -72,5 +72,22 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
     List<Phong> findByTrangThai(Boolean trangThai);
 
 
+    boolean existsByTenPhong(String tenPhong);
+
+    @Query("SELECT MAX(p.maPhong) FROM Phong p")
+    String findMaxMaPhong();
+
+
+    // Lọc phòng có sẵn trong khoảng thời gian và không vượt quá số người tối đa của loại phòng
+    @Query("SELECT p FROM Phong p WHERE p.idPhong NOT IN " +
+            "(SELECT dp.phong.idPhong FROM DatPhong dp WHERE " +
+            "(dp.ngayNhan < :endDate AND dp.ngayTra > :startDate)) " +
+            "AND p.loaiPhong.soNguoiToiDa >= :soNguoi " +
+            "AND p.trangThai = true") // Thêm điều kiện kiểm tra trạng thái
+    List<Phong> findAvailableRoomsWithMaxGuests(@Param("startDate") LocalDateTime startDate,
+                                                @Param("endDate") LocalDateTime endDate,
+                                                @Param("soNguoi") int soNguoi);
+
+
 }
 

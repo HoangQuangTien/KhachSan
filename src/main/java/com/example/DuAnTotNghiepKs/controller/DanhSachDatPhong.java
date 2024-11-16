@@ -72,6 +72,14 @@ public class DanhSachDatPhong {
                 return ResponseEntity.badRequest().body(Map.of("error", "Không tìm thấy thông tin nhân viên."));
             }
 
+            // Kiểm tra danh sách người đi cùng
+            if (datPhong.getLoaiPhong().getSoNguoiToiDa() > 1 &&
+                    (datPhong.getNguoiDiCungList() == null || datPhong.getNguoiDiCungList().isEmpty())) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Phòng chưa có người đi cùng."));
+            }
+
+
+
             // Lấy thời gian dự kiến nhận phòng từ đặt phòng
             LocalDateTime ngayNhanPhong = datPhong.getNgayNhan();
 

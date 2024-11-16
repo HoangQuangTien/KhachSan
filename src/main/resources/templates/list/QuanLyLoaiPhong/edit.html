@@ -4,42 +4,99 @@
 <head>
     <title>Chỉnh sửa Loại Phòng</title>
     <link rel="stylesheet" th:href="@{/css/edit.css}" />
+    <script>
+        function validateForm() {
+            const tenLoaiPhong = document.getElementById("tenLoaiPhong").value.trim();
+            const moTa = document.getElementById("moTa").value.trim();
+            const soLuongGiuong = document.getElementById("soLuongGiuong").value.trim();
+            const soNguoiToiDa = document.getElementById("soNguoiToiDa").value.trim();
+            const gia = document.getElementById("gia").value.trim();
+            const sucChua = document.getElementById("sucChua").value.trim();
+
+            // Kiểm tra "Tên Loại Phòng" không được để trống
+            if (tenLoaiPhong === "") {
+                alert("Tên Loại Phòng không được để trống!");
+                return false;
+            }
+
+            // Kiểm tra "Tên Loại Phòng" không được chứa số
+            const regex = /\d/;
+            if (regex.test(tenLoaiPhong)) {
+                alert("Tên Loại Phòng không được chứa số!");
+                return false;
+            }
+
+            // Kiểm tra "Mô Tả" không được để trống
+            if (moTa === "") {
+                alert("Mô Tả không được để trống!");
+                return false;
+            }
+
+            // Kiểm tra "Số Lượng Giường" không được để trống và phải từ 1 đến 3
+            if (soLuongGiuong === "" || isNaN(soLuongGiuong) || Number(soLuongGiuong) < 1 || Number(soLuongGiuong) > 3) {
+                alert("Số Lượng Giường phải là số nguyên từ 1 đến 3!");
+                return false;
+            }
+
+            // Kiểm tra "Số Người Tối Đa" không được để trống và phải từ 1 đến 6
+            if (soNguoiToiDa === "" || isNaN(soNguoiToiDa) || Number(soNguoiToiDa) < 1 || Number(soNguoiToiDa) > 6) {
+                alert("Số Người Tối Đa phải là số nguyên từ 1 đến 6!");
+                return false;
+            }
+
+            // Kiểm tra "Giá" không được để trống và phải lớn hơn 0
+            if (gia === "" || isNaN(gia) || Number(gia) <= 0) {
+                alert("Giá phải là một số hợp lệ và lớn hơn 0!");
+                return false;
+            }
+
+            // Kiểm tra "Sức Chứa" không được để trống và phải từ 1 đến 6
+            if (sucChua === "" || isNaN(sucChua) || Number(sucChua) < 1 || Number(sucChua) > 6) {
+                alert("Sức Chứa phải là số nguyên từ 1 đến 6!");
+                return false;
+            }
+
+            // Nếu tất cả các kiểm tra đều hợp lệ, hiển thị thông báo thành công
+            alert("Sửa loại phòng mới thành công!");
+            return true; // Trả về true để form có thể gửi
+        }
+    </script>
 </head>
-<body class="vertical  light">
+<body class="vertical light">
 <h2>Chỉnh sửa Loại Phòng</h2>
+
 <!-- Hiển thị thông báo lỗi nếu có -->
 <div th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></div>
-<form th:action="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" th:object="${loaiPhong}" method="post">
-    <label>Mã Loại Phòng:</label>
-    <input type="text" th:field="*{maLoaiPhong}" />
-    <div class="error"  th:if="${#fields.hasErrors('maLoaiPhong')}" th:errors="*{maLoaiPhong}"></div><br/>
+
+<form th:action="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" th:object="${loaiPhong}" method="post" onsubmit="return validateForm()">
+    <input type="hidden" th:field="*{maLoaiPhong}" />
 
     <label>Tên Loại Phòng:</label>
-    <input type="text" th:field="*{tenLoaiPhong}" />
-    <div class="error"  th:if="${#fields.hasErrors('tenLoaiPhong')}" th:errors="*{tenLoaiPhong}"></div><br/>
+    <input type="text" th:field="*{tenLoaiPhong}" id="tenLoaiPhong" />
+    <div class="error" th:if="${#fields.hasErrors('tenLoaiPhong')}" th:errors="*{tenLoaiPhong}"></div><br/>
 
     <label>Mô Tả:</label>
-    <textarea th:field="*{moTa}"></textarea><br/>
+    <textarea th:field="*{moTa}" id="moTa"></textarea><br/>
 
     <label>Số Lượng Giường:</label>
-    <input type="number" th:field="*{soLuongGiuong}" />
-    <div class="error"  th:if="${#fields.hasErrors('soLuongGiuong')}" th:errors="*{soLuongGiuong}"></div><br/>
+    <input type="number" th:field="*{soLuongGiuong}" id="soLuongGiuong" />
+    <div class="error" th:if="${#fields.hasErrors('soLuongGiuong')}" th:errors="*{soLuongGiuong}"></div><br/>
 
     <label>Số Người Tối Đa:</label>
-    <input type="number" th:field="*{soNguoiToiDa}" />
-    <div class="error"  th:if="${#fields.hasErrors('soNguoiToiDa')}" th:errors="*{soNguoiToiDa}"></div><br/>
+    <input type="number" th:field="*{soNguoiToiDa}" id="soNguoiToiDa" />
+    <div class="error" th:if="${#fields.hasErrors('soNguoiToiDa')}" th:errors="*{soNguoiToiDa}"></div><br/>
 
     <label>Giá:</label>
-    <input type="number" th:field="*{gia}" step="0.1" />
-    <div class="error"  th:if="${#fields.hasErrors('gia')}" th:errors="*{gia}"></div><br/>
+    <input type="number" th:field="*{gia}" step="0.1" id="gia" />
+    <div class="error" th:if="${#fields.hasErrors('gia')}" th:errors="*{gia}"></div><br/>
 
-    <label>Suc Chua:</label>
-    <input type="number" th:field="*{sucChua}" />
-    <div class="error"  th:if="${#fields.hasErrors('sucChua')}" th:errors="*{sucChua}"></div><br/>
+    <label>Sức Chứa:</label>
+    <input type="number" th:field="*{sucChua}" id="sucChua" />
+    <div class="error" th:if="${#fields.hasErrors('sucChua')}" th:errors="*{sucChua}"></div><br/>
 
     <div style="display: flex;">
         <a href="/loaiphongs"><button type="button" style="background-color: gray;">Quay lại</button></a>
-        <button type="submit" class="luu"> Lưu Thay Đổi</button>
+        <button type="submit" class="luu">Lưu Thay Đổi</button>
     </div>
 </form>
 </body>

@@ -68,6 +68,6 @@ public class KhachHang {
     @JoinColumn(name = "ten_dang_nhap") // Tên cột khóa ngoại trong bảng KhachHang
     private TaiKhoan taiKhoan;
 
-//    @OneToMany(mappedBy = "datPhong", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @OneToMany(mappedBy = "datPho ng", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private Set<ChiTietDatPhong> chiTietDatPhongs = new HashSet<>();
 }

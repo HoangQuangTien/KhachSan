@@ -299,7 +299,7 @@ public class NhanVienController {
                 nhanVienDTO.setImg(existingNhanVien.get().getImg());
             }
 
-            nhanVienSerVice.save(nhanVienDTO);
+            nhanVienSerVice.update(nhanVienDTO);
             return ResponseEntity.ok(Map.of("success", "Sửa nhân viên thành công!"));
 
         } catch (Exception e) {

@@ -37,4 +37,10 @@ public class TangServiceImp implements TangService {
         return tangRepository.findByLoaiPhong_IdLoaiPhong(idLoaiPhong);
     }
 
+
+    @Override
+    public long countTang() {
+        return tangRepository.count(); // Đếm số lượng tầng
+    }
+
 }

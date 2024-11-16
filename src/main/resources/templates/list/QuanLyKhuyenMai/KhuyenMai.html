@@ -167,11 +167,11 @@
 
                 <!-- Nút mở modal thêm Khuyến Mãi -->
                 <div class="mb-3 d-flex justify-content-end">
-                    <a type="button" class="btn btn-success me-1" data-bs-toggle="modal" data-bs-target="#addKhuyenMaiModal">
+                    <a type="button" class="btn btn-success me-1" data-bs-toggle="modal" data-bs-target="#addKhuyenMaiModal" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                         <i class="fas fa-plus" style="color: #fcfcfc; top: 20px"></i>
                     </a>
 
-                    <a data-bs-toggle="modal" data-bs-target="#add" class="btn btn-success">
+                    <a data-bs-toggle="modal" data-bs-target="#add" class="btn btn-success" >
                         <i class="fa-regular fa-paper-plane" style="color: #fcfcfc; top: 20px"></i>
                     </a>
                 </div>
@@ -198,13 +198,13 @@
                         <tr th:each="khuyenMai : ${khuyenMaiPage.content}">
                             <td th:text="${khuyenMai.maKhuyenMai}">Mã KM</td>
                             <td th:text="${khuyenMai.tenKhuyenMai}">Tên KM</td>
-                            <td th:text="${khuyenMai.giamGia}">Giảm Giá</td>
+                            <td th:text="${#numbers.formatDecimal(khuyenMai.giamGia, 0,'0')}">Giảm Giá</td>
                             <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
                             <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
-                            <td th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
-                            <td th:text="${khuyenMai.giamToiDa}">Giảm Tối Đa</td>
+                            <td th:text="${#numbers.formatDecimal(khuyenMai.giamToiThieu, 0,'0')}">Giảm Tối Thiểu</td>
+                            <td th:text="${#numbers.formatDecimal(khuyenMai.giamToiDa, 0,'0')}">Giảm Tối Đa</td>
                             <td th:text="${khuyenMai.trangThai}">Trạng Thái</td>
-                            <td>
+                            <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
                                         th:data-idKhuyenMai="${khuyenMai.idKhuyenMai}"
                                         th:data-maKhuyenMai="${khuyenMai.maKhuyenMai}"
@@ -471,12 +471,29 @@
                 </div>
                 <!-- Phân trang -->
 
-                <div class="pagination">
-                    <a class="prev" th:if="${khuyenMaiPage.hasPrevious()}"
-                       th:href="@{/admin/quan-ly-khuyen-mai(page=${khuyenMaiPage.number - 1}, size=${khuyenMaiPage.size})}">&laquo;</a>
-                    <span class="current-page" th:text="${khuyenMaiPage.number + 1}"></span>
-                    <a class="next" th:if="${khuyenMaiPage.hasNext()}"
-                       th:href="@{/admin/quan-ly-khuyen-mai(page=${khuyenMaiPage.number + 1}, size=${khuyenMaiPage.size})}">&raquo;</a>
+                <div class="pagination d-flex justify-content-center mt-2">
+<!--                    &lt;!&ndash; Hiển thị nút Previous nếu có trang trước &ndash;&gt;-->
+<!--                    <a class="prev page-item" th:if="${khuyenMaiPage.hasPrevious()}"-->
+<!--                       th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number - 1}, size=${khuyenMaiPage.size})}"-->
+<!--                       aria-label="Previous">-->
+<!--                        <span aria-hidden="true">&laquo;</span>-->
+<!--                    </a>-->
+
+                    <!-- Hiển thị các số trang -->
+                    <ul class="pagination">
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, khuyenMaiPage.totalPages - 1)}"
+                            th:class="${i == khuyenMaiPage.number} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/quan-ly-khuyen-mai(page=${i}, size=${khuyenMaiPage.size})}"
+                               th:text="${i + 1}"></a>
+                        </li>
+                    </ul>
+
+<!--                    &lt;!&ndash; Hiển thị nút Next nếu có trang tiếp theo &ndash;&gt;-->
+<!--                    <a class="next page-item" th:if="${khuyenMaiPage.hasNext()}"-->
+<!--                       th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number + 1}, size=${khuyenMaiPage.size})}"-->
+<!--                       aria-label="Next">-->
+<!--                        <span aria-hidden="true">&raquo;</span>-->
+<!--                    </a>-->
                 </div>
             </div>
         </div>
@@ -704,7 +721,7 @@
     function searchInModal() {
         var input, filter, table, tr, td, i, txtValue;
         input = document.getElementById("modalSearchInput");
-        filter = input.value.toUpperCase();
+        filter = input.value.trim().toUpperCase();
         table = document.querySelector(".modal-body table");
         tr = table.getElementsByTagName("tr");
 

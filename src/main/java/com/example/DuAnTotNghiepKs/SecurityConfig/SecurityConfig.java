@@ -23,23 +23,19 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Set;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = { "/api", "/login","khach-hang","view-dat-phong","/thanh-toan-khach-hang","/dat-phong","/vnpay",
+    private final String[] PUBLIC_ENDPOINTS = { "/api","/register", "/login","khach-hang","view-dat-phong","/thanh-toan-khach-hang","/dat-phong","/vnpay",
             "/assets1/**","vnpay_pay","vnpay_result","vnpay-create","https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-            "/load-phong","/img/**","/css/**","/js/**","lien-he","/searchh","/about","/listPhong","/phong-theo-loai"};
+            "/load-phong/**","/img/**","/css/**","/js/**","lien-he","/searchh","/about","/listPhong","/phong-theo-loai","/register","/api/available-rooms"
+            ,"/khach-hang/login"};
     private final String[] ADMIN_ENDPOINTS= {"thongke"};
     private final String[] EMPLOYEE_ENDPOINTS= {"quan-ly-khach-hang/**"};
 
@@ -210,4 +206,11 @@ public class SecurityConfig {
         //dùng để mã hóa mật khẩu
         return new BCryptPasswordEncoder(8);
     }
+
+//    @Bean
+//    public SpringTemplateEngine templateEngine() {
+//        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+//        templateEngine.addDialect(new SpringSecurityDialect());
+//        return templateEngine;
+//    }
 }

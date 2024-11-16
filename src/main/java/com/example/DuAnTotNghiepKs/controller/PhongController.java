@@ -144,13 +144,17 @@ public class PhongController {
 
             }
 
-            if (phongService.isMaPhongTrung(phongDTO.getMaPhong())) {
-
-                redirectAttributes.addFlashAttribute("errorMessage", "Mã phòng đã tồn tại!");
-
-                return "redirect:/phongs";
-
+            if (phong.getMaPhong() == null || phong.getMaPhong().isEmpty()) {
+                phong.setMaPhong(phongService.generateMaPhong());
             }
+
+//            if (phongService.isMaPhongTrung(phongDTO.getMaPhong())) {
+//
+//                redirectAttributes.addFlashAttribute("errorMessage", "Mã phòng đã tồn tại!");
+//
+//                return "redirect:/phongs";
+//
+//            }
 
 
 
@@ -261,6 +265,16 @@ public class PhongController {
         List<PhongDTO> results = phongService.search(query);
         return ResponseEntity.ok(results);
     }
+
+
+    @GetMapping("/checkTenPhong")
+    @ResponseBody
+    public Map<String, Boolean> checkTenPhong(@RequestParam String tenPhong) {
+        boolean exists = phongService.isTenPhongTrung(tenPhong);
+        return Collections.singletonMap("exists", exists);
+    }
+
+
 
 
 

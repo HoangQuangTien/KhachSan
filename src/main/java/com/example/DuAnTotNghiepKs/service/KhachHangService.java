@@ -46,4 +46,14 @@ public interface KhachHangService {
     boolean existsById(Integer id);
 
     boolean update1(Integer id, KhachHangDTO khachHangDTO);
+
+    boolean existsByTenDangNhap(String tenDangNhap);
+
+    String createMaKH();
+
+    void insert(KhachHang khachHang);
+
+    KhachHang findByTenDangNhap(String tenDangNhap);
+
+    void updateKH(KhachHang khachHang);
 }

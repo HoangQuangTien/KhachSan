@@ -20,6 +20,10 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
     List<DatPhong> findByTinhTrang(String tinhTrang);
 
+    List<DatPhong> findByTinhTrangAndTrangThaiOrTinhTrangAndTrangThai(String tinhTrang1, boolean trangThai1, String tinhTrang2, boolean trangThai2);
+
+
+
     @Query("SELECT SUM(dp.tienCoc) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) = :month AND YEAR(dp.ngayNhan) = :year")
     Double findRevenueByMonth(@Param("month") int month, @Param("year") int year);
 
@@ -69,6 +73,7 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "FROM PhongDatNhieuNhat\n" +
             "WHERE row_num <= 3;",nativeQuery = true)
     List<Object[]> findTopPhongDuocDatNhieuNhat();
+
 
 
 
@@ -131,17 +136,20 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "        p.id_phong,\n" +
             "        p.img,\n" +
             "        p.ten_phong,\n" +
-            "        p.gia,\n" +
+            "        lp.gia,\n" +  // Lấy giá từ bảng LoaiPhong
             "        COUNT(dp.id_dat_phong) AS so_lan_dat,\n" +
             "        ROW_NUMBER() OVER (ORDER BY COUNT(dp.id_dat_phong) DESC) AS row_num\n" +
             "    FROM DatPhong dp\n" +
             "    JOIN phong p ON dp.id_phong = p.id_phong\n" +
-            "    GROUP BY p.id_phong, p.img, p.ten_phong, p.gia\n" +
+            "    JOIN LoaiPhong lp ON p.id_loai_phong = lp.id_loai_phong\n" +  // Kết nối với bảng LoaiPhong để lấy giá
+            "    GROUP BY p.id_phong, p.img, p.ten_phong, lp.gia\n" +
             ")\n" +
             "SELECT id_phong, img, ten_phong, gia\n" +
             "FROM PhongDatNhieuNhat\n" +
             "WHERE row_num <= 3;", nativeQuery = true)
     List<Object[]> findTopPhongDuocDatNhieuNhat1();
+
+
 
 
     @Query(value = "SELECT COUNT(*) AS cancelled_count \n" +

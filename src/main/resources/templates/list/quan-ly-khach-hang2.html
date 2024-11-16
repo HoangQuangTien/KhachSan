@@ -148,15 +148,12 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <form action="/quan-ly-khach-hang/them" id="addForm" method="post">
+                                            <div th:if="${message}" th:class="${messageClass}">
+                                                <p th:text="${message}"></p>
+                                            </div>
+                                            <form action="/quan-ly-khach-hang/them" id="addForm" method="post" onsubmit="return validateForm()">
                                                 <div class="form-row">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="maKhachHang">Use name</label>
-                                                        <input class="form-control" id="maKhachHang"
-                                                               name="maKhachHang"
-                                                               placeholder="Nhập use name" required
-                                                               type="text">
-                                                    </div>
+                                                    <input type="hidden" name="maKhachHang" id="maKhachHang">
                                                     <div class="form-group col-md-6">
                                                         <label for="hoVaTen">Họ và tên</label>
                                                         <input class="form-control" id="hoVaTen" name="hoVaTen"
@@ -345,8 +342,6 @@
                 '<td>' + khachHang.soDienThoai + '</td>' +
                 '<td>' + khachHang.createdAt + '</td>' +
                 '<td>' + (khachHang.gioiTinh ? 'Nam' : 'Nữ') + '</td>' +
-                // '<td><span class="' + (khachHang.trangThai === 'active' ? 'text-success' : 'text-danger') + '">' +
-                // (khachHang.trangThai === 'active' ? 'Hoạt động' : 'Không hoạt động') + '</span></td>' +
                 '<td style="display: flex"><a href="/quan-ly-khach-hang-detail?id=' + khachHang.id + '">' +
                 '<button class="btn mb-2 mr-1 btn-outline-success" type="button"><span class="fe fe-edit-3"></span></button>' +
                 '</a></td>' +
@@ -354,7 +349,6 @@
             tableBody.innerHTML += row;
         });
     }
-
 
     function showSuccessToast(message) {
         Toastify({
@@ -409,29 +403,45 @@
         filterKhachHang();
     });
 
-    function updateTableBody(data) {
-        var tableBody = document.getElementById('khachHangTable');
-        tableBody.innerHTML = '';
+    function validateForm() {
+        const hoVaTen = document.getElementById("hoVaTen").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const soDienThoai = document.getElementById("soDienThoai").value.trim();
 
-        data.forEach(function (khachHang, index) {
-            var row = '<tr>' +
-                '<td>' + (index + 1) + '</td>' +
-                '<td>' + khachHang.hoVaTen + '</td>' +
-                '<td>' + khachHang.email + '</td>' +
-                '<td>' + khachHang.soDienThoai + '</td>' +
-                '<td>' + khachHang.createdAt + '</td>' +
-                '<td>' + (khachHang.gioiTinh ? 'Nam' : 'Nữ') + '</td>' +
-                // '<td><span class="' + (khachHang.trangThai === 'active' ? 'text-success' : 'text-danger') + '">' +
-                // (khachHang.trangThai === 'active' ? 'Hoạt động' : 'Không hoạt động') + '</span></td>' +
-                '<td style="display: flex"><a href="/quan-ly-khach-hang-detail?id=' + khachHang.id + '">' +
-                '<button class="btn mb-2 mr-1 btn-outline-success type="button"><span class="fe fe-edit-3"></span></button>' +
-                '</a></td>' +
-                '</tr>';
-            tableBody.innerHTML += row;
-        });
+        // Kiểm tra họ và tên không chứa số
+        const nameRegex = /^[\p{L}\s]+$/u;
+        if (!nameRegex.test(hoVaTen)) {
+            showErrorToast("Họ tên không được chứa số hoặc ký tự đặc biệt.");
+            return false;
+        }
+
+        // Kiểm tra định dạng email
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)) {
+            showErrorToast("Email không đúng định dạng.");
+            return false;
+        }
+
+        // Kiểm tra số điện thoại có đúng 10 chữ số
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(soDienThoai)) {
+            showErrorToast("Số điện thoại phải có 10 chữ số.");
+            return false;
+        }
+
+        // Nếu tất cả kiểm tra đều hợp lệ
+        showSuccessToast("Dữ liệu hợp lệ. Bạn có thể gửi form.");
+        return true;
     }
 
+    // Bắt sự kiện submit của form
+    document.getElementById("formKhachHang").addEventListener("submit", function(event) {
+        if (!validateForm()) {
+            event.preventDefault(); // Ngăn không cho gửi form nếu dữ liệu không hợp lệ
+        }
+    });
 
 </script>
+
 </body>
 </html>

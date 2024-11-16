@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NguoiDiCungDTO {
-
+    private Integer id;
     private String tenNguoiDiCung;
     private String soCmnd;
     private Integer datPhongId;

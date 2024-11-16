@@ -708,7 +708,7 @@
 
                                             <h5 class="mb-1" th:text="${phong.tenPhong}"></h5>
 
-                                            <p class="mb-0" th:text="'Giá: ' + ${phong.loaiPhong.gia}"></p>
+                                            <p class="mb-0" th:text="'Giá: ' + ${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></p>
 
                                         </div>
 
@@ -762,9 +762,9 @@
 
                                     <!-- Tình Trạng -->
 
-                                    <p class="card-text"><strong>Tình Trạng: </strong><span th:text="${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></span></p>
+<!--                                    <p class="card-text"><strong>Tình Trạng: </strong><span th:text="${phong.tinhTrang ? 'Đang hoạt động' : 'Ngừng hoạt động'}"></span></p>-->
 
-
+                                    <p class="card-text"><strong>Trạng Thái: </strong><span th:text="${phong.trangThai ? 'Phòng trống' : 'Phòng có người ở'}"></span></p>
 
                                     <!-- Nút Sửa -->
 
@@ -862,7 +862,7 @@
 
                     <div class="modal-body">
 
-                        <form action="/save" id="addForm" method="post">
+                        <form action="/save" id="addForm" method="post" onsubmit="return validateForm()">
 
                             <input type="hidden" id="idPhong" name="idPhong" th:value="${phong.idPhong}"/>
 
@@ -898,29 +898,23 @@
 
                             <!-- Mã Phòng và Tên Phòng -->
 
-                            <div class="row g-3">
 
-                                <div class="form-group col-md-6">
 
-                                    <label for="maPhong">Mã Phòng</label>
 
-                                    <input type="text" id="maPhong" name="maPhong" class="form-control"
+                                <div class="row g-3">
 
-                                           onchange="checkMaPhong()" th:value="${phong.maPhong}" required/>
+                                    <input type="hidden" name="maPhong" id="maPhong">
 
-                                </div>
+                                    <div class="form-group col-md-3">
+                                        <label for="tenPhong">Tên Phòng</label>
+                                        <input type="text" id="tenPhong" name="tenPhong" class="form-control" required onchange="checkTenPhong()"/>
+                                        <small id="tenPhongError" class="text-danger" style="display: none;"></small>
+                                    </div>
 
-                                <div class="form-group col-md-6">
-
-                                    <label for="tenPhong">Tên Phòng</label>
-
-                                    <input type="text" id="tenPhong" name="tenPhong" class="form-control"
-
-                                           th:value="${phong.tenPhong}" required/>
 
                                 </div>
 
-                            </div>
+
 
 
 
@@ -1451,6 +1445,31 @@
     setInterval(updateDateTime, 1000);
 
 
+
+    function checkTenPhong() {
+        const tenPhong = document.getElementById("tenPhong").value;
+        const tenPhongError = document.getElementById("tenPhongError");
+
+        fetch(`/checkTenPhong?tenPhong=${tenPhong}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    tenPhongError.style.display = "block";
+                } else {
+                    tenPhongError.style.display = "none";
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    }
+
+    function validateForm() {
+        const tenPhongError = document.getElementById("tenPhongError");
+        if (tenPhongError.style.display === "block") {
+            alert("Tên phòng đã tồn tại! Vui lòng chọn tên khác.");
+            return false;
+        }
+        return true;
+    }
 
 </script>
 

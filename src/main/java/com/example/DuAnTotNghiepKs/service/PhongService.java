@@ -214,5 +214,40 @@ public class PhongService {
         return phongRepository.findById(roomId).orElse(null);
     }
 
+    public boolean isTenPhongTrung(String tenPhong) {
+        return phongRepository.existsByTenPhong(tenPhong);
+    }
+
+    public String generateMaPhong() {
+        String maxMaPhong = phongRepository.findMaxMaPhong(); // Lấy mã lớn nhất hiện có
+        if (maxMaPhong != null) {
+            // Tách số từ mã phòng và tăng lên
+            int nextNumber = Integer.parseInt(maxMaPhong.replaceAll("[^\\d]", "")) + 1;
+            return String.format("P%03d", nextNumber); // Định dạng: P001, P002,...
+        }
+        return "P001"; // Giá trị mặc định khi chưa có phòng nào
+    }
+
+
+    // Trong lớp PhongService
+    public List<PhongDTO> findAvailableRooms(LocalDateTime ngayNhan, LocalDateTime ngayTra, int soLuongNguoi) {
+        // Gọi repo để lấy danh sách phòng trống dựa trên các tiêu chí tìm kiếm
+        List<Phong> availableRooms = phongRepository.findAvailablePhongs(ngayNhan, ngayTra, soLuongNguoi);
+
+        // Chuyển đổi các đối tượng Phong sang PhongDTO nếu cần thiết
+        List<PhongDTO> availableRoomDTOs = availableRooms.stream()
+                .map(room -> new PhongDTO(room.getIdPhong(), room.getTenPhong(), room.getMaPhong() ,room.getMoTa(),room.getTinhTrang(),room.getTrangThai(),room.getGia(),room.getImg(),room.getLoaiPhong().getSoNguoiToiDa(),room.getLoaiPhong().getIdLoaiPhong(),
+                        room.getLoaiPhong().getTenLoaiPhong(),room.getLoaiPhong().getGia()))
+                .collect(Collectors.toList());
+
+        return availableRoomDTOs;
+    }
+
+
+    // Lấy danh sách phòng có sẵn với số người tối đa của loại phòng
+    public List<Phong> getAvailableRoomsWithMaxGuests(LocalDateTime startDate, LocalDateTime endDate, int soNguoi) {
+        return phongRepository.findAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi);
+    }
+
 }
 

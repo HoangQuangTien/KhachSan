@@ -56,7 +56,7 @@ public class ThanhToanController {
     public String loadAll(
             @ModelAttribute ThanhToanDTO thanhToanDTO,
             @RequestParam(value = "page", defaultValue = "0") int currentPage, // Trang hiện tại
-            @RequestParam(value = "size", defaultValue = "5") int pageSize, // Kích thước trang
+            @RequestParam(value = "size", defaultValue = "2") int pageSize, // Kích thước trang
             Model model) {
 
         // Lấy danh sách đặt phòng đã cọc

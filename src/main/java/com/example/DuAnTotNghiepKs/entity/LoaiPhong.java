@@ -2,8 +2,7 @@ package com.example.DuAnTotNghiepKs.entity;
 
 import com.example.DuAnTotNghiepKs.validation.NoNumbers;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,29 +23,34 @@ public class LoaiPhong {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_loai_phong")
     private Integer idLoaiPhong;
-    @NotBlank(message = "Mã loại phòng không được để trống")
     @Column(name = "ma_loai_phong", nullable = false, length = 10)
     private String maLoaiPhong;
 
-    @NoNumbers
-    @NotBlank(message = "Ten loại phòng không được để trống")
+
     @Column(name = "ten_loai_phong")
     private String tenLoaiPhong;
 
     @Column(name = "mo_ta")
     private String moTa;
 
-    @Positive(message = "Số lượng giường phải là số dương")
+    @NotNull(message = "Số lượng giường không được để trống")
+    @Min(value = 1, message = "Số lượng giường phải là một số dương")
+    @Max(value = 3, message = "So luong giuong tối đa không được vượt quá 3")
     @Column(name = "so_luong_giuong")
     private Integer soLuongGiuong;
 
-    @Positive(message = "Số lượng người phải là số dương")
+    @NotNull(message = "Số người tối đa không được để trống")
+    @Min(value = 1, message = "Số người tối đa phải là một số dương")
+    @Max(value = 6, message = "Số người tối đa không được vượt quá 6")
     @Column(name = "so_nguoi_toi_da")
     private Integer soNguoiToiDa;
-
+    @NotNull(message = "Giá không được để trống")
+    @Min(value = 0, message = "Giá phải là một số không âm")
     @Column(name = "gia")
     private Float gia;
-
+    @NotNull(message = "Sức chứa không được để trống")
+    @Min(value =    1, message = "Sức chứa phải là một số dương")
+    @Max(value = 6, message = "Sức chứa tối đa không được vượt quá 6")
     @Column(name = "suc_chua")
     private Integer sucChua;
 
@@ -59,13 +63,10 @@ public class LoaiPhong {
 
 
     @OneToOne
-    @JoinColumn(name = "id_Tang", referencedColumnName = "id_Tang")
+    @JoinColumn(name = "id_tang", referencedColumnName = "id_tang")
     private Tang tang;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_dien_tich",referencedColumnName ="id_dien_tich")
     private DienTich dienTich;
-
-
 }
-

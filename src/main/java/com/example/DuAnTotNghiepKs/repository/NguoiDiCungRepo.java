@@ -22,4 +22,9 @@ public interface NguoiDiCungRepo extends JpaRepository<NguoiDiCung, Integer> {
     @Transactional
     @Query("DELETE FROM NguoiDiCung ndc WHERE ndc.datPhong.idDatPhong = :idDatPhong")
     void xoaTatCaCCCDTheoIdDatPhong(@Param("idDatPhong") Long idDatPhong);
+
+
+
 }
+
+

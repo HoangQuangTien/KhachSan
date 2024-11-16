@@ -38,10 +38,14 @@ public class NguoiDiCungRest {
     @Autowired
     private TaiKhoanService taiKhoanService;
 
+
+   
+
+
     @GetMapping("/nguoidicung")
     public String showDatPhongList(Model model) {
         // Lấy tất cả thông tin đặt phòng chưa check-in
-        List<DatPhong> datPhongs = datPhongService.getDatPhongChuaCheckIn();
+        List<DatPhong> datPhongs = datPhongService.getDatPhongChuaVaDaCheckIn();
         model.addAttribute("datPhongs", datPhongs);
 
         TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
@@ -181,6 +185,4 @@ public class NguoiDiCungRest {
                     .body("Lỗi khi xóa CCCD: " + e.getMessage());
         }
     }
-
-
 }

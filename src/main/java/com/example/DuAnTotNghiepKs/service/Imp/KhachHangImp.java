@@ -7,8 +7,10 @@ import com.example.DuAnTotNghiepKs.entity.KhachHang;
 import com.example.DuAnTotNghiepKs.exception.ResourceNotfound;
 import com.example.DuAnTotNghiepKs.repository.DiaChiKhachHangRepository;
 import com.example.DuAnTotNghiepKs.repository.KhachHangRepository;
+import com.example.DuAnTotNghiepKs.repository.TaiKhoanRepo;
 import com.example.DuAnTotNghiepKs.service.KhachHangService;
 import org.modelmapper.ModelMapper;
+import org.netlib.util.booleanW;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,8 @@ public class KhachHangImp implements KhachHangService {
     private KhachHangRepository khachHangRepository;
 
     @Autowired
+    private TaiKhoanRepo taiKhoanRepo;
+    @Autowired
     private DiaChiKhachHangRepository diaChiKhachHangRepository;
 
     @Autowired
@@ -32,8 +36,7 @@ public class KhachHangImp implements KhachHangService {
     @Override
     public List<KhachHangDTO> getAll() {
         List<KhachHang> khachHangs = khachHangRepository.findAll();
-        return khachHangs.stream()
-                .map(khachHang -> modelMapper.map(khachHang, KhachHangDTO.class))
+        return khachHangs.stream().map(khachHang -> modelMapper.map(khachHang, KhachHangDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -124,8 +127,7 @@ public class KhachHangImp implements KhachHangService {
     @Override
     public List<KhachHangDTO> search(String query) {
         List<KhachHang> results = khachHangRepository.searchByNameOrPhone(query);
-        return results.stream()
-                .map(khachHang -> modelMapper.map(khachHang, KhachHangDTO.class))
+        return results.stream().map(khachHang -> modelMapper.map(khachHang, KhachHangDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -165,7 +167,6 @@ public class KhachHangImp implements KhachHangService {
         return savedKhachHang.getId();
     }
 
-
     @Override
     public boolean existsByEmail(String email) {
         return khachHangRepository.existsByEmail(email);
@@ -176,48 +177,34 @@ public class KhachHangImp implements KhachHangService {
         return khachHangRepository.existsBySoDienThoai(soDienThoai);
     }
 
-
     @Override
     public KhachHangDTO findBySoDienThoai(String soDienThoai) {
         KhachHang khachHang = khachHangRepository.findBySoDienThoai(soDienThoai);
         if (khachHang != null) {
             // Chuyển đổi từ KhachHang entity sang KhachHangDTO
-            return KhachHangDTO.builder()
-                    .id(khachHang.getId())
-                    .maKhachHang(khachHang.getMaKhachHang())
-                    .hoVaTen(khachHang.getHoVaTen())
-                    .email(khachHang.getEmail())
-                    .gioiTinh(khachHang.isGioiTinh())
-                    .soDienThoai(khachHang.getSoDienThoai())
-                    .build();
+            return KhachHangDTO.builder().id(khachHang.getId()).maKhachHang(khachHang.getMaKhachHang())
+                    .hoVaTen(khachHang.getHoVaTen()).email(khachHang.getEmail()).gioiTinh(khachHang.isGioiTinh())
+                    .soDienThoai(khachHang.getSoDienThoai()).build();
         }
         return null;
     }
-
 
     @Override
     public KhachHangDTO findByEmail(String email) {
         KhachHang khachHang = khachHangRepository.findByEmail(email);
         if (khachHang != null) {
             // Chuyển đổi từ KhachHang entity sang KhachHangDTO
-            return KhachHangDTO.builder()
-                    .id(khachHang.getId())
-                    .maKhachHang(khachHang.getMaKhachHang())
-                    .hoVaTen(khachHang.getHoVaTen())
-                    .email(khachHang.getEmail())
-                    .gioiTinh(khachHang.isGioiTinh())
-                    .soDienThoai(khachHang.getSoDienThoai())
-                    .build();
+            return KhachHangDTO.builder().id(khachHang.getId()).maKhachHang(khachHang.getMaKhachHang())
+                    .hoVaTen(khachHang.getHoVaTen()).email(khachHang.getEmail()).gioiTinh(khachHang.isGioiTinh())
+                    .soDienThoai(khachHang.getSoDienThoai()).build();
         }
         return null;
     }
-
 
     @Override
     public boolean existsById(Integer id) {
         return khachHangRepository.existsById(id);
     }
-
 
     @Override
     public boolean update1(Integer id, KhachHangDTO khachHangDTO) {
@@ -235,7 +222,43 @@ public class KhachHangImp implements KhachHangService {
         return false;
     }
 
+    @Override
+    public boolean existsByTenDangNhap(String tenDangNhap) {
+        return taiKhoanRepo.findByTenDangNhap(tenDangNhap) != null;
+    }
+
+    @Override
+    public String createMaKH() {
+        List<String> allMaKhachHang = khachHangRepository.findAll().stream().map(KhachHang::getMaKhachHang)
+                .collect(Collectors.toList());
+
+        if (allMaKhachHang.isEmpty()) {
+            return "KH001";
+        }
+
+        int maxNumber = allMaKhachHang.stream().filter(maKH -> maKH.startsWith("KH"))
+                .mapToInt(maKH -> Integer.parseInt(maKH.substring(2))).max().orElse(0);
+
+        return String.format("KH%03d", maxNumber + 1);
+    }
+
+    @Override
+    public void insert(KhachHang khachHang) {
+        taiKhoanRepo.save(khachHang.getTaiKhoan());
+        khachHangRepository.save(khachHang);
+    }
+
+    @Override
+    public KhachHang findByTenDangNhap(String tenDangNhap) {
+        return khachHangRepository.findByTenDangNhap(tenDangNhap);
+    }
+
+    @Override
+    public void updateKH(KhachHang khachHang) {
+        khachHangRepository.save(khachHang);
+
+    }
+
+
+
 }
-
-
-

@@ -9,11 +9,15 @@ import com.example.DuAnTotNghiepKs.repository.KhachHangRepository;
 import com.example.DuAnTotNghiepKs.repository.PhongRepo;
 import com.example.DuAnTotNghiepKs.repository.ThamSoRepo;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,7 +38,8 @@ public class DatPhongServiceImp implements DatPhongService {
     @Autowired
     private KhachHangRepository khachHangRepository;
 
-
+    @Autowired
+    private JavaMailSender emailSender;
 
 
 
@@ -107,6 +112,14 @@ public class DatPhongServiceImp implements DatPhongService {
     public List<DatPhong> getDatPhongChuaCheckIn() {
         return datPhongRepository.findByTinhTrang("Chưa Checkin");
     }
+
+    @Override
+    public List<DatPhong> getDatPhongChuaVaDaCheckIn() {
+        boolean trangThai = false;
+        return datPhongRepository.findByTinhTrangAndTrangThaiOrTinhTrangAndTrangThai("Chưa Checkin", trangThai, "Đã Checkin", trangThai);
+    }
+
+
 
     @Override
     public DatPhong saveDatPhong1(DatPhong datPhong) {
@@ -276,6 +289,19 @@ public class DatPhongServiceImp implements DatPhongService {
         return false; // Không tìm thấy đặt phòng
     }
 
+@Override
+    public void sendEmail(String to, String subject, String text) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(text, true); // true để gửi email dưới dạng HTML
+            emailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace(); // Xử lý ngoại lệ nếu cần
+        }
+    }
 
 
 }

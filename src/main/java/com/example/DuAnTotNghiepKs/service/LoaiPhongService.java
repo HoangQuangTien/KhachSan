@@ -75,4 +75,9 @@ public class LoaiPhongService {
 //        }
 //        return null;
 //    }
+
+
+    public long countLoaiPhong() {
+        return loaiPhongRepository.count(); // Giả sử bạn có repository `loaiPhongRepo` để truy vấn
+    }
 }

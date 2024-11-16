@@ -102,7 +102,7 @@ public class KhachHangDD {
 
     @GetMapping("/load-phong")
     public ResponseEntity<List<Object[]>> loadAllPhongKhachHang() {
-        List<Object[]> objects = datPhongService.getTopPhongDuocDatNhieuNhat();
+        List<Object[]> objects = datPhongService.getTopPhongDuocDatNhieuNhat1();
         return ResponseEntity.ok(objects);
     }
 
@@ -152,6 +152,9 @@ public class KhachHangDD {
 
         return "list/KhachHang/datPhong"; // Tên của view datPhong.html
     }
+
+
+
 
     //
     @PostMapping("/dat-phong")
@@ -342,6 +345,25 @@ public class KhachHangDD {
         }
     }
 
+    @PostMapping("/vnpay/return")
+    public ResponseEntity<?> vnpayReturn(
+            @RequestParam Map<String, String> params) {
+
+        // Kiểm tra mã phản hồi từ VNPAY
+        String vnp_ResponseCode = params.get("vnp_ResponseCode");
+        if ("00".equals(vnp_ResponseCode)) {
+            // Thanh toán thành công, xử lý lưu thông tin đặt phòng
+            // Lấy các thông tin cần thiết từ params và lưu vào cơ sở dữ liệu
+
+            // Trả về thông báo thành công
+            return ResponseEntity.ok(Map.of("message", "Thanh toán thành công, đặt phòng đã được xác nhận!"));
+        } else {
+            // Thanh toán thất bại
+            return ResponseEntity.badRequest().body(Map.of("error", "Thanh toán thất bại, vui lòng thử lại!"));
+        }
+    }
+
+
     // Hàm kiểm tra thanh toán
     private boolean isPaymentCompleted(Integer idKhachHang) {
         // Logic kiểm tra thanh toán
@@ -413,4 +435,42 @@ public class KhachHangDD {
         return "List/KhachHang/hangphongdetail";
     }
 
+
+
+    @GetMapping("/api/available-rooms")
+    @ResponseBody
+    public List<PhongDTO> getAvailableRooms(
+            @RequestParam LocalDateTime ngayNhan,
+            @RequestParam LocalDateTime ngayTra,
+            @RequestParam int soLuongNguoi) {
+        return phongService.findAvailableRooms(ngayNhan, ngayTra, soLuongNguoi);
+    }
+
+
+    @GetMapping("/tim")
+    public String tim() {
+        return "list/KhachHang/tim"; // Không cần .html
+    }
+
+
+    @GetMapping("/search1")
+    public String searchRooms(@RequestParam("ngayNhan") String ngayNhan,
+                              @RequestParam("ngayTra") String ngayTra,
+                              @RequestParam("soPhong") Integer soPhong,
+                              @RequestParam("soNguoi") Integer soNguoi,
+                              Model model) {
+        // Chuyển đổi chuỗi sang LocalDateTime
+        LocalDateTime startDate = LocalDateTime.parse(ngayNhan);
+        LocalDateTime endDate = LocalDateTime.parse(ngayTra);
+
+        // Lấy danh sách phòng có sẵn theo số người tối đa của loại phòng
+        List<Phong> availableRooms = phongService.getAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi);
+
+        // Thêm dữ liệu vào model để trả về view
+        model.addAttribute("availableRooms", availableRooms);
+        model.addAttribute("soPhong", soPhong);
+        model.addAttribute("soNguoi", soNguoi);
+
+        return "list/KhachHang/tim"; // Tên view trả về (có thể là searchResults.html)
+    }
 }

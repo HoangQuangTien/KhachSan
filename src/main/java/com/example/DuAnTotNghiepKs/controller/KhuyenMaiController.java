@@ -1,10 +1,12 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.KhuyenMaiDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
 import com.example.DuAnTotNghiepKs.repository.KhuyenMaiRepo;
 import com.example.DuAnTotNghiepKs.service.KhachHangService;
 import com.example.DuAnTotNghiepKs.service.KhuyenMaiService;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import jakarta.servlet.ServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,9 @@ public class KhuyenMaiController {
     @Autowired
     private KhuyenMaiRepo khuyenMaiRepo;
 
+    @Autowired
+    private TaiKhoanService taiKhoanService;
+
     @GetMapping()
     public String showKhuyenMaiPage(
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -54,6 +59,13 @@ public class KhuyenMaiController {
         model.addAttribute("listKH", khachHangService.getAll());
         model.addAttribute("Voucher", new KhuyenMai());
         model.addAttribute("activeVouchers", activeVouchers);
+
+        //lấy id nhân viên
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+        }
         return "list/QuanLyKhuyenMai/KhuyenMai";
     }
 

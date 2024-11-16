@@ -7,66 +7,245 @@
 </head>
 <body>
 <h2>Tạo Loại Phòng Mới</h2>
-<form th:action="@{/loaiphongs/save}" th:object="${loaiPhong}" method="post">
 
-    <label>Mã Loại Phòng:</label>
-    <input type="text" th:field="*{maLoaiPhong}" />
-    <div class="error" th:if="${#fields.hasErrors('maLoaiPhong')}" th:errors="*{maLoaiPhong}"></div><br/>
+<!-- Hiển thị thông báo nếu có -->
+<div th:if="${message}" th:class="${messageClass}">
+    <p th:text="${message}"></p>
+</div>
 
-    <label>Tên Loại Phòng:</label>
-    <input type="text" th:field="*{tenLoaiPhong}" />
-    <div class="error"  th:if="${#fields.hasErrors('tenLoaiPhong')}" th:errors="*{tenLoaiPhong}"></div><br/>
+<form th:action="@{/loaiphongs/save}" th:object="${loaiPhong}" method="post" onsubmit="return validateForm()">
+    <input type="hidden" name="maLoaiPhong" id="maLoaiPhong">
 
-    <label>Mô Tả:</label>
-    <textarea th:field="*{moTa}"></textarea><br/>
 
-    <label>Số Lượng Giường:</label>
-    <input type="number" th:field="*{soLuongGiuong}" />
-    <div class="error"  th:if="${#fields.hasErrors('soLuongGiuong')}" th:errors="*{soLuongGiuong}"></div><br/>
+    <label for="tenLoaiPhong">Tên Loại Phòng:</label>
+    <input type="text" id="tenLoaiPhong" th:field="*{tenLoaiPhong}" />
+    <div class="error" th:if="${#fields.hasErrors('tenLoaiPhong')}" th:errors="*{tenLoaiPhong}"></div><br/>
 
-    <label>Số Người Tối Đa:</label>
-    <input type="number" th:field="*{soNguoiToiDa}" />
-    <div class="error"  th:if="${#fields.hasErrors('soNguoiToiDa')}" th:errors="*{soNguoiToiDa}"></div><br/>
+    <label for="moTa">Mô Tả:</label>
+    <textarea id="moTa" th:field="*{moTa}"></textarea><br/>
 
-    <label>Giá:</label>
-    <input type="number" th:field="*{gia}" step="0.1" />
-    <div class="error"  th:if="${#fields.hasErrors('gia')}" th:errors="*{gia}"></div><br/>
+    <label for="soLuongGiuong">Số Lượng Giường:</label>
+    <input type="number" id="soLuongGiuong" th:field="*{soLuongGiuong}" />
+    <div class="error" th:if="${#fields.hasErrors('soLuongGiuong')}" th:errors="*{soLuongGiuong}"></div><br/>
 
-    <div class=" display: flex;">
-        <a href="/loaiphongs"> <button class="background-color: gray" type="button"> Quay lại</button></a>
+    <label for="soNguoiToiDa">Số Người Tối Đa:</label>
+    <input type="number" id="soNguoiToiDa" th:field="*{soNguoiToiDa}" />
+    <div class="error" th:if="${#fields.hasErrors('soNguoiToiDa')}" th:errors="*{soNguoiToiDa}"></div><br/>
+
+    <label for="gia">Giá:</label>
+    <input type="number" id="gia" th:field="*{gia}" step="0.1" />
+    <div class="error" th:if="${#fields.hasErrors('gia')}" th:errors="*{gia}"></div><br/>
+
+    <!-- Trường Sức Chứa -->
+    <label for="sucChua">Sức Chứa:</label>
+    <input type="number" id="sucChua" th:field="*{sucChua}" required min="1" />
+    <div class="error" th:if="${#fields.hasErrors('sucChua')}" th:errors="*{sucChua}"></div><br/>
+
+    <!-- Dropdown cho Tầng -->
+    <label for="tang">Tầng:</label>
+    <select id="tang" th:field="*{tang}" required>
+        <option value="" disabled selected>Chọn tầng</option>
+        <option th:each="tang : ${tangs}" th:value="${tang.idTang}" th:text="${tang.tenTang}"></option>
+    </select>
+    <button type="button" onclick="submitTangForm()">+ </button>
+    <div class="error" th:if="${#fields.hasErrors('tang')}" th:errors="*{tang}"></div><br/>
+
+    <label for="dienTich">Diện Tích:</label>
+    <select id="dienTich" th:field="*{dienTich}" required>
+        <option value="" disabled selected>Chọn diện tích</option>
+        <!-- Hiển thị danh sách các diện tích -->
+        <option th:each="dienTich : ${dienTichs}" th:value="${dienTich.idDienTich}" th:text="${dienTich.tenDienTich}"></option>
+    </select>
+    <button type="button" onclick="showDienTichModal()">+ </button>
+    <div class="error" th:if="${#fields.hasErrors('dienTich')}" th:errors="*{dienTich}"></div><br/>
+
+    <!-- Submit and Cancel Buttons -->
+    <div style="display: flex;">
+        <a href="/loaiphongs" class="button-link"><button type="button">Quay lại</button></a>
         <button class="luu" type="submit">Lưu</button>
     </div>
 </form>
+<!-- Tang Modal -->
+<div id="tangModal" style="display:none;">
+    <form th:action="@{/tangs/save}" method="post" id="tangForm">
+        <label for="newTenTang">Tên Tầng:</label>
+        <input type="text" id="newTenTang" name="tenTang" required><br/>
 
-<!-- Hiển thị thông báo thành công nếu có -->
-<div th:if="${message}" th:text="${message}"></div>
+        <label for="newMoTaTang">Mô Tả:</label>
+        <textarea id="newMoTaTang" name="moTa"></textarea><br/>
 
+        <button type="button" onclick="submitTangForm()">Thêm Tầng</button>
+        <button type="button" onclick="hideTangModal()">Đóng</button>
+    </form>
+</div>
 
-<!--<h2>Thêm Loại Phòng</h2>-->
-<!--<form action="/loai-phong/save" method="post">-->
-<!--    <label>Mã Loại Phòng:</label>-->
-<!--    <input type="text" name="maLoaiPhong" required><br>-->
+<!-- Dien Tich Modal -->
+<div id="dienTichModal" style="display:none;">
+    <form th:action="@{/dientichs/save}" method="post" id="dienTichForm">
+        <label for="newTenDienTich">Diện Tích:</label>
+        <input type="number" id="newTenDienTich" name="tenDienTich" step="0.1" required><br/>
 
-<!--    <label>Tên Loại Phòng:</label>-->
-<!--    <input type="text" name="tenLoaiPhong" required><br>-->
+        <button type="button" onclick="submitDienTichForm()">Thêm Diện Tích</button>
+        <button type="button" onclick="hideDienTichModal()">Đóng</button>
+    </form>
+</div>
 
-<!--    <label>Mô Tả:</label>-->
-<!--    <textarea name="moTa"></textarea><br>-->
+<script>
+    // Functions to handle showing and hiding modals
+    function showTangModal() {
+        document.getElementById("tangModal").style.display = "block";
+    }
 
-<!--    <label>Số Lượng Giường:</label>-->
-<!--    <input type="number" name="soLuongGiuong"><br>-->
+    function hideTangModal() {
+        document.getElementById("tangModal").style.display = "none";
+    }
 
-<!--    <label>Số Người Tối Đa:</label>-->
-<!--    <input type="number" name="soNguoiToiDa"><br>-->
+    function showDienTichModal() {
+        document.getElementById("dienTichModal").style.display = "block";
+    }
 
-<!--    <label>Giá:</label>-->
-<!--    <input type="number" name="gia" step="0.1"><br>-->
+    function hideDienTichModal() {
+        document.getElementById("dienTichModal").style.display = "none";
+    }
 
-<!--    <div class=" display: flex;">-->
-<!--        <a href="/loai-phong"> <button class="background-color: gray" type="button"> Quay lại</button></a>-->
-<!--        <button class="luu" type="submit">Lưu</button>-->
-<!--    </div>-->
+    // Thêm xác nhận khi thêm Tầng
+    function submitTangForm() {
+        const confirmAddTang = confirm("Bạn có chắc chắn muốn thêm tầng này?");
+        if (confirmAddTang) {
+            fetch("/loaiphongs/save-tang", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Cập nhật dropdown tầng với tầng mới
+                    const tangSelect = document.getElementById("tang");
+                    const newOption = document.createElement("option");
+                    newOption.value = data.idTang;
+                    newOption.textContent = data.tenTang;
+                    tangSelect.appendChild(newOption);
+                    tangSelect.value = data.idTang;
+                    alert("Tầng mới đã được thêm thành công.");
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Không thể thêm tầng mới.");
+                });
+        } else {
+            alert("Thêm tầng bị hủy.");
+        }
+    }
 
-<!--</form>-->
+    // Thêm xác nhận khi thêm Diện Tích
+    function submitDienTichForm() {
+        const newDienTich = document.getElementById("newTenDienTich").value;
+        if (newDienTich) {
+            const confirmAddDienTich = confirm("Bạn có chắc chắn muốn thêm diện tích này?");
+            if (confirmAddDienTich) {
+                fetch("/loaiphongs/save-dien-tich", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ tenDienTich: newDienTich })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        const dienTichSelect = document.getElementById("dienTich");
+                        const newOption = document.createElement("option");
+                        newOption.value = data.idDienTich;
+                        newOption.textContent = data.tenDienTich;
+                        dienTichSelect.appendChild(newOption);
+                        dienTichSelect.value = data.idDienTich;
+                        alert("Diện tích mới đã được thêm thành công.");
+                        hideDienTichModal();
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Không thể thêm diện tích mới.");
+                    });
+            } else {
+                alert("Thêm diện tích bị hủy.");
+            }
+        } else {
+            alert("Vui lòng nhập tên diện tích.");
+        }
+    }
+    function validateForm() {
+        const tenLoaiPhong = document.getElementById("tenLoaiPhong").value.trim();
+        const moTa = document.getElementById("moTa").value.trim();
+        const soLuongGiuong = document.getElementById("soLuongGiuong").value.trim();
+        const soNguoiToiDa = document.getElementById("soNguoiToiDa").value.trim();
+        const gia = document.getElementById("gia").value.trim();
+        const sucChua = document.getElementById("sucChua").value.trim();
+        const tangSelect = document.getElementById("tang");
+        const tangValue = tangSelect.value;
+
+        // Mảng chứa các tên loại phòng đã tồn tại (bạn có thể lấy từ cơ sở dữ liệu hoặc danh sách tĩnh)
+        const existingRoomNames = ['Phòng Deluxe', 'Phòng Standard', 'Phòng Suite'];  // Ví dụ, thay bằng dữ liệu thực tế
+
+        // Kiểm tra "Tên Loại Phòng" không được để trống
+        if (tenLoaiPhong === "") {
+            alert("Tên Loại Phòng không được để trống!");
+            return false;
+        }
+
+        // Kiểm tra "Tên Loại Phòng" không được chứa số
+        const regex = /\d/;
+        if (regex.test(tenLoaiPhong)) {
+            alert("Tên Loại Phòng không được chứa số!");
+            return false;
+        }
+
+        // Kiểm tra trùng tên loại phòng
+        if (existingRoomNames.includes(tenLoaiPhong)) {
+            alert("Tên Loại Phòng đã tồn tại!");
+            return false;
+        }
+
+        // Kiểm tra "Mô Tả" không được để trống
+        if (moTa === "") {
+            alert("Mô Tả không được để trống!");
+            return false;
+        }
+
+        // Kiểm tra "Số Lượng Giường" không được để trống và phải từ 1 đến 3
+        if (soLuongGiuong === "" || isNaN(soLuongGiuong) || Number(soLuongGiuong) < 1 || Number(soLuongGiuong) > 3) {
+            alert("Số Lượng Giường không được vượt quá 3!");
+            return false;
+        }
+
+        // Kiểm tra "Số Người Tối Đa" không được để trống và phải từ 1 đến 6
+        if (soNguoiToiDa === "" || isNaN(soNguoiToiDa) || Number(soNguoiToiDa) < 1 || Number(soNguoiToiDa) > 6) {
+            alert("Số Người Tối Đa không được vượt quá 6!");
+            return false;
+        }
+
+        // Kiểm tra "Giá" không được để trống và phải lớn hơn 0
+        if (gia === "" || isNaN(gia) || Number(gia) <= 0) {
+            alert("Giá phải là một số hợp lệ và lớn hơn 0!");
+            return false;
+        }
+
+        // Kiểm tra "Sức Chứa" không được để trống và phải từ 1 đến 6
+        if (sucChua === "" || isNaN(sucChua) || Number(sucChua) < 1 || Number(sucChua) > 6) {
+            alert("Sức Chứa không được vượt quá 6!");
+            return false;
+        }
+
+        // Kiểm tra xem "Tầng" đã được chọn chưa
+        if (!tangValue) {
+            alert("Vui lòng chọn một tầng!");
+            return false;
+        }
+
+        // Nếu tất cả các kiểm tra đều hợp lệ, hiển thị thông báo thành công
+        alert("Thêm loại phòng mới thành công");
+        return true; // Trả về true để form có thể gửi
+    }
+</script>
+
 </body>
 </html>

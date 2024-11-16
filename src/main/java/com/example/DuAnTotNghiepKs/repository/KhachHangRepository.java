@@ -17,15 +17,17 @@ public interface KhachHangRepository extends JpaRepository<KhachHang,Integer> {
     boolean existsByEmail(String email);
     boolean existsBySoDienThoai(String soDienThoai);
 
-
     KhachHang findByEmail(String email);
-
     KhachHang findBySoDienThoai(String soDienThoai);
 
+
+    @Query(value = "SELECT * FROM KhachHang WHERE ten_dang_nhap = :tenDangNhap",nativeQuery = true)
+    KhachHang findByTenDangNhap(@Param("tenDangNhap") String tenDangNhap);
 
 //    @Query("SELECT kh FROM KhachHang kh WHERE kh.trangThai = :status")
 //    List<KhachHang> filterByStatus(@Param("status") String status);
 
+    boolean existsByMaKhachHang(String maKhachHang);
 
 
 

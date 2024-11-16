@@ -295,11 +295,11 @@ public class DatPhongController {
                 long soNgayO = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
                 float giaPhong = selectedPhong.getLoaiPhong().getGia();
                 float tongTienPhongPhong = giaPhong * soNgayO;
-                float tienCocPhong = tongTienPhongPhong * 0.8f;
+//                float tienCocPhong = tongTienPhongPhong * 0.8f;
 
-                // Cập nhật tổng tiền phòng và tiền cọc
-                tongTienPhong += tongTienPhongPhong;
-                tienCoc += tienCocPhong;
+//                // Cập nhật tổng tiền phòng và tiền cọc
+//                tongTienPhong += tongTienPhongPhong;
+//                tienCoc += tienCocPhong;
 
                 // Tạo đối tượng DatPhong cho từng phòng
                 DatPhong datPhong = new DatPhong();
@@ -308,9 +308,10 @@ public class DatPhongController {
                 datPhong.setNgayNhan(ngayNhan);
                 datPhong.setNgayTra(ngayTra);
                 datPhong.setCccd(cccd);
-                datPhong.setTongTien(tongTienPhong);
-                datPhong.setTienCoc(tienCoc);
-                datPhong.setTienConLai(tongTienPhong - tienCoc);
+                datPhong.setTongTien(tongTienPhongPhong);
+                datPhong.setTienCoc(tongTienPhongPhong * 0.8f);
+                float tienConLai = datPhong.getTongTien() - datPhong.getTienCoc(); // Tính tiền còn lại
+                datPhong.setTienConLai(tienConLai);
                 datPhong.setLoaiPhong(loaiPhong);
                 datPhong.setKhachHang(khachHang);
                 datPhong.setTinhTrang("Chưa Checkin");
@@ -337,6 +338,39 @@ public class DatPhongController {
 
                 chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
             }
+
+
+
+            // Gửi email xác nhận đặt phòng thành công cho khách hàng
+            String emailKhachHang = khachHangDTO.getEmail(); // Lấy email từ DTO của khách hàng
+            String subject = "Xác nhận đặt phòng thành công tại DRAGONBALL HOTEL";
+            String text = "<html>" +
+                    "<body style='font-family: Arial, sans-serif; color: #333333; background-color: #f9f9f9;'>" +
+                    "<div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px;'>" +
+                    "<h2 style='color: #4CAF50; text-align: center;'>Xin chào " + khachHang.getHoVaTen() + ",</h2>" +
+                    "<p style='font-size: 16px;'>Cảm ơn bạn đã lựa chọn <strong>DRAGONBALL HOTEL</strong> cho kỳ nghỉ của mình!</p>" +
+                    "<p style='font-size: 16px;'>Dưới đây là thông tin đặt phòng của bạn:</p>" +
+                    "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                    "<p style='font-size: 16px;'><strong>Phòng của bạn là:</strong> " +idPhongStr   + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Ngày nhận phòng:</strong> " + ngayNhanStr + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Ngày trả phòng:</strong> " + ngayTraStr + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Số tiền cọc:</strong> " + String.format("%,.2f", tienCoc) + " VND</p>" +
+                    "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                    "<p style='font-size: 16px;'>Chúng tôi mong được đón tiếp bạn và sẽ làm mọi điều có thể để kỳ nghỉ của bạn trở nên hoàn hảo nhất.</p>" +
+                    "<p style='font-size: 16px;'>Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại hoặc email hỗ trợ.</p>" +
+                    "<p style='font-size: 16px;'>Trân trọng,<br>Đội ngũ quản lý khách sạn <strong>DRAGONBALL HOTEL</strong></p>" +
+                    "<footer style='margin-top: 20px; font-size: 12px; text-align: center; color: #666666;'>" +
+                    "<p>Địa chỉ: Tòa nhà FPT Polytechnic, Phố Trịnh Văn Bô, Nam Từ Liêm, Hà Nội.</p>" +
+                    "<p>Điện thoại: 0397156204 | Email: support@dragonballhotel.com</p>" +
+                    "<p>&copy; 2024 DRAGONBALL HOTEL. Tất cả các quyền được bảo lưu.</p>" +
+                    "</footer>" +
+                    "</div>" +
+                    "</body>" +
+                    "</html>";
+
+
+// Gửi email xác nhận
+            datPhongService.sendEmail(emailKhachHang, subject, text);
 
             return ResponseEntity.ok(Map.of("success", "Đặt phòng thành công!"));
         } catch (NumberFormatException e) {

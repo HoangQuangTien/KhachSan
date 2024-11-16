@@ -239,7 +239,7 @@
 
 <div class="container" id="container">
     <div class="form-container sign-up-container">
-        <form action="#">
+        <form action="#" id="idForm">
             <h1>Create Account</h1>
             <div class="social-container">
                 <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -248,14 +248,28 @@
             </div>
             <input type="text" name="tenDangNhap" class="form-control" placeholder="Tên đăng nhập" required />
             <input type="password" name="matKhau" class="form-control" placeholder="Mật khẩu" required />
-            <input type="password" name="email" class="form-control" placeholder="email" required />
-            <button>Sign Up</button>
+            <input type="text" name="hoVaTen" class="form-control" placeholder="Họ tên"
+                   pattern="[a-zA-ZÀ-ỹà-ỹ\s]+"
+                   title="Họ tên chỉ được chứa chữ cái." required />
+            <input type="email" name="email" class="form-control" placeholder="Email"
+                   pattern="[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}"
+                   title="Email chỉ được chứa chữ cái và số, và phải đúng định dạng (VD: example123@gmail.com)" required />
+            <input type="text" name="soDienThoai" class="form-control" placeholder="Số điện thoại"
+                   pattern="\d{10}"
+                   title="Số điện thoại phải chứa đúng 10 chữ số." required />
+            <div class="d-flex justify-content-start gap-2">
+                <input type="radio" id="Nam" checked name="gioiTinh" value="true" required>
+                <label for="Nam">Nam</label>
+                <input type="radio" id="Nu" name="gioiTinh" value="false" required>
+                <label for="Nu">Nữ</label>
+            </div>
+            <button type="submit" value="Đăng Ký">Sign Up</button>
         </form>
 
     </div>
 
     <div class="form-container sign-in-container">
-        <form th:action="@{/login}" method="post" id="idForm">
+        <form th:action="@{/login}" method="post" id="idForm1">
 
             <!-- Hiển thị thông báo lỗi nếu có -->
             <div th:if="${param.error}" class="alert alert-danger">
@@ -324,6 +338,60 @@
         container.classList.remove("right-panel-active");
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+
+
+        // Xử lý form đăng nhập
+        const idForm = document.getElementById('idForm'); // Đảm bảo rằng bạn có id cho form
+        if (idForm) {
+            idForm.addEventListener('submit', function (event) {
+                event.preventDefault(); // Ngăn chặn gửi form mặc định
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.disabled = true; // Vô hiệu hóa nút submit
+
+                // Thay vì sử dụng FormData, chúng ta sử dụng URLSearchParams
+                const formData = new URLSearchParams(new FormData(this));
+
+                fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded', // Định dạng URL-encoded
+                    },
+                    body: formData.toString() // Chuyển đổi thành chuỗi URL-encoded
+                })
+                    .then(response => {
+                        submitButton.disabled = false;
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: 'Đăng ký tài khoản thành công!',
+                            });
+
+                        } else {
+                            response.json().then(data => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: data.error, // Truy xuất lỗi từ JSON
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Có lỗi xảy ra:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Có lỗi xảy ra',
+                            text: 'Vui lòng thử lại sau.',
+                        });
+                        submitButton.disabled = false; // Kích hoạt lại nút submit
+                    });
+            });
+        } else {
+            console.error("Không tìm thấy form với id 'idForm'.");
+        }
+    });
 
     //     const signUpButton = document.getElementById('signUp');
     //     const signInButton = document.getElementById('signIn');
@@ -336,6 +404,7 @@
     //     signUpButton.addEventListener('click', () => {
     //     container.classList.remove("right-panel-active");
     // });
+
 </script>
 
 

@@ -27,6 +27,8 @@ public interface DatPhongService {
     List<DatPhong> getDatPhongChuaCheckIn();
 
 
+    List<DatPhong> getDatPhongChuaVaDaCheckIn();
+
     DatPhong saveDatPhong1(DatPhong datPhong);
 
     double getRevenueByMonth(int month, int year);
@@ -71,6 +73,8 @@ public interface DatPhongService {
 
 
     boolean xoaCCCD(Integer idDatPhong);
+
+    void sendEmail(String to, String subject, String text);
 
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động

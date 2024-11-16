@@ -171,7 +171,7 @@ public class KhuyenMaiService {
         if (keyword == null || keyword.isEmpty()) {
             // Nếu có trạng thái, tìm theo trạng thái
             if (trangThai != null && !trangThai.isEmpty()) {
-                return (Page<KhuyenMai>) khuyenMaiRepository.findByTrangThai(trangThai);
+                return khuyenMaiRepository.findByTrangThai(trangThai, pageable);
             }
             // Nếu không có trạng thái, trả về tất cả
             return khuyenMaiRepository.findAll(pageable);

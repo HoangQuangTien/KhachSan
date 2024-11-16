@@ -29,4 +29,6 @@ public class NguoiDiCung {
 //    @JoinColumn(name = "khach_hang_id ", nullable = false)
 //    private  KhachHang khachHang;
 
+
+
 }

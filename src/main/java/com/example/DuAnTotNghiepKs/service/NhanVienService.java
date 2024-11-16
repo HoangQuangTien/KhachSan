@@ -2,10 +2,14 @@ package com.example.DuAnTotNghiepKs.service;
 
 import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
 import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
+import com.example.DuAnTotNghiepKs.entity.ChiTietVaiTro;
 import com.example.DuAnTotNghiepKs.entity.NhanVien;
 import com.example.DuAnTotNghiepKs.entity.TaiKhoan;
+import com.example.DuAnTotNghiepKs.entity.VaiTro;
+import com.example.DuAnTotNghiepKs.repository.ChiTietVaiTroRepo;
 import com.example.DuAnTotNghiepKs.repository.NhanVienRepo;
 import com.example.DuAnTotNghiepKs.repository.TaiKhoanRepo;
+import com.example.DuAnTotNghiepKs.repository.VaiTroRepo;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.Tuple;
 import org.modelmapper.ModelMapper;
@@ -13,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.mail.internet.MimeMessage;
 
@@ -34,6 +39,11 @@ public class NhanVienService {
     private JavaMailSender emailSender;
     @Autowired
     private TaiKhoanRepo taiKhoanRepo;
+    @Autowired
+    private VaiTroRepo vaiTroRepo;
+
+    @Autowired
+    private ChiTietVaiTroRepo chiTietVaiTroRepo;
 
     public void sendEmail(String to, String subject, String text) {
         try {
@@ -102,7 +112,10 @@ public class NhanVienService {
         return nhanVien;
     }
 
-    public NhanVienDTO save(NhanVienDTO nhanVienDTO) {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public NhanVienDTO update(NhanVienDTO nhanVienDTO) {
         // Chuyển đổi nhanVienDTO sang NhanVien
         NhanVien nhanVien = modelMapper.map(nhanVienDTO, NhanVien.class);
 
@@ -125,6 +138,49 @@ public class NhanVienService {
 
         return modelMapper.map(nhanVien, NhanVienDTO.class);
     }
+
+    public NhanVienDTO save(NhanVienDTO nhanVienDTO) {
+        // Chuyển đổi nhanVienDTO sang NhanVien
+        NhanVien nhanVien = modelMapper.map(nhanVienDTO, NhanVien.class);
+
+        // Lưu tài khoản
+
+        TaiKhoan taiKhoan = new TaiKhoan();
+        taiKhoan.setTenDangNhap(nhanVienDTO.getTaiKhoanDTO().getTenDangNhap());
+        taiKhoan.setMatKhau(passwordEncoder.encode(nhanVienDTO.getTaiKhoanDTO().getMatKhau()));
+        System.out.println("TenDangNhap: " + taiKhoan.getTenDangNhap());
+        taiKhoan = taiKhoanRepo.save(taiKhoan);
+        System.out.println("Saved TaiKhoan: " + taiKhoan);
+
+
+        // Gán tài khoản vào nhân viên
+        nhanVien.setTaiKhoan(taiKhoan);
+        System.out.println("NhanVien before save: " + nhanVien);
+
+        //tạo vai trò
+        VaiTro vaiTro = vaiTroRepo.findByIdVaiTro(2);
+        //tạo chi tiết vai trò
+        ChiTietVaiTro chiTietVaiTro = new ChiTietVaiTro();
+        chiTietVaiTro.setMaChoTietVaiTro(generateMaChiTietVaiTro());
+        chiTietVaiTro.setVaiTro(vaiTro);
+        chiTietVaiTro.setTaiKhoan(taiKhoan);
+        chiTietVaiTroRepo.save(chiTietVaiTro);
+
+        // Lưu nhân viên
+        nhanVien = nhanVienRepo.save(nhanVien);
+        System.out.println("Saved NhanVien: " + nhanVien);
+
+        return modelMapper.map(nhanVien, NhanVienDTO.class);
+    }
+
+    //genmaChiTietVaiTro
+    private String generateMaChiTietVaiTro() {
+        String prefix = "CTVT";
+        ChiTietVaiTro lastCTVT = chiTietVaiTroRepo.findTopByOrderByIdChiTietVaiTroDesc();
+        int nextId = lastCTVT != null ? (int) (lastCTVT.getIdChiTietVaiTro() + 1) : 1;
+        return prefix + String.format("%03d", nextId);
+    }
+
 
 
     //validate add
