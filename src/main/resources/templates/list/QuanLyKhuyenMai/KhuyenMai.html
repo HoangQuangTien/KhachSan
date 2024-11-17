@@ -123,6 +123,58 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pagination a,
+        .pagination .current-page {
+            padding: 8px 15px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .pagination a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .pagination .current-page {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .pagination .prev,
+        .pagination .next {
+            font-weight: bold;
+        }
+
+        .pagination .prev:hover,
+        .pagination .next:hover {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .pagination .prev,
+        .pagination .next {
+            padding: 8px 12px;
+            font-size: 18px;
+        }
+
+        .pagination a:disabled {
+            color: #aaa;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
 
     </style>
 
@@ -167,11 +219,11 @@
 
                 <!-- Nút mở modal thêm Khuyến Mãi -->
                 <div class="mb-3 d-flex justify-content-end">
-                    <a type="button" class="btn btn-success me-1" data-bs-toggle="modal" data-bs-target="#addKhuyenMaiModal" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a type="button" class="btn btn-success me-1" data-bs-toggle="modal" data-bs-target="#addKhuyenMaiModal">
                         <i class="fas fa-plus" style="color: #fcfcfc; top: 20px"></i>
                     </a>
 
-                    <a data-bs-toggle="modal" data-bs-target="#add" class="btn btn-success" >
+                    <a data-bs-toggle="modal" data-bs-target="#add" class="btn btn-success">
                         <i class="fa-regular fa-paper-plane" style="color: #fcfcfc; top: 20px"></i>
                     </a>
                 </div>
@@ -198,13 +250,13 @@
                         <tr th:each="khuyenMai : ${khuyenMaiPage.content}">
                             <td th:text="${khuyenMai.maKhuyenMai}">Mã KM</td>
                             <td th:text="${khuyenMai.tenKhuyenMai}">Tên KM</td>
-                            <td th:text="${#numbers.formatDecimal(khuyenMai.giamGia, 0,'0')}">Giảm Giá</td>
+                            <td th:text="${khuyenMai.giamGia}">Giảm Giá</td>
                             <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
                             <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
-                            <td th:text="${#numbers.formatDecimal(khuyenMai.giamToiThieu, 0,'0')}">Giảm Tối Thiểu</td>
-                            <td th:text="${#numbers.formatDecimal(khuyenMai.giamToiDa, 0,'0')}">Giảm Tối Đa</td>
+                            <td th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
+                            <td th:text="${khuyenMai.giamToiDa}">Giảm Tối Đa</td>
                             <td th:text="${khuyenMai.trangThai}">Trạng Thái</td>
-                            <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                            <td>
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
                                         th:data-idKhuyenMai="${khuyenMai.idKhuyenMai}"
                                         th:data-maKhuyenMai="${khuyenMai.maKhuyenMai}"
@@ -395,7 +447,8 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="editKhuyenMaiForm" onsubmit="return updateKhuyenMai(event)">
+                                <!-- Form cập nhật khuyến mãi -->
+                                <form id="editKhuyenMaiForm" onsubmit="return updateKhuyenMai()">
                                     <input type="hidden" id="editId" name="id" />
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
@@ -447,21 +500,6 @@
                                                 <option value="tienMat">Tiền Mặt</option>
                                             </select>
                                         </div>
-                                        <!--                                                <div class="col-md-6 mb-3">-->
-                                        <!--                                                    <label class="form-label">Trạng Thái</label>-->
-                                        <!--                                                    <div>-->
-                                        <!--                                                        <input type="radio" id="conHann" name="trangThai" value="conHan" required>-->
-                                        <!--                                                        <label for="conHann">Còn Hạn</label>-->
-                                        <!--                                                    </div>-->
-                                        <!--                                                    <div>-->
-                                        <!--                                                        <input type="radio" id="hetHann" name="trangThai" value="hetHan" required>-->
-                                        <!--                                                        <label for="hetHann">Hết Hạn</label>-->
-                                        <!--                                                    </div>-->
-                                        <!--                                                    <div>-->
-                                        <!--                                                        <input type="radio" id="sapDienRaa" name="trangThai" value="sapDienRa" required>-->
-                                        <!--                                                        <label for="sapDienRaa">Sắp Diễn Ra</label>-->
-                                        <!--                                                    </div>-->
-                                        <!--                                                </div>-->
                                     </div>
                                     <button type="submit" class="btn btn-primary">Cập Nhật</button>
                                 </form>
@@ -469,31 +507,15 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Phân trang -->
 
-                <div class="pagination d-flex justify-content-center mt-2">
-<!--                    &lt;!&ndash; Hiển thị nút Previous nếu có trang trước &ndash;&gt;-->
-<!--                    <a class="prev page-item" th:if="${khuyenMaiPage.hasPrevious()}"-->
-<!--                       th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number - 1}, size=${khuyenMaiPage.size})}"-->
-<!--                       aria-label="Previous">-->
-<!--                        <span aria-hidden="true">&laquo;</span>-->
-<!--                    </a>-->
-
-                    <!-- Hiển thị các số trang -->
-                    <ul class="pagination">
-                        <li class="page-item" th:each="i : ${#numbers.sequence(0, khuyenMaiPage.totalPages - 1)}"
-                            th:class="${i == khuyenMaiPage.number} ? 'active' : ''">
-                            <a class="page-link" th:href="@{/quan-ly-khuyen-mai(page=${i}, size=${khuyenMaiPage.size})}"
-                               th:text="${i + 1}"></a>
-                        </li>
-                    </ul>
-
-<!--                    &lt;!&ndash; Hiển thị nút Next nếu có trang tiếp theo &ndash;&gt;-->
-<!--                    <a class="next page-item" th:if="${khuyenMaiPage.hasNext()}"-->
-<!--                       th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number + 1}, size=${khuyenMaiPage.size})}"-->
-<!--                       aria-label="Next">-->
-<!--                        <span aria-hidden="true">&raquo;</span>-->
-<!--                    </a>-->
+                <div class="pagination">
+                    <a class="prev" th:if="${khuyenMaiPage.hasPrevious()}"
+                       th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number - 1}, size=${khuyenMaiPage.size})}">&laquo;</a>
+                    <span class="current-page" th:text="${khuyenMaiPage.number + 1}"></span>
+                    <a class="next" th:if="${khuyenMaiPage.hasNext()}"
+                       th:href="@{/quan-ly-khuyen-mai(page=${khuyenMaiPage.number + 1}, size=${khuyenMaiPage.size})}">&raquo;</a>
                 </div>
             </div>
         </div>
@@ -532,6 +554,15 @@
                 ngayBatDau: new Date(formElement.ngayBatDau.value),
                 ngayKetThuc: new Date(formElement.ngayKetThuc.value)
             };
+
+            // Log giá trị giamGia để kiểm tra
+            console.log("Giảm giá:", fields.giamGia);
+
+            // Kiểm tra phần trăm giảm giá không vượt quá 100%
+            if (fields.loaiGiam === 'phanTram' && fields.giamGia > 100) {
+                showErrorToast('Giảm giá phần trăm không thể vượt quá 100%.');
+                return; // Dừng thực hiện nếu có lỗi
+            }
 
             // Kiểm tra đầu vào
             const today = new Date();
@@ -572,7 +603,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('Thêm khuyến mãi thành công!');
+                    showSuccessToast('Thêm khuyến mãi thành công!');
                     $('#addKhuyenMaiModal').modal('hide');
                     formElement.reset();
                     // updateTable(data); // Cập nhật bảng nếu cần
@@ -585,7 +616,6 @@
             }
         });
     });
-
 
     function showSuccessToast(message) {
         Toastify({
@@ -680,31 +710,34 @@
     }
 
 
-    function updateKhuyenMai(event) {
-        event.preventDefault(); // Ngăn chặn hành động mặc định của form
+    function updateKhuyenMai() {
+        const form = document.getElementById("editKhuyenMaiForm");
+        const formData = new FormData(form);
 
-        const formData = new FormData(document.getElementById('editKhuyenMaiForm'));
-        const id = document.getElementById('editId').value;
+        const id = document.getElementById("editId").value; // Lấy ID từ modal
+        const url = `/quan-ly-khuyen-mai/update/${id}`; // API path
 
-        fetch(`/admin/quan-ly-khuyen-mai/update/${id}`, {
+        fetch(url, {
             method: 'POST',
             body: formData
         })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.success);
-                    // Đóng modal
+                    showSuccessToast("Cập nhật khuyến mãi thành công!");
+                    // Đóng modal và làm mới danh sách nếu cần
                     $('#editKhuyenMaiModal').modal('hide');
-                    // Cập nhật lại danh sách khuyến mãi nếu cần
                 } else {
-                    alert(data.error);
+                    showErrorToast(data.error || "Đã có lỗi xảy ra");
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                alert("Lỗi kết nối: " + error.message);
+            });
 
-        return false; // Ngăn chặn việc gửi form mặc định
+        return false; // Ngừng hành động mặc định của form
     }
+
 
     function toggleSelectAll() {
         const checkboxes = document.querySelectorAll('.form-check-input');
@@ -721,7 +754,7 @@
     function searchInModal() {
         var input, filter, table, tr, td, i, txtValue;
         input = document.getElementById("modalSearchInput");
-        filter = input.value.trim().toUpperCase();
+        filter = input.value.toUpperCase();
         table = document.querySelector(".modal-body table");
         tr = table.getElementsByTagName("tr");
 
@@ -758,7 +791,7 @@
 
         // Kiểm tra xem có khách hàng nào được chọn và mã voucher không
         if (selectedKhachHangList.length === 0 || !voucherId) {
-            alert("Vui lòng chọn ít nhất một khách hàng và một mã voucher.");
+            showErrorToast("Vui lòng chọn ít nhất một khách hàng và một mã voucher.");
             return; // Dừng thực thi nếu không đủ điều kiện
         }
 
@@ -786,7 +819,7 @@
                 if (typeof data === 'string') {
                     alert(data); // Hiển thị thông báo khi dữ liệu trả về là chuỗi văn bản
                 } else {
-                    alert('Email đã được gửi thành công'); // Hiển thị thông báo gửi email thành công
+                    showSuccessToast('Email đã được gửi thành công'); // Hiển thị thông báo gửi email thành công
                 }
                 $('#add').modal('hide'); // Đóng modal
 

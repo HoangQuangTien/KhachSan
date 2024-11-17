@@ -97,7 +97,19 @@
         tr {
             line-height: 1.2; /* Điều chỉnh chiều cao dòng để phù hợp với kích thước chữ */
         }
+        /* Basic styling for pagination container */
 
+
+        /* Pagination buttons */
+        #paginationContainer a {
+            text-decoration: none;
+            padding: 5px 10px;
+            margin: 0 3px;
+            border-radius: 3px;
+            font-size: 14px;
+            border: 1px solid #007bff;
+            cursor: pointer;
+        }
     </style>
 
     <head th:include="fragment/head :: head"></head>
@@ -145,10 +157,10 @@
                                          th:data-tenphong="${datPhong.phong.tenPhong}"
                                          th:data-thoigian="${datPhong.ngayNhan} + ' - ' + ${datPhong.ngayTra}"
                                          th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}"
-                                         th:data-giaphong="${datPhong.phong.loaiPhong.gia}"
+                                         th:data-giaphong="${datPhong.loaiPhong.gia}"
                                          th:data-tiencoc="${datPhong.tienCoc}"
-                                         th:data-tongtien="${datPhong.tongTien}"
                                          th:data-tienconlai="${datPhong.tienConLai}"
+                                         th:data-tongTien="${datPhong.tongTien}"
                                          class="card mb-3"
                                          onclick="showForm(this.getAttribute('data-id-dat-phong'),
                             this.getAttribute('data-id-phong'),
@@ -160,8 +172,8 @@
                             this.getAttribute('data-ngaycheckin'),
                             this.getAttribute('data-giaphong'),
                             this.getAttribute('data-tiencoc'),
-                            this.getAttribute('data-tongtien'),
                             this.getAttribute('data-tienconlai'),
+                             this.getAttribute('data-tongTien'),
                             this)">
                                         <div class="card-body">
                                             <h5 class="card-title" th:text="${datPhong.khachHang.hoVaTen}"></h5>
@@ -255,9 +267,10 @@
                         </table>
 
                         <!-- Phân trang -->
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div id="paginationContainer"></div>
-                        </div>
+                        <div id="paginationContainer" class=" mb-3">  </div>
+
+
+
 
                     </div>
                 </div>
@@ -337,13 +350,12 @@
 
                         <div class="row border-bottom pb-2 mb-3">
                             <div class="col-6 mb-3">
-                                <label for="tienCoc" class="form-label font-weight-bold">Số tiền đã cọc</label>
+                                <label for="tienCoc" class="form-label font-weight-bold">Tiền cọc phòng</label>
                                 <div class="input-group">
-                                    <input type="text" name="tienCoc" id="tienCoc" class="form-control form-control-sm" disabled>
+                                    <input type="text" name="tienCoc" id="tienCoc" class="form-control form-control-sm">
                                     <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
                                 </div>
                             </div>
-
                             <div class="col-6 mb-3">
                                 <label for="tienCoc" class="form-label font-weight-bold">Tổng tiền phòng</label>
                                 <div class="input-group">
@@ -352,8 +364,9 @@
                                 </div>
                             </div>
 
-
                         </div>
+
+
 
 
                         <!-- Thông tin thanh toán -->
@@ -380,7 +393,7 @@
                             </div>
                             <div class="form-check form-check-inline">
                                 <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false" class="form-check-input" onclick="handleVirtualTransfer()">
-                                <label for="chuyenKhoan" class="form-check-label font-weight-bold">Chuyển khoản</label>
+                                <label for="chuyenKhoan" class="form-check-label font-weight-bold">Chuyển khoản ảo</label>
                             </div>
                         </div>
 
@@ -412,7 +425,7 @@
                         <div class="mb-3">
                             <label for="tienConLai" class="form-label">Tổng phải thanh toán</label>
                             <div class="input-group">
-                                <input type="number" name="soTien" id="tienConLai" class="form-control" disabled >
+                                <input type="number" name="soTien" id="tienConLai" class="form-control">
                                 <span class="input-group-text">VND</span>
                             </div>
                         </div>
@@ -573,14 +586,14 @@
                                 : 'N/A';
 
                             row.innerHTML = `
-                    <td>${transaction.maThanhToan || 'N/A'}</td>
-                    <td>${formattedDate}</td>
-                    <td>${transaction.tenPhong || 'N/A'}</td>
-                    <td>${transaction.hoVaTen || 'N/A'}</td>
-                    <td>${transaction.tongTien || '0.00'}</td>
-                    <td>${transaction.tinhTrang ? 'Đã Thanh Toán' : 'Chưa Thanh Toán'}</td>
-                    <td>${transaction.hoTen || 'N/A'}</td>
-                `;
+                        <td>${transaction.maThanhToan || 'N/A'}</td>
+                        <td>${formattedDate}</td>
+                        <td>${transaction.tenPhong || 'N/A'}</td>
+                        <td>${transaction.hoVaTen || 'N/A'}</td>
+                        <td>${transaction.tongTien || '0.00'}</td>
+                        <td>${transaction.tinhTrang ? 'Đã Thanh Toán' : 'Chưa Thanh Toán'}</td>
+                        <td>${transaction.hoTen || 'N/A'}</td>
+                    `;
                             transactionTableBody.appendChild(row);
                         });
                     }
@@ -601,7 +614,7 @@
                 if (currentPage > 0) {
                     const prevButton = document.createElement('a');
                     prevButton.href = "#";
-                    prevButton.className = 'btn btn-primary ';
+                    prevButton.className = 'btn btn-primary me-2';
                     prevButton.textContent = '<<';
                     prevButton.addEventListener('click', function(event) {
                         event.preventDefault(); // Prevent default link behavior
@@ -651,7 +664,6 @@
         // Initially fetch the first page of transactions
         fetchTransactions(currentPage);
     });
-
 
 
     //Lắng nghe sự kiến submit từ form
@@ -845,7 +857,7 @@
     // Hàm này điền dữ liệu vào các input fields trong form
     function showForm(idDatPhong, idPhong, idLoaiPhong, hoVaTen,
                       soDienThoai, tenPhong, thoiGian, thoiGianCheckIn,
-                      giaPhong, tienCoc,tongTien, tienConLai ,cardElement) {
+                      giaPhong, tienCoc, tienConLai,tongTien ,cardElement) {
         // Điền giá trị vào form
         document.getElementById('idDatPhong').value = idDatPhong;
         document.getElementById('idPhong').value = idPhong;
@@ -1050,54 +1062,39 @@
 
     // Hàm tính tổng tiền cần thanh toán (bao gồm phụ phí)
     function tinhTongTien() {
-        // Lấy giá trị từ các trường nhập liệu
         var tienPhuPhi = parseFloat(document.getElementById('tienPhuPhi').value) || 0;
-        var tongSoTien = parseFloat(document.getElementById('tienConLai').value) || 0; // Đây có thể là lỗi: bạn cần lấy giá trị gốc, không phải tiền còn lại.
-
-        console.log("Tiền phụ phí:", tienPhuPhi);
-        console.log("Tổng số tiền ban đầu:", tongSoTien);
+        var tongSoTien = parseFloat(document.getElementById('tienConLai').value) || 0;
 
         var voucherSelect = document.getElementById('voucherId');
         var selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
 
         var giamGia = 0;
         if (selectedOption.value) {
-            // Lấy mức giảm và loại giảm từ thuộc tính của voucher được chọn
+            // Lấy mức giảm và loại giảm
             var mucGiam = parseFloat(selectedOption.getAttribute('data-muc-giam')) || 0;
             var loaiGiamStr = selectedOption.getAttribute('data-loai-giam');
-            var loaiGiam = loaiGiamStr === "true"; // `true` cho giảm theo phần trăm, `false` cho giảm theo tiền mặt
+            var loaiGiam = loaiGiamStr === "true";  // `true` cho phần trăm, `false` cho tiền mặt
 
             console.log("Mức giảm:", mucGiam);
-            console.log("Loại giảm:", loaiGiam ? "Phần trăm" : "Tiền mặt");
+            console.log("Loại giảm:", loaiGiam);
 
-            // Tính giảm giá dựa trên loại giảm
+            // Tính giảm giá theo loại giảm
             if (loaiGiam) { // Nếu là giảm theo phần trăm
                 giamGia = (mucGiam / 100) * tongSoTien;
+                console.log("Giảm giá theo phần trăm:", giamGia);
             } else { // Nếu là giảm theo tiền mặt
                 giamGia = mucGiam;
+                console.log("Giảm giá theo tiền mặt:", giamGia);
             }
 
-            console.log("Giảm giá sau tính toán:", giamGia);
-
-            // Đảm bảo giảm giá không vượt quá tổng số tiền ban đầu
-            giamGia = Math.min(giamGia, tongSoTien);
+            // Đảm bảo giảm giá không vượt quá tổng tiền
+            giamGia = Math.min(giamGia, tongSoTien + tienPhuPhi);
         }
 
-        // Tính tổng tiền sau khi áp dụng giảm giá và phụ phí
-        var tongTienSauGiam = (tongSoTien - giamGia) + tienPhuPhi;
-
-        console.log("Tổng tiền sau giảm trước khi kiểm tra âm:", tongTienSauGiam);
-
-        // Đảm bảo tổng tiền không âm
-        tongTienSauGiam = Math.max(0, tongTienSauGiam);
-
-        // Cập nhật giá trị tổng tiền cần thanh toán vào trường 'tienConLai'
-        document.getElementById("tienConLai").value = tongTienSauGiam.toFixed(2);
-
-        console.log("Giảm giá:", giamGia);
-        console.log("Tổng tiền sau giảm:", tongTienSauGiam);
+        var tongTien = tongSoTien + tienPhuPhi - giamGia;
+        document.getElementById("tienConLai").value = tongTien.toFixed(2);
+        console.log("Tổng tiền sau giảm:", tongTien);
     }
-
 
 
 
@@ -1197,6 +1194,15 @@
                 console.error('Error occurred while fetching data:', error);
             });
     });
+
+
+    // Hàm để xóa mã QR nếu không cần tạo lại
+    function generateQR(create) {
+        if (!create) {
+            const qrCodeDisplay = document.getElementById("qrCodeDisplay");
+            qrCodeDisplay.innerHTML = ""; // Xóa mã QR
+        }
+    }
 
     function handleVirtualTransfer() {
         const accountNumber = "2141703920"; // Số tài khoản BIDV

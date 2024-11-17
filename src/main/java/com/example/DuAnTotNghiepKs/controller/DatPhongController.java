@@ -413,12 +413,12 @@ public class DatPhongController {
         }
     }
 
-
-    @GetMapping("/month")
-    public ResponseEntity<Double> getRevenueByMonth(@RequestParam int month, @RequestParam int year) {
-        double revenue = datPhongService.getRevenueByMonth(month, year);
-        return ResponseEntity.ok(revenue);
-    }
+//
+//    @GetMapping("/month")
+//    public ResponseEntity<Double> getRevenueByMonth(@RequestParam int month, @RequestParam int year) {
+//        double revenue = datPhongService.getRevenueByMonth(month, year);
+//        return ResponseEntity.ok(revenue);
+//    }
 
     @GetMapping("/four-months")
     public ResponseEntity<Map<String, Object>> getRevenueForFourMonths(@RequestParam int startMonth, @RequestParam int year) {
@@ -426,11 +426,11 @@ public class DatPhongController {
         return ResponseEntity.ok(revenueData);
     }
 
-    @GetMapping("/year")
-    public ResponseEntity<Map<String, Object>> getRevenueByYear(@RequestParam int year) {
-        Map<String, Object> revenueData = datPhongService.getRevenueByYear(year);
-        return ResponseEntity.ok(revenueData);
-    }
+//    @GetMapping("/year")
+//    public ResponseEntity<Map<String, Object>> getRevenueByYear(@RequestParam int year) {
+//        Map<String, Object> revenueData = datPhongService.getRevenueByYear(year);
+//        return ResponseEntity.ok(revenueData);
+//    }
 
 
 
@@ -515,6 +515,72 @@ public ResponseEntity<?> getTop3PhongDuocDatNhieuNhat() {
         }
     }
 
+
+    @GetMapping("/month")
+    public ResponseEntity<Double> getRevenueByMonth(@RequestParam int month, @RequestParam int year) {
+        try {
+            double revenue = datPhongService.getRevenueByMonth(month, year);
+            return ResponseEntity.ok(revenue);  // Trả về doanh thu là một số thực
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(0.0);
+        }
+    }
+
+
+    @GetMapping("/date-range")
+    public ResponseEntity<Map<String, Object>> getRevenueByDateRange(
+            @RequestParam String startDate, @RequestParam String endDate) {
+
+        try {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            Map<String, Object> revenueData = datPhongService.getRevenueByDateRange(start, end);
+            return ResponseEntity.ok(revenueData);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid date format"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Server error", "message", e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/year")
+    public ResponseEntity<Map<String, Object>> getRevenueByYear(@RequestParam int year) {
+        Map<String, Object> revenueData = datPhongService.getRevenueByYear(year);
+        return ResponseEntity.ok(revenueData);
+    }
+
+    @GetMapping("/quarter")
+    public ResponseEntity<Map<String, Object>> getRevenueByQuarter(
+            @RequestParam String quarterRange, @RequestParam int year) {
+        int startMonth, endMonth;
+
+        // Xác định khoảng tháng dựa trên quarterRange
+        switch (quarterRange) {
+            case "1-3":
+                startMonth = 1;
+                endMonth = 3;
+                break;
+            case "4-6":
+                startMonth = 4;
+                endMonth = 6;
+                break;
+            case "7-9":
+                startMonth = 7;
+                endMonth = 9;
+                break;
+            case "10-12":
+                startMonth = 10;
+                endMonth = 12;
+                break;
+            default:
+                throw new IllegalArgumentException("Quý không hợp lệ: " + quarterRange);
+        }
+
+        Map<String, Object> revenueData = datPhongService.getRevenueByQuarter(year, startMonth, endMonth);
+        return ResponseEntity.ok(revenueData);
+    }
 
 
 

@@ -87,7 +87,7 @@
                             </div>
 
                             <!-- Add Button -->
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                                 <button type="button" class="btn btn-success" data-bs-toggle="modal"
                                         data-bs-target="#formAdd">Thêm
                                 </button>
@@ -315,7 +315,7 @@
                                 </div>
 
                                 <div class="text-end mt-4">
-                                    <button type="submit" class="btn btn-primary">Sửa nhân viên</button>
+                                    <button type="submit" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Sửa nhân viên</button>
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng
                                     </button>
                                 </div>

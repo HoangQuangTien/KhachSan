@@ -57,7 +57,7 @@
                                                 <!-- Add Button -->
                                                 <button type="button" class="btn btn-success"
                                                         data-toggle="modal" data-target="#addModal" style="width: 100px;"
-                                                        data-whatever="@mdo">Thêm <span class="fe fe-plus"></span>
+                                                        data-whatever="@mdo" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Thêm <span class="fe fe-plus"></span>
                                                 </button>
                                             </form>
                                         </div>

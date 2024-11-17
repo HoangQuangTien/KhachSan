@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,10 @@ public interface DatPhongService {
     Map<String, Object> getRevenueForFourMonths(int startMonth, int year);
 
 //    double getRevenueByYear(int year);
+
+    Double getRevenueBetweenDates(LocalDate startDate, LocalDate endDate);
+
+    Map<String, Object> getRevenueByDateRange(LocalDate startDate, LocalDate endDate);
 
     Map<String, Object> getRevenueByYear(int year);
 
@@ -75,6 +80,8 @@ public interface DatPhongService {
     boolean xoaCCCD(Integer idDatPhong);
 
     void sendEmail(String to, String subject, String text);
+
+    Map<String, Object> getRevenueByQuarter(int year, int startMonth, int endMonth);
 
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động

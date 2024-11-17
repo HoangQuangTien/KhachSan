@@ -50,6 +50,9 @@ public class DatPhong {
     @Column(name = "tien_con_lai")
     private Float tienConLai;
 
+    @Column(name = "ngay_dat")
+    private LocalDateTime ngayDat;
+
     //    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm")
     @Column(name = "ngay_check_in")
     private LocalDateTime ngayCheckIn;

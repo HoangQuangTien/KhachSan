@@ -229,7 +229,7 @@
         </div>
     </div>
 
-    <img th:src="@{/img/logo-Photoroom.png}" class="logo position-absolute" alt="Logo">
+    <img th:src="@{/img/logo-Photoroom.png}" class="logo position-absolute" alt="">
     <!-- Overlay content -->
     <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center"
          style="background: rgba(0, 0, 0, 0.5);">
@@ -240,7 +240,7 @@
         <!-- Subtitle -->
         <p class="text-white mb-4 text-center">Tìm kiếm để so sánh giá cả và khám phá ưu đãi tuyệt vời</p>
 
-        <!-- Search Bar -->
+
         <!-- Search Bar -->
         <form action="/search1" method="GET" class="search-bar p-4 bg-white rounded shadow-sm d-flex align-items-center justify-content-between">
             <!-- Check-in & Check-out Section -->
@@ -286,24 +286,27 @@
         </form>
 
         <!-- Login Button -->
-        <!-- Login Button -->
         <div class="login-button-container position-absolute top-0 end-0 m-3">
-            <!-- Kiểm tra nếu session không có user (chưa đăng nhập) -->
-            <th:block th:if="${session.user == null}">
-                <a href="/khach-hang/login" class="btn btn-outline-light btnLogin">Đăng nhập</a>
+            <!--             Kiểm tra nếu session không có user (chưa đăng nhập) -->
+            <th:block th:if="${hoVaTen == null}">
+                <a href="/login" class="btn btn-outline-light btnLogin">Đăng nhập</a>
             </th:block>
-
-            <!-- Kiểm tra nếu session có user (đã đăng nhập) -->
-            <th:block th:if="${session.user != null}">
+            <!--             Kiểm tra nếu session có user (đã đăng nhập) -->
+            <th:block th:if="${hoVaTen != null}">
                 <div class="dropdown">
-                    <!-- Hiển thị tên người dùng -->
-                    <button th:text="${session.user.hoVaTen}"
-                            class="btn btn-secondary dropdown-toggle"
+                    <!-- Hiển thị tên người dùng và icon -->
+                    <button class="btn btn-secondary dropdown-toggle d-flex align-items-center gap-2"
                             type="button" data-toggle="dropdown" aria-expanded="false">
+                        <span th:text="${hoVaTen}"></span>
+                        <i class="fas fa-user-circle"></i> <!-- Biểu tượng người dùng -->
                     </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/khach-hang/trang-ca-nhan">Trang cá nhân</a>
-                        <a class="dropdown-item" href="/khach-hang/logout">Đăng xuất</a>
+                    <div class="dropdown-menu shadow-sm">
+                        <a class="dropdown-item d-flex align-items-center gap-2" href="/khach-hang/trang-ca-nhan">
+                            <i class="fas fa-user"></i> Trang cá nhân
+                        </a>
+                        <a class="dropdown-item d-flex align-items-center gap-2" href="/khach-hang/logout">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a>
                     </div>
                 </div>
             </th:block>

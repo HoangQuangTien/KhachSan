@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,18 +38,8 @@ public class KhachHangController {
     private DiaChiKhachHangService diaChiKhachHangService;
     @Autowired
     private RestTemplate restTemplate;
-
-    @GetMapping("/khach-hang/login")
-    public String login(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        if (session.getAttribute("user") != null) {
-            return "redirect:/khach-hang";
-        }
-        return "list/DangNhap/login";
-    }
-
-
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("quan-ly-khach-hang")
     public String hienThiKhachHang(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
@@ -62,7 +53,6 @@ public class KhachHangController {
         return "list/quan-ly-khach-hang2";
     }
 
-
     @PostMapping("/quan-ly-khach-hang/them")
     public String addKhachHang(@ModelAttribute KhachHangDTO khachHangDTO) {
         // Kiểm tra nếu mã khách hàng chưa tồn tại, sinh mã tự động
@@ -75,21 +65,25 @@ public class KhachHangController {
         return "redirect:/quan-ly-khach-hang";
     }
 
-
-
     @GetMapping("/quan-ly-khach-hang-detail")
     public String detailHTKH(@RequestParam(value = "id", required = false) Integer id,
                              @RequestParam(value = "page", defaultValue = "0") int pageDiaChi,
-                             @RequestParam(value = "sizeDiaChi", defaultValue = "3") int sizeDiaChi,
-                             Model model) {
+                             @RequestParam(value = "sizeDiaChi", defaultValue = "3") int sizeDiaChi, Model model) {
         if (id != null) {
             KhachHangDTO khachHangDTO = khachHangService.findById(id);
-            Pageable pageable = PageRequest.of(pageDiaChi, sizeDiaChi, Sort.by("createdAt").descending()); // Sử dụng pageDiaChi và sizeDiaChi từ request
+            Pageable pageable = PageRequest.of(pageDiaChi, sizeDiaChi, Sort.by("createdAt").descending()); // Sử dụng
+            // pageDiaChi
+            // và
+            // sizeDiaChi
+            // từ
+            // request
             Page<DiaChiKhachHangDTO> diaChiPage = diaChiKhachHangService.findByIdDC(id, pageable);
             List<DiaChiKhachHangDTO> diaChiList = new ArrayList<>(diaChiPage.getContent());
 
             if (diaChiList.isEmpty() && pageDiaChi > 0) {
-                return "redirect:/quan-ly-khach-hang-detail?id=" + id + "&page=" + (pageDiaChi - 1); // Sửa đổi thành pageDiaChi - 1
+                return "redirect:/quan-ly-khach-hang-detail?id=" + id + "&page=" + (pageDiaChi - 1); // Sửa đổi thành
+                // pageDiaChi -
+                // 1
             }
 
 //            Collections.reverse(diaChiList);
@@ -109,23 +103,6 @@ public class KhachHangController {
     public String updateKH(@ModelAttribute KhachHangDTO khachHangDTO) {
         khachHangService.update(khachHangDTO.getId(), khachHangDTO);
         return "redirect:/quan-ly-khach-hang";
-    }
-
-
-    @PostMapping("/khach-hang/login")
-    public ResponseEntity<?> login(@RequestParam String tenDangNhap, @RequestParam String matKhau,
-                                   HttpServletRequest request) {
-        // Xac thuc nguoi dung bang username va password
-        KhachHang khachHang = khachHangService.findByTenDangNhap(tenDangNhap);
-        if (khachHang == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Tài khoản không tồn tại"));
-        }
-        // Kiểm tra mật khẩu
-        if (!khachHang.getTaiKhoan().getMatKhau().equals(matKhau)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Mật khẩu không chính xác"));
-        }
-        request.getSession().setAttribute("user", khachHang);
-        return ResponseEntity.ok(Map.of("message", "Đăng nhập thành công", "user", khachHang));
     }
 
     @GetMapping("/khach-hang/logout")
@@ -148,8 +125,7 @@ public class KhachHangController {
 
     @PutMapping("/khach-hang/trang-ca-nhan")
     public ResponseEntity<?> register(@RequestParam String hoVaTen, @RequestParam String soDienThoai,
-                                      @RequestParam Boolean gioiTinh, @RequestParam String email,
-                                      HttpServletRequest request) {
+                                      @RequestParam Boolean gioiTinh, @RequestParam String email, HttpServletRequest request) {
         KhachHang khachHang = (KhachHang) request.getSession().getAttribute("user");
         if (khachHang == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "user không tồn tại"));
@@ -158,7 +134,6 @@ public class KhachHangController {
         khachHang.setSoDienThoai(soDienThoai);
         khachHang.setGioiTinh(gioiTinh);
         khachHang.setEmail(email);
-
         khachHangService.updateKH(khachHang);
         return ResponseEntity.ok(Map.of("message", "Đăng ký thành công"));
     }

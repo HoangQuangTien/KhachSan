@@ -42,6 +42,9 @@ public class KhachHangDD {
     private LoaiPhongService loaiPhongService;
 
     @Autowired
+    private VnpayService vnpayService;
+
+    @Autowired
     private ChiTietDatPhongService chiTietDatPhongService;
     @Autowired
     private TaiKhoanService taiKhoanService;
@@ -57,6 +60,7 @@ public class KhachHangDD {
             @RequestParam Map<String, String> requestParams,
             Model model) {
 
+
         // Xử lý thông tin nhận được từ VNPAY
         Map<String, String> fields = new HashMap<>();
         for (Map.Entry<String, String> entry : requestParams.entrySet()) {
@@ -71,7 +75,18 @@ public class KhachHangDD {
         String signValue = Config.hashAllFields(fields);
 
         // Kiểm tra chữ ký hợp lệ
+        String vnp_TxnRef = requestParams.get("vnp_TxnRef");
+        String responseCode = requestParams.get("vnp_ResponseCode");
+        Integer idDatPhong = Integer.valueOf(vnp_TxnRef);
         boolean isValidSignature = signValue.equals(vnp_SecureHash);
+
+        if (isValidSignature && "00".equals(responseCode)) {
+
+            vnpayService.ThanhToanThanhCong(idDatPhong);
+        } else {
+            vnpayService.ThanhToanThatBai(idDatPhong);
+        }
+
 
         // Truyền dữ liệu sang model để hiển thị trên view
         model.addAttribute("isValidSignature", isValidSignature);
@@ -157,8 +172,8 @@ public class KhachHangDD {
 
 
     //
-    @PostMapping("/dat-phong")
-    public ResponseEntity<?> datPhongKhachHang(
+    @PostMapping("/dat-phong1")
+    public ResponseEntity<?> createDatPhongKhachHang1(
             @RequestParam(name = "amount", required = false) Long amount,
             @RequestParam("bankCode") String bankCode,
             @RequestParam(value = "language", required = false) String language,
@@ -186,10 +201,6 @@ public class KhachHangDD {
             }
             KhachHang khachHang = khachHangService.convertToEntity(khachHangDTO);
 
-            // Kiểm tra thanh toán trước khi đặt phòng
-//        if (!isPaymentCompleted(idKhachHang)) {
-//            return ResponseEntity.badRequest().body(Map.of("error", "Bạn phải thanh toán trước khi đặt phòng."));
-//        }
 
             // Chuyển đổi ngày nhận và ngày trả
             LocalDateTime ngayNhan = parseDateTime(ngayNhanStr, "Ngày nhận phòng không hợp lệ.");
@@ -247,13 +258,14 @@ public class KhachHangDD {
                 datPhong.setPhong(selectedPhong);
                 datPhong.setNgayNhan(ngayNhan);
                 datPhong.setNgayTra(ngayTra);
+                datPhong.setNgayDat(LocalDateTime.now());
                 datPhong.setCccd(cccd);
                 datPhong.setTongTien(tongTienPhong);
                 datPhong.setTienCoc(tienCoc);
                 datPhong.setTienConLai(tongTienPhong - tienCoc);
                 datPhong.setLoaiPhong(loaiPhong);
                 datPhong.setKhachHang(khachHang);
-                datPhong.setTinhTrang("Chưa Checkin");
+                datPhong.setTinhTrang("Đang chờ thanh toán...");
                 datPhong.setTrangThai(false);
 
                 // Thêm vào danh sách để lưu sau
@@ -274,11 +286,17 @@ public class KhachHangDD {
                 chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
             }
 
+
+            DatPhong booking = datPhongList.get(0);
+            Integer id = booking.getIdDatPhong();
+
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";
-            String vnp_TxnRef = Config.getRandomNumber(8);
+            String vnp_TxnRef = String.valueOf(id);
             String vnp_IpAddr = Config.getIpAddress(req);
             String vnp_TmnCode = Config.vnp_TmnCode;
+
+            System.out.println("vnp_TxnRef:"+vnp_TxnRef);
 
             Map<String, String> vnp_Params = new HashMap<>();
             vnp_Params.put("vnp_Version", vnp_Version);
@@ -291,7 +309,7 @@ public class KhachHangDD {
                 vnp_Params.put("vnp_BankCode", bankCode);
             }
             vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-            vnp_Params.put("vnp_OrderInfo", "Đặt phòng " + idKhachHang);
+            vnp_Params.put("vnp_OrderInfo", "billpayment");
             vnp_Params.put("vnp_OrderType", "booking");
 
             String locate = (language != null && !language.isEmpty()) ? language : "vn";
@@ -345,31 +363,6 @@ public class KhachHangDD {
         }
     }
 
-    @PostMapping("/vnpay/return")
-    public ResponseEntity<?> vnpayReturn(
-            @RequestParam Map<String, String> params) {
-
-        // Kiểm tra mã phản hồi từ VNPAY
-        String vnp_ResponseCode = params.get("vnp_ResponseCode");
-        if ("00".equals(vnp_ResponseCode)) {
-            // Thanh toán thành công, xử lý lưu thông tin đặt phòng
-            // Lấy các thông tin cần thiết từ params và lưu vào cơ sở dữ liệu
-
-            // Trả về thông báo thành công
-            return ResponseEntity.ok(Map.of("message", "Thanh toán thành công, đặt phòng đã được xác nhận!"));
-        } else {
-            // Thanh toán thất bại
-            return ResponseEntity.badRequest().body(Map.of("error", "Thanh toán thất bại, vui lòng thử lại!"));
-        }
-    }
-
-
-    // Hàm kiểm tra thanh toán
-    private boolean isPaymentCompleted(Integer idKhachHang) {
-        // Logic kiểm tra thanh toán
-        // Trả về true nếu đã thanh toán, false nếu chưa thanh toán
-        return false;
-    }
 
 
     // Phương thức chuyển đổi ngày giờ

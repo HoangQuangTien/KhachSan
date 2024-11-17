@@ -32,7 +32,7 @@ import java.util.Set;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = { "/api","/register", "/login","khach-hang","view-dat-phong","/thanh-toan-khach-hang","/dat-phong","/vnpay",
+    private final String[] PUBLIC_ENDPOINTS = { "/api","/register", "/login","khach-hang","view-dat-phong","/thanh-toan-khach-hang","/dat-phong1","/vnpay",
             "/assets1/**","vnpay_pay","vnpay_result","vnpay-create","https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
             "/load-phong/**","/img/**","/css/**","/js/**","lien-he","/searchh","/about","/listPhong","/phong-theo-loai","/register","/api/available-rooms"
             ,"/khach-hang/login"};
@@ -76,7 +76,7 @@ public class SecurityConfig {
                 )
                 .logout(logoff -> logoff
                         .logoutUrl("/logoff")
-                        .logoutSuccessUrl("/khach-hang")
+                        .logoutSuccessUrl("/login")
                         .permitAll()
                 )
 //                .sessionManagement(session -> session

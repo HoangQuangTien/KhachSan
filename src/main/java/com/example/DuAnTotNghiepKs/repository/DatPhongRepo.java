@@ -24,15 +24,27 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
 
 
-    @Query("SELECT SUM(dp.tienCoc) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) = :month AND YEAR(dp.ngayNhan) = :year")
+    @Query("SELECT SUM(dp.tongTien) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) = :month AND YEAR(dp.ngayNhan) = :year")
     Double findRevenueByMonth(@Param("month") int month, @Param("year") int year);
+    @Query("SELECT dp.ngayNhan AS day, COALESCE(SUM(dp.tongTien), 0) AS revenue " +
+            "FROM DatPhong dp " + // Thêm dấu cách sau FROM
+            "WHERE dp.ngayNhan BETWEEN :startDate AND :endDate " +
+            "GROUP BY dp.ngayNhan") // Bỏ ngoặc thừa
+    List<Object[]> findRevenueByDateRange(@Param("startDate") LocalDateTime startDate,
+                                          @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT SUM(dp.tienCoc) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) = :month AND YEAR(dp.ngayNhan) = :year")
-    Double findRevenueByMonthAndYear(@Param("month") int month, @Param("year") int year);
 
+    @Query("SELECT MONTH(dp.ngayNhan) AS month, COALESCE(SUM(dp.tongTien), 0) AS revenue " +
+            "FROM DatPhong dp WHERE YEAR(dp.ngayNhan) = :year AND MONTH(dp.ngayNhan) BETWEEN :startMonth AND :endMonth " +
+            "GROUP BY MONTH(dp.ngayNhan) " +
+            "ORDER BY MONTH(dp.ngayNhan)")
+    List<Object[]> findRevenueByQuarter(@Param("year") int year, @Param("startMonth") int startMonth, @Param("endMonth") int endMonth);
 
     @Query("SELECT MONTH(dp.ngayNhan) AS month, COALESCE(SUM(dp.tongTien), 0) AS revenue FROM DatPhong dp WHERE YEAR(dp.ngayNhan) = :year GROUP BY MONTH(dp.ngayNhan)")
     List<Object[]> findRevenueByYear(@Param("year") int year);
+
+
+    List<DatPhong> findByNgayNhanBetween(LocalDateTime startDate, LocalDateTime endDate);
 
 
     @Query("SELECT COUNT(dp) FROM DatPhong dp")
@@ -168,5 +180,7 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
             "LOWER(k.hoVaTen) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "OR LOWER(d.maDatPhong) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<DatPhong> searchBy(@Param("query") String query, Pageable pageable);
+
+
 
 }

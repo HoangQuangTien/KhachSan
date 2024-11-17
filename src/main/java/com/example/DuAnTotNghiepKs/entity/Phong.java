@@ -132,9 +132,9 @@ public class Phong {
     private Set<DatPhong> datPhongs = new HashSet<>();
 
 
-    @OneToMany(mappedBy = "phong", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DanhGia> danhGias; // Danh sách các đánh giá của phòng
-
+//    @OneToMany(mappedBy = "phong")
+//    private Set<DanhGia> danhGias; // Danh sách các đánh giá của phòng
+//
 
 
 
