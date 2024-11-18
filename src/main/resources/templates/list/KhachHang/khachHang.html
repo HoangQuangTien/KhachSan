@@ -203,6 +203,58 @@
             text-align: center;
         }
 
+        .features {
+            display: flex; /* Sử dụng Flexbox để căn chỉnh các phần tử ngang hàng */
+            justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
+            gap: 20px; /* Khoảng cách giữa các phần tử */
+            text-align: center; /* Căn giữa nội dung trong mỗi <p> */
+        }
+
+        .features p {
+            font-size: 1rem;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Khoảng cách giữa icon và văn bản */
+        }
+
+        .features i {
+            font-size: 1.5rem; /* Kích thước biểu tượng */
+            color: #4caf50; /* Màu xanh cho biểu tượng */
+        }
+
+
+        .eco-garden-description {
+            margin-bottom: 2rem;
+            padding: 20px;
+            background-color: #f4fff0;  /* Nền màu nhạt */
+            border-radius: 8px;
+            text-align: left; /* Căn trái */
+        }
+
+        .eco-garden-description h2 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center; /* Căn giữa tiêu đề */
+        }
+
+        .eco-garden-description .features p {
+            font-size: 1rem;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+
+        .eco-garden-description .features i {
+            font-size: 1.2rem;
+            color: #4caf50; /* Màu xanh cho biểu tượng */
+        }
+
+
+
     </style>
 
 </head>
@@ -414,6 +466,24 @@
         </div>
     </div>
 </div>
+
+
+<div class="eco-garden-description">
+    <h2>Đánh thức mọi giác quan của bạn tại DragonBall Hotel</h2>
+    <p style="font-size: 1rem; color: #555; line-height: 1.6; white-space: normal; text-align: center;">
+        Khách sạn Dragon Ball Hotel với các phòng ngủ được xây dựng theo phong cách hiện đại phương tây. <br>
+        mỗi phòng được bố trí đón ánh sáng và gió biển thổi vào rất thoáng mát<br>
+        Đội ngũ nhân viên phục vụ là người địa phương rất thân thiện và được đào tạo chuyên nghiệp để phục vụ cho quý khách.
+    </p>
+
+
+    <div class="features">
+        <p><i class="fas fa-hotel"></i> Khách sạn sang trọng tại trung tâm thành phố</p>
+        <p><i class="fas fa-location-arrow"></i> Vị trí thuận tiện gần các điểm du lịch</p>
+        <p><i class="fas fa-concierge-bell"></i> Dịch vụ hoàn hảo và tiện nghi hiện đại</p>
+    </div>
+</div>
+
 
 <!--Vùng để load phòng-->
 <div id="top-phong" class="top-phong">

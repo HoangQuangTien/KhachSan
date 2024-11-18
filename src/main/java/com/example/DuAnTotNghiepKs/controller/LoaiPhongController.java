@@ -22,10 +22,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/loaiphongs")
@@ -228,5 +225,13 @@ public class LoaiPhongController {
     public String deleteLoaiPhong(@PathVariable int id) {
         loaiPhongService.deleteLoaiPhong(id);
         return "redirect:/loaiphongs";
+    }
+
+
+    @GetMapping("/checkTenLoaiPhong")
+    @ResponseBody
+    public Map<String, Boolean> checkTenLoaiPhong(@RequestParam String tenLoaiPhong) {
+        boolean exists = loaiPhongService.isTenLoaiPhongTrung(tenLoaiPhong);
+        return Collections.singletonMap("exists", exists);
     }
 }

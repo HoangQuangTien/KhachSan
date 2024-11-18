@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="mt-5" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a href="/loaiphongs/create">
+            <a href="/loaiphongs/create" >
                 <button type="button" ><i class="bi bi-plus-circle"></i> Thêm Loại Phòng</button>
             </a>
         </div>
@@ -48,8 +48,7 @@
                 <td th:text="${loaiPhong.soNguoiToiDa}"></td>
                 <td th:text="${loaiPhong.tang.tenTang}"></td>
                 <td th:text="${loaiPhong.dienTich.tenDienTich}"></td>
-                <td th:text="${#numbers.formatDecimal(loaiPhong.gia, 0, '0')}"></td>
-
+                <td th:text="${#numbers.formatCurrency(loaiPhong.gia)}"></td>
 
 
                 <td th:text="${loaiPhong.sucChua}"></td>
@@ -64,10 +63,25 @@
         </table>
 
         <div class="pagination">
-            <a class="prev" th:if="${loaiPhongPage.hasPrevious()}" th:href="@{/loai-phong(page=${loaiPhongPage.number - 1}, size=${loaiPhongPage.size})}">&laquo;</a>
-            <span class="current-page" th:text="${loaiPhongPage.number + 1}"></span>
-            <a class="next" th:if="${loaiPhongPage.hasNext()}" th:href="@{/loai-phong(page=${loaiPhongPage.number + 1}, size=${loaiPhongPage.size})}">&raquo;</a>
+            <!-- Nút về trang đầu -->
+            <a class="first" th:if="${!loaiPhongPage.first}" th:href="@{/loaiphongs(page=0, size=${loaiPhongPage.size})}">First</a>
+
+            <!-- Nút trang trước -->
+            <a class="prev" th:if="${loaiPhongPage.hasPrevious()}" th:href="@{/loaiphongs(page=${loaiPhongPage.number - 1}, size=${loaiPhongPage.size})}">&laquo;</a>
+
+            <!-- Danh sách các trang -->
+            <span th:each="i : ${#numbers.sequence(loaiPhongPage.number - 2, loaiPhongPage.number + 2)}">
+        <a th:if="${i >= 0 and i < loaiPhongPage.totalPages}" th:href="@{/loaiphongs(page=${i}, size=${loaiPhongPage.size})}"
+           th:classappend="${i == loaiPhongPage.number} ? 'active'" th:text="${i + 1}">1</a>
+    </span>
+
+            <!-- Nút trang sau -->
+            <a class="next" th:if="${loaiPhongPage.hasNext()}" th:href="@{/loaiphongs(page=${loaiPhongPage.number + 1}, size=${loaiPhongPage.size})}">&raquo;</a>
+
+            <!-- Nút đến trang cuối -->
+            <a class="last" th:if="${!loaiPhongPage.last}" th:href="@{/loaiphongs(page=${loaiPhongPage.totalPages - 1}, size=${loaiPhongPage.size})}">Last</a>
         </div>
+
     </main>
     <div th:include="fragment/modal :: modal"></div>
 </div>
@@ -76,7 +90,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function searchDatPhong() {
-        var keyword = document.getElementById('keyword').value.trim().toLowerCase();
+        var keyword = document.getElementById('keyword').value.toLowerCase();
         var rows = document.querySelectorAll('#resultTable tbody tr'); // Đảm bảo chọn đúng bảng
         var hasResults = false;
 
@@ -141,7 +155,7 @@
                     <td>${loaiPhong.soNguoiToiDa}</td>
                     <td>${loaiPhong.gia}</td>
                     <td>
-                        <a href="/loaiphongs/edit/${loaiPhong.idLoaiPhong}"  class="btn btn-warning btn-sm">
+                        <a href="/loaiphongs/edit/${loaiPhong.idLoaiPhong}" class="btn btn-warning btn-sm">
                             <i class="bi bi-pen"></i> Sửa
                         </a>
                     </td>

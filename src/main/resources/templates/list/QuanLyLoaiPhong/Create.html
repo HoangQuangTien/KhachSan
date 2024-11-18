@@ -13,13 +13,14 @@
     <p th:text="${message}"></p>
 </div>
 
-<form th:action="@{/loaiphongs/save}" th:object="${loaiPhong}" method="post" onsubmit="return validateForm()">
+<form th:action="@{/loaiphongs/save}" th:object="${loaiPhong}" method="post" onsubmit="return validateForm(event)">
     <input type="hidden" name="maLoaiPhong" id="maLoaiPhong">
 
-
-    <label for="tenLoaiPhong">Tên Loại Phòng:</label>
-    <input type="text" id="tenLoaiPhong" th:field="*{tenLoaiPhong}" />
-    <div class="error" th:if="${#fields.hasErrors('tenLoaiPhong')}" th:errors="*{tenLoaiPhong}"></div><br/>
+    <div class="form-group col-md-3">
+        <label for="tenLoaiPhong">Tên Loại Phòng</label>
+        <input type="text" id="tenLoaiPhong" name="tenLoaiPhong" class="form-control" required onchange="checkTenLoaiPhong()" />
+        <small id="tenLoaiPhongError" class="text-danger" style="display: none;"></small>
+    </div>
 
     <label for="moTa">Mô Tả:</label>
     <textarea id="moTa" th:field="*{moTa}"></textarea><br/>
@@ -107,7 +108,28 @@
     function hideDienTichModal() {
         document.getElementById("dienTichModal").style.display = "none";
     }
+    function showSuccessToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+            stopOnFocus: true
+        }).showToast();
+    }
 
+    // Hàm hiển thị toast thông báo khi lỗi
+    function showErrorToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+            stopOnFocus: true
+        }).showToast();
+    }
     // Thêm xác nhận khi thêm Tầng
     function submitTangForm() {
         const confirmAddTang = confirm("Bạn có chắc chắn muốn thêm tầng này?");
@@ -173,7 +195,10 @@
             alert("Vui lòng nhập tên diện tích.");
         }
     }
-    function validateForm() {
+
+    async function validateForm(event) {
+        event.preventDefault();  // Ngừng gửi form ngay lập tức
+
         const tenLoaiPhong = document.getElementById("tenLoaiPhong").value.trim();
         const moTa = document.getElementById("moTa").value.trim();
         const soLuongGiuong = document.getElementById("soLuongGiuong").value.trim();
@@ -183,9 +208,6 @@
         const tangSelect = document.getElementById("tang");
         const tangValue = tangSelect.value;
 
-        // Mảng chứa các tên loại phòng đã tồn tại (bạn có thể lấy từ cơ sở dữ liệu hoặc danh sách tĩnh)
-        const existingRoomNames = ['Phòng Deluxe', 'Phòng Standard', 'Phòng Suite'];  // Ví dụ, thay bằng dữ liệu thực tế
-
         // Kiểm tra "Tên Loại Phòng" không được để trống
         if (tenLoaiPhong === "") {
             alert("Tên Loại Phòng không được để trống!");
@@ -193,58 +215,83 @@
         }
 
         // Kiểm tra "Tên Loại Phòng" không được chứa số
-        const regex = /\d/;
-        if (regex.test(tenLoaiPhong)) {
+        const regexNumber = /\d/;
+        if (regexNumber.test(tenLoaiPhong)) {
             alert("Tên Loại Phòng không được chứa số!");
             return false;
         }
 
-        // Kiểm tra trùng tên loại phòng
-        if (existingRoomNames.includes(tenLoaiPhong)) {
-            alert("Tên Loại Phòng đã tồn tại!");
+        // Kiểm tra "Tên Loại Phòng" không được chứa ký tự đặc biệt
+        const regexSpecialChars = /[^a-zA-Z0-9\s]/;  // Kiểm tra ký tự đặc biệt
+        if (regexSpecialChars.test(tenLoaiPhong)) {
+            showErrorToast("Tên Loại Phòng không được chứa ký tự đặc biệt!");
             return false;
         }
 
-        // Kiểm tra "Mô Tả" không được để trống
+        // Kiểm tra trùng tên loại phòng qua API
+        const exists = await checkTenLoaiPhong(tenLoaiPhong);
+        if (exists) {
+            alert("Tên Loại Phòng đã tồn tại!");
+            return false;  // Nếu tên loại phòng đã tồn tại, không gửi form
+        }
+
+        // Kiểm tra các trường còn lại
         if (moTa === "") {
             alert("Mô Tả không được để trống!");
             return false;
         }
 
-        // Kiểm tra "Số Lượng Giường" không được để trống và phải từ 1 đến 3
         if (soLuongGiuong === "" || isNaN(soLuongGiuong) || Number(soLuongGiuong) < 1 || Number(soLuongGiuong) > 3) {
             alert("Số Lượng Giường không được vượt quá 3!");
             return false;
         }
 
-        // Kiểm tra "Số Người Tối Đa" không được để trống và phải từ 1 đến 6
         if (soNguoiToiDa === "" || isNaN(soNguoiToiDa) || Number(soNguoiToiDa) < 1 || Number(soNguoiToiDa) > 6) {
             alert("Số Người Tối Đa không được vượt quá 6!");
             return false;
         }
 
-        // Kiểm tra "Giá" không được để trống và phải lớn hơn 0
         if (gia === "" || isNaN(gia) || Number(gia) <= 0) {
             alert("Giá phải là một số hợp lệ và lớn hơn 0!");
             return false;
         }
 
-        // Kiểm tra "Sức Chứa" không được để trống và phải từ 1 đến 6
         if (sucChua === "" || isNaN(sucChua) || Number(sucChua) < 1 || Number(sucChua) > 6) {
             alert("Sức Chứa không được vượt quá 6!");
             return false;
         }
 
-        // Kiểm tra xem "Tầng" đã được chọn chưa
         if (!tangValue) {
             alert("Vui lòng chọn một tầng!");
             return false;
         }
 
-        // Nếu tất cả các kiểm tra đều hợp lệ, hiển thị thông báo thành công
+        // Nếu tất cả các kiểm tra đều hợp lệ, cho phép gửi form
         alert("Thêm loại phòng mới thành công");
-        return true; // Trả về true để form có thể gửi
+
+        // Tiến hành gửi form
+        event.target.submit();
     }
+
+    // Kiểm tra trùng tên loại phòng qua API
+    async function checkTenLoaiPhong(tenLoaiPhong) {
+        try {
+            const response = await fetch(`/loaiphongs/checkTenLoaiPhong?tenLoaiPhong=${tenLoaiPhong}`);
+            const data = await response.json();
+            const tenLoaiPhongError = document.getElementById("tenLoaiPhongError");
+            if (data.exists) {
+                tenLoaiPhongError.style.display = "block";
+            } else {
+                tenLoaiPhongError.style.display = "none";
+            }
+            return data.exists;  // Trả về true nếu tên đã tồn tại
+        } catch (error) {
+            console.error("Error checking room type name: ", error);
+            alert("Có lỗi xảy ra trong quá trình kiểm tra tên loại phòng.");
+            return true;  // Nếu có lỗi, giả định tên đã tồn tại (để tránh gửi form)
+        }
+    }
+
 </script>
 
 </body>

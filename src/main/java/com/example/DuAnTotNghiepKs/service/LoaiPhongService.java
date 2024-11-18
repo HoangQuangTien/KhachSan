@@ -80,4 +80,8 @@ public class LoaiPhongService {
     public long countLoaiPhong() {
         return loaiPhongRepository.count(); // Giả sử bạn có repository `loaiPhongRepo` để truy vấn
     }
+
+    public boolean isTenLoaiPhongTrung(String tenLoaiPhong) {
+        return loaiPhongRepository.existsByTenLoaiPhong(tenLoaiPhong);
+    }
 }

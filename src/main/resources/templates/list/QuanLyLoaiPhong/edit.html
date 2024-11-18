@@ -72,7 +72,7 @@
     <input type="hidden" th:field="*{maLoaiPhong}" />
 
     <label>Tên Loại Phòng:</label>
-    <input type="text" th:field="*{tenLoaiPhong}" id="tenLoaiPhong" />
+    <input type="text" th:field="*{tenLoaiPhong}" id="tenLoaiPhong" readonly />
     <div class="error" th:if="${#fields.hasErrors('tenLoaiPhong')}" th:errors="*{tenLoaiPhong}"></div><br/>
 
     <label>Mô Tả:</label>

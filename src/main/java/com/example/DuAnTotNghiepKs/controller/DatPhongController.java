@@ -339,7 +339,15 @@ public class DatPhongController {
                 chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
             }
 
+            StringBuilder danhSachPhong = new StringBuilder();
+            for (DatPhong datPhong : datPhongList) {
+                String tenPhong = datPhong.getPhong().getTenPhong(); // Giả sử phương thức `getTenPhong()` trả về tên phòng
+                danhSachPhong.append("- ").append(tenPhong).append("<br>");
+            }
 
+            DatPhong datPhong1 = datPhongList.get(0);
+            Integer idPhong = datPhong1.getPhong().getIdPhong();
+            phongService.findById(idPhong);
 
             // Gửi email xác nhận đặt phòng thành công cho khách hàng
             String emailKhachHang = khachHangDTO.getEmail(); // Lấy email từ DTO của khách hàng
@@ -351,10 +359,10 @@ public class DatPhongController {
                     "<p style='font-size: 16px;'>Cảm ơn bạn đã lựa chọn <strong>DRAGONBALL HOTEL</strong> cho kỳ nghỉ của mình!</p>" +
                     "<p style='font-size: 16px;'>Dưới đây là thông tin đặt phòng của bạn:</p>" +
                     "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
-                    "<p style='font-size: 16px;'><strong>Phòng của bạn là:</strong> " +idPhongStr   + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Phòng của bạn là:</strong> " +danhSachPhong.toString()   + "</p>" +
                     "<p style='font-size: 16px;'><strong>Ngày nhận phòng:</strong> " + ngayNhanStr + "</p>" +
                     "<p style='font-size: 16px;'><strong>Ngày trả phòng:</strong> " + ngayTraStr + "</p>" +
-                    "<p style='font-size: 16px;'><strong>Số tiền cọc:</strong> " + String.format("%,.2f", tienCoc) + " VND</p>" +
+                    "<p style='font-size: 16px;'><strong>Số tiền cọc:</strong> " +  datPhong1.getTienCoc()+ " VND</p>" +
                     "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
                     "<p style='font-size: 16px;'>Chúng tôi mong được đón tiếp bạn và sẽ làm mọi điều có thể để kỳ nghỉ của bạn trở nên hoàn hảo nhất.</p>" +
                     "<p style='font-size: 16px;'>Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại hoặc email hỗ trợ.</p>" +

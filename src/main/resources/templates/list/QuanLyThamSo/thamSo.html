@@ -5,6 +5,10 @@
     <title>Quản lý Tham Số</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Thêm link CSS cho Toastify -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css" rel="stylesheet">
+
     <style>
         body {
             background-color: #f8f9fa;
@@ -34,7 +38,9 @@
             font-weight: bold;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
     <head th:include="fragment/head :: head"></head>
 </head>
 <body class="vertical light">
@@ -49,7 +55,7 @@
             </h2>
 
             <!-- Nút mở modal thêm tham số -->
-            <div class="mb-3">
+            <div class="mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                 <button type="button" class="btn btn-warning-custom" data-bs-toggle="modal" data-bs-target="#addThamSoModal">
                     <i class="fas fa-plus"></i> Thêm Tham Số
                 </button>
@@ -78,7 +84,7 @@
                                 th:data-tenThamSo="${thamSo.tenThamSo}"
                                 th:data-giaTri="${thamSo.giaTri}"
                                 th:data-moTa="${thamSo.moTa}"
-                                onclick="setModalData(this)">
+                                onclick="setModalData(this)" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                             <i class="fas fa-edit"></i> Sửa
                         </button>
                     </td>
@@ -96,7 +102,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form th:action="@{/thamSo/add}" method="POST">
+                        <form th:action="@{/thamSo/add}" method="POST" onsubmit="return validateAddForm()">
                             <div class="mb-3">
                                 <label for="tenThamSo" class="form-label">Tên Tham Số</label>
                                 <input type="text" class="form-control" id="tenThamSo" name="tenThamSo" placeholder="Nhập tên tham số" required>
@@ -125,11 +131,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="editForm" method="post" th:action="@{/thamSo/update}">
+                        <form id="editForm" method="post" th:action="@{/thamSo/update}" onsubmit="return validateEditForm()">
+
                             <input type="hidden" id="editId" name="id"/>
                             <div class="mb-3">
                                 <label for="editTenThamSo" class="form-label">Tên Tham Số</label>
-                                <input type="text" class="form-control" id="editTenThamSo" name="tenThamSo" required/>
+                                <input type="text" class="form-control" id="editTenThamSo" name="tenThamSo" required readonly />
                             </div>
                             <div class="mb-3">
                                 <label for="editGiaTri" class="form-label">Giá Trị</label>
@@ -145,10 +152,38 @@
                 </div>
             </div>
         </div>
+
     </main>
 </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
+<!-- Thêm link tới Toastify JS -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
+    function showSuccessToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+            stopOnFocus: true
+        }).showToast();
+    }
+
+    function showErrorToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+            stopOnFocus: true
+        }).showToast();
+    }
+
+
+    // Hàm thiết lập dữ liệu cho modal khi sửa
     function setModalData(button) {
         const id = button.getAttribute('data-id');
         const tenThamSo = button.getAttribute('data-tenThamSo');
@@ -160,67 +195,149 @@
         document.getElementById('editGiaTri').value = giaTri;
         document.getElementById('editMoTa').value = moTa;
     }
-    function validateAddForm() {
-        const tenThamSo = document.getElementById('tenThamSo').value.trim();
-        const giaTri = document.getElementById('giaTri').value.trim();
-        const moTa = document.getElementById('moTa').value.trim();
-        if (!tenThamSo || !giaTri) {
-            alert("Vui lòng điền tất cả các trường yêu cầu.");
-            return false;
-        }
-        if (hasSpecialCharacters(tenThamSo) || hasSpecialCharacters(moTa)) {
-            alert("Tên Tham Số và Mô Tả không được chứa ký tự đặc biệt.");
-            return false;
-        }
-        if (isOnlyNumbers(tenThamSo)) {
-            alert("Tên Tham Số không được là số.");
-            return false;
-        }
-        if (isDuplicate(tenThamSo)) {
-            alert("Tên Tham Số đã tồn tại. Vui lòng nhập tên khác.");
-            return false;
-        }
-        return true;
-    }
-    function validateEditForm() {
-        const editTenThamSo = document.getElementById('editTenThamSo').value.trim();
-        const editGiaTri = document.getElementById('editGiaTri').value.trim();
-        const editMoTa = document.getElementById('editMoTa').value.trim();
-        if (!editTenThamSo || !editGiaTri) {
-            alert("Vui lòng điền tất cả các trường yêu cầu.");
-            return false;
-        }
-        if (hasSpecialCharacters(editTenThamSo) || hasSpecialCharacters(editMoTa)) {
-            alert("Tên Tham Số và Mô Tả không được chứa ký tự đặc biệt.");
-            return false;
-        }
-        if (isOnlyNumbers(editTenThamSo)) {
-            alert("Tên Tham Số không được là số.");
-            return false;
-        }
-        if (isDuplicate(editTenThamSo, document.getElementById('editId').value)) {
-            alert("Tên Tham Số đã tồn tại. Vui lòng nhập tên khác.");
-            return false;
-        }
 
-        return true;
-    }
+
+
+
+    // Hàm kiểm tra trùng tên tham số
     function isDuplicate(tenThamSo, currentId = null) {
         const thamSoList = [...document.querySelectorAll('tbody tr')].map(row => {
             const id = row.querySelector('td:nth-child(1)').innerText.trim();
             const name = row.querySelector('td:nth-child(2)').innerText.trim();
             return { id, name: name.toLowerCase() };
         });
+
+        // Kiểm tra nếu tên tham số đã tồn tại
         return thamSoList.some(thamSo => thamSo.name === tenThamSo.toLowerCase() && thamSo.id !== currentId);
     }
+
+    // Hàm kiểm tra có ký tự đặc biệt
     function hasSpecialCharacters(str) {
         const specialChars = /[!@#$%^&*(),.?":{}|<>]/g;
         return specialChars.test(str);
     }
+
+    // Hàm kiểm tra chuỗi có phải chỉ là số
     function isOnlyNumbers(str) {
         return /^\d+$/.test(str);
     }
-</script>
 
+
+    function validateAddForm(id) {
+        const tenThamSo = document.getElementById('tenThamSo').value.trim();
+        const giaTri = document.getElementById('giaTri').value.trim();
+        const moTa = document.getElementById('moTa').value.trim();
+
+        // Kiểm tra trường bắt buộc
+        if (!tenThamSo || !giaTri) {
+            showErrorToast("Vui lòng điền tất cả các trường yêu cầu.");
+            return false;
+        }
+
+        // Kiểm tra ký tự đặc biệt
+        if (hasSpecialCharacters(tenThamSo) || hasSpecialCharacters(moTa)) {
+            showErrorToast("Tên Tham Số và Mô Tả không được chứa ký tự đặc biệt.");
+            return false;
+        }
+
+        // Kiểm tra Tên Tham Số không phải là số
+        if (isOnlyNumbers(tenThamSo)) {
+            showErrorToast("Tên Tham Số không được là số.");
+            return false;
+        }
+
+        // Kiểm tra Mô Tả không được là số hoặc chứa ký tự đặc biệt
+        if (isOnlyNumbers(moTa) || hasSpecialCharacters(moTa)) {
+            showErrorToast("Mô Tả không được là số hoặc chứa ký tự đặc biệt.");
+            return false;
+        }
+
+        // Kiểm tra giá trị giaTri phải là số dương và có tối đa 2 chữ số thập phân
+        if (parseFloat(giaTri) <= 0 || !/^(\d+(\.\d{1,2})?)?$/.test(giaTri)) {
+            showErrorToast("Giá trị phải là số dương và có tối đa 2 chữ số thập phân.");
+            return false;
+        }
+
+        // Kiểm tra nếu id == 1 thì giá trị không được lớn hơn 5
+        if (id === 1 && parseFloat(giaTri) > 5) {
+            showErrorToast("Với ID là 1 thì giá trị không được lớn hơn 5.");
+            return false;
+        }
+
+        // Kiểm tra nếu id == 3 thì giá trị không được nhỏ hơn 30
+        if (id === 3 && parseFloat(giaTri) < 30) {
+            showErrorToast("Với ID là 3 thì giá trị không được nhỏ hơn 30.");
+            return false;
+        }
+
+        // Kiểm tra trùng tên tham số
+        if (isDuplicate(tenThamSo)) {
+            showErrorToast("Tên Tham Số đã tồn tại. Vui lòng nhập tên khác.");
+            return false;
+        }
+
+        // Hiển thị thông báo thành công
+        alert("Thêm tham số thành công!");
+
+        return true; // Dữ liệu hợp lệ
+    }
+
+    function validateEditForm() {
+        const editTenThamSo = document.getElementById('editTenThamSo').value.trim();
+        const editGiaTri = document.getElementById('editGiaTri').value.trim();
+        const editMoTa = document.getElementById('editMoTa').value.trim();
+        const editId = parseInt(document.getElementById('editId').value); // Lấy ID từ hidden input hoặc DOM
+
+        console.log('editTenThamSo:', editTenThamSo);
+        console.log('editGiaTri:', editGiaTri);
+        console.log('editMoTa:', editMoTa);
+        console.log('editId:', editId);
+
+        // Kiểm tra trường bắt buộc
+        if (!editTenThamSo || !editGiaTri) {
+            showErrorToast("Vui lòng điền tất cả các trường yêu cầu.");
+            return false;
+        }
+
+        // Kiểm tra ký tự đặc biệt
+        if (hasSpecialCharacters(editTenThamSo) || hasSpecialCharacters(editMoTa)) {
+            showErrorToast("Tên Tham Số và Mô Tả không được chứa ký tự đặc biệt.");
+            return false;
+        }
+
+        // Kiểm tra Tên Tham Số không được là số
+        if (isOnlyNumbers(editTenThamSo)) {
+            showErrorToast("Tên Tham Số không được là số.");
+            return false;
+        }
+
+        // Kiểm tra Mô Tả không được là số hoặc chứa ký tự đặc biệt
+        if (isOnlyNumbers(editMoTa) || hasSpecialCharacters(editMoTa)) {
+            showErrorToast("Mô Tả không được là số hoặc chứa ký tự đặc biệt.");
+            return false;
+        }
+
+        // Kiểm tra giá trị editGiaTri phải là số dương và có tối đa 2 chữ số thập phân
+        if (parseFloat(editGiaTri) <= 0 || !/^(\d+(\.\d{1,2})?)?$/.test(editGiaTri)) {
+            showErrorToast("Giá trị phải là số dương và có tối đa 2 chữ số thập phân.");
+            return false;
+        }
+
+        // Kiểm tra nếu id == 1 thì giá trị không được lớn hơn 5
+        if (editId === 1 && parseFloat(editGiaTri) > 5) {
+            showErrorToast("Với ID là 1 thì giá trị không được lớn hơn 5.");
+            return false;
+        }
+        if (editId === 3 && parseFloat(editGiaTri) < 30) {
+            showErrorToast("Với ID là 3 thì giá trị không được nhỏ hơn 30.");
+            return false;
+        }
+
+        alert("Sửa tham số thành công!");
+
+        return true;
+    }
+
+</script>
 </body>
 </html>

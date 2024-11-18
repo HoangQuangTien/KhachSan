@@ -13,53 +13,71 @@
 </head>
 <body>
 <div class="container">
-    <div class="header clearfix">
-        <h3 class="text-muted">KẾT QUẢ THANH TOÁN</h3>
+    <div class="container my-5">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h3 class="text-primary font-weight-bold">Kết Quả Thanh Toán</h3>
+            <p class="text-muted">Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+        </div>
+
+        <!-- Payment Details Table -->
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <tbody>
+                    <tr>
+                        <th class="text-right text-secondary">Mã Giao Dịch Thanh Toán:</th>
+                        <td class="font-weight-bold" th:text="${vnp_TxnRef}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right text-secondary">Số Tiền:</th>
+                        <td class="font-weight-bold" th:text="${vnp_Amount}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right text-secondary">Mô Tả Giao Dịch:</th>
+                        <td th:text="${vnp_OrderInfo}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right text-secondary">Mã Lỗi Thanh Toán:</th>
+                        <td th:text="${vnp_ResponseCode}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right text-secondary">Mã Giao Dịch Tại VNPAY-QR:</th>
+                        <td th:text="${vnp_TransactionNo}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right text-secondary">Mã Ngân Hàng Thanh Toán:</th>
+                        <td th:text="${vnp_BankCode}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right text-secondary">Thời Gian Thanh Toán:</th>
+                        <td th:text="${vnp_PayDate}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right text-secondary">Tình Trạng Giao Dịch:</th>
+                        <td>
+                            <span th:if="${isValidSignature}">
+                                <span th:text="${vnp_TransactionStatus == '00' ? 'Thành công' : 'Không thành công'}"
+                                      class="badge"
+                                      th:classappend="${vnp_TransactionStatus == '00' ? 'badge-success' : 'badge-danger'}"></span>
+                            </span>
+                            <span th:unless="${isValidSignature}" class="badge badge-warning">
+                                Chữ ký không hợp lệ
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-4">
+            <p class="text-muted">&copy; 2024 VNPAY - Tất cả các quyền được bảo lưu.</p>
+            <p class="font-italic text-primary">Cảm ơn bạn đã tin tưởng chúng tôi!</p>
+        </div>
     </div>
-    <div class="table-responsive">
-        <div class="form-group">
-            <label>Mã giao dịch thanh toán:</label>
-            <label th:text="${vnp_TxnRef}"></label>
-        </div>
-        <div class="form-group">
-            <label>Số tiền:</label>
-            <label th:text="${vnp_Amount}"></label>
-        </div>
-        <div class="form-group">
-            <label>Mô tả giao dịch:</label>
-            <label th:text="${vnp_OrderInfo}"></label>
-        </div>
-        <div class="form-group">
-            <label>Mã lỗi thanh toán:</label>
-            <label th:text="${vnp_ResponseCode}"></label>
-        </div>
-        <div class="form-group">
-            <label>Mã giao dịch tại CTT VNPAY-QR:</label>
-            <label th:text="${vnp_TransactionNo}"></label>
-        </div>
-        <div class="form-group">
-            <label>Mã ngân hàng thanh toán:</label>
-            <label th:text="${vnp_BankCode}"></label>
-        </div>
-        <div class="form-group">
-            <label>Thời gian thanh toán:</label>
-            <label th:text="${vnp_PayDate}"></label>
-        </div>
-        <div class="form-group">
-            <label>Tình trạng giao dịch:</label>
-            <label>
-                <span th:if="${isValidSignature}">
-                    <span th:text="${vnp_TransactionStatus == '00' ? 'Thành công' : 'Không thành công'}"></span>
-                </span>
-                <span th:unless="${isValidSignature}">
-                    Chữ ký không hợp lệ
-                </span>
-            </label>
-        </div>
-    </div>
-    <footer class="footer">
-        <p>&copy; VNPAY 2020</p>
-    </footer>
+
 </div>
 </body>
 </html>

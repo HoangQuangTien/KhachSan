@@ -1,9 +1,12 @@
 package com.example.DuAnTotNghiepKs.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +43,10 @@ public class KhachHangController {
     private RestTemplate restTemplate;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+
+    @Autowired
+    private TaiKhoanService taiKhoanService;
 
     @GetMapping("quan-ly-khach-hang")
     public String hienThiKhachHang(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
@@ -113,29 +120,67 @@ public class KhachHangController {
     }
 
     @GetMapping("/khach-hang/trang-ca-nhan")
-    public String trangcanhan(HttpServletRequest request) {
-        KhachHang khachHang = (KhachHang) request.getSession().getAttribute("user");
-        if (khachHang == null) {
-            return "redirect:/khach-hang/login";
+    public String trangcanhan(Model model) {
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
+        if (taiKhoanDTO != null && taiKhoanDTO.getKhachHangDTO() != null
+                && taiKhoanDTO.getKhachHangDTO().getHoVaTen() != null) {
+            model.addAttribute("user", taiKhoanDTO.getKhachHangDTO());
+            List<DiaChiKhachHangDTO> listDiaChiKhachHangDTO = diaChiKhachHangService
+                    .findById(taiKhoanDTO.getKhachHangDTO().getId());
+            if (listDiaChiKhachHangDTO.size() > 0) {
+                model.addAttribute("userDC", listDiaChiKhachHangDTO.get(0));
+            } else {
+                model.addAttribute("userDC", new DiaChiKhachHangDTO());
+            }
+        } else {
+            return "redirect:/login";
         }
-        request.getSession().setAttribute("user",
-                khachHangService.findByTenDangNhap(khachHang.getTaiKhoan().getTenDangNhap()));
         return "list/KhachHang/trangcanhan";
     }
 
     @PutMapping("/khach-hang/trang-ca-nhan")
     public ResponseEntity<?> register(@RequestParam String hoVaTen, @RequestParam String soDienThoai,
-                                      @RequestParam Boolean gioiTinh, @RequestParam String email, HttpServletRequest request) {
-        KhachHang khachHang = (KhachHang) request.getSession().getAttribute("user");
-        if (khachHang == null) {
+                                      @RequestParam Boolean gioiTinh, @RequestParam String email,
+                                      @RequestParam(value = "diaChi", required = false) String diaChi,
+                                      @RequestParam(value = "thanhPho", required = false) String thanhPho,
+                                      @RequestParam(value = "phuongXa", required = false) String phuongXa,
+                                      @RequestParam(value = "quan", required = false) String quan) {
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
+        if (taiKhoanDTO == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "user không tồn tại"));
         }
-        khachHang.setHoVaTen(hoVaTen);
-        khachHang.setSoDienThoai(soDienThoai);
-        khachHang.setGioiTinh(gioiTinh);
-        khachHang.setEmail(email);
-        khachHangService.updateKH(khachHang);
-        return ResponseEntity.ok(Map.of("message", "Đăng ký thành công"));
+        KhachHangDTO khachHangDTO = taiKhoanDTO.getKhachHangDTO();
+        khachHangDTO.setHoVaTen(hoVaTen);
+        khachHangDTO.setSoDienThoai(soDienThoai);
+        khachHangDTO.setGioiTinh(gioiTinh);
+        khachHangDTO.setEmail(email);
+
+        khachHangService.update(khachHangDTO.getId(), khachHangDTO);
+
+        List<DiaChiKhachHangDTO> listDiaChiKhachHangDTO = diaChiKhachHangService.findById(khachHangDTO.getId());
+
+        if (listDiaChiKhachHangDTO.size() == 0) {
+            DiaChiKhachHangDTO diaChiKhachHangDTO = new DiaChiKhachHangDTO();
+            diaChiKhachHangDTO.setIdKhachHang(khachHangDTO.getId());
+            diaChiKhachHangDTO.setDiaChiCuThe(diaChi);
+            diaChiKhachHangDTO.setThanhPho(thanhPho);
+            diaChiKhachHangDTO.setPhuongXa(phuongXa);
+            diaChiKhachHangDTO.setQuanHuyen(quan);
+            diaChiKhachHangDTO.setCreatedAt(LocalDateTime.now());
+            diaChiKhachHangService.save(diaChiKhachHangDTO);
+        } else {
+            DiaChiKhachHangDTO diaChiKhachHangDTO = listDiaChiKhachHangDTO.get(0);
+            diaChiKhachHangDTO.setIdKhachHang(khachHangDTO.getId());
+            diaChiKhachHangDTO.setDiaChiCuThe(diaChi);
+            diaChiKhachHangDTO.setThanhPho(thanhPho);
+            diaChiKhachHangDTO.setPhuongXa(phuongXa);
+            diaChiKhachHangDTO.setQuanHuyen(quan);
+            diaChiKhachHangDTO.setUpdatedAt(LocalDateTime.now());
+            diaChiKhachHangService.save(diaChiKhachHangDTO);
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Cập nhật tài khoản thành công"));
     }
+
 
 }

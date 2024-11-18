@@ -21,5 +21,7 @@ public interface LoaiPhongRepo extends JpaRepository<LoaiPhong, Integer> {
     Page<LoaiPhong> findAll(Pageable pageable);
     Page<LoaiPhong> findByMaLoaiPhongContainingIgnoreCaseOrTenLoaiPhongContainingIgnoreCase(
             String maLoaiPhong, String tenLoaiPhong, Pageable pageable);
+
+    boolean existsByTenLoaiPhong(String tenLoaiPhong);
 }
 
