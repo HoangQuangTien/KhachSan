@@ -9,6 +9,7 @@ import com.example.DuAnTotNghiepKs.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -195,26 +196,67 @@ public class KhachHangDD {
     }
 
     @GetMapping("/view-dat-phong")
-    public String showRoomDetailPhong(@RequestParam("roomId") Integer roomId, Model model, HttpSession session) {
+    public String showRoomDetailPhong(@RequestParam(required = false) String roomId,
+                                      @RequestParam(required = false) String roomIds,
+                                      Model model) {
         // Lấy thông tin tài khoản từ session
         TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
         if (taiKhoanDTO != null && taiKhoanDTO.getKhachHangDTO() != null && taiKhoanDTO.getKhachHangDTO().getId() != null) {
             model.addAttribute("idKhachHang", taiKhoanDTO.getKhachHangDTO().getId());
         }
 
-        // Lấy thông tin phòng
-        Phong phong = phongService.getPhongById1(roomId);
-        if (phong == null) {
-            model.addAttribute("error", "Phòng không tồn tại.");
-            return "list/KhachHang/datPhong"; // Trả về view với thông báo lỗi
+        // Trường hợp chỉ có một phòng được chọn
+        if (roomId != null) {
+            try {
+                Integer idPhong = Integer.parseInt(roomId);
+                Phong phong = phongService.getPhongById1(idPhong);
+
+                if (phong == null) {
+                    model.addAttribute("error", "Phòng không tồn tại.");
+                } else {
+                    // Chuyển đổi Phong sang DTO và thêm vào model
+                    PhongDTO phongDTO = phongService.convertToPhongDTO(phong);
+                    model.addAttribute("phong", phongDTO);
+                }
+            } catch (NumberFormatException e) {
+                model.addAttribute("error", "ID phòng không hợp lệ.");
+            }
         }
 
-        // Chuyển đổi Phong sang PhongDTO
-        PhongDTO phongDTO = phongService.convertToPhongDTO(phong);
-        model.addAttribute("phong", phongDTO);
 
-        return "list/KhachHang/datPhong"; // Tên của view datPhong.html
+        if (roomIds != null) {
+            try {
+                List<Integer> selectedRoomIds = Arrays.stream(roomIds.split(","))
+                        .map(Integer::parseInt)
+                        .collect(Collectors.toList());
+
+                List<PhongDTO> phongDTOList = phongService.getPhongByIds(selectedRoomIds);
+
+                // Kiểm tra từng phòng trong danh sách
+                List<PhongDTO> validPhongDTOList = new ArrayList<>();
+                for (PhongDTO phongDTO : phongDTOList) {
+                    if (phongDTO != null && phongDTO.getTenPhong() != null) {
+                        validPhongDTOList.add(phongDTO);
+                    }
+                }
+
+                if (validPhongDTOList.isEmpty()) {
+                    model.addAttribute("error", "Không có phòng nào hợp lệ trong danh sách.");
+                } else {
+                    model.addAttribute("phongList", validPhongDTOList);
+                }
+
+            } catch (NumberFormatException e) {
+                model.addAttribute("error", "Danh sách ID phòng không hợp lệ.");
+            }
+        }
+
+
+
+
+        return "list/KhachHang/datPhong"; // Trả về view datPhong.html
     }
+
 
 
 
@@ -504,12 +546,19 @@ public class KhachHangDD {
         LocalDateTime endDate = LocalDateTime.parse(ngayTra);
 
         // Lấy danh sách phòng có sẵn theo số người tối đa của loại phòng
-        List<Phong> availableRooms = phongService.getAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi);
+        List<Phong> availableRooms = phongService.getAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi,soPhong);
+
+        // Chuyển danh sách phòng thành chuỗi
+        // Tạo chuỗi các ID phòng
+        String rooms = availableRooms.stream()
+                .map(phong -> String.valueOf(phong.getIdPhong())) // Đảm bảo getId trả về Integer
+                .collect(Collectors.joining(","));
 
         // Thêm dữ liệu vào model để trả về view
         model.addAttribute("availableRooms", availableRooms);
         model.addAttribute("soPhong", soPhong);
         model.addAttribute("soNguoi", soNguoi);
+        model.addAttribute("rooms", rooms);
 
         return "list/KhachHang/tim"; // Tên view trả về (có thể là searchResults.html)
     }

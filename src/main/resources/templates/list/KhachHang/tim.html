@@ -242,7 +242,6 @@
         <p class="text-white mb-4 text-center">Tìm kiếm để so sánh giá cả và khám phá ưu đãi tuyệt vời</p>
 
         <!-- Search Bar -->
-        <!-- Search Bar -->
         <form action="/search1" method="GET" class="search-bar p-4 bg-white rounded shadow-sm d-flex align-items-center justify-content-between">
             <!-- Check-in & Check-out Section -->
             <div class="check-in-out d-flex align-items-center">
@@ -349,51 +348,101 @@
 </div>
 
 <div>
-    <!--VÙng để chèn phòng đã tìm-->
+    <!-- Vùng để chèn phòng đã tìm -->
     <div class="row room-list d-flex flex-wrap mt-4" style="margin-top: 30px;">
+
+        <!-- Hiển thị thông báo lỗi nếu có -->
         <div th:if="${message}">
             <p th:text="${message}" style="color: red;"></p>
         </div>
-        <div th:each="phong : ${availableRooms}" class="col-lg-3 col-md-4 col-sm-6 mb-4">
-            <div class="card shadow h-100" th:classappend="${phong.trangThai} ? 'border-success' : 'border-danger'">
-                <!-- Image Section -->
-                <div class="card-img-top position-relative">
-                <span th:text="${phong.trangThai == true ? 'Còn trống' : 'Đã đặt'}" class="status-text position-absolute top-0 start-0 p-2 text-white" th:classappend="${phong.trangThai == true} ? 'bg-success' : 'bg-danger'">
-                </span>
-                    <img th:src="${phong.img}" class="card-img" alt="Ảnh phòng của ${phong.tenPhong}" style="object-fit: cover; height: 200px;">
-                </div>
 
-                <!-- Information Section -->
-                <div class="card-body p-4 text-dark bg-white shadow-sm rounded-lg">
-                    <h5 class="card-title text-truncate" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}" style="font-size: 1.3rem; font-weight: 600; color: #333;"></h5>
+        <!-- Trường hợp khách chọn 1 phòng -->
+        <div th:if="${#lists.size(availableRooms) == 1}">
+            <div th:each="phong : ${availableRooms}" class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card shadow h-100" th:classappend="${phong.trangThai ? 'border-success' : 'border-danger'}">
 
-                    <p class="card-text mb-2" style="font-size: 1.1rem; color: #444;">
-                        <strong class="text-primary">Giá:</strong>
-                        <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
-                    </p>
+                    <!-- Image Section -->
+                    <div class="card-img-top position-relative">
+                    <span th:text="${phong.trangThai ? 'Còn trống' : 'Đã đặt'}"
+                          class="status-text position-absolute top-0 start-0 p-2 text-white"
+                          th:classappend="${phong.trangThai ? 'bg-success' : 'bg-danger'}"></span>
+                        <img th:src="${phong.img}" class="card-img" alt="Ảnh phòng của ${phong.tenPhong}" style="object-fit: cover; height: 200px;">
+                    </div>
 
-                    <p class="card-text mb-2" style="font-size: 1.1rem; color: #444;">
-                        <i class="fas fa-users"></i>
-                        <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span> người
-                    </p>
+                    <!-- Information Section -->
+                    <div class="card-body p-4 text-dark bg-white shadow-sm rounded-lg">
+                        <h5 class="card-title text-truncate" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}"
+                            style="font-size: 1.3rem; font-weight: 600; color: #333;"></h5>
 
-                    <p class="card-text mb-2" style="font-size: 1rem; color: #555;">
-                        <strong><i class="fas fa-info-circle"></i> Mô Tả:</strong>
-                        <span th:text="${phong.moTa}"></span>
-                    </p>
+                        <p class="card-text mb-2" style="font-size: 1.1rem; color: #444;">
+                            <strong class="text-primary">Giá:</strong>
+                            <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
+                        </p>
 
-                    <div class="d-flex justify-content-start mt-4">
-                        <a th:href="@{/view-dat-phong(roomId=${phong.idPhong})}">
-                            <button class="btn btn-success d-flex align-items-center px-4 py-2 shadow-sm hover-shadow">
-                                <i class="fas fa-bed mr-2"></i>
-                                <span class="font-weight-bold">Đặt phòng</span>
-                            </button>
-                        </a>
+                        <p class="card-text mb-2" style="font-size: 1.1rem; color: #444;">
+                            <i class="fas fa-users"></i>
+                            <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span> người
+                        </p>
+
+                        <p class="card-text mb-2" style="font-size: 1rem; color: #555;">
+                            <strong><i class="fas fa-info-circle"></i> Mô Tả:</strong>
+                            <span th:text="${phong.moTa}"></span>
+                        </p>
+
+                        <div class="d-flex justify-content-start mt-4">
+                            <a th:href="@{/view-dat-phong(roomId=${phong.idPhong})}">
+                                <button class="btn btn-success d-flex align-items-center px-4 py-2 shadow-sm hover-shadow">
+                                    <i class="fas fa-bed mr-2"></i>
+                                    <span class="font-weight-bold">Đặt phòng</span>
+                                </button>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
+        <!-- Trường hợp khách chọn từ 2 phòng trở lên -->
+        <div th:if="${#lists.size(availableRooms) > 1}">
+            <div class="col-12 mb-4">
+                <h3>Phòng đã chọn:</h3>
+                <div th:each="phong : ${availableRooms}" class="card shadow mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img th:src="${phong.img}" class="card-img" alt="Ảnh phòng của ${phong.tenPhong}" style="object-fit: cover; height: 200px;">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}"></h5>
+                                <p class="card-text">
+                                    <strong>Giá:</strong> <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
+                                </p>
+                                <p class="card-text">
+                                    <strong>Người tối đa:</strong> <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span> người
+                                </p>
+                                <p class="card-text">
+                                    <strong>Mô Tả:</strong> <span th:text="${phong.moTa}"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nút Đặt phòng chung cho tất cả các phòng đã chọn -->
+                <div class="d-flex justify-content-start mt-4">
+                    <a th:href="@{/view-dat-phong(roomIds=${rooms})}">
+                        <button class="btn btn-success d-flex align-items-center px-4 py-2 shadow-sm hover-shadow">
+                            <i class="fas fa-bed mr-2"></i>
+                            <span class="font-weight-bold">Đặt phòng</span>
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
+
 
 </div>
 <!--&lt;!&ndash; Biểu tượng chọn phòng với nền trắng trong suốt, góc phải giữa màn hình &ndash;&gt;-->
@@ -817,6 +866,7 @@
 
 
     // Hàm thay đổi số phòng
+    // Hàm thay đổi số phòng
     function changeRoom(change) {
         var roomCount = parseInt(document.getElementById('room-count1').innerText);
         roomCount += change;
@@ -828,8 +878,10 @@
         document.getElementById('room-display').innerText = roomCount + " phòng";
 
         // Cập nhật giá trị input ẩn
-        document.getElementById('soPhong').value = roomCount;
+        document.getElementById('soPhong').value = roomCount;  // Cập nhật giá trị của input ẩn
     }
+
+
 
     // Hàm thay đổi số người
     function changeGuest(change) {

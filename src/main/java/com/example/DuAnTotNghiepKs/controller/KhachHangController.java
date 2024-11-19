@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
+import com.example.DuAnTotNghiepKs.entity.DatPhong;
+import com.example.DuAnTotNghiepKs.service.DatPhongService;
 import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,6 +46,8 @@ public class KhachHangController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+//    @Autowired
+//    private DatPhongService ;
 
     @Autowired
     private TaiKhoanService taiKhoanService;
@@ -181,6 +185,22 @@ public class KhachHangController {
 
         return ResponseEntity.ok(Map.of("message", "Cập nhật tài khoản thành công"));
     }
+
+
+//    @GetMapping("/datphongKH")
+//    public String showDatPhongList(Model model) {
+//        // Lấy tất cả thông tin đặt phòng chưa check-in
+//        List<DatPhong> datPhongs = datPhongService.getDatPhongChuaVaDaCheckIn();
+//        model.addAttribute("datPhongs", datPhongs);
+//
+//        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+//        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+//            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+//            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg());
+//        }
+//
+//        return "list/QuanLyDatPhong/nguoidicung"; // Đường dẫn tới trang HTML hiển thị danh sách đặt phòng
+//    }
 
 
 }

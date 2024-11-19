@@ -78,15 +78,28 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
     String findMaxMaPhong();
 
 
-    // Lọc phòng có sẵn trong khoảng thời gian và không vượt quá số người tối đa của loại phòng
-    @Query("SELECT p FROM Phong p WHERE p.idPhong NOT IN " +
-            "(SELECT dp.phong.idPhong FROM DatPhong dp WHERE " +
-            "(dp.ngayNhan < :endDate AND dp.ngayTra > :startDate)) " +
-            "AND p.loaiPhong.soNguoiToiDa >= :soNguoi " +
-            "AND p.trangThai = true") // Thêm điều kiện kiểm tra trạng thái
+    @Query(value = "SELECT p.* " +
+            "FROM Phong p " +
+            "JOIN LoaiPhong lp ON p.id_loai_phong = lp.id_loai_phong " +
+            "WHERE lp.so_nguoi_toi_da >= :soNguoi " +
+            "AND p.id_phong NOT IN ( " +
+            "  SELECT dp.id_phong " +
+            "  FROM DatPhong dp " +
+            "  WHERE (dp.ngay_nhan_phong BETWEEN :startDate AND :endDate) " +
+            "     OR (dp.ngay_tra_phong BETWEEN :startDate AND :endDate) " +
+            "     OR (:startDate BETWEEN dp.ngay_nhan_phong AND dp.ngay_tra_phong) " +
+            "     OR (:endDate BETWEEN dp.ngay_nhan_phong AND dp.ngay_tra_phong) " +
+            ") " +
+            "AND p.trang_thai = 1"+
+            "ORDER BY p.id_phong " +
+            "OFFSET 0 ROWS FETCH NEXT :soLuongPhongCanTim ROWS ONLY",
+            nativeQuery = true)
     List<Phong> findAvailableRoomsWithMaxGuests(@Param("startDate") LocalDateTime startDate,
                                                 @Param("endDate") LocalDateTime endDate,
-                                                @Param("soNguoi") int soNguoi);
+                                                @Param("soNguoi") Integer soNguoi,
+                                                @Param("soLuongPhongCanTim") Integer soLuongPhongCanTim);
+
+
 
 
 }

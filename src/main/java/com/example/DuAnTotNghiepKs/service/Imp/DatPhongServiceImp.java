@@ -125,6 +125,7 @@ public class DatPhongServiceImp implements DatPhongService {
 
 
 
+
     @Override
     public DatPhong saveDatPhong1(DatPhong datPhong) {
         if (datPhong.getIdDatPhong() != null) { // Đang cập nhật
@@ -407,6 +408,8 @@ public class DatPhongServiceImp implements DatPhongService {
         // Lưu tất cả thay đổi vào database
         datPhongRepository.saveAll(datPhongs);
     }
+
+
 
 
 }

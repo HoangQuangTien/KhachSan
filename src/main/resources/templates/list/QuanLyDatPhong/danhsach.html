@@ -78,7 +78,7 @@
 <main role="main" class="main-content">
     <div class="container-fluid">
         <h1>Danh sách đặt phòng chưa check-in</h1>
-        <table id="dataTable-1">
+        <table id="dataTable-1" class="table table-sm">
             <thead>
             <tr>
                 <div class="col-md-6">
@@ -97,8 +97,8 @@
                 <th>Phòng</th>
                 <th>CCCD</th>
                 <th>Ngày Nhận</th>
-
                 <th>Ngày Trả</th>
+                <th>Số Người</th>
                 <th>Hành Động</th>
             </tr>
             </thead>
@@ -112,6 +112,7 @@
                 <td th:text="${datPhong.cccd}"></td>
                 <td th:text="${datPhong.ngayNhan}"></td>
                 <td th:text="${datPhong.ngayTra}"></td>
+                <td th:text="${datPhong.loaiPhong.soNguoiToiDa}"></td>
 
 
 <!--                <td th:text="${#dates.format(datPhong.ngayNhan, 'dd/MM/yyyy HH:mm')}"></td>-->

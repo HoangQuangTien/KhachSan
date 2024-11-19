@@ -89,6 +89,9 @@
                 <a href="#tabThongTin" class="list-group-item list-group-item-action active" data-bs-toggle="tab">
                     Thông tin cá nhân
                 </a>
+                <a href="#datPhong" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    Đặt Phòng
+                </a>
                 <a href="#tabLichSu" class="list-group-item list-group-item-action" data-bs-toggle="tab">
                     Lịch sử đặt phòng
                 </a>
@@ -184,6 +187,36 @@
                     </div>
                 </div>
 
+                <!-- tab đặt phòng -->
+                <div class="tab-pane fade" id="datPhong">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white text-center">
+                            <h5>Đơn đặt phòng</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover text-center">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tên phòng</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Ngày trả</th>
+                                    <th>Giá</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+
+                                <!-- Nếu không có dữ liệu -->
+                                <tr>
+                                    <td colspan="6">Không có phòng đang được đặt</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
                 <!-- Tab Lịch sử đặt phòng -->
                 <div class="tab-pane fade" id="tabLichSu">
                     <div class="card shadow-sm">

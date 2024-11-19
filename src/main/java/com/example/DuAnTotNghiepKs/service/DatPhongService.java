@@ -30,6 +30,9 @@ public interface DatPhongService {
 
     List<DatPhong> getDatPhongChuaVaDaCheckIn();
 
+
+//    List<DatPhong> getDatPhongChuaVaDaCheckIn1(Integer idKhachHang);
+
     DatPhong saveDatPhong1(DatPhong datPhong);
 
     double getRevenueByMonth(int month, int year);
@@ -84,7 +87,9 @@ public interface DatPhongService {
     Map<String, Object> getRevenueByQuarter(int year, int startMonth, int endMonth);
 
 
+
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();
+
 
 }

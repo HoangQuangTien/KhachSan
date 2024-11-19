@@ -35,7 +35,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = { "/api","/register", "/login","khach-hang","view-dat-phong","/thanh-toan-khach-hang","/dat-phong1","/vnpay",
             "/assets1/**","vnpay_pay","vnpay_result","vnpay-create","https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
             "/load-phong/**","/img/**","/css/**","/js/**","lien-he","/searchh","/about","/listPhong","/phong-theo-loai","/register","/api/available-rooms"
-            ,"/khach-hang/login","/search1"};
+            ,"/khach-hang/login","/search1","/datphongKH"};
     private final String[] ADMIN_ENDPOINTS= {"thongke"};
     private final String[] EMPLOYEE_ENDPOINTS= {"quan-ly-khach-hang/**"};
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -214,6 +215,15 @@ public class PhongService {
         return phongRepository.findById(roomId).orElse(null);
     }
 
+    public List<PhongDTO> getPhongByIds(List<Integer> roomIds) {
+        List<Phong> rooms = phongRepository.findAllById(roomIds); // Lấy tất cả phòng từ repository
+        return rooms.stream()
+                .filter(Objects::nonNull) // Lọc phòng null nếu có
+                .map(this::convertToPhongDTO) // Chuyển đổi thành PhongDTO
+                .collect(Collectors.toList());
+    }
+
+
     public boolean isTenPhongTrung(String tenPhong) {
         return phongRepository.existsByTenPhong(tenPhong);
     }
@@ -245,9 +255,10 @@ public class PhongService {
 
 
     // Lấy danh sách phòng có sẵn với số người tối đa của loại phòng
-    public List<Phong> getAvailableRoomsWithMaxGuests(LocalDateTime startDate, LocalDateTime endDate, int soNguoi) {
-        return phongRepository.findAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi);
+    public List<Phong> getAvailableRoomsWithMaxGuests(LocalDateTime startDate, LocalDateTime endDate, Integer soNguoi, Integer soPhong) {
+        return phongRepository.findAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi, soPhong);
     }
+
 
 }
 

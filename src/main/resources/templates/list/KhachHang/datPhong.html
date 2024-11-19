@@ -387,6 +387,18 @@
             </div>
         </div>
     </div>
+    <div class="room-list-container">
+        <h3>Danh sách các phòng đã chọn</h3>
+
+        <div th:each="phong : ${phongList}">
+            <!-- Kiểm tra nếu phong != null trước khi truy cập thuộc tính -->
+            <p th:if="${phong != null}" th:text="${phong.tenPhong}">Tên phòng</p>
+            <p th:if="${phong == null}">Phòng không hợp lệ</p>
+        </div>
+
+    </div>
+
+
     <div class="booking-form flex-fill">
         <h4>ĐẶT PHÒNG</h4>
         <form id="idDatPhong">
