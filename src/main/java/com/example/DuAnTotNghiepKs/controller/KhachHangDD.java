@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RequestMapping
@@ -49,6 +50,13 @@ public class KhachHangDD {
     private ChiTietDatPhongService chiTietDatPhongService;
     @Autowired
     private TaiKhoanService taiKhoanService;
+
+
+    @Autowired
+    private ThamSoService thamSoService;
+
+
+
 
     public KhachHangDD(DatPhongService datPhongService, PhongService phongService, KhachHangService khachHangService) {
         this.datPhongService = datPhongService;
@@ -217,6 +225,7 @@ public class KhachHangDD {
                     // Chuyển đổi Phong sang DTO và thêm vào model
                     PhongDTO phongDTO = phongService.convertToPhongDTO(phong);
                     model.addAttribute("phong", phongDTO);
+                    return "list/KhachHang/datPhong"; // Trả về view datPhong.html
                 }
             } catch (NumberFormatException e) {
                 model.addAttribute("error", "ID phòng không hợp lệ.");
@@ -243,7 +252,16 @@ public class KhachHangDD {
                 if (validPhongDTOList.isEmpty()) {
                     model.addAttribute("error", "Không có phòng nào hợp lệ trong danh sách.");
                 } else {
+                    String idPhongStr = phongDTOList.stream()
+                            .map(phong -> String.valueOf(phong.getIdPhong()))
+                            .collect(Collectors.joining(","));
+                    String idLoaiPhongStr = phongDTOList.stream()
+                            .map(phong -> String.valueOf((phong.getIdLoaiPhong())))
+                            .collect(Collectors.joining(","));
                     model.addAttribute("phongList", validPhongDTOList);
+                    model.addAttribute("idPhong",idPhongStr);
+                    model.addAttribute("idLoaiPhong",idLoaiPhongStr);
+                    return "list/KhachHang/datNhieuPhong";
                 }
 
             } catch (NumberFormatException e) {
@@ -257,6 +275,234 @@ public class KhachHangDD {
         return "list/KhachHang/datPhong"; // Trả về view datPhong.html
     }
 
+
+
+
+    @PostMapping("/dat-phong")
+    public ResponseEntity<?> createDatNhieuPhongKhachHang1(
+            @RequestParam("idLoaiPhong") List<String> idLoaiPhongStrList,
+            @RequestParam("idPhong") String idPhongStr,
+            @RequestParam("gia") Long amount,
+            @RequestParam("bankCode") String bankCode,
+            @RequestParam("language") String language,
+            @RequestParam("ngayNhan") String ngayNhanStr,
+            @RequestParam("ngayTra") String ngayTraStr,
+            @RequestParam("cccd") String cccd,
+            @RequestParam("idKhachHang") String idKhachHangStr,
+            HttpServletRequest req) {
+
+        // Chuyển đổi chuỗi ID phòng thành danh sách
+        List<String> idPhongStrList = Arrays.asList(idPhongStr.split(","));
+
+        // Kiểm tra các tham số đầu vào để đảm bảo chúng không rỗng
+        if (idLoaiPhongStrList == null || idLoaiPhongStrList.isEmpty() ||
+                idPhongStrList == null || idPhongStrList.isEmpty() ||
+                idKhachHangStr == null || idKhachHangStr.isEmpty() ||
+                ngayNhanStr == null || ngayNhanStr.isEmpty() ||
+                ngayTraStr == null || ngayTraStr.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Các tham số không được để trống."));
+        }
+
+        try {
+
+            // Chuyển đổi ID khách hàng
+            Integer idKhachHang = parseInteger(idKhachHangStr, "ID không đúng định dạng");
+            KhachHangDTO khachHangDTO = khachHangService.findById(idKhachHang);
+            if (khachHangDTO == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Khách hàng không tồn tại."));
+            }
+            KhachHang khachHang = khachHangService.convertToEntity(khachHangDTO);
+
+            // Chuyển đổi ngày nhận và ngày trả
+            LocalDateTime ngayNhan = parseDateTime(ngayNhanStr, "Ngày nhận phòng không hợp lệ.");
+            LocalDateTime ngayTra = parseDateTime(ngayTraStr, "Ngày trả phòng không hợp lệ.");
+
+
+            if (ngayTra.isBefore(ngayNhan)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Ngày trả phòng phải sau ngày nhận phòng."));
+            }
+
+            // Tính toán tổng tiền phòng và tiền cọc
+            float tongTienPhong = 0;
+            float tienCoc = 0;
+
+
+            // Lấy giá trị thời gian cho phép từ bảng ThamSo dựa trên ID
+            Long idThamSo = 3L;
+            String thoiGianChoPhepStr = thamSoService.getValueById(idThamSo);
+
+            if (thoiGianChoPhepStr == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Tham số thời gian cho phép không tồn tại."));
+            }
+
+            // Chuyển đổi giá trị 'giaTri' từ chuỗi sang kiểu long
+            long thoiGianChoPhepMillis = TimeUnit.MINUTES.toMillis(Long.parseLong(thoiGianChoPhepStr));
+
+            // Lưu danh sách các đối tượng DatPhong
+            List<DatPhong> datPhongList = new ArrayList<>();
+
+            for (int i = 0; i < idPhongStrList.size(); i++) {
+
+                // Kiểm tra và chuyển đổi ID loại phòng
+                // Sử dụng loại phòng tương ứng hoặc giữ nguyên loại phòng cuối cùng nếu danh sách loại phòng ngắn hơn
+                Integer idLoaiPhong = parseInteger(idLoaiPhongStrList.get(Math.min(i, idLoaiPhongStrList.size() - 1)), "ID loại phòng không hợp lệ.");
+                LoaiPhong loaiPhong = loaiPhongService.findById(idLoaiPhong);
+
+
+                // Kiểm tra và chuyển đổi ID phòng
+                Integer idPhong = parseInteger(idPhongStrList.get(i), "ID phòng không hợp lệ.");
+                Phong selectedPhong = phongService.findById(idPhong);
+
+                // Kiểm tra tình trạng phòng
+                if (selectedPhong == null || !selectedPhong.getTinhTrang()) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "Phòng " + idPhong + " không hợp lệ hoặc đã ngừng hoạt động."));
+                }
+
+
+
+                // Lấy thông tin đặt phòng đã tồn tại
+                List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra);
+
+                // Kiểm tra khoảng thời gian giữa các lần đặt phòng
+                for (DatPhong existingBooking : existingBookings) {
+                    // Kiểm tra nếu trạng thái của đặt phòng không phải "Đã Hủy"
+                    if (!existingBooking.getTinhTrang().equals("Đã Hủy") && !existingBooking.getTrangThai()) {
+                        LocalDateTime existingNgayTra = existingBooking.getNgayTra();
+                        long existingNgayTraMillis = existingNgayTra.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                        long ngayNhanMillis = ngayNhan.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+                        // Kiểm tra khoảng thời gian giữa các lần đặt phòng
+                        if (ngayNhanMillis - existingNgayTraMillis < thoiGianChoPhepMillis) {
+                            return ResponseEntity.badRequest().body(Map.of("error", "Thời gian đặt của bạn không hợp lệ, trùng với người đặt trước."));
+                        }
+                    }
+                }
+
+                // Tính toán các chi phí cho từng phòng
+                long soNgayO = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
+                float giaPhong = selectedPhong.getLoaiPhong().getGia();
+                float tongTienPhongPhong = giaPhong * soNgayO;
+                float tienCocPhong = tongTienPhongPhong * 0.8f;
+
+//                // Cập nhật tổng tiền phòng và tiền cọc
+                tongTienPhong += tongTienPhongPhong;
+                tienCoc += tienCocPhong;
+
+                // Tạo đối tượng DatPhong cho từng phòng
+                DatPhong datPhong = new DatPhong();
+                datPhong.setMaDatPhong(generateMaDatPhong()+""+(i+1));
+                datPhong.setPhong(selectedPhong);
+                datPhong.setNgayNhan(ngayNhan);
+                datPhong.setNgayTra(ngayTra);
+                datPhong.setNgayDat(LocalDateTime.now());
+                datPhong.setCccd(cccd);
+                datPhong.setTongTien(tongTienPhongPhong);
+                datPhong.setTienCoc(tongTienPhongPhong * 0.8f);
+                float tienConLai = datPhong.getTongTien() - datPhong.getTienCoc(); // Tính tiền còn lại
+                datPhong.setTienConLai(tienConLai);
+                datPhong.setLoaiPhong(loaiPhong);
+                datPhong.setKhachHang(khachHang);
+                datPhong.setTinhTrang("Đang chờ thanh toán...");
+                datPhong.setTrangThai(false);
+
+                // Thêm vào danh sách để lưu sau
+                datPhongList.add(datPhong);
+                System.out.println("idLoaiPhongStrList: " + idLoaiPhongStrList);
+                System.out.println("idPhongStrList: " + idPhongStrList);
+            }
+
+            // Lưu tất cả các đối tượng DatPhong vào cơ sở dữ liệu
+            for (DatPhong datPhong : datPhongList) {
+                datPhongService.saveDatPhong(datPhong);
+
+
+                // Lưu thông tin chi tiết đặt phòng
+                ChiTietDatPhong chiTietDatPhong = new ChiTietDatPhong();
+                chiTietDatPhong.setMaChiTietDatPhong("CTDP" + datPhong.getIdDatPhong());
+                chiTietDatPhong.setDatPhong(datPhong);
+                chiTietDatPhong.setKhachHang(khachHang);
+                chiTietDatPhong.setNgayLap(new Date());
+                chiTietDatPhong.setTongTien(BigDecimal.valueOf(tongTienPhong));
+
+                chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
+            }
+
+
+            DatPhong booking = datPhongList.get(0);
+            Integer id = booking.getIdDatPhong();
+
+            String vnp_Version = "2.1.0";
+            String vnp_Command = "pay";
+            String vnp_TxnRef = String.valueOf(id);
+            String vnp_IpAddr = Config.getIpAddress(req);
+            String vnp_TmnCode = Config.vnp_TmnCode;
+
+            System.out.println("vnp_TxnRef:"+vnp_TxnRef);
+
+            Map<String, String> vnp_Params = new HashMap<>();
+            vnp_Params.put("vnp_Version", vnp_Version);
+            vnp_Params.put("vnp_Command", vnp_Command);
+            vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
+            vnp_Params.put("vnp_Amount", String.valueOf((int) (tienCoc * 100))); // Chuyển đổi sang đồng
+            vnp_Params.put("vnp_CurrCode", "VND");
+
+            if (bankCode != null && !bankCode.isEmpty()) {
+                vnp_Params.put("vnp_BankCode", bankCode);
+            }
+            vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+            vnp_Params.put("vnp_OrderInfo", "billpayment");
+            vnp_Params.put("vnp_OrderType", "booking");
+
+            String locate = (language != null && !language.isEmpty()) ? language : "vn";
+            vnp_Params.put("vnp_Locale", locate);
+            vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
+            vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+
+            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            String vnp_CreateDate = formatter.format(cld.getTime());
+            vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+
+            cld.add(Calendar.MINUTE, 15);
+            String vnp_ExpireDate = formatter.format(cld.getTime());
+            vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+
+            List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+            Collections.sort(fieldNames);
+            StringBuilder hashData = new StringBuilder();
+            StringBuilder query = new StringBuilder();
+
+            for (String fieldName : fieldNames) {
+                String fieldValue = vnp_Params.get(fieldName);
+                if (fieldValue != null && fieldValue.length() > 0) {
+                    hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII))
+                            .append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                    if (fieldNames.indexOf(fieldName) < fieldNames.size() - 1) {
+                        query.append('&');
+                        hashData.append('&');
+                    }
+                }
+            }
+
+            String vnp_SecureHash = Config.hmacSHA512(Config.secretKey, hashData.toString());
+            String paymentUrl = Config.vnp_PayUrl + "?" + query.toString() + "&vnp_SecureHash=" + vnp_SecureHash;
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", "00");
+            response.put("message", "success");
+            response.put("data", paymentUrl);
+
+            return ResponseEntity.ok(response);
+
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Định dạng ID không hợp lệ."));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Định dạng ngày không hợp lệ."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Có lỗi xảy ra: " + e.getMessage()));
+        }
+    }
 
 
 

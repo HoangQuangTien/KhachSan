@@ -168,6 +168,7 @@
     }
 
     function checkInDatPhong(idDatPhong) {
+        // Gọi API kiểm tra thông tin phòng
         fetch(`/danhsach/check-in?idDatPhong=${encodeURIComponent(idDatPhong)}`, {
             method: 'POST',
             headers: {
@@ -176,27 +177,82 @@
         })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    // Loại bỏ đặt phòng khỏi danh sách
-                    document.getElementById(`datPhong-${idDatPhong}`).remove();
-
-                    // Cập nhật trang lịch nếu có đối tượng calendar
-                    if (window.calendar) {
-                        window.calendar.refetchEvents();
-                    }
+                // Kiểm tra nếu có cảnh báo
+                if (data.warning) {
+                    // Hiển thị cảnh báo cho người dùng và yêu cầu xác nhận
+                    Swal.fire({
+                        title: 'Cảnh báo!',
+                        text: data.warning,  // Thông báo từ backend
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Đồng ý check-in',
+                        cancelButtonText: 'Hủy',
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Nếu người dùng đồng ý, thực hiện check-in
+                            proceedCheckIn(idDatPhong);
+                        }
+                    });
+                } else if (data.success) {
+                    // Nếu không có cảnh báo và check-in thành công
                     Swal.fire({
                         title: 'Thành công!',
-                        text: 'Check-in thành công!',
+                        text: data.success,  // Thông báo thành công
                         icon: 'success',
                         confirmButtonText: 'Đóng',
                         customClass: {
                             confirmButton: 'btn btn-success'
                         }
                     });
-                } else {
+                }
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra:', error);
+                Swal.fire({
+                    title: 'Có lỗi xảy ra!',
+                    text: 'Vui lòng thử lại sau.',
+                    icon: 'error',
+                    confirmButtonText: 'Đóng',
+                    customClass: {
+                        confirmButton: 'btn btn-danger'
+                    }
+                });
+            });
+    }
+
+    function proceedCheckIn(idDatPhong) {
+        // Tiến hành check-in nếu người dùng đồng ý
+        fetch(`/danhsach/confirm-check-in?idDatPhong=${encodeURIComponent(idDatPhong)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Kiểm tra kết quả sau khi check-in
+                if (data.success) {
+
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: data.success,  // Thông báo check-in thành công
+                        icon: 'success',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            confirmButton: 'btn btn-success'
+                        }
+                    }).then(() => {
+                        // Reload lại trang sau khi thông báo thành công
+                        location.reload();
+                    });
+                } else if (data.error) {
                     Swal.fire({
                         title: 'Có lỗi xảy ra!',
-                        text: data.error || 'Không có thông tin lỗi',
+                        text: data.error,  // Thông báo lỗi
                         icon: 'error',
                         confirmButtonText: 'Đóng',
                         customClass: {
@@ -218,6 +274,9 @@
                 });
             });
     }
+
+
+
 
     function confirmCancelBooking(idDatPhong) {
         Swal.fire({

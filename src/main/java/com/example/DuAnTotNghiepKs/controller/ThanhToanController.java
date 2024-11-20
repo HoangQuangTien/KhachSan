@@ -12,7 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -95,7 +97,7 @@ public class ThanhToanController {
 
 
     @PostMapping("/add")
-    public String save(@ModelAttribute ThanhToanDTO thanhToanDTO,@RequestParam(required = false) Integer idKhuyenMai, RedirectAttributes redirectAttributes) {
+    public String save(@ModelAttribute ThanhToanDTO thanhToanDTO, @RequestParam(required = false) Integer idKhuyenMai, RedirectAttributes redirectAttributes) {
         try {
             if (idKhuyenMai != null) {
                 ResponseEntity<Map<String, Object>> response = khuyenMaiService.capNhatSoLuong(idKhuyenMai);
@@ -105,7 +107,6 @@ public class ThanhToanController {
                     return "redirect:/thanhToan"; // Quay lại trang thanh toán nếu không thành công
                 }
             }
-
 
             // Lưu thông tin thanh toán
             thanhToanService.save(thanhToanDTO);
@@ -126,48 +127,53 @@ public class ThanhToanController {
                 }
             }).start();
 
-            // Nếu người dùng chọn in hóa đơn
-            if (thanhToanDTO.isInHoaDon()) {
-                byte[] pdfBytes = thanhToanService.createInvoicePDF(thanhToanDTO);
-
-                // Đường dẫn tới thư mục lưu hóa đơn
-                String directoryPath = "D:/invoices";
-                File directory = new File(directoryPath);
-
-                // Kiểm tra xem thư mục đã tồn tại chưa, nếu chưa thì tạo thư mục
-                if (!directory.exists()) {
-                    if (directory.mkdirs()) {
-                        System.out.println("Thư mục đã được tạo: " + directoryPath);
-                    } else {
-                        System.out.println("Không thể tạo thư mục: " + directoryPath);
-                        // Có thể thêm logic xử lý lỗi ở đây, ví dụ: thông báo lỗi cho người dùng
-                    }
-                }
-
-                // Đường dẫn đầy đủ đến file hóa đơn
-                String filePath = directoryPath + "/invoice.pdf";
-
-                // Lưu file PDF
-                try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                    fos.write(pdfBytes);
-                    System.out.println("Hóa đơn đã được lưu tại: " + filePath);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // Xử lý lỗi nếu không thể ghi file
-                }
-            }
-
-
-            // Thêm thông báo thành công vào redirect
+            // Thông báo thành công
             redirectAttributes.addFlashAttribute("successMessage", "Thanh toán thành công!");
+
+
         } catch (Exception e) {
             // Thêm thông báo lỗi vào redirect nếu có lỗi
             redirectAttributes.addFlashAttribute("errorMessage", "Đã có lỗi xảy ra, vui lòng thử lại!");
         }
 
-        // Redirect về trang thanh toán
+        // Redirect về trang thanh toán nếu có lỗi
         return "redirect:/thanhToan";
     }
+
+    @GetMapping("/download-invoice")
+    public ResponseEntity<byte[]> downloadInvoice(@RequestParam("id") Integer idThanhToan) {
+        try {
+            // Lấy thông tin thanh toán từ ID
+            ThanhToanDTO thanhToanDTO = thanhToanService.getThanhToanById(idThanhToan);
+            if (thanhToanDTO == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);  // Không tìm thấy
+            }
+
+            // Tạo PDF từ thông tin thanh toán
+            byte[] pdfBytes = thanhToanService.createInvoicePDF(thanhToanDTO);
+
+            // Kiểm tra nếu pdfBytes null hoặc rỗng
+            if (pdfBytes == null || pdfBytes.length == 0) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Nếu không có PDF
+            }
+
+            // Tạo headers để trình duyệt tải về file PDF
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "invoice_" + idThanhToan + ".pdf");
+
+            // Trả về phản hồi chứa file PDF
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Xử lý lỗi
+        }
+    }
+
+
+
 
 
 

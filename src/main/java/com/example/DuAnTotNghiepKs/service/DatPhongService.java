@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.service;
 
+import com.example.DuAnTotNghiepKs.DTO.DatPhongDTO;
 import com.example.DuAnTotNghiepKs.DTO.IdleRoomDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
@@ -86,6 +87,7 @@ public interface DatPhongService {
 
     Map<String, Object> getRevenueByQuarter(int year, int startMonth, int endMonth);
 
+    List<DatPhongDTO> findByKhachHang_Id(Integer id);
 
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động

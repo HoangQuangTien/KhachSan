@@ -182,5 +182,6 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
     Page<DatPhong> searchBy(@Param("query") String query, Pageable pageable);
 
 
+    List<DatPhong> findByKhachHang_IdAndTinhTrang(Integer idKhachHang, String tinhTrang);
 
 }

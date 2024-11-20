@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý thông tin</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
@@ -27,8 +29,10 @@
     <script
             src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{/css/styleKH.css}"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<!--    <link rel="stylesheet" th:href="@{/css/styleKH.css}" />-->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+            rel="stylesheet">
 
 
 </head>
@@ -38,7 +42,8 @@
     <div class="login-button-container position-absolute top-0 end-0 m-3">
 
         <th:block th:if="${user == null}">
-            <a href="/khach-hang/login" class="btn btn-outline-light btnLogin">Đăng nhập</a>
+            <a href="/khach-hang/login" class="btn btn-outline-light btnLogin">Đăng
+                nhập</a>
         </th:block>
         <th:block th:if="${user != null}">
             <div class="dropdown">
@@ -46,9 +51,10 @@
                         class="btn btn-secondary dropdown-toggle" type="button"
                         data-toggle="dropdown" aria-expanded="false"></button>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/khach-hang/trang-ca-nhan"><i class="fa-regular fa-circle-user"></i>
-                        Quản lý tài khoản</a>
-                    <a class="dropdown-item" href="/khach-hang/logout"><i class="bi-box-arrow-right"></i> Đăng xuất</a>
+                    <a class="dropdown-item" href="/khach-hang/trang-ca-nhan"><i
+                            class="fa-regular fa-circle-user"></i> Quản lý tài khoản</a> <a
+                        class="dropdown-item" href="/khach-hang/logout"><i
+                        class="bi-box-arrow-right"></i> Đăng xuất</a>
                 </div>
             </div>
         </th:block>
@@ -86,15 +92,11 @@
         <!-- Thanh menu bên trái -->
         <div class="col-md-3">
             <div class="list-group">
-                <a href="#tabThongTin" class="list-group-item list-group-item-action active" data-bs-toggle="tab">
-                    Thông tin cá nhân
-                </a>
-                <a href="#datPhong" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                    Đặt Phòng
-                </a>
-                <a href="#tabLichSu" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                    Lịch sử đặt phòng
-                </a>
+                <a href="#tabThongTin"
+                   class="list-group-item list-group-item-action active"
+                   data-bs-toggle="tab"> Thông tin cá nhân </a> <a href="#tabLichSu"
+                                                                   class="list-group-item list-group-item-action"
+                                                                   data-bs-toggle="tab"> Lịch sử đặt phòng </a>
             </div>
         </div>
 
@@ -111,29 +113,28 @@
                             <form id="idForm">
                                 <!-- Nội dung form -->
                                 <div class="mb-3">
-                                    <label for="inputUsername" class="form-label">Họ tên</label>
-                                    <input type="text" name="hoVaTen" class="form-control"
-                                           th:value="${user.hoVaTen}"
-                                           pattern="[a-zA-ZÀ-ỹà-ỹ\s]+"
-                                           title="Họ tên chỉ được chứa chữ cái."
-                                           placeholder="Nhập họ tên" required/>
+                                    <label for="inputUsername" class="form-label">Họ tên</label> <input
+                                        type="text" name="hoVaTen" class="form-control"
+                                        th:value="${user.hoVaTen}" pattern="[a-zA-ZÀ-ỹà-ỹ\s]+"
+                                        title="Họ tên chỉ được chứa chữ cái."
+                                        placeholder="Nhập họ tên" required />
 
                                 </div>
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" name="email" class="form-control"
-                                           th:value="${user.email}"
-                                           pattern="[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}"
-                                           title="Email phải đúng định dạng (VD: example@gmail.com)"
-                                           placeholder="Nhập email" required/>
+                                    <label for="email" class="form-label">Email</label> <input
+                                        type="email" name="email" class="form-control"
+                                        th:value="${user.email}"
+                                        pattern="[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}"
+                                        title="Email phải đúng định dạng (VD: example@gmail.com)"
+                                        placeholder="Nhập email" required />
                                 </div>
                                 <div class="mb-3">
-                                    <label for="soDienThoai" class="form-label">Số điện thoại</label>
-                                    <input type="text" name="soDienThoai" class="form-control"
-                                           th:value="${user.soDienThoai}" id="soDienThoai"
-                                           pattern="\d{10}"
-                                           title="Số điện thoại phải chứa đúng 10 chữ số."
-                                           placeholder="Nhập số điện thoại" required/>
+                                    <label for="soDienThoai" class="form-label">Số điện
+                                        thoại</label> <input type="text" name="soDienThoai"
+                                                             class="form-control" th:value="${user.soDienThoai}"
+                                                             id="soDienThoai" pattern="\d{10}"
+                                                             title="Số điện thoại phải chứa đúng 10 chữ số."
+                                                             placeholder="Nhập số điện thoại" required />
 
                                 </div>
                                 <!-- Giới tính -->
@@ -141,13 +142,13 @@
                                     <label class="form-label">Giới tính</label>
                                     <div class="form-check form-check-inline">
                                         <input type="radio" id="Nam" name="gioiTinh" value="true"
-                                               th:checked="${user.gioiTinh == true}" required/>
-                                        <label for="Nam" class="form-check-label">Nam</label>
+                                               th:checked="${user.gioiTinh == true}" required /> <label
+                                            for="Nam" class="form-check-label">Nam</label>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input type="radio" id="Nu" name="gioiTinh" value="false"
-                                               th:checked="${user.gioiTinh == false}" required/>
-                                        <label for="Nu" class="form-check-label">Nữ</label>
+                                               th:checked="${user.gioiTinh == false}" required /> <label
+                                            for="Nu" class="form-check-label">Nữ</label>
                                     </div>
                                 </div>
                                 <!-- Địa chỉ -->
@@ -160,63 +161,51 @@
                                 <!-- Thành phố, Quận, Phường -->
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
-                                        <label for="thanhPho" class="form-label">Thành phố</label>
-                                        <input type="text" name="thanhPho" th:value="${userDC.thanhPho}"
-                                               class="form-control" id="thanhPho"
-                                               placeholder="Nhập thành phố"/>
+                                        <label for="city">Tỉnh thành</label> <select
+                                            class="form-control" id="city" name="thanhPho">
+                                        <option
+                                                th:if="${userDC != null and userDC.thanhPho != null}"
+                                                th:value="${userDC.thanhPho}" th:text="${userDC.thanhPho}"
+                                                selected></option>
+                                        <option th:if="${userDC == null or userDC.thanhPho == null}"
+                                                selected value="">Chọn tỉnh thành</option>
+                                    </select>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label for="quan" class="form-label">Quận</label>
-                                        <input type="text" name="quan" th:value="${userDC.quanHuyen}"
-                                               class="form-control" id="quan"
-                                               placeholder="Nhập quận"/>
+                                        <label for="district">Quận huyện</label> <select
+                                            class="form-control" id="district" name="quan">
+                                        <option
+                                                th:if="${userDC != null and userDC.quanHuyen != null}"
+                                                th:value="${userDC.quanHuyen}"
+                                                th:text="${userDC.quanHuyen}" selected></option>
+                                        <option
+                                                th:if="${userDC == null or userDC.quanHuyen == null}"
+                                                selected value="">Chọn quận huyện</option>
+                                    </select>
+
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label for="phuongXa" class="form-label">Phường xã</label>
-                                        <input type="text" name="phuongXa" th:value="${userDC.phuongXa}"
-                                               class="form-control" id="phuongXa"
-                                               placeholder="Nhập phường xã"/>
+                                        <label for="ward">Phường xã</label> <select
+                                            class="form-control" id="ward" name="phuongXa">
+                                        <option
+                                                th:if="${userDC != null and userDC.phuongXa != null}"
+                                                th:value="${userDC.phuongXa}" th:text="${userDC.phuongXa}"
+                                                selected></option>
+                                        <option th:if="${userDC == null or userDC.phuongXa == null}"
+                                                selected value="">Chọn phường xã</option>
+                                    </select>
                                     </div>
                                 </div>
 
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary">Cập nhật thông tin</button>
+                                    <button type="submit" class="btn btn-primary">Cập
+                                        nhật thông tin</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- tab đặt phòng -->
-                <div class="tab-pane fade" id="datPhong">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-success text-white text-center">
-                            <h5>Đơn đặt phòng</h5>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-bordered table-hover text-center">
-                                <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Tên phòng</th>
-                                    <th>Ngày đặt</th>
-                                    <th>Ngày trả</th>
-                                    <th>Giá</th>
-                                    <th>Trạng thái</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-
-                                <!-- Nếu không có dữ liệu -->
-                                <tr>
-                                    <td colspan="6">Không có phòng đang được đặt</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
                 <!-- Tab Lịch sử đặt phòng -->
                 <div class="tab-pane fade" id="tabLichSu">
                     <div class="card shadow-sm">
@@ -229,32 +218,30 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Tên phòng</th>
-                                    <th>Ngày đặt</th>
+                                    <th>Ngày nhận</th>
                                     <th>Ngày trả</th>
                                     <th>Giá</th>
+                                    <th>Tình trạng</th>
                                     <th>Trạng thái</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Phòng Deluxe</td>
-                                    <td>2024-11-10</td>
-                                    <td>2024-11-15</td>
-                                    <td>2,500,000 VNĐ</td>
-                                    <td><span class="badge bg-success">Đã thanh toán</span></td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Phòng Suite</td>
-                                    <td>2024-11-01</td>
-                                    <td>2024-11-05</td>
-                                    <td>3,000,000 VNĐ</td>
-                                    <td><span class="badge bg-warning text-dark">Chưa thanh toán</span></td>
-                                </tr>
-                                <!-- Nếu không có dữ liệu -->
-                                <tr>
+                                <tr th:if="${#lists.isEmpty(listDatPhong)}">
                                     <td colspan="6">Không có lịch sử đặt phòng.</td>
+                                </tr>
+                                <tr th:each="item : ${listDatPhong}">
+                                    <td>1</td>
+                                    <td th:text="${item.tenPhong}"></td>
+                                    <td
+                                            th:text="${#temporals.format(item.ngayNhanPhong, 'dd-MM-yyyy')}"></td>
+                                    <td
+                                            th:text="${#temporals.format(item.ngayTraPhong, 'dd-MM-yyyy')}"></td>
+                                    <td th:text="${item.tienConLai + ' VNĐ'}"></td>
+                                    <td th:text="${item.tinhTrang}"></td>
+                                    <td><span
+                                            th:text="${item.trangThai ? 'Đã thanh toán' : 'Chưa thanh toán'}"
+                                            th:class="${item.trangThai ? 'badge bg-success' : 'badge bg-warning text-dark'}">
+											</span></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -305,7 +292,8 @@
     </div>
 </footer>
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -319,6 +307,8 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
         crossorigin="anonymous"></script>
+<script
+        src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const idForm = document.getElementById('idForm'); // Đảm bảo rằng bạn có id cho form
@@ -367,6 +357,58 @@
             console.error("Không tìm thấy form với id 'idForm'.");
         }
     });
+
+    var citis = document.getElementById("city");
+    var districts = document.getElementById("district");
+    var wards = document.getElementById("ward");
+    var Parameter = {
+        url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+        method: "GET",
+        responseType: "application/json",
+    };
+    var promise = axios(Parameter);
+    promise.then(function (result) {
+        renderCity(result.data);
+    });
+    function renderCity(data) {
+        for (const x of data) {
+            var opt = document.createElement('option');
+            opt.value = x.Name;
+            opt.text = x.Name;
+            opt.setAttribute('data-id', x.Id);
+            citis.options.add(opt);
+        }
+        citis.onchange = function () {
+            districts.length = 1;
+            wards.length = 1;
+            if (this.options[this.selectedIndex].dataset.id !== "") {
+                const result = data.filter(n => n.Id === this.options[this.selectedIndex].dataset.id);
+
+                for (const k of result[0].Districts) {
+                    var opt = document.createElement('option');
+                    opt.value = k.Name;
+                    opt.text = k.Name;
+                    opt.setAttribute('data-id', k.Id);
+                    districts.options.add(opt);
+                }
+            }
+        };
+        districts.onchange = function () {
+            wards.length = 1;
+            const dataCity = data.filter((n) => n.Id === citis.options[citis.selectedIndex].dataset.id);
+            if (this.options[this.selectedIndex].dataset.id !== "") {
+                const dataWards = dataCity[0].Districts.filter(n => n.Id === this.options[this.selectedIndex].dataset.id)[0].Wards;
+
+                for (const w of dataWards) {
+                    var opt = document.createElement('option');
+                    opt.value = w.Name;
+                    opt.text = w.Name;
+                    opt.setAttribute('data-id', w.Id);
+                    wards.options.add(opt);
+                }
+            }
+        };
+    }
 </script>
 
 </body>

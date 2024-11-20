@@ -26,4 +26,6 @@ public interface ThanhToanService {
     byte[] createInvoicePDF(ThanhToanDTO thanhToanDTO) throws IOException;
 
     List<ThanhToanDTO> search(String query, Date ngayThanhToan);
+
+    ThanhToanDTO getThanhToanById(Integer id);
 }

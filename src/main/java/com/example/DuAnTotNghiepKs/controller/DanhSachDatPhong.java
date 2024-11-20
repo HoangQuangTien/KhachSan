@@ -72,10 +72,10 @@ public class DanhSachDatPhong {
                 return ResponseEntity.badRequest().body(Map.of("error", "Không tìm thấy thông tin nhân viên."));
             }
 
-            // Kiểm tra danh sách người đi cùng
+            // Kiểm tra nếu phòng có yêu cầu người đi cùng
             if (datPhong.getLoaiPhong().getSoNguoiToiDa() > 1 &&
                     (datPhong.getNguoiDiCungList() == null || datPhong.getNguoiDiCungList().isEmpty())) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Phòng chưa có người đi cùng."));
+                return ResponseEntity.ok(Map.of("warning", "Phòng chưa có người đi cùng. Bạn có muốn tiếp tục check-in?"));
             }
 
 
@@ -139,6 +139,80 @@ public class DanhSachDatPhong {
         }
     }
 
+    @PostMapping("/confirm-check-in")
+    public ResponseEntity<?> confirmCheckIn(@RequestParam("idDatPhong") Integer idDatPhong) {
+        try {
+            // Tìm đặt phòng theo ID
+            DatPhong datPhong = datPhongService.getDatPhongById(idDatPhong);
+            if (datPhong == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Đặt phòng không tồn tại."));
+            }
+
+            // Lấy thông tin tài khoản từ session
+            TaiKhoan taiKhoan = taiKhoanService.getTaiKhoanTuSession1();
+            if (taiKhoan == null || taiKhoan.getNhanVien() == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Không tìm thấy thông tin nhân viên."));
+            }
+
+
+            // Lấy thời gian dự kiến nhận phòng từ đặt phòng
+            LocalDateTime ngayNhanPhong = datPhong.getNgayNhan();
+
+            // Lấy giá trị cho phép từ bảng tham số bằng id
+            Long thamSoId = 1L; // id của tham số check-in được phép trong bảng ThamSo
+            String checkinLeewayStr = thamSoService.getValueById(thamSoId);
+            if (checkinLeewayStr == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Tham số kiểm tra check-in chưa được cấu hình."));
+            }
+
+            // Chuyển đổi giá trị từ String sang Integer
+            Integer checkinLeewayMinutes = Integer.parseInt(checkinLeewayStr);
+
+            // Lấy thời gian hiện tại
+            LocalDateTime now = LocalDateTime.now();
+
+            // Kiểm tra nếu khách hàng check-in trước quá 5 phút (hoặc giá trị từ tham số)
+            if (now.isBefore(ngayNhanPhong.minusMinutes(checkinLeewayMinutes))) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Chỉ được phép check-in trước tối đa " + checkinLeewayMinutes + " phút."));
+            }
+            // Lấy thời gian dự kiến nhận phòng từ đặt phòng
+
+
+//            LocalDateTime ngayTraPhong = datPhong.getNgayTra(); // Lấy ngày trả phòng
+//
+//            if (ngayTraPhong.isAfter(now) && datPhong.getNhanVienCheckIn() == null) {
+//                // Nếu ngày trả phòng lớn hơn hiện tại và chưa check-in
+//                datPhong.setTinhTrang("Đã Hủy"); // Cập nhật trạng thái đặt phòng thành "Đã hủy"
+//                datPhongService.saveDatPhong1(datPhong);
+//
+//                Phong phong = datPhong.getPhong();
+//                phong.setTrangThai(true); // Đặt trạng thái phòng thành có sẵn
+//                phongService.savePhong(phong); // Lưu lại trạng thái phòng
+//
+//                return ResponseEntity.ok(Map.of("success", "Đặt phòng đã bị hủy do quas thoi gian check-in."));
+//            }
+            // Cập nhật thông tin check-in
+            NhanVien nhanVienCheckIn = taiKhoan.getNhanVien();
+            datPhong.setNhanVienCheckIn(nhanVienCheckIn); // Lưu đối tượng NhanVien
+
+            Phong phong = datPhong.getPhong();
+            // Cập nhật trạng thái đặt phòng thành "đang ở"
+            datPhong.setTinhTrang("Đã Checkin");
+            datPhongService.saveDatPhong1(datPhong);
+
+
+            phong.setTrangThai(false); // false biểu thị phòng đã hết
+            phongService.savePhong(phong); // Giả sử có một dịch vụ lưu phòng
+
+            datPhong.setTrangThai(false);
+            datPhong.setNgayCheckIn(LocalDateTime.now()); // lấy ngày hiện tại
+
+            datPhongService.saveDatPhong1(datPhong);
+            return ResponseEntity.ok(Map.of("success", "Check-in thành công!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 
 
 

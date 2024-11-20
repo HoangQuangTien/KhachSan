@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.example.DuAnTotNghiepKs.DTO.DatPhongDTO;
 import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
@@ -46,6 +47,8 @@ public class KhachHangController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private DatPhongService datPhongService;
 //    @Autowired
 //    private DatPhongService ;
 
@@ -131,16 +134,19 @@ public class KhachHangController {
             model.addAttribute("user", taiKhoanDTO.getKhachHangDTO());
             List<DiaChiKhachHangDTO> listDiaChiKhachHangDTO = diaChiKhachHangService
                     .findById(taiKhoanDTO.getKhachHangDTO().getId());
+            List<DatPhongDTO> listDatPhongDTO = datPhongService.findByKhachHang_Id(taiKhoanDTO.getKhachHangDTO().getId());
             if (listDiaChiKhachHangDTO.size() > 0) {
                 model.addAttribute("userDC", listDiaChiKhachHangDTO.get(0));
             } else {
                 model.addAttribute("userDC", new DiaChiKhachHangDTO());
             }
+            model.addAttribute("listDatPhong", listDatPhongDTO);
         } else {
             return "redirect:/login";
         }
         return "list/KhachHang/trangcanhan";
     }
+
 
     @PutMapping("/khach-hang/trang-ca-nhan")
     public ResponseEntity<?> register(@RequestParam String hoVaTen, @RequestParam String soDienThoai,
@@ -187,6 +193,7 @@ public class KhachHangController {
     }
 
 
+
 //    @GetMapping("/datphongKH")
 //    public String showDatPhongList(Model model) {
 //        // Lấy tất cả thông tin đặt phòng chưa check-in
@@ -201,6 +208,8 @@ public class KhachHangController {
 //
 //        return "list/QuanLyDatPhong/nguoidicung"; // Đường dẫn tới trang HTML hiển thị danh sách đặt phòng
 //    }
+
+
 
 
 }

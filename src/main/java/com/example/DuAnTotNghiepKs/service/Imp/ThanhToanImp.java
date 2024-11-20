@@ -8,7 +8,13 @@ import com.example.DuAnTotNghiepKs.repository.ThamSoRepo;
 import com.example.DuAnTotNghiepKs.repository.ThanhToanRepo;
 import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import com.example.DuAnTotNghiepKs.service.ThanhToanService;
+import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,10 +31,12 @@ import java.io.ByteArrayOutputStream;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -256,21 +264,64 @@ public class ThanhToanImp implements ThanhToanService {
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
         Document document = new Document(pdfDocument);
 
-        // Thêm nội dung hóa đơn vào PDF
-        document.add(new Paragraph("Hóa Đơn Thanh Toán")
+        // Font và tiêu đề
+        PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+        PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+        // Tiêu đề hóa đơn
+        document.add(new Paragraph("HÓA ĐƠN THANH TOÁN")
+                .setFont(boldFont)
                 .setFontSize(20)
-                .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))); // Sử dụng PdfFontFactory
+                .setTextAlignment(TextAlignment.CENTER)
+                .setMarginBottom(20));
 
+        // Thông tin khách hàng
+        document.add(new Paragraph("Thông tin khách hàng")
+                .setFont(boldFont)
+                .setFontSize(14)
+                .setMarginBottom(10));
 
-        document.add(new Paragraph("Thông tin khách hàng: " + thanhToanDTO.getHoVaTen()));
-        document.add(new Paragraph("Phòng: " + thanhToanDTO.getTenPhong()));
-        document.add(new Paragraph("Tổng tiền: " + thanhToanDTO.getTongTien()));
-        document.add(new Paragraph("Ngày thanh toán: " + thanhToanDTO.getNgayThanhToan()));
-        document.add(new Paragraph("Nhân Viên: " + thanhToanDTO.getHoTen()));
+        Table customerTable = new Table(2);
+        customerTable.setWidth(UnitValue.createPercentValue(100));
+        customerTable.addCell(new Cell().add(new Paragraph("Họ và tên:").setFont(boldFont)).setBorder(Border.NO_BORDER));
+        customerTable.addCell(new Cell().add(new Paragraph(thanhToanDTO.getHoVaTen()).setFont(regularFont)).setBorder(Border.NO_BORDER));
+        customerTable.addCell(new Cell().add(new Paragraph("Phòng:").setFont(boldFont)).setBorder(Border.NO_BORDER));
+        customerTable.addCell(new Cell().add(new Paragraph(thanhToanDTO.getTenPhong()).setFont(regularFont)).setBorder(Border.NO_BORDER));
+        customerTable.addCell(new Cell().add(new Paragraph("Ngày thanh toán:").setFont(boldFont)).setBorder(Border.NO_BORDER));
+        customerTable.addCell(new Cell().add(new Paragraph(String.valueOf(thanhToanDTO.getNgayThanhToan())).setFont(regularFont)).setBorder(Border.NO_BORDER));
+        customerTable.addCell(new Cell().add(new Paragraph("Nhân viên:").setFont(boldFont)).setBorder(Border.NO_BORDER));
+        customerTable.addCell(new Cell().add(new Paragraph(thanhToanDTO.getHoTen()).setFont(regularFont)).setBorder(Border.NO_BORDER));
+        document.add(customerTable.setMarginBottom(20));
+
+        // Thông tin thanh toán
+        document.add(new Paragraph("Chi tiết thanh toán")
+                .setFont(boldFont)
+                .setFontSize(14)
+                .setMarginBottom(10));
+
+        Table paymentTable = new Table(2);
+        paymentTable.setWidth(UnitValue.createPercentValue(100));
+        paymentTable.addCell(new Cell().add(new Paragraph("Tổng tiền:").setFont(boldFont)).setBorder(Border.NO_BORDER));
+        paymentTable.addCell(new Cell().add(new Paragraph(formatCurrency(thanhToanDTO.getTongTien())).setFont(regularFont)).setBorder(Border.NO_BORDER));
+        document.add(paymentTable.setMarginBottom(20));
+
+        // Thêm thông điệp cảm ơn
+        document.add(new Paragraph("Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFont(regularFont)
+                .setFontSize(12)
+                .setMarginTop(30));
 
         document.close();
-        return outputStream.toByteArray(); // Trả về byte array của PDF
+        return outputStream.toByteArray();
     }
+
+    // Hàm định dạng số tiền
+    private String formatCurrency(double amount) {
+        DecimalFormat decimalFormat = new DecimalFormat("#,### VND");
+        return decimalFormat.format(amount);
+    }
+
 
 
 
@@ -280,6 +331,33 @@ public class ThanhToanImp implements ThanhToanService {
         return results.stream()
                 .map(thanhToan -> modelMapper.map(thanhToan, ThanhToanDTO.class))
                 .collect(Collectors.toList());
+    }
+
+
+
+    @Override
+    public ThanhToanDTO getThanhToanById(Integer id) {
+        // Truy vấn thanh toán từ repository theo ID
+        Optional<ThanhToan> thanhToanOptional = thanhToanRepository.findById(id);
+
+        // Nếu không tìm thấy, trả về null hoặc có thể ném exception tùy vào logic bạn muốn
+        if (thanhToanOptional.isPresent()) {
+            ThanhToan thanhToan = thanhToanOptional.get();
+
+            // Chuyển đổi entity ThanhToan thành DTO
+            ThanhToanDTO thanhToanDTO = new ThanhToanDTO();
+            thanhToanDTO.setIdThanhToan(thanhToan.getIdThanhToan());
+            thanhToanDTO.setHoVaTen(thanhToan.getDatPhong().getKhachHang().getHoVaTen());
+            thanhToanDTO.setTenPhong(thanhToan.getDatPhong().getPhong().getTenPhong());
+            thanhToanDTO.setTongTien(thanhToan.getDatPhong().getTongTien());
+            thanhToanDTO.setNgayThanhToan(thanhToan.getNgayThanhToan());
+            thanhToanDTO.setHoTen(thanhToan.getNhanVien().getHoTen());
+
+            // Trả về DTO
+            return thanhToanDTO;
+        } else {
+            return null; // Hoặc ném exception nếu bạn muốn
+        }
     }
 
 

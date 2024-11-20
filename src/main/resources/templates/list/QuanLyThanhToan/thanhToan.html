@@ -328,7 +328,7 @@
                             <div class="col-6 mb-3">
                                 <label for="tienPhuPhi" class="form-label font-weight-bold">Tiền phụ phí</label>
                                 <div class="input-group">
-                                    <input type="text" id="tienPhuPhi" class="form-control form-control-sm" disabled>
+                                    <input type="text" id="tienPhuPhi" class="form-control form-control-sm" readonly>
                                     <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
                                 </div>
                             </div>
@@ -352,7 +352,7 @@
                             <div class="col-6 mb-3">
                                 <label for="tienCoc" class="form-label font-weight-bold">Tiền cọc phòng</label>
                                 <div class="input-group">
-                                    <input type="text" name="tienCoc" id="tienCoc" class="form-control form-control-sm">
+                                    <input type="text" name="tienCoc" id="tienCoc" class="form-control form-control-sm" readonly>
                                     <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
                                 </div>
                             </div>
@@ -393,7 +393,7 @@
                             </div>
                             <div class="form-check form-check-inline">
                                 <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false" class="form-check-input" onclick="handleVirtualTransfer()">
-                                <label for="chuyenKhoan" class="form-check-label font-weight-bold">Chuyển khoản ảo</label>
+                                <label for="chuyenKhoan" class="form-check-label font-weight-bold">Chuyển khoản</label>
                             </div>
                         </div>
 
@@ -425,7 +425,7 @@
                         <div class="mb-3">
                             <label for="tienConLai" class="form-label">Tổng phải thanh toán</label>
                             <div class="input-group">
-                                <input type="number" name="soTien" id="tienConLai" class="form-control">
+                                <input type="number" name="soTien" id="tienConLai" class="form-control" readonly>
                                 <span class="input-group-text">VND</span>
                             </div>
                         </div>
@@ -868,9 +868,9 @@
         document.getElementById("thoiGian").value = thoiGian;
         document.getElementById("ngayCheckIn").value = thoiGianCheckIn;
         document.getElementById("giaPhong").value = giaPhong;
-        document.getElementById("tienCoc").value = tienCoc;
+        document.getElementById("tienCoc").value = tienCoc.toLocaleString('vi-VN');
         document.getElementById("tongTien").value = tongTien;
-        document.getElementById("tienConLai").value = tienConLai;
+        document.getElementById("tienConLai").value = tienConLai.toLocaleString('vi-VN');;
         // document.getElementById("soTien").value = tongTien;
         document.getElementById("datPhongId").value = idDatPhong;
 
@@ -897,6 +897,9 @@
 
 
     }
+
+
+
 
     function phuPhiChange(selectElement) {
         const selectOption = selectElement.options[selectElement.selectedIndex];
@@ -928,7 +931,6 @@
     }
 
     function kiemTraThanhToan(idDatPhong) {
-
         console.log("ID Đặt Phòng:", idDatPhong); // Kiểm tra xem ID đặt phòng có được truyền vào không
 
         const soTienKhachDua = parseFloat(document.getElementById("soTienKhachDua").value) || 0;
@@ -986,126 +988,197 @@
             return; // Ngăn không gửi form
         }
 
-        // Hiển thị thông báo thành công và thực hiện các yêu cầu API
+        // Hiển thị thông báo xác nhận trước khi thực hiện thanh toán
         Swal.fire({
-            title: 'Thành công!',
-            text: 'Thanh toán thành công!',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        }).then(function() {
-            // Cập nhật số lượng mã khuyến mại nếu có mã khuyến mãi
-            if (idKhuyenMai) {
-                fetch(`/api/vouchers/update/${idKhuyenMai}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+            title: 'Bạn chắc chắn muốn thanh toán?',
+            text: "Hãy kiểm tra lại thông tin trước khi tiếp tục.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Có, thanh toán!',
+            cancelButtonText: 'Hủy bỏ'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Thực hiện các bước thanh toán
+                Swal.fire({
+                    title: 'Thành công!',
+                    text: 'Thanh toán thành công!',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(function () {
+                    // Cập nhật số lượng mã khuyến mại nếu có mã khuyến mãi
+                    if (idKhuyenMai) {
+                        fetch(`/api/vouchers/update/${idKhuyenMai}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    console.log("Số lượng mã khuyến mại đã được cập nhật!");
+                                } else {
+                                    console.error(data.message || "Có lỗi xảy ra khi cập nhật số lượng khuyến mại.");
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Lỗi khi cập nhật số lượng mã khuyến mại:", error);
+                            });
                     }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log("Số lượng mã khuyến mại đã được cập nhật!");
-                        } else {
-                            console.error(data.message || "Có lỗi xảy ra khi cập nhật số lượng khuyến mại.");
+
+                    // Xóa CCCD của đặt phòng
+                    fetch(`/datphongs/xoaCCCD/${idDatPhong}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
                         }
                     })
-                    .catch(error => {
-                        console.error("Lỗi khi cập nhật số lượng mã khuyến mại:", error);
-                    });
+                        .then(response => {
+                            if (response.ok) {
+                                console.log("CCCD đã được xóa thành công.");
+                            } else {
+                                throw new Error('Không thể xóa CCCD');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi xóa CCCD:', error);
+                        });
+
+                    // Xóa CCCD từ bảng NguoiDiCung
+                    fetch(`/xoaTatCaCCCD/${idDatPhong}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                console.log("CCCD trong bảng NguoiDiCung đã được xóa thành công.");
+                            } else {
+                                throw new Error('Không thể xóa CCCD trong bảng NguoiDiCung');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi xóa CCCD trong bảng NguoiDiCung:', error);
+                        });
+
+                    // Gửi form sau khi các yêu cầu hoàn thành
+                    document.getElementById("formId").submit();
+                });
             }
-
-            // Xóa CCCD của đặt phòng
-            fetch(`/datphongs/xoaCCCD/${idDatPhong}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        console.log("CCCD đã được xóa thành công.");
-                    } else {
-                        throw new Error('Không thể xóa CCCD');
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi khi xóa CCCD:', error);
-                });
-
-            // Xóa CCCD từ bảng NguoiDiCung
-            fetch(`/xoaTatCaCCCD/${idDatPhong}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        console.log("CCCD trong bảng NguoiDiCung đã được xóa thành công.");
-                    } else {
-                        throw new Error('Không thể xóa CCCD trong bảng NguoiDiCung');
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi khi xóa CCCD trong bảng NguoiDiCung:', error);
-                });
-
-
-            // Gửi form sau khi các yêu cầu hoàn thành
-            document.getElementById("formId").submit();
         });
-
-
     }
 
 
 
-    // Hàm tính tổng tiền cần thanh toán (bao gồm phụ phí)
+
+    var isVoucherApplied = false; // Biến theo dõi voucher đã được chọn hay chưa
+    var isPhuPhiApplied = false; // Biến theo dõi phụ phí đã được áp dụng hay chưa
+
     function tinhTongTien() {
-        var tienPhuPhi = parseFloat(document.getElementById('tienPhuPhi').value) || 0;
-        var tongSoTien = parseFloat(document.getElementById('tienConLai').value) || 0;
+        var tienPhuPhi = parseFloat(document.getElementById('tienPhuPhi').value) || 0; // Phụ phí
+        var tienConLai = parseFloat(document.getElementById('tienConLai').value) || 0; // Số tiền còn lại
+
+
+        if (tienConLai <= 0) {
+            console.error("Số tiền gốc (tổng tiền còn lại) không hợp lệ!");
+            return;
+        }
 
         var voucherSelect = document.getElementById('voucherId');
         var selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
 
-        var giamGia = 0;
-        if (selectedOption.value) {
-            // Lấy mức giảm và loại giảm
+        var giamGia = 0; // Biến lưu giá trị giảm giá
+
+        // Kiểm tra nếu có voucher được chọn và chưa áp dụng voucher trước đó
+        if (selectedOption && selectedOption.value && !isVoucherApplied) {
             var mucGiam = parseFloat(selectedOption.getAttribute('data-muc-giam')) || 0;
-            var loaiGiamStr = selectedOption.getAttribute('data-loai-giam');
-            var loaiGiam = loaiGiamStr === "true";  // `true` cho phần trăm, `false` cho tiền mặt
+            var loaiGiam = selectedOption.getAttribute('data-loai-giam') === "true"; // Phần trăm hay số tiền
 
-            console.log("Mức giảm:", mucGiam);
-            console.log("Loại giảm:", loaiGiam);
-
-            // Tính giảm giá theo loại giảm
-            if (loaiGiam) { // Nếu là giảm theo phần trăm
-                giamGia = (mucGiam / 100) * tongSoTien;
-                console.log("Giảm giá theo phần trăm:", giamGia);
-            } else { // Nếu là giảm theo tiền mặt
-                giamGia = mucGiam;
-                console.log("Giảm giá theo tiền mặt:", giamGia);
+            if (loaiGiam) {
+                giamGia = (mucGiam / 100) * tienConLai; // Giảm giá theo phần trăm
+            } else {
+                giamGia = mucGiam; // Giảm giá theo số tiền
             }
 
-            // Đảm bảo giảm giá không vượt quá tổng tiền
-            giamGia = Math.min(giamGia, tongSoTien + tienPhuPhi);
+            isVoucherApplied = true;  // Đánh dấu voucher đã được áp dụng
         }
 
-        var tongTien = tongSoTien + tienPhuPhi - giamGia;
-        document.getElementById("tienConLai").value = tongTien.toFixed(2);
-        console.log("Tổng tiền sau giảm:", tongTien);
+        // Nếu không có voucher và phụ phí chưa được áp dụng, phụ phí có thể được cộng vào
+        if (!isVoucherApplied && !isPhuPhiApplied) {
+            isPhuPhiApplied = true; // Đánh dấu phụ phí đã được áp dụng
+        }
+
+        var tongTienSauGiam = Math.max(0, tienConLai - giamGia); // Tính tiền sau giảm giá
+
+        // Tính tổng tiền thanh toán
+        var tongTienThanhToan = isVoucherApplied ? tongTienSauGiam : tongTienSauGiam + (isPhuPhiApplied ? tienPhuPhi : 0);
+
+        document.getElementById("tienConLai").value = tongTienThanhToan.toFixed(0);
+
+
+        if (isVoucherApplied) {
+            document.getElementById('tienPhuPhi').disabled = true; // Vô hiệu hóa trường nhập phụ phí khi voucher được chọn
+        } else {
+            document.getElementById('tienPhuPhi').disabled = false; // Nếu không có voucher, trường phụ phí vẫn có thể nhập
+        }
+
+        // Disable trường voucher nếu voucher đã được chọn
+        if (isVoucherApplied) {
+            document.getElementById('voucherId').disabled = true; // Vô hiệu hóa trường chọn voucher khi đã chọn
+        } else {
+            document.getElementById('voucherId').disabled = false; // Nếu chưa chọn voucher, trường voucher vẫn có thể chọn
+        }
     }
 
 
 
 
-    document.getElementById('printInvoice').addEventListener('change', function() {
-        if (this.checked) {
-            console.log("Người dùng chọn in hóa đơn");
+
+
+
+
+    document.getElementById('confirmButton').addEventListener('click', function () {
+        const printInvoice = document.getElementById('printInvoice').checked;
+
+        if (printInvoice) {
+            console.log("Người dùng chọn in hóa đơn. Tải hóa đơn...");
+            taiHoaDon(idThanhToan); // Gọi hàm tải hóa đơn (đã định nghĩa ở trên)
         } else {
-            console.log("Người dùng không chọn in hóa đơn");
+            console.log("Người dùng không chọn in hóa đơn.");
         }
     });
+
+    // Hàm tải hóa đơn
+    function taiHoaDon(idThanhToan) {
+        fetch(`/download-invoice?id=${idThanhToan}`, {
+            method: 'GET'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Không thể tải hóa đơn.");
+                }
+                return response.blob();  // Chuyển đổi dữ liệu thành Blob
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob); // Tạo URL cho Blob
+                const a = document.createElement('a');  // Tạo thẻ <a>
+                a.style.display = 'none';  // Ẩn thẻ <a>
+                a.href = url;  // Đặt URL cho thẻ <a>
+                a.download = 'invoice.pdf';  // Tên file khi tải về
+                document.body.appendChild(a);
+                a.click();  // Mô phỏng click vào thẻ <a> để tải file
+                window.URL.revokeObjectURL(url);  // Hủy URL sau khi sử dụng
+                document.body.removeChild(a);  // Xóa thẻ <a> khỏi DOM
+            })
+            .catch(error => {
+                console.error("Lỗi khi tải hóa đơn:", error);  // Xử lý lỗi
+            });
+    }
+
+
+
+
 
     // function generateQR(showQR) {
     //     var qrCodeDiv = document.getElementById("qrCode");
