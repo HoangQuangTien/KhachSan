@@ -254,11 +254,23 @@ public class PhongService {
     }
 
 
-    // Lấy danh sách phòng có sẵn với số người tối đa của loại phòng
-    public List<Phong> getAvailableRoomsWithMaxGuests(LocalDateTime startDate, LocalDateTime endDate, Integer soNguoi, Integer soPhong) {
-        return phongRepository.findAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi, soPhong);
-    }
+    // Phương thức lấy phòng có sẵn cho ngày nhận phòng và trả phòng, và số người yêu cầu
+    public List<Phong> getAvailableRoomsWithMaxGuests(LocalDateTime startDate, LocalDateTime endDate, int soNguoi, int soPhong) {
+        // Lấy danh sách phòng có sẵn trong khoảng thời gian
+        List<Phong> availableRooms = phongRepository.findAvailableRooms(startDate, endDate);
 
+        // Lọc phòng theo số người tối đa mà phòng có thể chứa
+        List<Phong> filteredRooms = availableRooms.stream()
+                .filter(room -> room.getLoaiPhong().getSoNguoiToiDa() >= soNguoi)  // Kiểm tra phòng có thể chứa số khách yêu cầu
+                .collect(Collectors.toList());
+
+        // Nếu có yêu cầu về số phòng, lọc thêm số phòng cần thiết
+        if (filteredRooms.size() > soPhong) {
+            return filteredRooms.subList(0, soPhong); // Lấy đúng số phòng yêu cầu
+        }
+
+        return filteredRooms;
+    }
 
 }
 

@@ -781,6 +781,7 @@ public class KhachHangDD {
     }
 
 
+
     @GetMapping("/search1")
     public String searchRooms(@RequestParam("ngayNhan") String ngayNhan,
                               @RequestParam("ngayTra") String ngayTra,
@@ -792,20 +793,100 @@ public class KhachHangDD {
         LocalDateTime endDate = LocalDateTime.parse(ngayTra);
 
         // Lấy danh sách phòng có sẵn theo số người tối đa của loại phòng
-        List<Phong> availableRooms = phongService.getAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi,soPhong);
+        List<Phong> availableRooms = phongService.getAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi, soPhong);
+
+        // Kiểm tra nếu có đủ số phòng và phòng còn trống
+        if (availableRooms.size() < soPhong) {
+            model.addAttribute("message", "Không đủ phòng để đáp ứng yêu cầu.");
+            return "list/KhachHang/tim"; // Tên view trả về khi không đủ phòng
+        }
+
+        // Ghép phòng cho khách
+        List<RoomGroup> roomGroups = groupRoomsForGuests(availableRooms, soNguoi, soPhong);
 
         // Chuyển danh sách phòng thành chuỗi
-        // Tạo chuỗi các ID phòng
         String rooms = availableRooms.stream()
                 .map(phong -> String.valueOf(phong.getIdPhong())) // Đảm bảo getId trả về Integer
                 .collect(Collectors.joining(","));
 
         // Thêm dữ liệu vào model để trả về view
-        model.addAttribute("availableRooms", availableRooms);
+        model.addAttribute("roomGroups", roomGroups);
         model.addAttribute("soPhong", soPhong);
         model.addAttribute("soNguoi", soNguoi);
         model.addAttribute("rooms", rooms);
 
         return "list/KhachHang/tim"; // Tên view trả về (có thể là searchResults.html)
     }
+
+    private List<RoomGroup> groupRoomsForGuests(List<Phong> availableRooms, int soNguoi, int soPhong) {
+        List<RoomGroup> roomGroups = new ArrayList<>();
+        int peopleRemaining = soNguoi;
+
+        // Lọc các phòng có thể chứa số lượng khách yêu cầu (phòng phải đủ chỗ cho ít nhất một người)
+        List<Phong> availableRoomsToUse = availableRooms.stream()
+                .filter(room -> room.getLoaiPhong().getSoNguoiToiDa() >= 1) // Phòng có sức chứa
+                .collect(Collectors.toList());
+
+        // Kiểm tra tổng sức chứa các phòng có đủ cho số khách yêu cầu không
+        int totalCapacity = availableRoomsToUse.stream()
+                .mapToInt(room -> room.getLoaiPhong().getSoNguoiToiDa())
+                .sum();
+
+        if (totalCapacity < soNguoi) {
+            // Nếu không đủ phòng, thông báo hoặc trả về kết quả thất bại
+            System.out.println("Không đủ phòng để chứa hết số khách yêu cầu.");
+            return Collections.emptyList();  // Hoặc trả về thông báo lỗi thích hợp
+        }
+
+        while (peopleRemaining > 0 && roomGroups.size() < soPhong) {
+            List<Phong> roomGroup = new ArrayList<>();
+            int roomCapacity = 0;
+            String roomType = null;
+
+            // Thêm phòng vào nhóm cho đến khi đủ số khách
+            Iterator<Phong> iterator = availableRoomsToUse.iterator();
+            while (iterator.hasNext() && peopleRemaining > 0) {
+                Phong room = iterator.next();
+                int roomMaxCapacity = room.getLoaiPhong().getSoNguoiToiDa();
+
+                if (roomCapacity + roomMaxCapacity <= peopleRemaining) {
+                    roomGroup.add(room);
+                    roomCapacity += roomMaxCapacity;
+                    peopleRemaining -= roomMaxCapacity;
+                    roomType = room.getLoaiPhong().getTenLoaiPhong(); // Gán loại phòng
+                    iterator.remove();  // Xóa phòng đã dùng khỏi danh sách
+                }
+            }
+
+            // Nếu nhóm phòng đã đủ, thêm vào danh sách
+            if (!roomGroup.isEmpty()) {
+                RoomGroup group = new RoomGroup(roomGroup, roomType, roomGroup.size());
+                roomGroups.add(group);
+            }
+
+            // Nếu đã đủ số phòng yêu cầu, thoát khỏi vòng lặp
+            if (roomGroups.size() >= soPhong) {
+                break;
+            }
+        }
+
+        // Kiểm tra nếu còn khách mà không đủ phòng
+        if (peopleRemaining > 0) {
+            System.out.println("Không đủ phòng để chứa hết số khách yêu cầu.");
+            return Collections.emptyList(); // Trả về danh sách trống hoặc có thể xử lý khác
+        }
+
+        // Cập nhật số lượng phòng vào roomGroup
+        for (RoomGroup roomGroup : roomGroups) {
+            roomGroup.setQuantity(roomGroup.getQuantity());  // Đảm bảo rằng `setQuantity()` sẽ lưu lại số phòng trong nhóm
+        }
+
+        return roomGroups;
+    }
+
+
+
+
+
+
 }

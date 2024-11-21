@@ -26,10 +26,7 @@ public class DanhGiaImp implements DanhGiaService {
 
     @Override
     public List<DanhGiaDTO> getDanhGiaByPhong(Integer idPhong) {
-        // Lấy danh sách đánh giá từ repository theo id phòng
         List<DanhGia> danhGiaList = danhGiaRepo.findByPhong_IdPhong(idPhong);
-
-        // Chuyển đổi từ entity DanhGia sang DTO DanhGiaDTO
         return danhGiaList.stream()
                 .map(danhGia -> new DanhGiaDTO(
                         danhGia.getIdDanhGia(),

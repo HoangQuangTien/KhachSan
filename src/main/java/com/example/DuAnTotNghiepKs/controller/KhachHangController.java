@@ -1,13 +1,14 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.example.DuAnTotNghiepKs.DTO.DatPhongDTO;
 import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
+import com.example.DuAnTotNghiepKs.entity.LichSuDatPhong;
+import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
+import com.example.DuAnTotNghiepKs.repository.LichSuDatPhongRepo;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
 import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.DuAnTotNghiepKs.DTO.DiaChiKhachHangDTO;
@@ -49,6 +46,13 @@ public class KhachHangController {
 
     @Autowired
     private DatPhongService datPhongService;
+
+    @Autowired
+    private DatPhongRepo datPhongRepo;
+
+    @Autowired
+    private LichSuDatPhongRepo lichSuDatPhongRepo;
+//
 //    @Autowired
 //    private DatPhongService ;
 
@@ -129,22 +133,34 @@ public class KhachHangController {
     @GetMapping("/khach-hang/trang-ca-nhan")
     public String trangcanhan(Model model) {
         TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
+
         if (taiKhoanDTO != null && taiKhoanDTO.getKhachHangDTO() != null
                 && taiKhoanDTO.getKhachHangDTO().getHoVaTen() != null) {
+
+            // Lấy thông tin khách hàng và địa chỉ
             model.addAttribute("user", taiKhoanDTO.getKhachHangDTO());
+
             List<DiaChiKhachHangDTO> listDiaChiKhachHangDTO = diaChiKhachHangService
                     .findById(taiKhoanDTO.getKhachHangDTO().getId());
-            List<DatPhongDTO> listDatPhongDTO = datPhongService.findByKhachHang_Id(taiKhoanDTO.getKhachHangDTO().getId());
+
+            List<DatPhongDTO> listDatPhongDTO = datPhongService.findByKhachHang_Id(taiKhoanDTO.getKhachHangDTO().getId()); // Phòng đã check-in
+            List<DatPhongDTO> listDatPhongDTO1 = datPhongService.findByKhachHang_Id12(taiKhoanDTO.getKhachHangDTO().getId()); // Phòng chưa check-in
+
+            // Cập nhật thông tin địa chỉ khách hàng, nếu có
             if (listDiaChiKhachHangDTO.size() > 0) {
                 model.addAttribute("userDC", listDiaChiKhachHangDTO.get(0));
             } else {
                 model.addAttribute("userDC", new DiaChiKhachHangDTO());
             }
-            model.addAttribute("listDatPhong", listDatPhongDTO);
+
+            // Truyền dữ liệu vào mô hình để hiển thị
+            model.addAttribute("listDatPhong", listDatPhongDTO);  // Phòng đã check-in
+            model.addAttribute("listDatPhongDTO1", listDatPhongDTO1);  // Phòng chưa check-in
         } else {
-            return "redirect:/login";
+            return "redirect:/login";  // Nếu người dùng không đăng nhập, chuyển hướng đến trang login
         }
-        return "list/KhachHang/trangcanhan";
+
+        return "list/KhachHang/trangcanhan";  // Trả về trang cá nhân của khách hàng
     }
 
 
@@ -210,6 +226,35 @@ public class KhachHangController {
 //    }
 
 
+
+    @PostMapping("/khach-hang/huy-phong/{idDatPhong}")
+    public String huyPhong(@PathVariable Integer idDatPhong, @RequestParam String lyDoHuy) {
+        // Kiểm tra sự tồn tại của mã đặt phòng
+        Optional<DatPhong> datPhongOpt = datPhongRepo.findById(idDatPhong);
+        if (!datPhongOpt.isPresent()) {
+            return "redirect:/khach-hang/trang-ca-nhan?error=PhongKhongTonTai"; // Nếu không tìm thấy phòng
+        }
+
+        DatPhong datPhong = datPhongOpt.get();
+
+        // Kiểm tra nếu phòng đã hủy
+        if ("Đã Hủy".equals(datPhong.getTinhTrang())) {
+            return "redirect:/khach-hang/trang-ca-nhan?error=PhongDaBiHuy"; // Nếu phòng đã hủy
+        }
+
+        // Cập nhật trạng thái phòng thành "Đã Hủy"
+        datPhong.setTinhTrang("Đã Hủy");
+        datPhongRepo.save(datPhong);
+
+        // Lưu thông tin lịch sử hủy phòng
+        LichSuDatPhong lichSu = new LichSuDatPhong();
+        lichSu.setDatPhong(datPhong);
+        lichSu.setThoiGianThayDoi(new Date());
+        lichSu.setChiTietThayDoi("Phòng: " + datPhong.getPhong().getTenPhong() + " đã hủy. Lý do: " + lyDoHuy);  // Lý do hủy
+        lichSuDatPhongRepo.save(lichSu);
+
+        return "redirect:/khach-hang/trang-ca-nhan?success=PhongDaHuy"; // Trả về trang cá nhân sau khi hủy phòng thành công
+    }
 
 
 }

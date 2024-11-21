@@ -89,6 +89,13 @@ public interface DatPhongService {
 
     List<DatPhongDTO> findByKhachHang_Id(Integer id);
 
+    List<DatPhongDTO> findByKhachHang_Id1(Integer id);
+
+
+    List<DatPhongDTO> findByKhachHang_Id12(Integer id);
+
+    DatPhong findById1(Integer id);
+
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();

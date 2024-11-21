@@ -425,6 +425,33 @@ public class DatPhongServiceImp implements DatPhongService {
             dto.setTenPhong(phongRepository.findById(datPhong.getPhong().getIdPhong()).get().getTenPhong());
             dto.setNgayNhanPhong(datPhong.getNgayNhan());
             dto.setNgayTraPhong(datPhong.getNgayTra());
+            dto.setTongTien(datPhong.getTongTien());
+            dto.setTinhTrang(datPhong.getTinhTrang());
+            dto.setTrangThai(datPhong.getTrangThai());
+            listDatPhongDTO.add(dto);
+        }
+
+        return listDatPhongDTO;
+    }
+
+
+    @Override
+    public List<DatPhongDTO> findByKhachHang_Id1(Integer id) {
+        // Lấy danh sách entity từ repository
+        List<DatPhong> listDatPhongs = datPhongRepository.findByKhachHang_IdAndTinhTrang(id,"Đã Checkin");
+
+        if (listDatPhongs.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<DatPhongDTO> listDatPhongDTO = new ArrayList<>();
+        for (DatPhong datPhong : listDatPhongs) {
+            DatPhongDTO dto = new DatPhongDTO();
+            // Thêm idDatPhong vào DTO
+            dto.setIdDatPhong(datPhong.getIdDatPhong());  // Gán idDatPhong vào DTO
+            dto.setTenPhong(phongRepository.findById(datPhong.getPhong().getIdPhong()).get().getTenPhong());
+            dto.setNgayNhanPhong(datPhong.getNgayNhan());
+            dto.setNgayTraPhong(datPhong.getNgayTra());
             dto.setTienConLai(datPhong.getTienConLai());
             dto.setTinhTrang(datPhong.getTinhTrang());
             dto.setTrangThai(datPhong.getTrangThai());
@@ -434,4 +461,36 @@ public class DatPhongServiceImp implements DatPhongService {
         return listDatPhongDTO;
     }
 
+    @Override
+    public List<DatPhongDTO> findByKhachHang_Id12(Integer id) {
+        // Lấy danh sách entity từ repository
+        List<DatPhong> listDatPhongs = datPhongRepository.findByKhachHang_IdAndTinhTrang(id,"Chưa Checkin");
+
+        if (listDatPhongs.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<DatPhongDTO> listDatPhongDTO = new ArrayList<>();
+        for (DatPhong datPhong : listDatPhongs) {
+            DatPhongDTO dto = new DatPhongDTO();
+            // Thêm idDatPhong vào DTO
+            dto.setIdDatPhong(datPhong.getIdDatPhong());  // Gán idDatPhong vào DTO
+            dto.setTenPhong(phongRepository.findById(datPhong.getPhong().getIdPhong()).get().getTenPhong());
+            dto.setNgayNhanPhong(datPhong.getNgayNhan());
+            dto.setNgayTraPhong(datPhong.getNgayTra());
+            dto.setTienConLai(datPhong.getTienConLai());
+            dto.setTinhTrang(datPhong.getTinhTrang());
+            dto.setTrangThai(datPhong.getTrangThai());
+            listDatPhongDTO.add(dto);
+        }
+
+        return listDatPhongDTO;
+    }
+
+    @Override
+    public DatPhong findById1(Integer id) {
+        // Trả về DatPhong nếu tìm thấy, hoặc null nếu không tìm thấy
+        Optional<DatPhong> datPhong = datPhongRepository.findById(id);
+        return datPhong.orElse(null);
+    }
 }

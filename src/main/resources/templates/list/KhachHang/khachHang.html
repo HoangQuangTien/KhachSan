@@ -7,6 +7,12 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
 
     <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/styleKH.css}"/>
@@ -263,23 +269,20 @@
 <!-- Header Section -->
 <div class="container-fluid p-0 position-relative">
     <!-- Background Image -->
-    <!-- Carousel -->
-    <div id="carouselExample" class="carousel slide" data-ride="carousel" data-interval="2000">
+    <div id="carouselExample" class="carousel slide carousel-fade" data-ride="carousel" data-interval="2000">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img th:src="@{/img/296817374_1015897554.jpg}" class="d-block w-100" alt="Slide 1"
-                     style="height: 100vh; object-fit: cover;">
+                <img th:src="@{/img/296817374_1015897554.jpg}" class="d-block w-100" alt="Slide 1">
             </div>
             <div class="carousel-item">
-                <img th:src="@{/img/phong-khach-san-dep-de-chup-anh-o-ha-noi-3.jpg}" class="d-block w-100" alt="Slide 2"
-                     style="height: 100vh; object-fit: cover;">
+                <img th:src="@{/img/anhnenkh.jpg}" class="d-block w-100" alt="Slide 2">
             </div>
             <div class="carousel-item">
-                <img th:src="@{/img/anhPhongKS1.jpg}" class="d-block w-100" alt="Slide 3"
-                     style="height: 100vh; object-fit: cover;">
+                <img th:src="@{/img/anhPhongKS1.jpg}" class="d-block w-100" alt="Slide 3">
             </div>
         </div>
     </div>
+
 
     <img th:src="@{/img/logo-Photoroom.png}" class="logo position-absolute" alt="">
     <!-- Overlay content -->
@@ -365,26 +368,32 @@
         </div>
 
         <div class="Home-button-container d-flex align-items-center position-absolute top-0 end-0 m-3">
-            <!-- Trang Chủ -->
-            <a href="/khach-hang" class="text-link mb-2 p-2">Trang Chủ</a>
-            <!-- Giới Thiệu -->
-            <a href="/about" class="text-link mb-2 p-2">Giới Thiệu</a>
-            <!-- Hạng Phòng -->
-            <div class="room-class-container">
-                <div id="room-classes-button" class="text-link mb-2 p-2" style="cursor: pointer;">Hạng Phòng</div>
-                <ul id="room-class-list" class="dropdown-menu" style="list-style: none; padding: 0; margin: 0;">
-                    <li data-loai-phong-id="1">Standard</li>
-                    <li data-loai-phong-id="2">Superior</li>
-                    <li data-loai-phong-id="3">Family suite</li>
-                    <li data-loai-phong-id="4">Deluxe</li>
-                </ul>
-            </div>
-
-
-            <!--            &lt;!&ndash; Liên Hệ &ndash;&gt;-->
-            <!--            <a href="javascript:void(0)" class="text-link mb-2 p-2" onclick="loadPageLienHe('list/KhachHang/lienHe.html')">Liên hệ</a>-->
-
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs custom-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase fw-bold " id="tab-trangchu" data-bs-toggle="tab" href="#Trangchu">
+                        <i class="fas fa-home me-2"></i>Trang Chủ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase fw-bold" id="tab-hethongphong" data-bs-toggle="tab" href="#hethongphong">
+                        <i class="fas fa-bed me-2"></i>Hệ Thống Phòng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase fw-bold" id="tab-gioithieu" data-bs-toggle="tab" href="#gioiThieu">
+                        <i class="fas fa-info-circle me-2"></i>Giới Thiệu
+                    </a>
+                </li>
+                <!-- New "Quy tắc" Tab -->
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase fw-bold" id="tab-quytac" data-bs-toggle="tab" href="#quyTac">
+                        <i class="fas fa-gavel me-2"></i>Quy Tắc
+                    </a>
+                </li>
+            </ul>
         </div>
+
 
         <!-- Các nút chọn ngôn ngữ -->
         <div class="language-buttons d-flex top-0 end-0">
@@ -407,7 +416,637 @@
 
 </div>
 
-<div></div>
+<!-- Tab Content -->
+<div class="tab-content p-3">
+    <div class="tab-pane fade show active" id="Trangchu" role="tabpanel" aria-labelledby="tab-trangchu">
+        <div class="eco-garden-description">
+            <h2>Đánh thức mọi giác quan của bạn tại DragonBall Hotel</h2>
+            <p style="font-size: 1rem; color: #555; line-height: 1.6; white-space: normal; text-align: center;">
+                Khách sạn Dragon Ball Hotel với các phòng ngủ được xây dựng theo phong cách hiện đại phương tây. <br>
+                mỗi phòng được bố trí đón ánh sáng và gió biển thổi vào rất thoáng mát<br>
+                Đội ngũ nhân viên phục vụ là người địa phương rất thân thiện và được đào tạo chuyên nghiệp để phục vụ cho quý khách.
+            </p>
+
+
+            <div class="features">
+                <p><i class="fas fa-hotel"></i> Khách sạn sang trọng tại trung tâm thành phố</p>
+                <p><i class="fas fa-location-arrow"></i> Vị trí thuận tiện gần các điểm du lịch</p>
+                <p><i class="fas fa-concierge-bell"></i> Dịch vụ hoàn hảo và tiện nghi hiện đại</p>
+            </div>
+        </div>
+
+
+        <!--Vùng để load phòng-->
+        <div id="top-phong" class="top-phong">
+            <h1 class="top-phong-title">Phòng nổi bật</h1>
+            <div id="loadPhongCustermoContainer" class="phong-list">
+                <!-- Các phòng sẽ được load vào đây bởi JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+    <div class="tab-pane fade" id="hethongphong" role="tabpanel" aria-labelledby="tab-hethongphong">
+        <h3>Hệ Thống Phòng</h3>
+        <p>Thông tin về hệ thống phòng.</p>
+        <div class="row mt-4 g-4">
+            <div th:each="phong : ${phongTrong}" class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card border-0 shadow h-100" th:classappend="${phong.trangThai ? 'border-success' : 'border-danger'}">
+                    <!-- Image Section -->
+                    <div class="position-relative overflow-hidden">
+                <span th:text="${phong.trangThai ? 'Còn trống' : 'Đã đặt'}"
+                      class="badge position-absolute top-0 start-0 p-2 text-white"
+                      th:classappend="${phong.trangThai ? 'bg-success' : 'bg-danger'}"></span>
+                        <img th:src="${phong.img}" class="card-img-top" alt="Ảnh phòng của ${phong.tenPhong}"
+                             style="object-fit: cover; height: 200px;">
+                    </div>
+                    <!-- Information Section -->
+                    <div class="card-body d-flex flex-column bg-white rounded">
+                        <h5 class="card-title text-truncate mb-2" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}"
+                            style="font-size: 1.1rem; font-weight: bold; color: #333;"></h5>
+                        <p class="card-text mb-1 text-muted">
+                            <strong>Giá: </strong>
+                            <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
+                        </p>
+                        <p class="card-text mb-1 text-muted">
+                            <i class="fas fa-users me-2"></i>
+                            <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span> người
+                        </p>
+                        <p class="card-text text-muted mb-3" style="font-size: 0.9rem;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span th:text="${phong.moTa}"></span>
+                        </p>
+                        <div class="mt-auto">
+                            <a th:href="@{/view-dat-phong(roomId=${phong.idPhong})}" class="btn btn-success w-100 d-flex align-items-center justify-content-center shadow-sm">
+                                <i class="fas fa-bed me-2"></i> Đặt phòng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="tab-pane fade" id="gioiThieu" role="tabpanel" aria-labelledby="tab-gioithieu">
+
+        <style>
+            .loi-noi-dau {
+                font-family: 'Pacifico', cursive; /* Font chữ */
+                font-size: 38px; /* Kích thước chữ */
+                color: red;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            }
+            .content {
+                max-width: 800px; /* Chiều rộng tối đa */
+                margin: auto; /* Căn giữa */
+                background-color: white; /* Màu nền của nội dung */
+                padding: 20px; /* Khoảng cách bên trong */
+                border-radius: 8px; /* Bo góc */
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+            }
+            h1 {
+                text-align: center; /* Căn giữa tiêu đề */
+                color: #333; /* Màu tiêu đề */
+            }
+            p {
+                line-height: 1.6; /* Khoảng cách giữa các dòng */
+                color: #555; /* Màu chữ */
+            }
+            .highlight {
+                color: red; /* Màu nổi bật */
+                font-weight: bold; /* Đậm */
+            }
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+                text-align: center;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+                color: #333;
+                margin-bottom: 30px;
+            }
+
+            .services {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 20px;
+            }
+
+            .service-item {
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                width: 23%;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                text-align: left;
+            }
+
+            .service-item img {
+                width: 40px;
+                margin-bottom: 10px;
+            }
+
+            .service-item h3 {
+                font-size: 1.2em;
+                color: #ff5722;
+                margin: 10px 0;
+            }
+
+            .service-item p {
+                font-size: 0.9em;
+                color: #666;
+
+            }
+
+            .image-container {
+                margin-top: 40px;
+            }
+
+            .image-container img {
+                width: 100%;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            .currency {
+                font-size: 20px;
+                color: #000;
+            }
+            .service-icon {
+                width: 40px;
+                margin-bottom: 10px;
+                transition: transform 0.3s ease; /* Thêm hiệu ứng chuyển động */
+            }
+
+            .service-item:hover .service-icon {
+                transform: scale(2);
+                .service-item img {
+                    width: 40px; /* Kích thước ban đầu */
+                    margin-bottom: 10px;
+                    transition: transform 0.3s ease; /* Hiệu ứng chuyển động */
+                }
+
+                .service-item:hover img {
+                    transform: scale(2); /* Phóng to 150% khi di chuột qua */
+                }
+            }
+
+
+
+        </style>
+        <div id="wrapper">
+
+            <div id="banner">
+                <div class="content">
+                    <h2>
+                        <span>GIỚI THIỆU</span>
+                        <br>
+                        <span>KHÁCH SẠN DRAGONBALL</span>
+                    </h2>
+                    <p>Chào mừng bạn đến với DragonBall Hotel, nơi lý tưởng cho sự tiện nghi và sự ấm cúng.</p>
+                    <button class="btn-primary">Đặt phòng ngay</button>
+                </div>
+                <div class="images">
+                    <img src="assetsKhachHang/2.jpg" alt="Khách sạn view 1">
+                    <img src="assetsKhachHang/1.jpg" alt="Khách sạn view 2">
+                    <img src="assetsKhachHang/3.jpg" alt="Khách sạn view 3">
+                </div>
+            </div>
+
+            <br>
+            <br>
+            <div class="tab-content">
+                <h1 class="loi-noi-dau">LỜI NÓI ĐẦU</h1>
+                <div class="content">
+
+                    <p>Tôi tự hào <span class="highlight">khách sạn của chúng tôi</span> là khách sạn tốt nhất Bắc Từ Liêm từ năm 2020. Khách sạn của chúng tôi đã có mặt hơn 5 năm.</p>
+
+                    <p>Khách sạn DragonBall Hotel được trang trí độc đáo theo phong cách Châu Á tiêu chuẩn 3 sao, nằm ngay trên đường Trịnh Văn Bô - Nam Từ Liêm. Chúng tôi kết hợp chiến lược kinh doanh với hơn 20 năm kinh nghiệm trong ngành khách sạn, đồng thời nắm bắt các cơ hội và kênh phân phối mới để mở rộng công nghệ internet cho khách sạn nhằm cung cấp cho những người tiêu dùng quyền truy cập trực tiếp, dễ dàng.</p>
+
+                    <p>Du khách đến khách sạn đi công tác hay giải trí chắc chắn sẽ ấn tượng bởi sự hiếu khách, phục vụ chuyên nghiệp và tiện nghi với phương châm của khách sạn: "<span class="highlight">Tinh thần hiếu khách của người Việt Nam</span>".</p>
+                </div>
+
+
+            </div>
+
+            <div id="facilities">
+                <h2 class="section-title">CÁC TIỆN NGHI CỦA KHÁCH SẠN</h2>
+                <div class="facility-items">
+                    <div class="item">
+                        <img src="assetsKhachHang/images.jpg" alt="Hồ bơi hiện đại">
+                        <h3>Hồ bơi</h3>
+                        <p>Được thiết kế hiện đại, nước trong xanh và không gian thư giãn tuyệt vời.</p>
+                    </div>
+                    <div class="item">
+                        <img src="assetsKhachHang/8.jpg" alt="Phòng gym thoáng mát">
+                        <h3>Phòng tập gym</h3>
+                        <p>Không gian tập luyện chuyên nghiệp với thiết bị hiện đại.</p>
+                    </div>
+                    <!-- Thêm các mục khác tương tự -->
+                </div>
+            </div>
+
+            <div class="container">
+                <h1>DỊCH VỤ CHÚNG TÔI CUNG CẤP</h1>
+                <div class="services">
+                    <div class="service-item">
+                        <img class="service-icon" src="assetsKhachHang/giaca.png" alt="Giá Bình Dân">
+
+                        <h3>GIÁ BÌNH DÂN</h3>
+                        <p>Khách sạn DragonBall có giá bình dân nhưng dịch vụ và chất lượng phục vụ luôn đạt tiêu chuẩn 3*</p>
+                    </div>
+                    <div class="service-item">
+                        <img class="service-icon" src="assetsKhachHang/trungtam.png" alt="Trung Tâm">
+                        <h3>TRUNG TÂM</h3>
+                        <p>Tọa lạc tại nằm ngay trên đường Trịnh Văn Bô - Nam Từ Liêm</p>
+                    </div>
+                    <div class="service-item">
+                        <img class="service-icon" src="assetsKhachHang/ks.png" alt="Cổ Điển">
+                        <h3>THIẾT KẾ</h3>
+                        <p>Phong cách sang trọng thiết kế cổ điển và sang trọng, sẽ mang cho quý khách những cảm giác thân thuộc thoải mái.</p>
+                    </div>
+                    <div class="service-item">
+                        <img class="service-icon" src="assetsKhachHang/phucvu.jpg" alt="Phục Vụ">
+                        <h3>PHỤC VỤ</h3>
+                        <p>Bạn sẽ được trải nghiệm những dịch vụ: phục vụ bữa sáng, dọn dẹp phòng, giặt ủi, chăn-ga-gối-đệm...</p>
+                    </div>
+                </div>
+                <div class="image-container">
+                    <img src="assetsKhachHang/off.png" alt="Room Image">
+                </div>
+            </div>
+            <div id="saleoff">
+                <div class="box-left">
+                    <h1>
+                        <span>GIẢM GIÁ PHÒNG LÊN ĐẾN</span>
+                        <span>45%</span>
+                    </h1>
+                </div>
+                <div class="box-right"></div>
+            </div>
+
+            <div id="comment">
+                <h2>NHẬN XÉT CỦA KHÁCH HÀNG</h2>
+                <div id="comment-body">
+                    <div class="prev">
+                        <a href="#">
+                            <img src="assetsKhachHang/prev.png" alt="">
+                        </a>
+                    </div>
+                    <ul id="list-comment">
+                        <li class="item">
+                            <div class="avatar">
+                                <img src="assetsKhachHang/sep.png" alt="">
+
+                            </div>
+                            <div class="stars">
+                            <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                            </div>
+                            <div class="name">Nguyễn Đình Vũ</div>
+
+                            <div class="highlight-text">
+                                <p>Dịch vụ tận tình: Khách sạn được đánh giá
+                                    cao về sự phục vụ chu đáo của nhân viên. Du khách cảm thấy
+                                    được chào đón và hỗ trợ nhiệt tình trong suốt thời gian lưu trú.</p>
+                            </div>
+                        </li>
+                        <li class="item">
+                            <div class="avatar">
+                                <img src="assetsKhachHang/son.jpg" alt="">
+
+                            </div>
+                            <div class="stars">
+                            <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                            </div>
+                            <div class="name">Trần Ngọc Sơn</div>
+
+                            <div class="highlight-text">
+                                <p>Bữa sáng ngon miệng: Du khách thường khen ngợi
+                                    bữa sáng tại khách sạn với sự đa dạng và hương vị
+                                    thơm ngon, giúp họ bắt đầu ngày mới tràn đầy năng lượng.</p>
+                            </div>
+                        </li>
+                        <li class="item">
+                            <div class="avatar">
+                                <img src="assetsKhachHang/4.jpg" alt="">
+
+                            </div>
+                            <div class="stars">
+                            <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                                <span>
+                                <img src="assetsKhachHang/star.png" alt="">
+                            </span>
+                            </div>
+                            <div class="name">Nguyễn Trần Vi</div>
+
+                            <div class="highlight-text">
+                                <p>Phòng ốc sạch sẽ: Nhiều nhận xét tích cực
+                                    về sự sạch sẽ và thoải mái của phòng, với
+                                    đầy đủ tiện nghi cần thiết cho một kỳ nghỉ dễ chịu.</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="next">
+                        <a href="#">
+                            <img src="assetsKhachHang/next.png" alt="">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="footer">
+                <div class="box">
+                    <div class="logo">
+                        <img src="/assetsKhachHang/logo.png" alt="">
+                    </div>
+
+                </div>
+                <div class="box">
+                    <ul class="quick-menu">
+                        <li class="item">
+                            <a href="/khach-hang" class="home-button">Trang chủ</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="box">
+                    <h3>LIÊN HỆ</h3>
+                    <form action="">
+                        <input type="text" placeholder="Địa chỉ email">
+                        <button>Nhận tin</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="quyTac" role="tabpanel" aria-labelledby="tab-quytac">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+            }
+
+            .terms-container {
+                max-width: 1200px;
+                margin: 50px auto;
+                padding: 20px;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .terms-container h2 {
+                font-size: 30px;
+                color: #333;
+                margin-bottom: 20px;
+            }
+
+            .terms-container h6 {
+                font-size: 18px;
+                color: #666;
+                line-height: 1.8;
+            }
+
+            .highlight {
+                font-weight: bold;
+                color: #2e8b57;
+            }
+
+            .terms-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 30px;
+                font-size: 16px;
+            }
+
+            .terms-table th,
+            .terms-table td {
+                padding: 12px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+
+            .terms-table th {
+                background-color: #f2f2f2;
+                color: #333;
+                text-align: center;
+            }
+
+            .terms-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            .terms-table tr:hover {
+                background-color: #f1f1f1;
+            }
+
+            .terms-table td {
+                vertical-align: top;
+            }
+
+            .terms-table b {
+                color: #333;
+            }
+
+            .terms-table .section-title {
+                font-size: 20px;
+                font-weight: bold;
+                color: #333;
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            .terms-table .note {
+                color: #555;
+                font-style: italic;
+            }
+
+            .highlight-text {
+                color: #2e8b57;
+            }
+
+        </style>
+
+        <div class="terms-container">
+            <h2>Điều khoản và Điều kiện</h2>
+            <h6>
+                Website này thuộc quyền sở hữu và quản lý của khách sạn và dịch vụ <span class="highlight">DragonBall Hotel</span>.
+                Khi truy cập và sử dụng website này, bạn đồng ý rằng đã đọc, hiểu các <span class="highlight">điều kiện</span> và
+                <span class="highlight">điều khoản</span> dưới đây. Chính vì vậy, bạn cần đọc rõ và sử dụng tiếp.
+            </h6>
+
+            <table class="terms-table">
+                <thead>
+                <tr>
+                    <th colspan="2" class="section-title">1. Điều khoản chung:</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>1.1.</b> Đồng ý với các <span class="highlight">điều khoản sử dụng:</span></td>
+                    <td>
+                        Khi sử dụng Website <span class="highlight">DragonBall Hotel</span> (sau đây gọi tắt là “<span class="highlight">Website</span>”),
+                        Quý khách đã mặc nhiên chấp thuận các <span class="highlight">điều khoản</span> và
+                        <span class="highlight">điều kiện sử dụng</span> (sau đây gọi tắt là “<span class="highlight">Điều khoản Sử dụng</span>”) được quy định dưới đây.
+                        Để biết được các sửa đổi mới nhất, Quý khách nên thường xuyên kiểm tra lại “<span class="highlight">Điều khoản Sử dụng</span>”.
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>1.2.</b> Các thông tin hiển thị:</td>
+                    <td>
+                        Các nội dung hiển thị trên <span class="highlight">Website</span> nhằm mục đích cung cấp thông tin về dịch vụ khách sạn, bao gồm thông tin về các
+                        <span class="highlight">loại phòng</span>, <span class="highlight">tiện nghi</span>, các chương trình <span class="highlight">khuyến mãi</span>,
+                        và các <span class="highlight">điều khoản sử dụng</span>.
+                    </td>
+                </tr>
+                </tbody>
+
+                <thead>
+                <tr>
+                    <th colspan="2" class="section-title">2. Quy tắc khách sạn:</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>2.1.</b> Khi khách muốn <span class="highlight">hủy phòng</span></td>
+                    <td>Khách sẽ phải chịu <span class="highlight">mất toàn bộ tiền cọc</span>.</td>
+                </tr>
+                <tr>
+                    <td><b>2.2.</b> Khi khách đi theo đoàn muốn đặt nhiều phòng</td>
+                    <td>Vui lòng <span class="highlight">liên hệ với khách sạn</span> để đặt phòng.</td>
+                </tr>
+                <tr>
+                    <td><b>2.3.</b> Khi khách muốn <span class="highlight">đổi phòng</span></td>
+                    <td>Vui lòng liên hệ với khách sạn để được tư vấn.</td>
+                </tr>
+                <tr>
+                    <td><b>2.4.</b> <span class="highlight">Nghiêm cấm</span> nấu ăn hoặc giặt giũ trong phòng.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.5.</b> Xuất trình <span class="highlight">giấy tờ</span> có giá trị hoặc <span class="highlight">hộ chiếu</span> tại quầy lễ tân khi nhận phòng.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.6.</b> <span class="highlight">Nghiêm cấm mang vật nuôi, vũ khí</span> vào khách sạn.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.7.</b> Tiếp khách tại sảnh lễ tân, <span class="highlight">không tiếp khách</span> tại phòng ngủ.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.8.</b> <span class="highlight">Nghiêm cấm</span> hành vi <span class="highlight">đánh bạc, mại dâm</span> trong khách sạn.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.9.</b> Quý khách vui lòng <span class="highlight">tự bảo quản tài sản</span> hoặc gửi tại quầy Lễ tân.</td>
+                    <td>Khách sạn <span class="highlight">không chịu trách nhiệm</span> cho bất kỳ tổn thất nào.</td>
+                </tr>
+                <tr>
+                    <td><b>2.10.</b> Tham khảo hướng dẫn phòng cháy chữa cháy và các trường hợp thoát hiểm khẩn cấp.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.11.</b> Không mang đồ ăn, thức uống nặng mùi vào khách sạn.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.12.</b> <span class="highlight">Không hút thuốc</span> trong khách sạn.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.13.</b> Hư hỏng hoặc mất mát trang thiết bị do quý khách gây ra, vui lòng <span class="highlight">đền bù</span> đầy đủ.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>2.14.</b> Quý khách không thay đổi, di chuyển các trang thiết bị trong phòng nếu không có sự đồng ý của Ban Quản lý khách sạn.</td>
+                    <td></td>
+                </tr>
+                </tbody>
+
+                <thead>
+                <tr>
+                    <th colspan="2" class="section-title">3. Nghĩa vụ của khách hàng khi sử dụng website:</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>3.1.</b> Quý khách vui lòng cung cấp đầy đủ thông tin khi đặt dịch vụ trên <span class="highlight">website</span>:</td>
+                    <td>Họ tên, số điện thoại, địa chỉ email. Chúng tôi không chịu trách nhiệm nếu thông tin sai lệch.</td>
+                </tr>
+                <tr>
+                    <td><b>3.2.</b> Không sử dụng các công cụ phá hoại <span class="highlight">website</span>.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>3.3.</b> Đảm bảo tuân thủ <span class="highlight">quy định về pháp lý</span> khi tham gia vào dịch vụ đặt phòng trên website.</td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
 <!--VÙng để chèn phòng đã tìm-->
 <div class="row room-list d-flex flex-wrap mt-4"  style="margin-top: 30px;"  >
     <div th:if="${message}">-->
@@ -468,30 +1107,6 @@
 </div>
 
 
-<div class="eco-garden-description">
-    <h2>Đánh thức mọi giác quan của bạn tại DragonBall Hotel</h2>
-    <p style="font-size: 1rem; color: #555; line-height: 1.6; white-space: normal; text-align: center;">
-        Khách sạn Dragon Ball Hotel với các phòng ngủ được xây dựng theo phong cách hiện đại phương tây. <br>
-        mỗi phòng được bố trí đón ánh sáng và gió biển thổi vào rất thoáng mát<br>
-        Đội ngũ nhân viên phục vụ là người địa phương rất thân thiện và được đào tạo chuyên nghiệp để phục vụ cho quý khách.
-    </p>
-
-
-    <div class="features">
-        <p><i class="fas fa-hotel"></i> Khách sạn sang trọng tại trung tâm thành phố</p>
-        <p><i class="fas fa-location-arrow"></i> Vị trí thuận tiện gần các điểm du lịch</p>
-        <p><i class="fas fa-concierge-bell"></i> Dịch vụ hoàn hảo và tiện nghi hiện đại</p>
-    </div>
-</div>
-
-
-<!--Vùng để load phòng-->
-<div id="top-phong" class="top-phong">
-    <h1 class="top-phong-title">Phòng nổi bật</h1>
-    <div id="loadPhongCustermoContainer" class="phong-list">
-        <!-- Các phòng sẽ được load vào đây bởi JavaScript -->
-    </div>
-</div>
 
 
 <!--&lt;!&ndash; Biểu tượng chọn phòng với nền trắng trong suốt, góc phải giữa màn hình &ndash;&gt;-->
@@ -720,7 +1335,7 @@
     </div>
 </div>
 
-<script th:src="@{/js/KH.js}"></script>
+<!--<script th:src="@{/js/KH.js}"></script>-->
 
 <!-- Bootstrap JS -->
 <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>-->
@@ -730,6 +1345,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <!-- FontAwesome để thêm icon chat -->
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
@@ -1005,6 +1622,35 @@
     }
 
 
+
+    const next = document.querySelector('.next')
+    const prev = document.querySelector('.prev')
+    const comment = document.querySelector('#list-comment')
+    const commentItem = document.querySelectorAll('#list-comment .item')
+    var translateY = 0
+    var count = commentItem.length
+
+    next.addEventListener('click', function (event) {
+        event.preventDefault()
+        if (count == 1) {
+            // Xem hết bình luận
+            return false
+        }
+        translateY += -400
+        comment.style.transform = `translateY(${translateY}px)`
+        count--
+    })
+
+    prev.addEventListener('click', function (event) {
+        event.preventDefault()
+        if (count == 3) {
+            // Xem hết bình luận
+            return false
+        }
+        translateY += 400
+        comment.style.transform = `translateY(${translateY}px)`
+        count++
+    })
 
 </script>
 

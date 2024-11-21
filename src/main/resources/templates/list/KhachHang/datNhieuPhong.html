@@ -338,7 +338,7 @@
                         <span th:text="${phong.getGiaLoaiPhong()} + ' VNĐ'"></span>
                         <span> cho 1 đêm</span>
                     </p>
-                    <input type="hidden" id="pricePerNight" th:value="${phong.getGiaLoaiPhong()}" /> <!-- Sửa lại th:value -->
+                    <input type="hidden" class="pricePerNight" data-id="${phong.idPhong}" th:value="${phong.getGiaLoaiPhong()}"/>
                     <p>
                         <span>Sức chứa tối đa gồm:</span>
                         <span th:text="${phong.getSoNguoiToiDa()}"></span>
@@ -346,13 +346,15 @@
                     </p>
                 </div>
 
-                <div>
-
-                </div>
-
+<!--                <div class="reviews-section" id="reviews-${phong.idPhong}">-->
+<!--                    <div id="danhGiaList-${phong.idPhong}" class="review-list">-->
+<!--                        &lt;!&ndash; Các đánh giá sẽ được hiển thị ở đây &ndash;&gt;-->
+<!--                    </div>-->
+<!--                </div>-->
             </div>
         </div>
     </div>
+
 
     <div class="booking-form flex-fill">
         <h4>ĐẶT PHÒNG</h4>
@@ -538,14 +540,11 @@
     });
 
     document.addEventListener("DOMContentLoaded", function () {
-        const idPhongElement = document.getElementById("idPhong");
-        if (!idPhongElement) {
-            alert("Không tìm thấy phần tử ID phòng!");
-            return;
-        }
+        const priceElements = document.querySelectorAll(".pricePerNight");
+        const depositElement = document.getElementById("deposit");
+        const rawDepositElement = document.getElementById("rawDeposit");
 
-        const pricePerNightElement = document.getElementById("pricePerNight"); // Phần tử chứa giá phòng mỗi đêm
-
+        // Lắng nghe sự kiện thay đổi ngày nhận và ngày trả
         document.getElementById("checkinDate").addEventListener("change", calculateDeposit);
         document.getElementById("checkoutDate").addEventListener("change", calculateDeposit);
 
@@ -560,7 +559,7 @@
                 // Kiểm tra ngày nhận phải trước ngày trả
                 if (checkinDate >= checkoutDate) {
                     alert("Ngày nhận phải trước ngày trả!");
-                    document.getElementById("deposit").value = "";
+                    depositElement.value = "";
                     return;
                 }
 
@@ -569,38 +568,81 @@
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                 if (diffDays > 0) {
-                    // Lấy giá phòng theo idPhong từ phần tử HTML hoặc server
-                    const pricePerNight = parseFloat(pricePerNightElement.value);
+                    let totalCost = 0;
 
-                    // Kiểm tra nếu giá phòng hợp lệ
-                    if (isNaN(pricePerNight) || pricePerNight <= 0) {
-                        alert("Giá phòng không hợp lệ!");
-                        document.getElementById("deposit").value = "";
-                        return;
-                    }
+                    // Lặp qua các giá phòng và tính tổng tiền
+                    priceElements.forEach((priceElement) => {
+                        const pricePerNight = parseFloat(priceElement.value);
 
-                    // Tính tổng giá phòng cho tất cả các phòng
-                    const roomCount = idPhongElement.value.split(',').length; // Số lượng phòng
-                    const totalCost = diffDays * pricePerNight * roomCount; // Tính tổng giá phòng cho tất cả các phòng
+                        if (isNaN(pricePerNight) || pricePerNight <= 0) {
+                            alert("Giá phòng không hợp lệ!");
+                            depositElement.value = "";
+                            return;
+                        }
 
-                    // Tiền cọc = 80% tổng giá
+                        totalCost += diffDays * pricePerNight;
+                    });
+
                     const depositAmount = totalCost * 0.8;
-
-                    // Hiển thị tiền cọc đã tính theo định dạng VNĐ
-                    document.getElementById('deposit').value = depositAmount.toLocaleString('vi-VN') + ' VNĐ';
-
-                    // Thêm giá trị thô vào input ẩn để gửi về server
-                    document.getElementById('rawDeposit').value = depositAmount;
+                    depositElement.value = depositAmount.toLocaleString('vi-VN') + ' VNĐ';
+                    rawDepositElement.value = depositAmount;
                 } else {
-                    document.getElementById("deposit").value = "";
+                    depositElement.value = "";
                 }
             } else {
-                document.getElementById("deposit").value = "";
+                depositElement.value = "";
             }
         }
     });
 
 
+
+
+
+    // // Hàm để lấy danh sách đánh giá cho một phòng
+    // function fetchDanhGia(idPhong) {
+    //     fetch(`/api/danhgia/${idPhong}`)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             const reviewsContainer = document.querySelector(`#danhGiaList-${idPhong}`);
+    //             reviewsContainer.innerHTML = ''; // Xóa nội dung cũ trước khi hiển thị mới
+    //
+    //             data.forEach(danhgia => {
+    //                 const reviewItem = `
+    //                     <div class="review-item">
+    //                         <div class="review-header">
+    //                             <strong>${danhgia.tenKhachHang}</strong>
+    //                             ${renderStars(danhgia.soSao)}
+    //                         </div>
+    //                         <p>${danhgia.noiDung}</p>
+    //                         <small>${danhgia.ngayDanhGia}</small>
+    //                     </div>
+    //                 `;
+    //                 reviewsContainer.innerHTML += reviewItem;
+    //             });
+    //         })
+    //         .catch(error => console.error('Error fetching reviews:', error));
+    // }
+    //
+    // // Hàm tạo các sao đánh giá
+    // function renderStars(soSao) {
+    //     let stars = '';
+    //     for (let i = 0; i < soSao; i++) {
+    //         stars += '<span class="star">&#9733;</span>'; // Sao đầy
+    //     }
+    //     for (let i = soSao; i < 5; i++) {
+    //         stars += '<span class="star">&#9734;</span>'; // Sao trống
+    //     }
+    //     return stars;
+    // }
+    //
+    // // Gọi API khi người dùng chọn phòng
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     const phongList = [[${phongList}]];  // Lấy danh sách phòng từ Thymleaf (hoặc một nguồn dữ liệu khác)
+    //     phongList.forEach(phong => {
+    //         fetchDanhGia(phong.idPhong);
+    //     });
+    // });
 
 
 </script>

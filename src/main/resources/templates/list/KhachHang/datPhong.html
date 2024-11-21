@@ -338,7 +338,7 @@
                         <span th:text="${phong.getGiaLoaiPhong()} + ' VNĐ'"></span>
                         <span> cho 1 đêm</span>
                     </p>
-                    <input type="hidden" id="pricePerNight" th:value="${phong.gia}" /> <!-- Sửa lại th:value -->
+                    <input type="hidden" id="pricePerNight" th:value="${phong.giaLoaiPhong}" /> <!-- Sửa lại th:value -->
                     <p>
                         <span>Sức chứa tối đa gồm:</span>
                         <span th:text="${phong.getSoNguoiToiDa()}"></span>
@@ -386,16 +386,6 @@
 
             </div>
         </div>
-    </div>
-    <div class="room-list-container">
-        <h3>Danh sách các phòng đã chọn</h3>
-
-        <div th:each="phong : ${phongList}">
-            <!-- Kiểm tra nếu phong != null trước khi truy cập thuộc tính -->
-            <p th:if="${phong != null}" th:text="${phong.tenPhong}">Tên phòng</p>
-            <p th:if="${phong == null}">Phòng không hợp lệ</p>
-        </div>
-
     </div>
 
 
