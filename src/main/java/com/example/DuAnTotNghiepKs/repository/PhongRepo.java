@@ -100,9 +100,21 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
 //                                                @Param("soLuongPhongCanTim") Integer soLuongPhongCanTim);
 
 
-    @Query("SELECT p FROM Phong p WHERE p.idPhong NOT IN (" +
-            "SELECT dp.idDatPhong FROM DatPhong dp WHERE dp.ngayNhan < :endDate AND dp.ngayTra > :startDate)")
-    List<Phong> findAvailableRooms(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    @Query(value = "SELECT p.* " +
+            "FROM phong p " +
+            "WHERE p.trang_thai = 1 " +
+            "  AND p.id_phong NOT IN (" +
+            "      SELECT dp.id_phong " +
+            "      FROM DatPhong dp " +
+            "      WHERE dp.ngay_nhan_phong < :endDate " +
+            "        AND dp.ngay_tra_phong > :startDate " +
+            "        AND dp.tinh_trang != 'Đã Hủy' " +
+            "        AND dp.trang_thai != 1" +
+            "  )", nativeQuery = true)
+    List<Phong> findAvailableRooms(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
 
 

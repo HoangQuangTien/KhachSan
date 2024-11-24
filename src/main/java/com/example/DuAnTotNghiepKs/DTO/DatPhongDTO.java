@@ -39,4 +39,7 @@ public class DatPhongDTO {
     private String email;
     private String soDienThoai;
     private Boolean gioiTinh;
+
+    private boolean hasReviewed; // Thêm thuộc tính này để lưu trạng thái phòng đã được đánh giá hay chưa
+
 }

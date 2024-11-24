@@ -349,40 +349,13 @@
                 <div>
 
                 </div>
-                <div class="reviews-section">
+                <div class="reviews-section" id="reviewForm">
 
-                    <div id="danhGiaList" class="review-list">
-                        <!-- Các đánh giá sẽ được hiển thị ở đây -->
-                    </div>
                 </div>
 
 
 
-                <div class="add-review-section">
-                    <h3>Để lại đánh giá của bạn</h3>
-                    <form id="reviewForm">
-                        <input type="hidden" id="idPhong" th:value="${phong.idPhong}">
-                        <div class="form-group">
-                            <label for="tenKhachHang">Tên của bạn:</label>
-                            <input type="text" id="tenKhachHang" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="soSao">Đánh giá:</label>
-                            <select id="soSao" class="form-control" required>
-                                <option value="5">5 sao</option>
-                                <option value="4">4 sao</option>
-                                <option value="3">3 sao</option>
-                                <option value="2">2 sao</option>
-                                <option value="1">1 sao</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="noiDung">Nội dung:</label>
-                            <textarea id="noiDung" class="form-control" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
-                    </form>
-                </div>
+
 
             </div>
         </div>
@@ -536,7 +509,7 @@
             cancelButtonText: "Không",
         }).then((swalResult) => {
             if (swalResult.isConfirmed) {
-                fetch("/dat-phong1", {
+                fetch("/dat-phong", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",

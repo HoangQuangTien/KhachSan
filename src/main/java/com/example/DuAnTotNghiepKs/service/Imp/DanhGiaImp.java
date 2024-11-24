@@ -42,6 +42,8 @@ public class DanhGiaImp implements DanhGiaService {
 
     @Override
     public DanhGiaDTO addDanhGia(DanhGiaDTO danhGiaDTO) {
+
+
         // Chuyển DTO sang entity
         DanhGia danhGia = new DanhGia();
         danhGia.setTenKhachHang(danhGiaDTO.getTenKhachHang());

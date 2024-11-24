@@ -1,7 +1,11 @@
 package com.example.DuAnTotNghiepKs.rest;
 
 import com.example.DuAnTotNghiepKs.DTO.DanhGiaDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
+import com.example.DuAnTotNghiepKs.entity.DanhGia;
+import com.example.DuAnTotNghiepKs.entity.Phong;
 import com.example.DuAnTotNghiepKs.service.DanhGiaService;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +18,9 @@ public class DanhGiaRest {
 
     @Autowired
     private DanhGiaService danhGiaService;
+
+    @Autowired
+    private TaiKhoanService taiKhoanService;
 
     @GetMapping("/{idPhong}")
     public ResponseEntity<List<DanhGiaDTO>> getDanhGiaByPhong(@PathVariable String idPhong) {
@@ -33,7 +40,29 @@ public class DanhGiaRest {
 
     @PostMapping
     public ResponseEntity<DanhGiaDTO> addDanhGia(@RequestBody DanhGiaDTO danhGiaDTO) {
-        return ResponseEntity.ok(danhGiaService.addDanhGia(danhGiaDTO));
+        // Lấy thông tin người dùng từ session
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
+
+        // Kiểm tra nếu tài khoản hợp lệ và có tên khách hàng
+        if (taiKhoanDTO != null && taiKhoanDTO.getKhachHangDTO() != null
+                && taiKhoanDTO.getKhachHangDTO().getHoVaTen() != null) {
+
+            // Lấy tên khách hàng từ tài khoản
+            String tenKhachHang = taiKhoanDTO.getKhachHangDTO().getHoVaTen();
+
+            // Cập nhật tên khách hàng vào DTO
+            danhGiaDTO.setTenKhachHang(tenKhachHang);
+
+            // Lưu đánh giá vào cơ sở dữ liệu
+            DanhGiaDTO savedDanhGiaDTO = danhGiaService.addDanhGia(danhGiaDTO);  // Dùng DTO khi gọi service
+
+            return ResponseEntity.ok(savedDanhGiaDTO);  // Trả về phản hồi thành công với DanhGiaDTO
+        }
+
+        // Nếu không có tài khoản hợp lệ hoặc không tìm thấy tên khách hàng
+        return ResponseEntity.badRequest().body(null);  // Trả về 400 nếu có lỗi
     }
+
+
 }
 

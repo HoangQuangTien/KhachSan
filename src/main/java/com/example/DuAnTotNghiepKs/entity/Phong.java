@@ -132,6 +132,8 @@ public class Phong {
     private Set<DatPhong> datPhongs = new HashSet<>();
 
 
+
+
 //    @OneToMany(mappedBy = "phong")
 //    private Set<DanhGia> danhGias; // Danh sách các đánh giá của phòng
 //

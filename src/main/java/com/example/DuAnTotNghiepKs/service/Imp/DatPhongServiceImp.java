@@ -2,13 +2,11 @@ package com.example.DuAnTotNghiepKs.service.Imp;
 
 import com.example.DuAnTotNghiepKs.DTO.DatPhongDTO;
 import com.example.DuAnTotNghiepKs.DTO.IdleRoomDTO;
+import com.example.DuAnTotNghiepKs.entity.DanhGia;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 
-import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
-import com.example.DuAnTotNghiepKs.repository.KhachHangRepository;
-import com.example.DuAnTotNghiepKs.repository.PhongRepo;
-import com.example.DuAnTotNghiepKs.repository.ThamSoRepo;
+import com.example.DuAnTotNghiepKs.repository.*;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -19,11 +17,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -34,6 +34,9 @@ public class DatPhongServiceImp implements DatPhongService {
 
     @Autowired
     private PhongRepo phongRepository;
+
+    @Autowired
+    private DanhGiaRepo danhGiaRepo;
 
     @Autowired
     private ThamSoRepo thamSoRepo;
@@ -423,6 +426,7 @@ public class DatPhongServiceImp implements DatPhongService {
         for (DatPhong datPhong : listDatPhongs) {
             DatPhongDTO dto = new DatPhongDTO();
             dto.setTenPhong(phongRepository.findById(datPhong.getPhong().getIdPhong()).get().getTenPhong());
+            dto.setIdPhong(datPhong.getPhong().getIdPhong());
             dto.setNgayNhanPhong(datPhong.getNgayNhan());
             dto.setNgayTraPhong(datPhong.getNgayTra());
             dto.setTongTien(datPhong.getTongTien());
@@ -493,4 +497,29 @@ public class DatPhongServiceImp implements DatPhongService {
         Optional<DatPhong> datPhong = datPhongRepository.findById(id);
         return datPhong.orElse(null);
     }
+
+
+    @Scheduled(fixedRate = 60000) // mỗi phút một lần
+    public void updateDatPhongKhachHangStatus() {
+        List<DatPhong> datPhongs = datPhongRepository.findByTinhTrang("Đang chờ thanh toán....");
+        LocalDateTime now = LocalDateTime.now(); // Lấy thời gian hiện tại
+        int gioiHanPhut = 15; // Giới hạn 15 phút
+
+        for (DatPhong datPhong : datPhongs) {
+            LocalDateTime ngayDat = datPhong.getNgayDat();
+            if (ngayDat == null) continue; // Bỏ qua nếu ngày đặt null
+
+            // Tính số phút giữa thời gian hiện tại và ngày đặt
+            long minutesBetween = ChronoUnit.MINUTES.between(ngayDat, now);
+
+            // Kiểm tra điều kiện cập nhật
+            if (minutesBetween > gioiHanPhut) {
+                datPhong.setTinhTrang("Đã Hủy");
+            }
+        }
+
+        // Lưu tất cả thay đổi vào database
+        datPhongRepository.saveAll(datPhongs);
+    }
+
 }

@@ -323,11 +323,12 @@
             return false;
         }
 
-        // // Kiểm tra nếu id == 1 thì giá trị không được lớn hơn 5
-        // if (editId === 1 && parseFloat(editGiaTri) > 5) {
-        //     showErrorToast("Với ID là 1 thì giá trị không được lớn hơn 5.");
-        //     return false;
-        // }
+        // Kiểm tra nếu id == 1 thì giá trị phải lớn hơn 5 và nhỏ hơn 30
+        if (editId === 1 && (parseFloat(editGiaTri) <= 5 || parseFloat(editGiaTri) >= 30)) {
+            showErrorToast("Với ID là 1 thì giá trị phải lớn hơn 5 và nhỏ hơn 30.");
+            return false;
+        }
+
         if (editId === 3 && parseFloat(editGiaTri) < 30) {
             showErrorToast("Với ID là 3 thì giá trị không được nhỏ hơn 30.");
             return false;

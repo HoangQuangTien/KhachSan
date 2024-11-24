@@ -48,8 +48,11 @@ public class KhachHangDD {
 
     @Autowired
     private ChiTietDatPhongService chiTietDatPhongService;
+
     @Autowired
     private TaiKhoanService taiKhoanService;
+
+
 
 
     @Autowired
@@ -69,7 +72,6 @@ public class KhachHangDD {
             @RequestParam Map<String, String> requestParams,
             Model model) {
 
-
         // Xử lý thông tin nhận được từ VNPAY
         Map<String, String> fields = new HashMap<>();
         for (Map.Entry<String, String> entry : requestParams.entrySet()) {
@@ -83,65 +85,82 @@ public class KhachHangDD {
         fields.remove("vnp_SecureHash");
         String signValue = Config.hashAllFields(fields);
 
+        // Lấy ra vnp_TxnRef - mã giao dịch duy nhất
+        String vnp_TxnRef = fields.get("vnp_TxnRef");
+        List<Integer> idListDatPhong = vnpayService.getTransaction(vnp_TxnRef);
+
         // Kiểm tra chữ ký hợp lệ
-        String vnp_TxnRef = requestParams.get("vnp_TxnRef");
-        String responseCode = requestParams.get("vnp_ResponseCode");
-        Integer idDatPhong = Integer.valueOf(vnp_TxnRef);
+        String responseCode = fields.get("vnp_ResponseCode");
         boolean isValidSignature = signValue.equals(vnp_SecureHash);
 
         if (isValidSignature && "00".equals(responseCode)) {
-            vnpayService.ThanhToanThanhCong(idDatPhong);
-            // Gửi email xác nhận đặt phòng thành công cho khách hàng
+            System.out.println("isValidSignature:" + isValidSignature);
+            System.out.println("vnp_TxnRef: " + vnp_TxnRef);
+            // Chuyển vnp_TxnRef thành ID đặt phòng nếu nó là một ID hợp lệ
+            for (Integer idDatPhong:idListDatPhong) {
+                //                Integer idDatPhong = Integer.parseInt(vnp_TxnRef); // Giả sử vnp_TxnRef là một ID duy nhất
+                vnpayService.ThanhToanThanhCong(idDatPhong);
 
-            //tìm kiếm phòng theo id
-            DatPhong datPhong = datPhongService.getDatPhongById(idDatPhong);
-            //tìm id khách hàng theo đặt phòng
-            Integer idKhachHang = datPhong.getKhachHang().getId();
-            KhachHangDTO khachHangDTO = khachHangService.findById(idKhachHang);
-            KhachHang khachHang = khachHangService.convertToEntity(khachHangDTO);
+                // Gửi email xác nhận đặt phòng thành công cho khách hàng
+                DatPhong datPhong = datPhongService.getDatPhongById(idDatPhong);
+                Integer idKhachHang = datPhong.getKhachHang().getId();
+                KhachHangDTO khachHangDTO = khachHangService.findById(idKhachHang);
+                KhachHang khachHang = khachHangService.convertToEntity(khachHangDTO);
 
-            // Định dạng ngày và giờ
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            String ngayNhanFormatted = datPhong.getNgayNhan().format(dateTimeFormatter);
-            String ngayTraFormatted = datPhong.getNgayTra().format(dateTimeFormatter);
+                // Định dạng ngày và giờ
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                String ngayNhanFormatted = datPhong.getNgayNhan().format(dateTimeFormatter);
+                String ngayTraFormatted = datPhong.getNgayTra().format(dateTimeFormatter);
 
-            // Định dạng tiền tệ
+                // Định dạng tiền tệ
+                Float soTien = Float.valueOf(requestParams.get("vnp_Amount")) / 100;
 
-            Float soTien = Float.valueOf(requestParams.get("vnp_Amount")) / 100;
-            //tìm idPhong theo datPhong
-            Integer idPhong = datPhong.getPhong().getIdPhong();
-            Phong phong = phongService.findById(idPhong);
-            String emailKhachHang = khachHang.getEmail(); // Lấy email từ DTO của khách hàng
-            String subject = "Xác nhận đặt phòng thành công tại DRAGONBALL HOTEL";
-            String text = "<html>" +
-                    "<body style='font-family: Arial, sans-serif; color: #333333; background-color: #f9f9f9;'>" +
-                    "<div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px;'>" +
-                    "<h2 style='color: #4CAF50; text-align: center;'>Xin chào " + khachHang.getHoVaTen() + ",</h2>" +
-                    "<p style='font-size: 16px;'>Cảm ơn bạn đã lựa chọn <strong>DRAGONBALL HOTEL</strong> cho kỳ nghỉ của mình!</p>" +
-                    "<p style='font-size: 16px;'>Dưới đây là thông tin đặt phòng của bạn:</p>" +
-                    "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
-                    "<p style='font-size: 16px;'><strong>Phòng của bạn là:</strong> " +phong.getTenPhong()   + "</p>" +
-                    "<p style='font-size: 16px;'><strong>Ngày nhận phòng:</strong> " + ngayNhanFormatted + "</p>" +
-                    "<p style='font-size: 16px;'><strong>Ngày trả phòng:</strong> " + ngayTraFormatted + "</p>" +
-                    "<p style='font-size: 16px;'><strong>Số tiền cọc:</strong> " + String.format("%,.1f",soTien)  + " VND</p>" +
-                    "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
-                    "<p style='font-size: 16px;'>Chúng tôi mong được đón tiếp bạn và sẽ làm mọi điều có thể để kỳ nghỉ của bạn trở nên hoàn hảo nhất.</p>" +
-                    "<p style='font-size: 16px;'>Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại hoặc email hỗ trợ.</p>" +
-                    "<p style='font-size: 16px;'>Trân trọng,<br>Đội ngũ quản lý khách sạn <strong>DRAGONBALL HOTEL</strong></p>" +
-                    "<footer style='margin-top: 20px; font-size: 12px; text-align: center; color: #666666;'>" +
-                    "<p>Địa chỉ: Tòa nhà FPT Polytechnic, Phố Trịnh Văn Bô, Nam Từ Liêm, Hà Nội.</p>" +
-                    "<p>Điện thoại: 0397156204 | Email: support@dragonballhotel.com</p>" +
-                    "<p>&copy; 2024 DRAGONBALL HOTEL. Tất cả các quyền được bảo lưu.</p>" +
-                    "</footer>" +
-                    "</div>" +
-                    "</body>" +
-                    "</html>";
+                // Lấy danh sách tên phòng (nếu có)
+                Set<Phong> phongs = datPhong.getPhong().getDatPhongs().stream()
+                        .map(DatPhong::getPhong)
+                        .collect(Collectors.toSet());
 
+                List<String> roomNames = phongs.stream()
+                        .map(Phong::getTenPhong)
+                        .collect(Collectors.toList());
 
-// Gửi email xác nhận
-            datPhongService.sendEmail(emailKhachHang, subject, text);
-        } else {
-            vnpayService.ThanhToanThatBai(idDatPhong);
+                String emailKhachHang = khachHang.getEmail();
+                String subject = "Xác nhận đặt phòng thành công tại DRAGONBALL HOTEL";
+                String text = "<html>" +
+                        "<body style='font-family: Arial, sans-serif; color: #333333; background-color: #f9f9f9;'>" +
+                        "<div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px;'>" +
+                        "<h2 style='color: #4CAF50; text-align: center;'>Xin chào " + khachHang.getHoVaTen() + ",</h2>" +
+                        "<p style='font-size: 16px;'>Cảm ơn bạn đã lựa chọn <strong>DRAGONBALL HOTEL</strong> cho kỳ nghỉ của mình!</p>" +
+                        "<p style='font-size: 16px;'>Dưới đây là thông tin đặt phòng của bạn:</p>" +
+                        "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                        "<p style='font-size: 16px;'><strong>Phòng của bạn là:</strong> " + roomNames.toString() + "</p>" +
+                        "<p style='font-size: 16px;'><strong>Ngày nhận phòng:</strong> " + ngayNhanFormatted + "</p>" +
+                        "<p style='font-size: 16px;'><strong>Ngày trả phòng:</strong> " + ngayTraFormatted + "</p>" +
+                        "<p style='font-size: 16px;'><strong>Số tiền cọc:</strong> " + String.format("%,.0f", soTien) + " VND</p>" +
+                        "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                        "<p style='font-size: 16px;'>Chúng tôi mong được đón tiếp bạn và sẽ làm mọi điều có thể để kỳ nghỉ của bạn trở nên hoàn hảo nhất.</p>" +
+                        "<p style='font-size: 16px;'>Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại hoặc email hỗ trợ.</p>" +
+                        "<p style='font-size: 16px;'>Trân trọng,<br>Đội ngũ quản lý khách sạn <strong>DRAGONBALL HOTEL</strong></p>" +
+                        "<footer style='margin-top: 20px; font-size: 12px; text-align: center; color: #666666;'>" +
+                        "<p>Địa chỉ: Tòa nhà FPT Polytechnic, Phố Trịnh Văn Bô, Nam Từ Liêm, Hà Nội.</p>" +
+                        "<p>Điện thoại: 0397156204 | Email: support@dragonballhotel.com</p>" +
+                        "<p>&copy; 2024 DRAGONBALL HOTEL. Tất cả các quyền được bảo lưu.</p>" +
+                        "</footer>" +
+                        "</div>" +
+                        "</body>" +
+                        "</html>";
+
+                // Gửi email xác nhận
+                datPhongService.sendEmail(emailKhachHang, subject, text);
+
+            }
+        }else {
+            System.out.println("isValidSignature:" + isValidSignature);
+            System.out.println("vnp_TxnRef: " + vnp_TxnRef);
+            for (Integer idDatPhong : idListDatPhong){
+                vnpayService.ThanhToanThatBai(idDatPhong);
+            }
+//            Integer idDatPhong = Integer.parseInt(vnp_TxnRef); // Giả sử vnp_TxnRef là một ID duy nhất
         }
 
 
@@ -158,6 +177,8 @@ public class KhachHangDD {
 
         return "list/KhachHang/Vnpay_result"; // Đường dẫn tới template HTML
     }
+
+
 
     @GetMapping("/khach-hang")
     public String hienThi(Model model) {
@@ -278,6 +299,7 @@ public class KhachHangDD {
 
 
 
+    //
     @PostMapping("/dat-phong")
     public ResponseEntity<?> createDatNhieuPhongKhachHang1(
             @RequestParam("idLoaiPhong") List<String> idLoaiPhongStrList,
@@ -359,7 +381,6 @@ public class KhachHangDD {
                 }
 
 
-
                 // Lấy thông tin đặt phòng đã tồn tại
                 List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra);
 
@@ -390,7 +411,7 @@ public class KhachHangDD {
 
                 // Tạo đối tượng DatPhong cho từng phòng
                 DatPhong datPhong = new DatPhong();
-                datPhong.setMaDatPhong(generateMaDatPhong()+""+(i+1));
+                datPhong.setMaDatPhong(generateMaDatPhong() + "" + (i + 1));
                 datPhong.setPhong(selectedPhong);
                 datPhong.setNgayNhan(ngayNhan);
                 datPhong.setNgayTra(ngayTra);
@@ -402,7 +423,7 @@ public class KhachHangDD {
                 datPhong.setTienConLai(tienConLai);
                 datPhong.setLoaiPhong(loaiPhong);
                 datPhong.setKhachHang(khachHang);
-                datPhong.setTinhTrang("Đang chờ thanh toán...");
+                datPhong.setTinhTrang("Đang chờ thanh toán....");
                 datPhong.setTrangThai(false);
 
                 // Thêm vào danh sách để lưu sau
@@ -428,45 +449,61 @@ public class KhachHangDD {
             }
 
 
-            DatPhong booking = datPhongList.get(0);
-            Integer id = booking.getIdDatPhong();
+//            DatPhong booking = datPhongList.get(0);
+//            Integer id = booking.getIdDatPhong();
+            List<Integer> idList = datPhongList.stream()
+                    .map(DatPhong::getIdDatPhong)
+                    .collect(Collectors.toList());
+            // Tạo mã vnp_TxnRef duy nhất
+            String vnp_TxnRef = "DP" + String.valueOf(System.currentTimeMillis()).substring(0, 12);
 
+
+            // Lưu ánh xạ mã giao dịch với danh sách ID phòng
+            Map<String, List<Integer>> transactionMap = new HashMap<>();
+            transactionMap.put(vnp_TxnRef, idList);
+            vnpayService.saveTransaction(vnp_TxnRef,idList);
+            System.out.println("transactionMap:"+transactionMap);
+            System.out.println("snp:"+vnp_TxnRef);
+
+// Thông tin cấu hình
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";
-            String vnp_TxnRef = String.valueOf(id);
             String vnp_IpAddr = Config.getIpAddress(req);
             String vnp_TmnCode = Config.vnp_TmnCode;
+            String vnp_Amount = String.valueOf((int) (tienCoc * 100)); // Số tiền (chuyển sang đồng)
+            String vnp_CurrCode = "VND";
+            String vnp_OrderInfo = "billpayment";
+            String vnp_OrderType = "booking";
+            String locate = (language != null && !language.isEmpty()) ? language : "vn";
+            String vnp_ReturnUrl = Config.vnp_ReturnUrl;
 
-            System.out.println("vnp_TxnRef:"+vnp_TxnRef);
+// Tạo ngày giờ
+            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            String vnp_CreateDate = formatter.format(cld.getTime());
+            cld.add(Calendar.MINUTE, 15);
+            String vnp_ExpireDate = formatter.format(cld.getTime());
 
+// Các tham số VNPAY
             Map<String, String> vnp_Params = new HashMap<>();
             vnp_Params.put("vnp_Version", vnp_Version);
             vnp_Params.put("vnp_Command", vnp_Command);
             vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
-            vnp_Params.put("vnp_Amount", String.valueOf((int) (tienCoc * 100))); // Chuyển đổi sang đồng
-            vnp_Params.put("vnp_CurrCode", "VND");
-
+            vnp_Params.put("vnp_Amount", vnp_Amount);
+            vnp_Params.put("vnp_CurrCode", vnp_CurrCode);
             if (bankCode != null && !bankCode.isEmpty()) {
                 vnp_Params.put("vnp_BankCode", bankCode);
             }
             vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-            vnp_Params.put("vnp_OrderInfo", "billpayment");
-            vnp_Params.put("vnp_OrderType", "booking");
-
-            String locate = (language != null && !language.isEmpty()) ? language : "vn";
+            vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo);
+            vnp_Params.put("vnp_OrderType", vnp_OrderType);
             vnp_Params.put("vnp_Locale", locate);
-            vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
+            vnp_Params.put("vnp_ReturnUrl", vnp_ReturnUrl);
             vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
-
-            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-            String vnp_CreateDate = formatter.format(cld.getTime());
             vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
-
-            cld.add(Calendar.MINUTE, 15);
-            String vnp_ExpireDate = formatter.format(cld.getTime());
             vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
+// Tạo chuỗi tham số
             List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
             Collections.sort(fieldNames);
             StringBuilder hashData = new StringBuilder();
@@ -485,210 +522,22 @@ public class KhachHangDD {
                 }
             }
 
+// Tạo chữ ký bảo mật
             String vnp_SecureHash = Config.hmacSHA512(Config.secretKey, hashData.toString());
+
+// Tạo URL thanh toán
             String paymentUrl = Config.vnp_PayUrl + "?" + query.toString() + "&vnp_SecureHash=" + vnp_SecureHash;
 
+// Trả về URL thanh toán
             Map<String, Object> response = new HashMap<>();
             response.put("code", "00");
             response.put("message", "success");
             response.put("data", paymentUrl);
 
-            return ResponseEntity.ok(response);
-
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Định dạng ID không hợp lệ."));
-        } catch (DateTimeParseException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Định dạng ngày không hợp lệ."));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Có lỗi xảy ra: " + e.getMessage()));
-        }
-    }
-
-
-
-
-    //
-    @PostMapping("/dat-phong1")
-    public ResponseEntity<?> createDatPhongKhachHang1(
-            @RequestParam("gia") Long amount,
-            @RequestParam("bankCode") String bankCode,
-            @RequestParam("language") String language,
-            @RequestParam("idPhong") String idPhongStr,
-            @RequestParam("idLoaiPhong") String idLoaiPhongStr,
-            @RequestParam("ngayNhan") String ngayNhanStr,
-            @RequestParam("ngayTra") String ngayTraStr,
-            @RequestParam("cccd") String cccd,
-            @RequestParam("idKhachHang") String idKhachHangStr,
-            HttpServletRequest req) {
-
-        // Kiểm tra các tham số đầu vào
-        if (idLoaiPhongStr.isEmpty() || idPhongStr.isEmpty() ||
-                idKhachHangStr.isEmpty() || ngayNhanStr.isEmpty() ||
-                ngayTraStr.isEmpty() || cccd.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Các tham số không được để trống."));
-        }
-
-        try {
-            // Chuyển đổi ID khách hàng
-            Integer idKhachHang = parseInteger(idKhachHangStr, "ID không đúng định dạng");
-            KhachHangDTO khachHangDTO = khachHangService.findById(idKhachHang);
-            if (khachHangDTO == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Khách hàng không tồn tại."));
-            }
-            KhachHang khachHang = khachHangService.convertToEntity(khachHangDTO);
-
-
-            // Chuyển đổi ngày nhận và ngày trả
-            LocalDateTime ngayNhan = parseDateTime(ngayNhanStr, "Ngày nhận phòng không hợp lệ.");
-            LocalDateTime ngayTra = parseDateTime(ngayTraStr, "Ngày trả phòng không hợp lệ.");
-
-            if (ngayTra.isBefore(ngayNhan)) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Ngày trả phòng phải sau ngày nhận phòng."));
-            }
-
-            // Tính toán tổng tiền phòng và tiền cọc
-            float tongTienPhong = 0;
-            float tienCoc = 0;
-
-            long thoiGianChoPhepMillis = datPhongService.getThoiGianChoPhepDatPhong();
-            List<DatPhong> datPhongList = new ArrayList<>();
-
-            // Chuyển đổi ID loại phòng
-            Integer idLoaiPhong = Integer.valueOf(idLoaiPhongStr);
-            LoaiPhong loaiPhong = loaiPhongService.findById(idLoaiPhong);
-
-            // Xử lý danh sách các ID phòng
-            List<String> idPhongStrList = Arrays.asList(idPhongStr.split(","));
-            for (String idPhongStrItem : idPhongStrList) {
-                Integer idPhong = Integer.valueOf(idPhongStrItem.trim());
-                Phong selectedPhong = phongService.findById(idPhong);
-
-                // Kiểm tra tình trạng phòng
-                if (selectedPhong == null || !selectedPhong.getTinhTrang()) {
-                    return ResponseEntity.badRequest().body(Map.of("error", "Phòng " + idPhong + " không hợp lệ hoặc đã ngừng hoạt động."));
-                }
-
-                // Lấy thông tin đặt phòng đã tồn tại
-                List<DatPhong> existingBookings = datPhongService.findByPhongAndThoiGian(idPhong, ngayNhan, ngayTra);
-                if (!existingBookings.isEmpty()) {
-                    for (DatPhong existingBooking : existingBookings) {
-                        if (ngayNhan.isBefore(existingBooking.getNgayTra().plusSeconds(thoiGianChoPhepMillis / 1000))) {
-                            return ResponseEntity.badRequest().body(Map.of("error", "Thời gian đặt của bạn không hợp lệ, trùng với người đặt trước."));
-                        }
-                    }
-                }
-
-                // Tính toán các chi phí cho từng phòng
-                long soNgayO = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
-                float giaPhong = selectedPhong.getLoaiPhong().getGia();
-                float tongTienPhongPhong = giaPhong * soNgayO;
-                float tienCocPhong = tongTienPhongPhong * 0.8f;
-
-                // Cập nhật tổng tiền phòng và tiền cọc
-                tongTienPhong += tongTienPhongPhong;
-                tienCoc += tienCocPhong;
-
-                // Tạo đối tượng DatPhong
-                DatPhong datPhong = new DatPhong();
-                datPhong.setMaDatPhong(generateMaDatPhong() + "-" + idPhong);
-                datPhong.setPhong(selectedPhong);
-                datPhong.setNgayNhan(ngayNhan);
-                datPhong.setNgayTra(ngayTra);
-                datPhong.setNgayDat(LocalDateTime.now());
-                datPhong.setCccd(cccd);
-                datPhong.setTongTien(tongTienPhong);
-                datPhong.setTienCoc(tienCoc);
-                datPhong.setTienConLai(tongTienPhong - tienCoc);
-                datPhong.setLoaiPhong(loaiPhong);
-                datPhong.setKhachHang(khachHang);
-                datPhong.setTinhTrang("Đang chờ thanh toán...");
-                datPhong.setTrangThai(false);
-
-                // Thêm vào danh sách để lưu sau
-                datPhongList.add(datPhong);
-            }
-            // Lưu tất cả các đối tượng DatPhong vào cơ sở dữ liệu
-            for (DatPhong datPhong : datPhongList) {
-                datPhongService.saveDatPhong(datPhong);
-
-                // Lưu thông tin chi tiết đặt phòng
-                ChiTietDatPhong chiTietDatPhong = new ChiTietDatPhong();
-                chiTietDatPhong.setMaChiTietDatPhong("CTDP" + datPhong.getIdDatPhong());
-                chiTietDatPhong.setDatPhong(datPhong);
-                chiTietDatPhong.setKhachHang(khachHang);
-                chiTietDatPhong.setNgayLap(new Date());
-                chiTietDatPhong.setTongTien(BigDecimal.valueOf(tongTienPhong));
-
-                chiTietDatPhongService.saveChiTietDatPhong(chiTietDatPhong);
-            }
-
-
-            DatPhong booking = datPhongList.get(0);
-            Integer id = booking.getIdDatPhong();
-
-            String vnp_Version = "2.1.0";
-            String vnp_Command = "pay";
-            String vnp_TxnRef = String.valueOf(id);
-            String vnp_IpAddr = Config.getIpAddress(req);
-            String vnp_TmnCode = Config.vnp_TmnCode;
-
-            System.out.println("vnp_TxnRef:"+vnp_TxnRef);
-
-            Map<String, String> vnp_Params = new HashMap<>();
-            vnp_Params.put("vnp_Version", vnp_Version);
-            vnp_Params.put("vnp_Command", vnp_Command);
-            vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
-            vnp_Params.put("vnp_Amount", String.valueOf((int) (tienCoc * 100))); // Chuyển đổi sang đồng
-            vnp_Params.put("vnp_CurrCode", "VND");
-
-            if (bankCode != null && !bankCode.isEmpty()) {
-                vnp_Params.put("vnp_BankCode", bankCode);
-            }
-            vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-            vnp_Params.put("vnp_OrderInfo", "billpayment");
-            vnp_Params.put("vnp_OrderType", "booking");
-
-            String locate = (language != null && !language.isEmpty()) ? language : "vn";
-            vnp_Params.put("vnp_Locale", locate);
-            vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
-            vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
-
-            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-            String vnp_CreateDate = formatter.format(cld.getTime());
-            vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
-
-            cld.add(Calendar.MINUTE, 15);
-            String vnp_ExpireDate = formatter.format(cld.getTime());
-            vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
-
-            List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
-            Collections.sort(fieldNames);
-            StringBuilder hashData = new StringBuilder();
-            StringBuilder query = new StringBuilder();
-
-            for (String fieldName : fieldNames) {
-                String fieldValue = vnp_Params.get(fieldName);
-                if (fieldValue != null && fieldValue.length() > 0) {
-                    hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
-                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII))
-                            .append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
-                    if (fieldNames.indexOf(fieldName) < fieldNames.size() - 1) {
-                        query.append('&');
-                        hashData.append('&');
-                    }
-                }
-            }
-
-            String vnp_SecureHash = Config.hmacSHA512(Config.secretKey, hashData.toString());
-            String paymentUrl = Config.vnp_PayUrl + "?" + query.toString() + "&vnp_SecureHash=" + vnp_SecureHash;
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("code", "00");
-            response.put("message", "success");
-            response.put("data", paymentUrl);
+            System.out.println("dataPayment:"+paymentUrl);
 
             return ResponseEntity.ok(response);
+
 
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Định dạng ID không hợp lệ."));
@@ -781,7 +630,6 @@ public class KhachHangDD {
     }
 
 
-
     @GetMapping("/search1")
     public String searchRooms(@RequestParam("ngayNhan") String ngayNhan,
                               @RequestParam("ngayTra") String ngayTra,
@@ -793,100 +641,20 @@ public class KhachHangDD {
         LocalDateTime endDate = LocalDateTime.parse(ngayTra);
 
         // Lấy danh sách phòng có sẵn theo số người tối đa của loại phòng
-        List<Phong> availableRooms = phongService.getAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi, soPhong);
-
-        // Kiểm tra nếu có đủ số phòng và phòng còn trống
-        if (availableRooms.size() < soPhong) {
-            model.addAttribute("message", "Không đủ phòng để đáp ứng yêu cầu.");
-            return "list/KhachHang/tim"; // Tên view trả về khi không đủ phòng
-        }
-
-        // Ghép phòng cho khách
-        List<RoomGroup> roomGroups = groupRoomsForGuests(availableRooms, soNguoi, soPhong);
+        List<Phong> availableRooms = phongService.getAvailableRoomsWithMaxGuests(startDate, endDate, soNguoi,soPhong);
 
         // Chuyển danh sách phòng thành chuỗi
+        // Tạo chuỗi các ID phòng
         String rooms = availableRooms.stream()
                 .map(phong -> String.valueOf(phong.getIdPhong())) // Đảm bảo getId trả về Integer
                 .collect(Collectors.joining(","));
 
         // Thêm dữ liệu vào model để trả về view
-        model.addAttribute("roomGroups", roomGroups);
+        model.addAttribute("availableRooms", availableRooms);
         model.addAttribute("soPhong", soPhong);
         model.addAttribute("soNguoi", soNguoi);
         model.addAttribute("rooms", rooms);
 
         return "list/KhachHang/tim"; // Tên view trả về (có thể là searchResults.html)
     }
-
-    private List<RoomGroup> groupRoomsForGuests(List<Phong> availableRooms, int soNguoi, int soPhong) {
-        List<RoomGroup> roomGroups = new ArrayList<>();
-        int peopleRemaining = soNguoi;
-
-        // Lọc các phòng có thể chứa số lượng khách yêu cầu (phòng phải đủ chỗ cho ít nhất một người)
-        List<Phong> availableRoomsToUse = availableRooms.stream()
-                .filter(room -> room.getLoaiPhong().getSoNguoiToiDa() >= 1) // Phòng có sức chứa
-                .collect(Collectors.toList());
-
-        // Kiểm tra tổng sức chứa các phòng có đủ cho số khách yêu cầu không
-        int totalCapacity = availableRoomsToUse.stream()
-                .mapToInt(room -> room.getLoaiPhong().getSoNguoiToiDa())
-                .sum();
-
-        if (totalCapacity < soNguoi) {
-            // Nếu không đủ phòng, thông báo hoặc trả về kết quả thất bại
-            System.out.println("Không đủ phòng để chứa hết số khách yêu cầu.");
-            return Collections.emptyList();  // Hoặc trả về thông báo lỗi thích hợp
-        }
-
-        while (peopleRemaining > 0 && roomGroups.size() < soPhong) {
-            List<Phong> roomGroup = new ArrayList<>();
-            int roomCapacity = 0;
-            String roomType = null;
-
-            // Thêm phòng vào nhóm cho đến khi đủ số khách
-            Iterator<Phong> iterator = availableRoomsToUse.iterator();
-            while (iterator.hasNext() && peopleRemaining > 0) {
-                Phong room = iterator.next();
-                int roomMaxCapacity = room.getLoaiPhong().getSoNguoiToiDa();
-
-                if (roomCapacity + roomMaxCapacity <= peopleRemaining) {
-                    roomGroup.add(room);
-                    roomCapacity += roomMaxCapacity;
-                    peopleRemaining -= roomMaxCapacity;
-                    roomType = room.getLoaiPhong().getTenLoaiPhong(); // Gán loại phòng
-                    iterator.remove();  // Xóa phòng đã dùng khỏi danh sách
-                }
-            }
-
-            // Nếu nhóm phòng đã đủ, thêm vào danh sách
-            if (!roomGroup.isEmpty()) {
-                RoomGroup group = new RoomGroup(roomGroup, roomType, roomGroup.size());
-                roomGroups.add(group);
-            }
-
-            // Nếu đã đủ số phòng yêu cầu, thoát khỏi vòng lặp
-            if (roomGroups.size() >= soPhong) {
-                break;
-            }
-        }
-
-        // Kiểm tra nếu còn khách mà không đủ phòng
-        if (peopleRemaining > 0) {
-            System.out.println("Không đủ phòng để chứa hết số khách yêu cầu.");
-            return Collections.emptyList(); // Trả về danh sách trống hoặc có thể xử lý khác
-        }
-
-        // Cập nhật số lượng phòng vào roomGroup
-        for (RoomGroup roomGroup : roomGroups) {
-            roomGroup.setQuantity(roomGroup.getQuantity());  // Đảm bảo rằng `setQuantity()` sẽ lưu lại số phòng trong nhóm
-        }
-
-        return roomGroups;
-    }
-
-
-
-
-
-
 }

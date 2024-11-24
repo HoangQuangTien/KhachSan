@@ -11,101 +11,80 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/styleKH.css}"/>
     <style>
-
-        #loadPhongCustermoContainer {
-            display: flex;
-            flex-wrap: wrap; /* Cho phép các mục phòng xuống dòng */
-            justify-content: space-between; /* Căn đều các mục */
+        /* Đặt container của toàn bộ danh sách phòng vào giữa màn hình */
+        .room-container {
+            max-width: 900px; /* Chiều rộng tối đa */
+            margin: 0 auto; /* Trung tâm hóa */
+            border: 2px solid #ddd; /* Khung viền bao quanh */
+            background-color: #fff; /* Màu nền trắng */
+            border-radius: 10px; /* Bo góc khung viền */
+            padding: 20px; /* Khoảng cách bên trong */
         }
 
-        /* Thêm phần tiêu đề cho Top 3 phòng nổi bật */
-        .top-phong-title {
-            text-align: center;
-            font-size: 2.5em;
+        /* Tiêu đề danh sách phòng */
+        .room-header {
+            font-size: 24px;
             font-weight: bold;
-            color: #333;
-            margin-bottom: 30px;
-            padding-top: 20px;
-            text-transform: uppercase;
-        }
-
-        /* Container Flexbox để các mục phòng hiển thị trên cùng một hàng */
-        .phong-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between; /* Tạo khoảng cách đều giữa các mục phòng */
-            gap: 20px; /* Khoảng cách giữa các mục phòng */
-        }
-
-        /* Style cho phần mục phòng */
-        .phong-item {
-            flex: 1 1 calc(33.333% - 20px); /* Mỗi phòng chiếm 1/3 chiều rộng với khoảng cách nhỏ giữa các mục */
-            border: 1px solid #ddd;
-            padding: 15px;
+            color: #007bff;
+            text-align: center;
             margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            transition: transform 0.2s;
-            background-color: #fff; /* Màu nền trắng cho các mục phòng */
-            overflow: hidden; /* Đảm bảo không bị tràn ra ngoài */
         }
 
-        .phong-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Tăng độ đổ bóng khi hover */
+        /* Thẻ từng phòng */
+        .room-card {
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease;
         }
 
-        .phong-image {
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        /* Hiệu ứng hover cho từng phòng */
+        .room-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .phong-ten {
-            font-size: 1.5em;
+        /* Hình ảnh phòng */
+        .card-img {
+            object-fit: cover;
+            height: 200px;
+            border-radius: 10px;
+        }
+
+        /* Thông tin chi tiết */
+        .card-title {
+            font-size: 20px;
             font-weight: bold;
             color: #333;
-            margin-bottom: 10px;
         }
 
-        .phong-gia {
-            font-size: 1.8em;
-            color: #e74c3c;
+        .card-text {
+            font-size: 16px;
+            color: #555;
+        }
+
+        /*!* Nút đặt phòng *!*/
+        /*.btn {*/
+        /*    font-size: 18px;*/
+        /*    font-weight: bold;*/
+        /*    background-color: #28a745;*/
+        /*    border: none;*/
+        /*    color: white;*/
+        /*    transition: background-color 0.3s ease;*/
+        /*}*/
+
+        .btn:hover {
+            background-color: #218838;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Căn chỉnh danh sách lỗi (nếu có) */
+        .error-message {
+            color: red;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 15px;
+            text-align: center;
         }
 
-        .btn-dat-phong {
-            padding: 10px 20px;
-            font-size: 1em;
-            color: #fff;
-            background-color: #28a745; /* Màu xanh lá cây */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .btn-dat-phong:hover {
-            background-color: #218838; /* Màu xanh lá cây đậm hơn khi hover */
-        }
-
-        /* Responsive: Chuyển thành 2 cột khi màn hình nhỏ hơn */
-        @media (max-width: 992px) {
-            .phong-item {
-                flex: 1 1 calc(50% - 20px); /* Chuyển về dạng 2 cột khi màn hình nhỏ hơn */
-            }
-        }
-
-        /* Responsive: Chuyển thành 1 cột trên thiết bị nhỏ hơn */
-        @media (max-width: 768px) {
-            .phong-item {
-                flex: 1 1 100%; /* Chuyển về dạng 1 cột khi màn hình nhỏ */
-            }
-        }
 
         .card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -202,6 +181,18 @@
             font-size: 16px;
             min-width: 20px;
             text-align: center;
+        }
+
+        /* Thông báo không tìm thấy phòng */
+        .no-rooms-message {
+            font-size: 18px;
+            color: red;
+            font-weight: bold;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            margin: 20px 0;
         }
 
     </style>
@@ -347,58 +338,58 @@
 
 </div>
 
-<div>
-    <!-- Vùng để chèn phòng đã tìm -->
-    <div class="row room-list d-flex flex-wrap mt-4" style="margin-top: 30px;">
-
-        <!-- Hiển thị thông báo lỗi nếu có -->
-        <div th:if="${message}">
-            <p th:text="${message}" style="color: red;"></p>
+<div class="container my-5">
+    <div class="room-container mx-auto shadow-lg rounded-3 p-4">
+        <!-- Kiểm tra nếu không có phòng nào -->
+        <div th:if="${#lists.isEmpty(availableRooms)}">
+            <p class="no-rooms-message text-center">
+                Không có phòng nào đúng với yêu cầu của bạn.
+            </p>
         </div>
+        <div th:if="${!#lists.isEmpty(availableRooms)}">
+            <h3 class="text-primary mb-4 room-header">Phòng đã chọn:</h3>
 
-        <div th:if="${roomGroups != null and roomGroups.size() > 0}">
-            <!-- Lặp qua mỗi nhóm phòng -->
-            <div th:each="roomGroup : ${roomGroups}" class="card shadow mb-3">
+
+            <!-- Danh sách phòng -->
+            <div th:each="phong : ${availableRooms}" class="card room-card mb-4">
                 <div class="row g-0">
+                    <!-- Hình ảnh phòng -->
                     <div class="col-md-4">
-                        <img th:src="@{${roomGroup.getRooms().get(0).img}}" class="card-img" alt="Ảnh phòng" style="object-fit: cover; height: 200px;">
+                        <img th:src="${phong.img}" class="card-img" alt="Ảnh phòng của [[${phong.tenPhong}]]">
                     </div>
+                    <!-- Thông tin phòng -->
                     <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title" th:text="${roomGroup.getRoomType()}"></h5>
+                            <h5 class="card-title" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}"></h5>
                             <p class="card-text">
-                                <strong>Giá:</strong> <span th:text="${#numbers.formatDecimal(roomGroup.getRooms().get(0).loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
+                                <strong>Giá:</strong>
+                                <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
                             </p>
                             <p class="card-text">
-                                <strong>Người tối đa:</strong> <span th:text="${roomGroup.getRooms().get(0).loaiPhong.soNguoiToiDa}"></span> người
+                                <strong>Người tối đa:</strong>
+                                <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span> người
                             </p>
-                            <!-- Hiển thị số lượng phòng theo định dạng xN -->
                             <p class="card-text">
-                                <strong>Số phòng:</strong> <span th:text="'x' + ${roomGroup.getQuantity()}"></span>
+                                <strong>Mô Tả:</strong>
+                                <span th:text="${phong.moTa}"></span>
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </div>
-
-        <div th:if="${roomGroups == null or roomGroups.size() == 0}">
-            <p class="text-danger">Không có phòng nào phù hợp với yêu cầu của bạn.</p>
+            <!-- Nút Đặt phòng -->
+            <div class="d-flex justify-content-start mt-4">
+                <a th:href="@{/view-dat-phong(roomIds=${rooms})}">
+                    <button class="btn btn-success d-flex align-items-center px-5 py-3 shadow-lg rounded-pill">
+                        <i class="fas fa-bed mr-3"></i>
+                        Đặt phòng
+                    </button>
+                </a>
+            </div>
         </div>
-    </div>
-    <!-- Nút Đặt phòng chung cho tất cả các phòng đã chọn -->
-    <div class="d-flex justify-content-start mt-4">
-        <a th:href="@{/view-dat-phong(roomIds=${rooms})}">
-            <button class="btn btn-success d-flex align-items-center px-4 py-2 shadow-sm hover-shadow">
-                <i class="fas fa-bed mr-2"></i>
-                <span class="font-weight-bold">Đặt phòng</span>
-            </button>
-        </a>
     </div>
 </div>
-
 
 
 

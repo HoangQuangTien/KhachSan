@@ -97,6 +97,7 @@ public interface DatPhongService {
     DatPhong findById1(Integer id);
 
 
+
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();
 

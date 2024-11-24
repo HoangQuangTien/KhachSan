@@ -252,7 +252,7 @@
                                     <td th:text="${item.tienConLai + ' VNĐ'}" class="text-nowrap"></td>
                                     <td th:text="${item.tinhTrang}" class="text-nowrap"></td>
                                     <td>
-                <span th:text="${item.trangThai ? 'Đã thanh toán' : 'Chưa thanh toán'}"
+                <span th:text="${item.trangThai ? 'Chưa đặt cọc' : 'Đã đặt cọc'}"
                       th:class="${item.trangThai ? 'badge bg-success' : 'badge bg-warning text-dark'}">
                 </span>
                                     </td>
@@ -307,9 +307,18 @@
                                     <td th:text="${item.tongTien + ' VNĐ'}"></td>
                                     <td th:text="${item.tinhTrang}"></td>
                                     <td>
-                <span th:text="${item.trangThai ? 'Đã thanh toán' : 'Chưa thanh toán'}"
+                <span th:text="${item.trangThai ? 'Đã Thanh Toán' : 'Chưa thanh toán'}"
                       th:class="${item.trangThai ? 'badge bg-success' : 'badge bg-warning text-dark'}">
                 </span>
+                                    </td>
+
+                                    <td>
+                                        <!-- Nút gửi đánh giá -->
+                                        <button type="button" class="btn btn-info"
+                                                data-bs-toggle="modal" data-bs-target="#feedbackModal"
+                                                th:data-bs-id="${item.idPhong}">
+                                            Gửi đánh giá
+                                        </button>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -317,6 +326,43 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Đánh giá -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel">Đánh giá phòng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="feedbackForm">
+                    <div class="form-group">
+                        <label for="soSao">Đánh giá:</label>
+                        <select id="soSao" class="form-control" required>
+                            <option value="5">5 sao</option>
+                            <option value="4">4 sao</option>
+                            <option value="3">3 sao</option>
+                            <option value="2">2 sao</option>
+                            <option value="1">1 sao</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="noiDung">Nội dung:</label>
+                        <textarea id="noiDung" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="roomId">ID phòng:</label>
+                        <!-- Input text để hiển thị ID phòng, bạn có thể cập nhật từ JavaScript -->
+                        <input type="text" id="roomId" class="form-control" readonly>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+                </form>
             </div>
         </div>
     </div>
@@ -381,6 +427,7 @@
 <script
         src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <script>
+
     document.addEventListener('DOMContentLoaded', function () {
         const idForm = document.getElementById('idForm'); // Đảm bảo rằng bạn có id cho form
         if (idForm) {
@@ -498,6 +545,64 @@
         });
     }
 
+
+
+    const feedbackModal = document.getElementById('feedbackModal');
+    feedbackModal.addEventListener('show.bs.modal', function (event) {
+        // Lấy nút kích hoạt modal (nút "Gửi đánh giá")
+        const button = event.relatedTarget;
+        // Lấy ID phòng từ thuộc tính data-bs-id của nút
+        const roomId = button.getAttribute('data-bs-id');
+        // Điền ID phòng vào input
+        const roomIdInput = document.getElementById('roomId');
+        roomIdInput.value = roomId; // Hiển thị ID phòng trong input
+    });
+
+    document.getElementById('feedbackForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const rating = document.getElementById('soSao').value;
+        const feedback = document.getElementById('noiDung').value;
+        const roomId = document.getElementById('roomId').value;
+
+        // Kiểm tra xem có thiếu trường nào không
+        if (!rating || !feedback || !roomId) {
+            alert('Vui lòng điền đầy đủ thông tin!');
+            return;
+        }
+
+        // Gửi thông tin đánh giá đến server (API) bằng Fetch
+        fetch('/api/danhgia', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                soSao: rating,         // Sửa lại tên trường từ rating thành soSao
+                noiDung: feedback,     // Sửa lại tên trường từ feedback thành noiDung
+                idPhong: roomId        // Sửa lại tên trường từ roomId thành idPhong
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Lỗi server: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    alert('Cảm ơn bạn đã gửi đánh giá!');
+                    // Đóng modal
+                    $('#feedbackModal').modal('hide');
+                } else {
+                    alert('Có lỗi xảy ra, vui lòng thử lại.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra, vui lòng thử lại.');
+            });
+    });
 
 </script>
 

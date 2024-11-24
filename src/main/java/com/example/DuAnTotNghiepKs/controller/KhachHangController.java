@@ -146,6 +146,7 @@ public class KhachHangController {
             List<DatPhongDTO> listDatPhongDTO = datPhongService.findByKhachHang_Id(taiKhoanDTO.getKhachHangDTO().getId()); // Phòng đã check-in
             List<DatPhongDTO> listDatPhongDTO1 = datPhongService.findByKhachHang_Id12(taiKhoanDTO.getKhachHangDTO().getId()); // Phòng chưa check-in
 
+
             // Cập nhật thông tin địa chỉ khách hàng, nếu có
             if (listDiaChiKhachHangDTO.size() > 0) {
                 model.addAttribute("userDC", listDiaChiKhachHangDTO.get(0));

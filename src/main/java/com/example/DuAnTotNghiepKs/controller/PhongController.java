@@ -173,9 +173,6 @@ public class PhongController {
                     return "redirect:/phongs"; // Thay đổi đường dẫn đến trang cần thiết
                 }
             }
-//            phong.setTang(tangService.getTangById(phong.getTang().getIdTang()).orElse(null));
-
-//            phong.setDienTich(dienTichService.getDienTichById(phong.getDienTich().getIdDienTich()).orElse(null));
 
             phong.setImg("/img/"+phongDTO.getImg());
 
@@ -186,7 +183,18 @@ public class PhongController {
         } else if ("update".equals(action)) {
 
             Phong existingPhong = phongService.getPhongById(phong.getIdPhong()).orElse(null);
+
+
+
             if (existingPhong != null) {
+
+
+                // Kiểm tra nếu phòng đã được đặt (tinhTrang = true)
+                if (Boolean.TRUE.equals(existingPhong.getTinhTrang())) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa phòng đang có người ở!");
+                    return "redirect:/phongs";
+                }
+
                 // Giữ lại ảnh hiện tại nếu không có ảnh mới
                 if (phongDTO.getImg() == null || phongDTO.getImg().isEmpty()) {
                     // Không có ảnh mới, giữ lại ảnh cũ

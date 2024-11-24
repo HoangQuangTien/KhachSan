@@ -708,7 +708,7 @@
 
                                             <h5 class="mb-1" th:text="${phong.tenPhong}"></h5>
 
-                                            <p class="mb-0" th:text="'Giá: ' + ${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></p>
+                                            <p class="mb-0" th:text="'Giá: ' + ${#numbers.formatCurrency(phong.loaiPhong.gia)}"></p>
 
                                         </div>
 
