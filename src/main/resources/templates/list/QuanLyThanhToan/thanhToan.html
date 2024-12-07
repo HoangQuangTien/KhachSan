@@ -11,6 +11,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Thêm thư viện jsPDF từ CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
 
     <style>
 
@@ -157,7 +161,7 @@
                                          th:data-tenphong="${datPhong.phong.tenPhong}"
                                          th:data-thoigian="${datPhong.ngayNhan} + ' - ' + ${datPhong.ngayTra}"
                                          th:data-ngaycheckin="${#temporals.format(datPhong.ngayCheckIn,'HH:mm - dd/MM/yyyy')}"
-                                         th:data-giaphong="${datPhong.loaiPhong.gia}"
+                                         th:data-giaphong="${datPhong.phong.loaiPhong.gia}"
                                          th:data-tiencoc="${datPhong.tienCoc}"
                                          th:data-tienconlai="${datPhong.tienConLai}"
                                          th:data-tongTien="${datPhong.tongTien}"
@@ -233,7 +237,7 @@
                             <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Tìm kiếm" oninput="searchChekin()" aria-label="Tìm kiếm">
                         </div>
                         <!-- Thêm text mô tả để người dùng biết họ đang tìm kiếm gì -->
-                        <small id="keywordHelp" class="form-text text-muted">Nhập số điện thoại, CCCD để tìm kiếm thông tin.</small>
+                        <small id="keywordHelp" class="form-text text-muted">Nhập mã,tên khách hàng để tìm kiếm thông tin.</small>
                     </div>
                 </div>
 
@@ -286,6 +290,8 @@
                         <input type="hidden" id="idDatPhong" th:field="*{idDatPhong}">
                         <input type="hidden" id="idPhong" th:field="*{idPhong}">
                         <input type="hidden" id="idLoaiPhong" th:field="*{idLoaiPhong}">
+                        <input type="hidden" id="idKhuyenMai" th:field="*{idKhuyenMai}">
+
 
                         <!-- Thông tin khách hàng -->
                         <div class="row border-bottom pb-2 mb-3">
@@ -338,6 +344,7 @@
                                 <select class="form-control" id="voucherId" name="voucherId"  onchange="tinhTongTien()">
                                     <option value="" disabled selected>-- Chọn Khuyen Mai --</option>
                                     <option th:each="voucher : ${activeVouchers}"
+                                            th:if="${voucher.soLuong > 0}"
                                             th:value="${voucher.idKhuyenMai}"
                                             th:data-muc-giam="${voucher.giamGia}"
                                             th:data-so-luong="${voucher.soLuong}"
@@ -346,6 +353,7 @@
                                 </select>
                             </div>
                         </div>
+
 
 
                         <div class="row border-bottom pb-2 mb-3">
@@ -417,9 +425,10 @@
                             <label for="printInvoice" class="form-label font-weight-bold">In hóa đơn</label>
                             <div class="form-switch">
                                 <input class="form-check-input" type="checkbox" id="printInvoice" name="inHoaDon">
-                                <label class="form-check-label" for="printInvoice"></label>
+                                <label class="form-check-label" for="printInvoice">In hóa đơn</label>
                             </div>
                         </div>
+
 
 
                         <div class="mb-3">
@@ -466,6 +475,7 @@
                                 <div class="text-end">
                                     <button type="submit" class="btn btn-success">Thêm phụ phí</button>
                                 </div>
+
                             </form>
 
                             <div class="mt-5">
@@ -547,11 +557,13 @@
         </div>
     </div>
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <!-- Thêm thư viện QRCode.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         let currentPage = 0; // Initial page
         const pageSize = 5; // Page size
 
@@ -585,12 +597,15 @@
                                 ? new Date(transaction.ngayThanhToan).toLocaleDateString()
                                 : 'N/A';
 
+                            // Format tongTien to currency with VND symbol
+                            const formattedTongTien = formatPrice(transaction.tongTien || 0.00);
+
                             row.innerHTML = `
                         <td>${transaction.maThanhToan || 'N/A'}</td>
                         <td>${formattedDate}</td>
                         <td>${transaction.tenPhong || 'N/A'}</td>
                         <td>${transaction.hoVaTen || 'N/A'}</td>
-                        <td>${transaction.tongTien || '0.00'}</td>
+                        <td>${formattedTongTien}</td>
                         <td>${transaction.tinhTrang ? 'Đã Thanh Toán' : 'Chưa Thanh Toán'}</td>
                         <td>${transaction.hoTen || 'N/A'}</td>
                     `;
@@ -602,6 +617,14 @@
                     updatePagination(page, totalPages);
                 })
                 .catch(error => console.error('Error fetching transactions:', error));
+        }
+
+        // Function to format price
+        function formatPrice(price) {
+            return price.toLocaleString('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            });
         }
 
         // Function to update pagination UI
@@ -616,7 +639,7 @@
                     prevButton.href = "#";
                     prevButton.className = 'btn btn-primary me-2';
                     prevButton.textContent = '<<';
-                    prevButton.addEventListener('click', function(event) {
+                    prevButton.addEventListener('click', function (event) {
                         event.preventDefault(); // Prevent default link behavior
                         if (currentPage > 0) {
                             currentPage--;
@@ -635,7 +658,7 @@
                     if (i === currentPage) {
                         pageButton.classList.add('active'); // Highlight the current page
                     }
-                    pageButton.addEventListener('click', function(event) {
+                    pageButton.addEventListener('click', function (event) {
                         event.preventDefault(); // Prevent default link behavior
                         currentPage = i;
                         fetchTransactions(currentPage); // Fetch data for the selected page
@@ -649,7 +672,7 @@
                     nextButton.href = "#";
                     nextButton.className = 'btn btn-primary ms-2';
                     nextButton.textContent = '>>';
-                    nextButton.addEventListener('click', function(event) {
+                    nextButton.addEventListener('click', function (event) {
                         event.preventDefault(); // Prevent default link behavior
                         if (currentPage < totalPages - 1) {
                             currentPage++;
@@ -667,7 +690,7 @@
 
 
     //Lắng nghe sự kiến submit từ form
-    document.getElementById("formPhuPhi").addEventListener('submit', function(event) {
+    document.getElementById("formPhuPhi").addEventListener('submit', function (event) {
         event.preventDefault(); // Ngăn chặn hành vi mặc định của form
 
         const idDatPhong = parseInt(document.getElementById('datPhongId').value, 10);
@@ -800,7 +823,7 @@
     }
 
     //updatePhuPhi
-    document.getElementById("formUpdatePhuPhi").addEventListener('submit', function(event) {
+    document.getElementById("formUpdatePhuPhi").addEventListener('submit', function (event) {
         event.preventDefault();
 
         const idPhuPhi = document.getElementById('idPhuPhiDetail').value;
@@ -852,12 +875,12 @@
         });
     }
 
-    let selectedCard= null
+    let selectedCard = null
 
     // Hàm này điền dữ liệu vào các input fields trong form
     function showForm(idDatPhong, idPhong, idLoaiPhong, hoVaTen,
                       soDienThoai, tenPhong, thoiGian, thoiGianCheckIn,
-                      giaPhong, tienCoc, tienConLai,tongTien ,cardElement) {
+                      giaPhong, tienCoc, tienConLai, tongTien, cardElement) {
         // Điền giá trị vào form
         document.getElementById('idDatPhong').value = idDatPhong;
         document.getElementById('idPhong').value = idPhong;
@@ -868,9 +891,9 @@
         document.getElementById("thoiGian").value = thoiGian;
         document.getElementById("ngayCheckIn").value = thoiGianCheckIn;
         document.getElementById("giaPhong").value = giaPhong;
-        document.getElementById("tienCoc").value = tienCoc.toLocaleString('vi-VN');
+        document.getElementById("tienCoc").value = tienCoc;
         document.getElementById("tongTien").value = tongTien;
-        document.getElementById("tienConLai").value = tienConLai.toLocaleString('vi-VN');;
+        document.getElementById("tienConLai").value = tienConLai;
         // document.getElementById("soTien").value = tongTien;
         document.getElementById("datPhongId").value = idDatPhong;
 
@@ -899,6 +922,15 @@
     }
 
 
+    // function formatCurrency(amount) {
+    //     // Kiểm tra nếu amount không phải là kiểu float, chuyển đổi thành float
+    //     let number = parseFloat(amount);
+    //
+    //     // Định dạng giá tiền theo kiểu VND mà không có ký hiệu đồng
+    //     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+    //         .format(number)
+    //         .replace('₫', ''); // Loại bỏ ký hiệu đồng nếu không cần
+    // }
 
 
     function phuPhiChange(selectElement) {
@@ -1062,6 +1094,16 @@
                             console.error('Lỗi khi xóa CCCD trong bảng NguoiDiCung:', error);
                         });
 
+
+                    // Kiểm tra xem người dùng có chọn in hóa đơn không
+                    const printInvoice = document.getElementById('printInvoice').checked;
+
+                    if (printInvoice) {
+                        // Gọi hàm in hóa đơn
+                        inHoaDon();
+                    }
+
+
                     // Gửi form sau khi các yêu cầu hoàn thành
                     document.getElementById("formId").submit();
                 });
@@ -1070,6 +1112,210 @@
     }
 
 
+    // Hàm in hóa đơn (in trực tiếp)
+    function inHoaDon() {
+        // Lấy thông tin từ form
+        const hoVaTen = document.getElementById("hoVaTen").value;
+        const soDienThoai = document.getElementById("soDienThoai").value;
+        const tenPhong = document.getElementById("tenphong").value;
+        const giaPhong = parseFloat(document.getElementById("giaPhong").value) || 0;
+        const tienCoc = parseFloat(document.getElementById("tienCoc").value) || 0;
+        const tongTien = parseFloat(document.getElementById("tongTien").value) || 0;
+        const giaPhuPhi = parseFloat(document.getElementById("tienPhuPhi").value) || 0; // Lấy giá trị phụ phí
+        const tienConLai = parseFloat(document.getElementById("tienConLai").value) || 0;
+        const voucherSelect = document.getElementById("voucherId");
+        const selectedVoucher = voucherSelect.options[voucherSelect.selectedIndex];
+
+        // Lấy thông tin khuyến mãi (nếu có)
+        let voucherDetails = "Không có khuyến mãi.";
+        let giamGia = 0;
+        let loaiGiam = '';
+
+        if (selectedVoucher.value) {
+            giamGia = selectedVoucher.getAttribute("data-muc-giam");
+            loaiGiam = selectedVoucher.getAttribute("data-loai-giam") === 'true' ? '%' : 'VND';
+            voucherDetails = `Khuyến mãi: Giảm giá ${giamGia.toLocaleLowerCase("vi-VN")} ${loaiGiam}`;
+        }
+
+        const ngayLapHoaDon = new Date().toLocaleString("vi-VN");
+
+        const hoten ="Nguyễn Thảo Linh"
+        // // Tính tổng tiền thực tế (nếu cần)
+        // const tongTienThucTe = tongTien + giaPhuPhi;
+
+        // Nội dung hóa đơn với HTML và CSS
+        const invoiceContent = `
+        <html>
+<head>
+    <title>Hóa Đơn Thanh Toán</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            color: #e65100;  /* Màu cam chủ đạo */
+            font-weight: bold;
+        }
+        .hotel-info {
+            text-align: center;
+            margin-bottom: 30px;
+            background-color: #ffcc80;  /* Màu cam nhạt */
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .hotel-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .customer-info {
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .customer-info p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .customer-info strong {
+            color: #e65100;
+        }
+        .payment-details {
+            margin-bottom: 20px;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .details-table th, .details-table td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+        .details-table th {
+            background-color: #ff9800;  /* Màu cam đậm cho header */
+            color: #fff;
+            font-weight: bold;
+        }
+        .details-table td {
+            background-color: #fff;
+        }
+        .details-table tr:nth-child(even) {
+            background-color: #f8f8f8; /* Màu nền xen kẽ */
+        }
+        .details-table tfoot {
+            background-color: #ffcc80;
+            font-weight: bold;
+        }
+        .details-table tfoot th {
+            color: #fff;
+            background-color: #e65100;  /* Màu cam đậm */
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #777;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .button {
+            background-color: #e65100; /* Màu cam cho nút */
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #ff5722; /* Màu cam sáng khi hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>HÓA ĐƠN THANH TOÁN</h1>
+    <div class="hotel-info">
+        <p><strong>DragonBail Hotel</strong></p>
+        <p>Địa chỉ: P. Kiều Mai, Phúc Diễn, Từ Liêm, Hà Nội</p>
+        <p>Điện thoại: 0397156204</p>
+        <p>Email: contact@dragonballhotel.com</p>
+    </div>
+    <div class="customer-info">
+        <p><strong>Thông tin khách hàng:</strong></p>
+        <p>Họ và tên: ${hoVaTen}</p>
+        <p>Số điện thoại: ${soDienThoai}</p>
+        <p>Ngày lập hóa đơn: ${ngayLapHoaDon}</p>
+        <p>Nhân viên Thanh Toán: ${hoten}</p>
+    </div>
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th>Dịch vụ</th>
+                <th>Chi tiết</th>
+                <th>Thành tiền (VND)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Phòng</td>
+                <td>${tenPhong}</td>
+                <td>${giaPhong.toLocaleString("vi-VN")}/Ngày</td>
+            </tr>
+            <tr>
+                <td>Tiền cọc</td>
+                <td>-</td>
+                <td>${tienCoc.toLocaleString("vi-VN")}</td>
+            </tr>
+            <tr>
+                <td>Tổng Tiền Phòng</td>
+                <td>-</td>
+                <td>${tongTien.toLocaleString("vi-VN")}</td>
+            </tr>
+            <tr>
+                <td>Tiền Phụ Phí</td>
+                <td>-</td>
+                <td>${giaPhuPhi.toLocaleString("vi-VN")}</td>
+            </tr>
+
+             <!-- Thêm thông tin khuyến mãi nếu có -->
+                    <tr>
+                        <td>Khuyến mãi</td>
+                        <td colspan="2">${voucherDetails}</td>
+                    </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="btn btn-warning" colspan="2" >Tổng hóa đơn thanh toán:</th>
+                <td>${tienConLai.toLocaleString("vi-VN")}</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div class="footer">
+        <p>Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!</p>
+        <p>Khách sạn DragonBail Hotel hân hạnh phục vụ quý khách.</p>
+    </div>
+</body>
+</html>`;
+
+        // Tạo cửa sổ in và hiển thị hóa đơn
+        const printWindow = window.open('', '', 'height=800,width=600');
+        printWindow.document.write(invoiceContent);
+        printWindow.document.close();
+
+        // In hóa đơn và tự động đóng cửa sổ
+        printWindow.print();
+        printWindow.close();
+    }
 
 
     var isVoucherApplied = false; // Biến theo dõi voucher đã được chọn hay chưa
@@ -1132,52 +1378,15 @@
     }
 
 
-
-
-
-
-
-
-    document.getElementById('confirmButton').addEventListener('click', function () {
-        const printInvoice = document.getElementById('printInvoice').checked;
-
-        if (printInvoice) {
-            console.log("Người dùng chọn in hóa đơn. Tải hóa đơn...");
-            taiHoaDon(idThanhToan); // Gọi hàm tải hóa đơn (đã định nghĩa ở trên)
-        } else {
-            console.log("Người dùng không chọn in hóa đơn.");
-        }
-    });
-
-    // Hàm tải hóa đơn
-    function taiHoaDon(idThanhToan) {
-        fetch(`/download-invoice?id=${idThanhToan}`, {
-            method: 'GET'
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Không thể tải hóa đơn.");
-                }
-                return response.blob();  // Chuyển đổi dữ liệu thành Blob
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob); // Tạo URL cho Blob
-                const a = document.createElement('a');  // Tạo thẻ <a>
-                a.style.display = 'none';  // Ẩn thẻ <a>
-                a.href = url;  // Đặt URL cho thẻ <a>
-                a.download = 'invoice.pdf';  // Tên file khi tải về
-                document.body.appendChild(a);
-                a.click();  // Mô phỏng click vào thẻ <a> để tải file
-                window.URL.revokeObjectURL(url);  // Hủy URL sau khi sử dụng
-                document.body.removeChild(a);  // Xóa thẻ <a> khỏi DOM
-            })
-            .catch(error => {
-                console.error("Lỗi khi tải hóa đơn:", error);  // Xử lý lỗi
-            });
-    }
-
-
-
+    // document.getElementById('confirmButton').addEventListener('click', function () {
+    //     const printInvoice = document.getElementById('printInvoice').checked;
+    //
+    //     if (printInvoice) {
+    //
+    //     } else {
+    //         console.log("Người dùng không chọn in hóa đơn.");
+    //     }
+    // });
 
 
     // function generateQR(showQR) {
@@ -1200,7 +1409,7 @@
     //     }
     // }
 
-    document.getElementById("paymentForm").addEventListener("submit", function(e) {
+    document.getElementById("paymentForm").addEventListener("submit", function (e) {
         confirmPayment(e);
     });
 
@@ -1228,7 +1437,7 @@
     }
 
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const khuyenMaiSelect = document.getElementById('khuyenMaiSelect');
         console.log("DOM fully loaded and parsed.");
 
@@ -1340,8 +1549,6 @@
     }
 
 
-
-
     function updateTableBody(data) {
         var tableBody = document.getElementById('transactionTableBody');
         tableBody.innerHTML = ''; // Xóa dữ liệu cũ trước khi cập nhật
@@ -1368,8 +1575,8 @@
 
         var hasResults = false; // Biến để kiểm tra có kết quả hay không
 
-        rows.forEach(function(row) {
-            var  hoVaTen  = row.cells[3].innerText.toLowerCase();
+        rows.forEach(function (row) {
+            var hoVaTen = row.cells[3].innerText.toLowerCase();
             var maThanhToan = row.cells[0].innerText.toLowerCase();
             var ngayThanhToan = row.cells[1].innerText.toLowerCase();
             // Kiểm tra xem từ khóa có trong mã đặt phòng hoặc tên khách hàng không
@@ -1391,8 +1598,9 @@
     }
 
 
-
 </script>
+
+
 </body>
 <script th:include="fragment/script :: script"></script>
 

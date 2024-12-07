@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -235,6 +236,12 @@ public class DatPhongController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Ngày trả phòng phải sau ngày nhận phòng."));
             }
 
+            // Kiểm tra khoảng cách tối thiểu 24 giờ
+            Duration duration = Duration.between(ngayNhan, ngayTra);
+            if (duration.toHours() < 24) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Ngày trả phòng và ngày nhận phòng phải cách nhau tối thiểu 24 giờ."));
+            }
+
             // Tính toán tổng tiền phòng và tiền cọc
             float tongTienPhong = 0;
             float tienCoc = 0;
@@ -345,9 +352,17 @@ public class DatPhongController {
                 danhSachPhong.append("- ").append(tenPhong).append("<br>");
             }
 
-            DatPhong datPhong1 = datPhongList.get(0);
-            Integer idPhong = datPhong1.getPhong().getIdPhong();
-            phongService.findById(idPhong);
+//            DatPhong datPhong1 = datPhongList.get(0);
+//            Integer idPhong = datPhong1.getPhong().getIdPhong();
+//            phongService.findById(idPhong);
+
+
+            // Tính tổng tiền cọc của tất cả các phòng đã đặt
+            float tongTienCocTatCaPhong = datPhongList.stream()
+                    .map(DatPhong::getTienCoc) // Lấy tiền cọc của từng đặt phòng
+                    .reduce(0f, Float::sum);   // Tính tổng tiền cọc
+
+
 
             // Gửi email xác nhận đặt phòng thành công cho khách hàng
             String emailKhachHang = khachHangDTO.getEmail(); // Lấy email từ DTO của khách hàng
@@ -362,7 +377,7 @@ public class DatPhongController {
                     "<p style='font-size: 16px;'><strong>Phòng của bạn là:</strong> " +danhSachPhong.toString()   + "</p>" +
                     "<p style='font-size: 16px;'><strong>Ngày nhận phòng:</strong> " + ngayNhanStr + "</p>" +
                     "<p style='font-size: 16px;'><strong>Ngày trả phòng:</strong> " + ngayTraStr + "</p>" +
-                    "<p style='font-size: 16px;'><strong>Số tiền cọc:</strong> " +  datPhong1.getTienCoc()+ " VND</p>" +
+                    "<p style='font-size: 16px;'><strong>Số tiền cọc:</strong> " + String.format("%,.0f", tongTienCocTatCaPhong) + " VND</p>" +
                     "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
                     "<p style='font-size: 16px;'>Chúng tôi mong được đón tiếp bạn và sẽ làm mọi điều có thể để kỳ nghỉ của bạn trở nên hoàn hảo nhất.</p>" +
                     "<p style='font-size: 16px;'>Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua số điện thoại hoặc email hỗ trợ.</p>" +

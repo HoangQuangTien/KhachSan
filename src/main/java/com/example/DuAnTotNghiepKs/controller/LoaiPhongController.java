@@ -234,4 +234,12 @@ public class LoaiPhongController {
         boolean exists = loaiPhongService.isTenLoaiPhongTrung(tenLoaiPhong);
         return Collections.singletonMap("exists", exists);
     }
+
+
+    @GetMapping("/check-tang/{idTang}")
+    public ResponseEntity<?> checkTang(@PathVariable Integer idTang) {
+        boolean exists = loaiPhongService.existsByTangId(idTang);
+        return ResponseEntity.ok(Collections.singletonMap("exists", exists));
+    }
+
 }

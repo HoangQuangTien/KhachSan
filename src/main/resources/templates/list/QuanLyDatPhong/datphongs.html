@@ -184,7 +184,7 @@
                             <!-- Tiền cọc -->
                             <div class="mb-3">
                                 <label for="tienCoc" class="form-label">Tiền Cọc:</label>
-                                <input type="number" class="form-control" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
+                                <input type="text" class="form-control" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
                             </div>
 
                             <!-- Button Đặt phòng -->
@@ -212,7 +212,6 @@
                             <form id="customerForm">
 
                                 <input type="hidden"  id="maKhachHang" name="maKhachHang">
-
                                 <div class="mb-3">
                                     <label for="hoVaTen" class="form-label">Họ và Tên:</label>
                                     <input type="text" class="form-control form-control-sm" id="hoVaTen" name="hoVaTen" placeholder="Họ và tên" required>
@@ -374,8 +373,6 @@
 
 
 
-
-
         function updateTienCoc() {
             const selectedPhongIds = Array.from(document.querySelectorAll('#phongSelect .form-check-input:checked'))
                 .map(input => input.value);
@@ -401,9 +398,14 @@
 
             totalTienConLai = totalTongTienPhong - totalTienCoc; // Tính tiền còn lại
 
+            // Cập nhật các trường liên quan đến tiền cọc và tổng tiền phòng, áp dụng định dạng tiền tệ
+            const formatTien = (tien) => {
+                return tien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            };
+
             // Cập nhật các trường liên quan đến tiền cọc và tổng tiền phòng
             if (tienCocInput) {
-                tienCocInput.value = totalTienCoc.toFixed(2); // Hiển thị 2 chữ số thập phân
+                tienCocInput.value = formatTien(totalTienCoc); // Hiển thị 2 chữ số thập phân
             }
             if (tongTienInput) {
                 tongTienInput.value = totalTongTienPhong.toFixed(2);
@@ -412,9 +414,6 @@
                 tienConLaiInput.value = totalTienConLai.toFixed(2); // Hiển thị 2 chữ số thập phân
             }
         }
-
-
-
 
 
 
@@ -604,6 +603,10 @@
 
 
         document.getElementById('datPhongForm').addEventListener('submit', function (event) {
+
+            // Lấy tham chiếu đến nút submit
+            const submitButton = document.getElementById('submitDatPhongBtn');
+
             const selectedPhongIds = Array.from(document.querySelectorAll('#phongSelect .form-check-input:checked'))
                 .map(input => input.value);
 
@@ -651,6 +654,11 @@
             for (const [key, value] of formData.entries()) {
                 console.log(`${key}: ${value}`);
             }
+
+
+            // Thay đổi trạng thái nút thành "Đang xử lý..."
+            submitButton.textContent = "Đang xử lý...";
+            submitButton.disabled = true;
 
             Swal.fire({
                 title: 'Bạn chắc chắn muốn đặt phòng chứ?',
@@ -701,14 +709,24 @@
                                 text: 'Đã xảy ra lỗi khi gửi yêu cầu đặt phòng. Vui lòng thử lại sau.',
                                 showConfirmButton: true
                             });
+                            resetSubmitButton(submitButton);
                         });
                 } else if (swalResult.isDismissed) {
                     // Người dùng chọn "Không", không thực hiện hành động nào
+                    // Người dùng chọn "Không", khôi phục trạng thái nút
+                    resetSubmitButton(submitButton);
                     console.log('Người dùng đã hủy hành động đặt phòng.');
                 }
             });
             event.preventDefault(); // Ngăn submit form để gửi dữ liệu bằng fetch
         });
+
+
+
+        function resetSubmitButton(submitButton) {
+            submitButton.textContent = "Đặt Phòng"; // Đặt lại văn bản trên nút
+            submitButton.disabled = false;         // Kích hoạt lại nút
+        }
 
 
 

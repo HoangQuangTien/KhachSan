@@ -338,7 +338,7 @@
             <input type="hidden" id="soPhong" name="soPhong" value="1">
             <input type="hidden" id="soNguoi" name="soNguoi" value="1">
             <!-- Search Button -->
-            <button class="btn btn-primary px-4">Tìm</button>
+            <button class="btn btn-primary px-4" type="submit">Tìm</button>
         </form>
 
         <!-- Login Button -->
@@ -469,7 +469,7 @@
                             style="font-size: 1.1rem; font-weight: bold; color: #333;"></h5>
                         <p class="card-text mb-1 text-muted">
                             <strong>Giá: </strong>
-                            <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
+                            <span th:text="${#numbers.formatCurrency(phong.loaiPhong.gia)}"></span> /đêm
                         </p>
                         <p class="card-text mb-1 text-muted">
                             <i class="fas fa-users me-2"></i>
@@ -1319,7 +1319,7 @@
                         <div class="phong-item">
                             <img src="${fixedImageUrl}" alt="${datPhong[2]}" class="phong-image">
                             <h3 class="phong-ten">${datPhong[2]}</h3>
-                            <p class="phong-gia">Giá: ${datPhong[3]} VND</p>
+                            <p class="phong-gia">Giá: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(datPhong[3])}</p>
                             <a href="${url}">
                                 <button class="btn btn-success d-flex align-items-center px-4 py-2 shadow-sm hover-shadow">
                                     <i class="fas fa-bed mr-2"></i>
@@ -1466,6 +1466,7 @@
     });
 
 
+
     let selectedRoomIds = [];
 
     function toggleRoomList() {
@@ -1593,6 +1594,37 @@
         comment.style.transform = `translateY(${translateY}px)`
         count++
     })
+
+
+
+    const ngayNhanInput = document.getElementById('ngayNhan');
+    const ngayTraInput = document.getElementById('ngayTra');
+
+    // Hàm kiểm tra tính hợp lệ của ngày nhận và ngày trả
+    function validateDates() {
+        const ngayNhan = new Date(ngayNhanInput.value);
+        const ngayTra = new Date(ngayTraInput.value);
+
+        if (ngayTra <= ngayNhan) {
+            ngayTraInput.setCustomValidity('Ngày trả phòng phải sau ngày nhận phòng.');
+            return false; // Không hợp lệ
+        } else {
+            ngayTraInput.setCustomValidity('');
+            return true; // Hợp lệ
+        }
+    }
+
+    // Lắng nghe sự kiện 'input' trên các trường
+    ngayNhanInput.addEventListener('input', validateDates);
+    ngayTraInput.addEventListener('input', validateDates);
+
+    // Kiểm tra khi submit form
+    document.querySelector('form').addEventListener('submit', function (event) {
+        if (!validateDates()) {
+            event.preventDefault(); // Ngăn gửi form
+            alert('Ngày trả phòng phải sau ngày nhận phòng!');
+        }
+    });
 
 </script>
 

@@ -562,7 +562,7 @@
         e.preventDefault();
 
         const rating = document.getElementById('soSao').value;
-        const feedback = document.getElementById('noiDung').value;
+        const feedback = document.getElementById('noiDung').value.trim();
         const roomId = document.getElementById('roomId').value;
 
         // Kiểm tra xem có thiếu trường nào không
@@ -602,7 +602,37 @@
                 console.error('Error:', error);
                 alert('Có lỗi xảy ra, vui lòng thử lại.');
             });
+
+
+
+        // Biểu thức regex để phát hiện ký tự đặc biệt
+        const specialCharRegex = /[^a-zA-Z0-9\s.,!?]/;
+
+        // Kiểm tra xem có thiếu trường nào không
+        if (!rating || !feedback || !roomId) {
+            alert('Vui lòng điền đầy đủ thông tin!');
+            return;
+        }
+
+        // Kiểm tra nếu nội dung chỉ toàn khoảng trắng
+        if (feedback === '') {
+            alert('Nội dung không được để trống hoặc chỉ toàn khoảng trắng!');
+            return;
+        }
+
+        // Kiểm tra nếu nội dung chứa ký tự đặc biệt
+        if (specialCharRegex.test(feedback)) {
+            alert('Nội dung không được chứa ký tự đặc biệt!');
+            return;
+        }
+
+
+
     });
+
+
+
+
 
 </script>
 

@@ -9,8 +9,7 @@ import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.LichSuDatPhong;
 import com.example.DuAnTotNghiepKs.repository.DatPhongRepo;
 import com.example.DuAnTotNghiepKs.repository.LichSuDatPhongRepo;
-import com.example.DuAnTotNghiepKs.service.DatPhongService;
-import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
+import com.example.DuAnTotNghiepKs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +25,6 @@ import org.springframework.web.client.RestTemplate;
 import com.example.DuAnTotNghiepKs.DTO.DiaChiKhachHangDTO;
 import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
 import com.example.DuAnTotNghiepKs.entity.KhachHang;
-import com.example.DuAnTotNghiepKs.service.DiaChiKhachHangService;
-import com.example.DuAnTotNghiepKs.service.KhachHangService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -52,6 +49,10 @@ public class KhachHangController {
 
     @Autowired
     private LichSuDatPhongRepo lichSuDatPhongRepo;
+
+
+    @Autowired
+    private EmailService emailService;
 //
 //    @Autowired
 //    private DatPhongService ;
@@ -251,11 +252,17 @@ public class KhachHangController {
         LichSuDatPhong lichSu = new LichSuDatPhong();
         lichSu.setDatPhong(datPhong);
         lichSu.setThoiGianThayDoi(new Date());
-        lichSu.setChiTietThayDoi("Phòng: " + datPhong.getPhong().getTenPhong() + " đã hủy. Lý do: " + lyDoHuy);  // Lý do hủy
+        lichSu.setChiTietThayDoi("Phòng: " + datPhong.getPhong().getTenPhong() + " đã hủy. Lý do: " + lyDoHuy); // Lý do
+        // hủy
         lichSuDatPhongRepo.save(lichSu);
-
-        return "redirect:/khach-hang/trang-ca-nhan?success=PhongDaHuy"; // Trả về trang cá nhân sau khi hủy phòng thành công
+        try {
+            emailService.sendEmailHuyPhong(datPhong.getKhachHang().getEmail(), "Hủy Phòng", datPhong.getKhachHang(),
+                    datPhong.getPhong());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "redirect:/khach-hang/trang-ca-nhan?success=PhongDaHuy"; // Trả về trang cá nhân sau khi hủy phòng thành
+        // công
     }
-
 
 }

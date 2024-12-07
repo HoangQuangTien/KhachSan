@@ -15,11 +15,15 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -55,6 +59,9 @@ public class ThanhToanImp implements ThanhToanService {
 
     @Autowired
     private TaiKhoanService taiKhoanService;
+
+    @Autowired
+    private JavaMailSender emailSender;
 
     @Override
     public boolean xacNhanThanhToan(Integer idDatPhong, Double paymentAmount) {
@@ -227,11 +234,15 @@ public class ThanhToanImp implements ThanhToanService {
         resultDTO.setTienCoc(datPhong.getTienCoc());
         resultDTO.setTongTien(datPhong.getTongTien());
 
-        // Ánh xạ thông tin KhachHang liên quan
+
+// Ánh xạ thông tin KhachHang liên quan
         KhachHang khachHang = datPhong.getKhachHang();
         if (khachHang != null) {
             resultDTO.setHoVaTen(khachHang.getHoVaTen());
             resultDTO.setSoDienThoai(khachHang.getSoDienThoai());
+            resultDTO.setEmail(khachHang.getEmail());
+        } else {
+            System.out.println("Khách hàng không tồn tại.");
         }
 
         return resultDTO;
@@ -242,6 +253,8 @@ public class ThanhToanImp implements ThanhToanService {
         Pageable pageable = PageRequest.of(page, size);
         return thanhToanRepository.findAll(pageable);
     }
+
+
 
 
 
@@ -357,6 +370,22 @@ public class ThanhToanImp implements ThanhToanService {
             return thanhToanDTO;
         } else {
             return null; // Hoặc ném exception nếu bạn muốn
+        }
+    }
+
+
+
+    @Override
+    public void sendEmail(String to, String subject, String text) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(text, true); // true để gửi email dưới dạng HTML
+            emailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace(); // Xử lý ngoại lệ nếu cần
         }
     }
 

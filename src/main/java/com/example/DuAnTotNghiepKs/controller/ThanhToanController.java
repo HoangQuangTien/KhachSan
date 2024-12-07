@@ -85,6 +85,8 @@ public class ThanhToanController {
         }
 
 
+
+
         return "list/QuanLyThanhToan/thanhToan"; // Trả về view
 
 
@@ -130,7 +132,6 @@ public class ThanhToanController {
             // Thông báo thành công
             redirectAttributes.addFlashAttribute("successMessage", "Thanh toán thành công!");
 
-
         } catch (Exception e) {
             // Thêm thông báo lỗi vào redirect nếu có lỗi
             redirectAttributes.addFlashAttribute("errorMessage", "Đã có lỗi xảy ra, vui lòng thử lại!");
@@ -139,41 +140,6 @@ public class ThanhToanController {
         // Redirect về trang thanh toán nếu có lỗi
         return "redirect:/thanhToan";
     }
-
-    @GetMapping("/download-invoice")
-    public ResponseEntity<byte[]> downloadInvoice(@RequestParam("id") Integer idThanhToan) {
-        try {
-            // Lấy thông tin thanh toán từ ID
-            ThanhToanDTO thanhToanDTO = thanhToanService.getThanhToanById(idThanhToan);
-            if (thanhToanDTO == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);  // Không tìm thấy
-            }
-
-            // Tạo PDF từ thông tin thanh toán
-            byte[] pdfBytes = thanhToanService.createInvoicePDF(thanhToanDTO);
-
-            // Kiểm tra nếu pdfBytes null hoặc rỗng
-            if (pdfBytes == null || pdfBytes.length == 0) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Nếu không có PDF
-            }
-
-            // Tạo headers để trình duyệt tải về file PDF
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "invoice_" + idThanhToan + ".pdf");
-
-            // Trả về phản hồi chứa file PDF
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(pdfBytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Xử lý lỗi
-        }
-    }
-
-
-
 
 
 

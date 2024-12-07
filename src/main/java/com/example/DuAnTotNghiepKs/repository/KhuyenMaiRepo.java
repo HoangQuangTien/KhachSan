@@ -50,6 +50,6 @@ public interface KhuyenMaiRepo extends JpaRepository<KhuyenMai,Integer> {
 //    Page<KhuyenMai> searchKhuyenmai1(@Param("keyword") String keyword, @Param("trangThai") String trangThai, Pageable pageable);
 
 
-    Page<KhuyenMai> findByMaKhuyenMaiContainingOrTenKhuyenMaiContainingAndTrangThai(String maKhuyenMai, String tenKhuyenMai, String trangThai, Pageable pageable);
+    Page<KhuyenMai> findByTenKhuyenMaiContainingOrTenKhuyenMaiContainingAndTrangThai(String maKhuyenMai, String tenKhuyenMai, String trangThai, Pageable pageable);
     Page<KhuyenMai> findByTrangThai(String trangThai, Pageable pageable);
 }

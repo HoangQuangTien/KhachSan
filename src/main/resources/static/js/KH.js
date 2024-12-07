@@ -7,7 +7,7 @@ const content = {
         roomSystem: "Hệ Thống Phòng",
         about: "Giới Thiệu",
         rules: "Quy Tắc",
-        login: "Đăng Nhập",
+        // login: "Đăng Nhập",
         address: "Địa Chỉ: P. Kieu Mai, Phuc Dien, Tu Liem, Hanoi",
         email: "Email: contact@dragonballhotel.com",
         phone: "Điện Thoại: +84 397156204",
@@ -68,7 +68,7 @@ const elements = {
     roomSystemTab: document.querySelector('#tab-hethongphong'),
     aboutTab: document.querySelector('#tab-gioithieu'),
     rulesTab: document.querySelector('#tab-quytac'),
-    loginButton: document.querySelector('.login-button-container .btn'),
+    // loginButton: document.querySelector('.login-button-container .btn'),
     footerTitle: document.querySelector('.bg-dark h5.text-white:nth-of-type(1)'),
     footerContact: document.querySelector('.bg-dark h5.text-white:nth-of-type(2)'),
     footerAddress: document.querySelector('.bg-dark p:nth-of-type(1)'),
@@ -95,7 +95,7 @@ function updateContent(language) {
     elements.roomSystemTab.textContent = langContent.tabRoomSystem;
     elements.aboutTab.textContent = langContent.tabAbout;
     elements.rulesTab.textContent = langContent.tabRules;
-    elements.loginButton.textContent = langContent.login;
+    // elements.loginButton.textContent = langContent.login;
     elements.footerTitle.textContent = langContent.footerTitle;
     elements.footerContact.textContent = langContent.footerContact;
     elements.footerAddress.textContent = langContent.address;

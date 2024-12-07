@@ -39,6 +39,9 @@ public class DanhSachDatPhong {
     @Autowired
     private ThamSoService thamSoService;
 
+    @Autowired
+    private EmailService emailService;
+
     @GetMapping()
     public String showDatPhongList(Model model) {
         // Lấy tất cả thông tin đặt phòng chưa check-in
@@ -103,19 +106,6 @@ public class DanhSachDatPhong {
             // Lấy thời gian dự kiến nhận phòng từ đặt phòng
 
 
-//            LocalDateTime ngayTraPhong = datPhong.getNgayTra(); // Lấy ngày trả phòng
-//
-//            if (ngayTraPhong.isAfter(now) && datPhong.getNhanVienCheckIn() == null) {
-//                // Nếu ngày trả phòng lớn hơn hiện tại và chưa check-in
-//                datPhong.setTinhTrang("Đã Hủy"); // Cập nhật trạng thái đặt phòng thành "Đã hủy"
-//                datPhongService.saveDatPhong1(datPhong);
-//
-//                Phong phong = datPhong.getPhong();
-//                phong.setTrangThai(true); // Đặt trạng thái phòng thành có sẵn
-//                phongService.savePhong(phong); // Lưu lại trạng thái phòng
-//
-//                return ResponseEntity.ok(Map.of("success", "Đặt phòng đã bị hủy do quas thoi gian check-in."));
-//            }
             // Cập nhật thông tin check-in
             NhanVien nhanVienCheckIn = taiKhoan.getNhanVien();
             datPhong.setNhanVienCheckIn(nhanVienCheckIn); // Lưu đối tượng NhanVien
@@ -133,6 +123,38 @@ public class DanhSachDatPhong {
             datPhong.setNgayCheckIn(LocalDateTime.now()); // lấy ngày hiện tại
 
             datPhongService.saveDatPhong1(datPhong);
+
+
+            // Gửi email xác nhận check-in thành công
+            String emailKhachHang = datPhong.getKhachHang().getEmail(); // Lấy email khách hàng từ đối tượng đặt phòng
+            String subject = "Xác nhận check-in thành công tại DRAGONBALL HOTEL";
+            String text = "<html>" +
+                    "<body style='font-family: Arial, sans-serif; color: #333333; background-color: #f9f9f9;'>" +
+                    "<div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px;'>" +
+                    "<h2 style='color: #4CAF50; text-align: center;'>Xin chào " + datPhong.getKhachHang().getHoVaTen() + ",</h2>" +
+                    "<p style='font-size: 16px;'>Chúng tôi xin thông báo rằng bạn đã check-in thành công tại <strong>DRAGONBALL HOTEL</strong>!</p>" +
+                    "<p style='font-size: 16px;'>Dưới đây là thông tin check-in của bạn:</p>" +
+                    "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                    "<p style='font-size: 16px;'><strong>Nhân viên checkin:</strong> " + datPhong.getNhanVienCheckIn().getHoTen() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Phòng:</strong> " + datPhong.getPhong().getTenPhong() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Ngày nhận phòng:</strong> " + datPhong.getNgayNhan() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Ngày check-in:</strong> " + datPhong.getNgayTra() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Số người tối đa:</strong> " + datPhong.getLoaiPhong().getSoNguoiToiDa() + "</p>" +
+                    "<p style='font-size: 16px;'>Chúng tôi rất mong bạn sẽ có một kỳ nghỉ thoải mái tại khách sạn của chúng tôi!</p>" +
+                    "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                    "<p style='font-size: 16px;'>Nếu bạn có bất kỳ câu hỏi hoặc yêu cầu nào, vui lòng liên hệ với chúng tôi.</p>" +
+                    "<p style='font-size: 16px;'>Trân trọng,<br>Đội ngũ quản lý khách sạn <strong>DRAGONBALL HOTEL</strong></p>" +
+                    "<footer style='margin-top: 20px; font-size: 12px; text-align: center; color: #666666;'>" +
+                    "<p>Địa chỉ: Tòa nhà FPT Polytechnic, Phố Trịnh Văn Bô, Nam Từ Liêm, Hà Nội.</p>" +
+                    "<p>Điện thoại: 0397156204 | Email: support@dragonballhotel.com</p>" +
+                    "<p>&copy; 2024 DRAGONBALL HOTEL. Tất cả các quyền được bảo lưu.</p>" +
+                    "</footer>" +
+                    "</div>" +
+                    "</body>" +
+                    "</html>";
+
+            // Gửi email xác nhận
+            datPhongService.sendEmail(emailKhachHang, subject, text);
             return ResponseEntity.ok(Map.of("success", "Check-in thành công!"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -178,19 +200,18 @@ public class DanhSachDatPhong {
             // Lấy thời gian dự kiến nhận phòng từ đặt phòng
 
 
-//            LocalDateTime ngayTraPhong = datPhong.getNgayTra(); // Lấy ngày trả phòng
-//
-//            if (ngayTraPhong.isAfter(now) && datPhong.getNhanVienCheckIn() == null) {
-//                // Nếu ngày trả phòng lớn hơn hiện tại và chưa check-in
-//                datPhong.setTinhTrang("Đã Hủy"); // Cập nhật trạng thái đặt phòng thành "Đã hủy"
-//                datPhongService.saveDatPhong1(datPhong);
-//
-//                Phong phong = datPhong.getPhong();
-//                phong.setTrangThai(true); // Đặt trạng thái phòng thành có sẵn
-//                phongService.savePhong(phong); // Lưu lại trạng thái phòng
-//
-//                return ResponseEntity.ok(Map.of("success", "Đặt phòng đã bị hủy do quas thoi gian check-in."));
-//            }
+            // Lấy thời gian dự kiến nhận phòng từ đặt phòng
+            LocalDateTime ngayTraPhong = datPhong.getNgayTra();
+            // Kiểm tra nếu đặt phòng đã hết hạn (quá ngày nhận phòng) hoặc đã bị hủy
+            if ((ngayTraPhong != null && now.isAfter(ngayTraPhong)) || "Đã Hủy".equals(datPhong.getTinhTrang())) {
+                // Cập nhật trạng thái đặt phòng thành "Đã Hủy"
+                datPhong.setTinhTrang("Đã Hủy");
+                datPhongService.saveDatPhong1(datPhong);
+
+
+                return ResponseEntity.badRequest().body(Map.of("error", "Không thể check-in vì đặt phòng đã quá hạn hoặc bị hủy. Trạng thái đã được cập nhật."));
+            }
+
             // Cập nhật thông tin check-in
             NhanVien nhanVienCheckIn = taiKhoan.getNhanVien();
             datPhong.setNhanVienCheckIn(nhanVienCheckIn); // Lưu đối tượng NhanVien
@@ -208,6 +229,38 @@ public class DanhSachDatPhong {
             datPhong.setNgayCheckIn(LocalDateTime.now()); // lấy ngày hiện tại
 
             datPhongService.saveDatPhong1(datPhong);
+
+
+            // Gửi email xác nhận check-in thành công
+            String emailKhachHang = datPhong.getKhachHang().getEmail(); // Lấy email khách hàng từ đối tượng đặt phòng
+            String subject = "Xác nhận check-in thành công tại DRAGONBALL HOTEL";
+            String text = "<html>" +
+                    "<body style='font-family: Arial, sans-serif; color: #333333; background-color: #f9f9f9;'>" +
+                    "<div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px;'>" +
+                    "<h2 style='color: #4CAF50; text-align: center;'>Xin chào " + datPhong.getKhachHang().getHoVaTen() + ",</h2>" +
+                    "<p style='font-size: 16px;'>Chúng tôi xin thông báo rằng bạn đã check-in thành công tại <strong>DRAGONBALL HOTEL</strong>!</p>" +
+                    "<p style='font-size: 16px;'>Dưới đây là thông tin check-in của bạn:</p>" +
+                    "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                    "<p style='font-size: 16px;'><strong>Nhân viên checkin:</strong> " + datPhong.getNhanVienCheckIn().getHoTen() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Phòng:</strong> " + datPhong.getPhong().getTenPhong() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Ngày nhận phòng:</strong> " + datPhong.getNgayNhan() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Ngày check-in:</strong> " + datPhong.getNgayTra() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>Số người tối đa:</strong> " + datPhong.getLoaiPhong().getSoNguoiToiDa() + "</p>" +
+                    "<p style='font-size: 16px;'>Chúng tôi rất mong bạn sẽ có một kỳ nghỉ thoải mái tại khách sạn của chúng tôi!</p>" +
+                    "<hr style='border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                    "<p style='font-size: 16px;'>Nếu bạn có bất kỳ câu hỏi hoặc yêu cầu nào, vui lòng liên hệ với chúng tôi.</p>" +
+                    "<p style='font-size: 16px;'>Trân trọng,<br>Đội ngũ quản lý khách sạn <strong>DRAGONBALL HOTEL</strong></p>" +
+                    "<footer style='margin-top: 20px; font-size: 12px; text-align: center; color: #666666;'>" +
+                    "<p>Địa chỉ: Tòa nhà FPT Polytechnic, Phố Trịnh Văn Bô, Nam Từ Liêm, Hà Nội.</p>" +
+                    "<p>Điện thoại: 0397156204 | Email: support@dragonballhotel.com</p>" +
+                    "<p>&copy; 2024 DRAGONBALL HOTEL. Tất cả các quyền được bảo lưu.</p>" +
+                    "</footer>" +
+                    "</div>" +
+                    "</body>" +
+                    "</html>";
+
+            // Gửi email xác nhận
+            datPhongService.sendEmail(emailKhachHang, subject, text);
             return ResponseEntity.ok(Map.of("success", "Check-in thành công!"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -217,9 +270,8 @@ public class DanhSachDatPhong {
 
 
     @PostMapping("/cancel-booking")
-    public ResponseEntity<Map<String, Object>> cancelBooking(
-            @RequestParam("idDatPhong") Integer idDatPhong,
-            @RequestParam("reason") String reason) { // Thêm tham số lý do hủy
+    public ResponseEntity<Map<String, Object>> cancelBooking(@RequestParam("idDatPhong") Integer idDatPhong,
+                                                             @RequestParam("reason") String reason) { // Thêm tham số lý do hủy
         Map<String, Object> response = new HashMap<>();
         try {
             // Tìm đặt phòng theo ID
@@ -236,10 +288,12 @@ public class DanhSachDatPhong {
             // Lưu lịch sử hủy
             LichSuDatPhong lichSuDatPhong = new LichSuDatPhong();
             lichSuDatPhong.setDatPhong(datPhong);
-            lichSuDatPhong.setChiTietThayDoi("Phòng: " + datPhong.getPhong().getTenPhong() + " đã hủy. Lý do: " + reason);
-            lichSuDatPhong.setThoiGianThayDoi(new Date());  // Thời gian hủy hiện tại
+            lichSuDatPhong
+                    .setChiTietThayDoi("Phòng: " + datPhong.getPhong().getTenPhong() + " đã hủy. Lý do: " + reason);
+            lichSuDatPhong.setThoiGianThayDoi(new Date()); // Thời gian hủy hiện tại
             lichSuDatPhongService.saveLichSuDatPhong(lichSuDatPhong);  // Lưu lịch sử hủy
-
+            emailService.sendEmailHuyPhong(datPhong.getKhachHang().getEmail(), "Hủy Phòng", datPhong.getKhachHang(),
+                    datPhong.getPhong());
 
             response.put("success", true);
             response.put("message", "Hủy phòng thành công!");
@@ -249,6 +303,4 @@ public class DanhSachDatPhong {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
-
 }

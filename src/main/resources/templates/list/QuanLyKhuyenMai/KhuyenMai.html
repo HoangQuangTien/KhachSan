@@ -253,8 +253,8 @@
                             <td th:text="${khuyenMai.giamGia}">Giảm Giá</td>
                             <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
                             <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
-                            <td th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
-                            <td th:text="${khuyenMai.giamToiDa}">Giảm Tối Đa</td>
+                            <td class="format-number" th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
+                            <td class="format-number" th:text="${khuyenMai.giamToiDa}">Giảm Tối Đa</td>
                             <td th:text="${khuyenMai.trangThai}">Trạng Thái</td>
                             <td>
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
@@ -536,8 +536,55 @@
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
+        const elements = document.querySelectorAll('.format-number');
+        elements.forEach(function (element) {
+            const rawNumber = parseFloat(element.textContent.trim());
+            if (!isNaN(rawNumber)) {
+                element.textContent = rawNumber.toLocaleString('vi-VN');
+            }
+        });
         const formElement = document.getElementById('form-add-promotion');
+        const tenKhuyenMaiInput = document.getElementById('tenKhuyenMai');
+        const moTaInput = document.getElementById('moTa');
+        const editTenKhuyenMaiInput = document.getElementById('editTenKhuyenMai');
+        const editMoTaInput = document.getElementById('editMoTa');
+        tenKhuyenMaiInput.addEventListener('input', function () {
+            const cursorPosition = tenKhuyenMaiInput.selectionStart;
+            let sanitizedValue = tenKhuyenMaiInput.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            tenKhuyenMaiInput.value = sanitizedValue;
 
+            tenKhuyenMaiInput.setSelectionRange(cursorPosition, cursorPosition);
+        });
+        moTaInput.addEventListener('input', function () {
+            const cursorPosition = moTaInput.selectionStart;
+            let sanitizedValue = moTaInput.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            moTaInput.value = sanitizedValue;
+
+            moTaInput.setSelectionRange(cursorPosition, cursorPosition);
+        });
+
+        editTenKhuyenMaiInput.addEventListener('input', function () {
+            const cursorPosition = editTenKhuyenMaiInput.selectionStart;
+            let sanitizedValue = editTenKhuyenMaiInput.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            editTenKhuyenMaiInput.value = sanitizedValue;
+
+            editTenKhuyenMaiInput.setSelectionRange(cursorPosition, cursorPosition);
+        });
+        editMoTaInput.addEventListener('input', function () {
+            const cursorPosition = editMoTaInput.selectionStart;
+            let sanitizedValue = editMoTaInput.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            editMoTaInput.value = sanitizedValue;
+
+            editMoTaInput.setSelectionRange(cursorPosition, cursorPosition);
+        });
         formElement.addEventListener('submit', async function (event) {
             event.preventDefault();
 
@@ -558,11 +605,14 @@
             // Log giá trị giamGia để kiểm tra
             console.log("Giảm giá:", fields.giamGia);
 
+            console.log("Giảm giá:", fields.loaiGiam);
+
             // Kiểm tra phần trăm giảm giá không vượt quá 100%
-            if (fields.loaiGiam === 'phanTram' && fields.giamGia > 100) {
+            if (fields.loaiGiam === 'true' && fields.giamGia > 100) { // '0' là phần trăm
                 showErrorToast('Giảm giá phần trăm không thể vượt quá 100%.');
                 return; // Dừng thực hiện nếu có lỗi
             }
+
 
             // Kiểm tra đầu vào
             const today = new Date();
@@ -572,6 +622,13 @@
                 showErrorToast('Vui lòng điền đầy đủ thông tin.');
                 return;
             }
+
+            const specialCharPattern = /[^\p{L}\p{N}\s]/u;
+            if (specialCharPattern.test(fields.tenKhuyenMai)) {
+                showErrorToast('Tên khuyến mãi không được chứa ký tự đặc biệt.');
+                return;
+            }
+
             if (fields.soLuong <= 0) {
                 showErrorToast('Số lượng phải lớn hơn 0.');
                 return;
@@ -754,7 +811,7 @@
     function searchInModal() {
         var input, filter, table, tr, td, i, txtValue;
         input = document.getElementById("modalSearchInput");
-        filter = input.value.toUpperCase();
+        filter = input.value.trim().toUpperCase();
         table = document.querySelector(".modal-body table");
         tr = table.getElementsByTagName("tr");
 
@@ -862,8 +919,8 @@
             <td>${khuyenMai.giamGia}</td>
             <td>${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}</td>
             <td>${khuyenMai.soLuong}</td>
-            <td>${khuyenMai.giamToiThieu}</td>
-            <td>${khuyenMai.giamToiDa}</td>
+            <td class="format-number">${khuyenMai.giamToiThieu}</td>
+            <td class="format-number">${khuyenMai.giamToiDa}</td>
             <td>${khuyenMai.trangThai}</td>
             <td>
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editKhuyenMaiModal"
@@ -878,6 +935,13 @@
         // Hiện hoặc ẩn bảng dựa trên có kết quả hay không
         const originalTableContainer = document.querySelector('.table-container');
         originalTableContainer.style.display = khuyenMais.length > 0 ? 'block' : 'none';
+        const elementt = document.querySelectorAll('.format-number');
+        elementt.forEach(function (element) {
+            const rawNumber = parseFloat(element.textContent.trim());
+            if (!isNaN(rawNumber)) {
+                element.textContent = rawNumber.toLocaleString('vi-VN'); // Định dạng số theo chuẩn Việt Nam
+            }
+        });
     }
 
 </script>

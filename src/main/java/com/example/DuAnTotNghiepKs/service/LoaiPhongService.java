@@ -84,4 +84,9 @@ public class LoaiPhongService {
     public boolean isTenLoaiPhongTrung(String tenLoaiPhong) {
         return loaiPhongRepository.existsByTenLoaiPhong(tenLoaiPhong);
     }
+
+    public boolean existsByTangId(Integer idTang) {
+        return loaiPhongRepository.existsByTang_IdTang(idTang);
+    }
+
 }

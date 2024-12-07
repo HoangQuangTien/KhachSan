@@ -124,6 +124,9 @@ public class KhachHangDD {
                         .map(Phong::getTenPhong)
                         .collect(Collectors.toList());
 
+
+
+
                 String emailKhachHang = khachHang.getEmail();
                 String subject = "Xác nhận đặt phòng thành công tại DRAGONBALL HOTEL";
                 String text = "<html>" +

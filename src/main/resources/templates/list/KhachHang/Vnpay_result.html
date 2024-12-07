@@ -10,129 +10,233 @@
     <!-- Custom styles for this template -->
     <link href="/assets/assets1/jumbotron-narrow.css" rel="stylesheet">
     <script src="/assets/assets1/jquery-1.11.3.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+          integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link
+            href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+            rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <!-- Custom CSS -->
+    <!--    <link rel="stylesheet" th:href="@{/css/styleKH.css}" />-->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+            rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .result-success, .result-failed {
+            text-align: center;
+        }
+
+        .result-success i, .result-failed i {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .result-success h4, .result-failed h4 {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .result-success {
+            color: #28a745;
+        }
+
+        .result-success i {
+            color: #28a745;
+        }
+
+        .result-success h4 {
+            color: #28a745;
+        }
+
+        .result-failed {
+            color: #dc3545;
+        }
+
+        .result-failed i {
+            color: #dc3545;
+        }
+
+        .result-failed h4 {
+            color: #dc3545;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer p {
+            font-size: 14px;
+        }
+
+        .footer p.text-muted {
+            color: #6c757d;
+        }
+
+        .footer p.text-primary {
+            color: #007bff;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <div class="container my-5">
-        <!-- Header -->
-        <div class="text-center mb-4">
-            <h3 class="text-primary font-weight-bold">Kết Quả Thanh Toán</h3>
-            <p class="text-muted">Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
-        </div>
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h3 class="text-primary font-weight-bold">Kết Quả Thanh Toán</h3>
+    </div>
 
-        <!-- Payment Details Table -->
-        <div class="card shadow">
-            <div class="card-body">
-                <table class="table table-hover">
-                    <tbody>
-                    <tr>
-                        <th class="text-right text-secondary">Mã Giao Dịch Thanh Toán:</th>
-                        <td class="font-weight-bold" th:text="${vnp_TxnRef}"></td>
-                    </tr>
-                    <tr>
-                        <th class="text-right text-secondary">Số Tiền:</th>
-                        <td class="font-weight-bold" th:text="${vnp_Amount}"></td>
-                    </tr>
-                    <tr>
-                        <th class="text-right text-secondary">Mô Tả Giao Dịch:</th>
-                        <td th:text="${vnp_OrderInfo}"></td>
-                    </tr>
-                    <tr>
-                        <th class="text-right text-secondary">Mã Lỗi Thanh Toán:</th>
-                        <td th:text="${vnp_ResponseCode}"></td>
-                    </tr>
-                    <tr>
-                        <th class="text-right text-secondary">Mã Giao Dịch Tại VNPAY-QR:</th>
-                        <td th:text="${vnp_TransactionNo}"></td>
-                    </tr>
-                    <tr>
-                        <th class="text-right text-secondary">Mã Ngân Hàng Thanh Toán:</th>
-                        <td th:text="${vnp_BankCode}"></td>
-                    </tr>
-                    <tr>
-                        <th class="text-right text-secondary">Thời Gian Thanh Toán:</th>
-                        <td th:text="${vnp_PayDate}"></td>
-                    </tr>
-                    <tr>
-                        <th class="text-right text-secondary">Tình Trạng Giao Dịch:</th>
-                        <td>
-                            <span th:if="${isValidSignature}">
-                                <span th:text="${vnp_TransactionStatus == '00' ? 'Thành công' : 'Không thành công'}"
-                                      class="badge"
-                                      th:classappend="${vnp_TransactionStatus == '00' ? 'badge-success' : 'badge-danger'}"></span>
-                            </span>
-                            <span th:unless="${isValidSignature}" class="badge badge-warning">
-                                Chữ ký không hợp lệ
-                            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+    <!-- Payment Result Notification -->
+    <div class="card shadow">
+        <div class="card-body text-center">
+            <!-- Thanh toán thành công -->
+            <div th:if="${vnp_TransactionStatus == '00'}" class="result-success">
+                <i class="fas fa-check-circle text-success" style="font-size: 80px;"></i>
+                <h4 class="mt-3 font-weight-bold text-success">Thanh toán thành công!</h4>
+                <p class="text-muted">Thông tin đơn hàng: <span>Tiền cọc đặt phòng khách sạn</span></p>
+                <p class="text-muted">Số tiền: <span th:text="${vnp_Amount}"></span> VNĐ</p>
+                <p class="text-muted">Thời gian thanh toán: <span th:text="${vnp_PayDate}"></span></p>
+                <p class="text-muted">Mã giao dịch: <span th:text="${vnp_TxnRef}"></span></p>
+
             </div>
-        </div>
 
-        <!-- Footer -->
-        <div class="text-center mt-4">
-            <p class="text-muted">&copy; 2024 VNPAY - Tất cả các quyền được bảo lưu.</p>
-            <p class="font-italic text-primary">Cảm ơn bạn đã tin tưởng chúng tôi!</p>
+            <!-- Thanh toán không thành công -->
+            <div th:unless="${vnp_TransactionStatus == '00'}" class="result-failed">
+                <i class="fas fa-times-circle text-danger" style="font-size: 80px;"></i>
+                <h4 class="mt-3 font-weight-bold text-danger">Thanh toán không thành công!</h4>
+                <p class="text-muted">Vui lòng kiểm tra lại thông tin giao dịch hoặc liên hệ với bộ phận hỗ trợ.</p>
+            </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <div class="footer mt-4">
+        <p class="text-muted">&copy; 2024 VNPAY - Tất cả các quyền được bảo lưu.</p>
+        <p class="font-italic text-primary">Cảm ơn bạn đã tin tưởng chúng tôi!</p>
+
+        <div class="my-3">
+            <a href="/khach-hang" class="btn btn-primary">
+                Về trang chủ
+            </a>
+        </div>
+    </div>
 </div>
 </body>
-</html>
-
-Vnpay_ipn.html
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thanh Toán VNPAY</title>
-    <link rel="stylesheet" href="/assets/assets1/bootstrap.min.css">
-    <script src="/assets/assets1/jquery-1.11.3.min.js"></script>
-</head>
-<body>
-<div class="container">
-    <h1>Xử Lý Thanh Toán</h1>
-    <div id="response-message"></div>
-</div>
-
 <script>
-    // Hàm xử lý phản hồi từ VNPAY
-    function handleVNPAYResponse(response) {
-        let message;
-        switch (response.RspCode) {
-            case "00":
-                message = "Xác nhận thanh toán thành công.";
-                break;
-            case "01":
-                message = "Đơn hàng không tồn tại.";
-                break;
-            case "02":
-                message = "Đơn hàng đã được xác nhận.";
-                break;
-            case "04":
-                message = "Số tiền không hợp lệ.";
-                break;
-            case "97":
-                message = "Sai checksum.";
-                break;
-            default:
-                message = "Có lỗi xảy ra.";
-        }
-        document.getElementById('response-message').innerHTML = message;
-    }
 
-    // Giả lập phản hồi từ VNPAY
-    const mockResponse = {
-        RspCode: "00", // Thay đổi giá trị này để kiểm tra các trường hợp khác
-        Message: "Confirm Success"
-    };
+    // Lấy số tiền từ thuộc tính data-amount
+    var amount = parseInt(document.getElementById('formattedAmount').getAttribute('data-amount')) / 100;  // Chia cho 100
 
-    // Gọi hàm xử lý với phản hồi giả lập
-    handleVNPAYResponse(mockResponse);
+    // Định dạng số tiền thành dạng tiền tệ VNĐ
+    var formattedAmount = amount.toLocaleString('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    });
+
+    // Gán số tiền đã định dạng vào span
+    document.getElementById('formattedAmount').innerText = formattedAmount;
 </script>
-</body>
 </html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="vi">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Thanh Toán VNPAY</title>-->
+<!--    <link rel="stylesheet" href="/assets/assets1/bootstrap.min.css">-->
+<!--    <script src="/assets/assets1/jquery-1.11.3.min.js"></script>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <h1>Xử Lý Thanh Toán</h1>-->
+<!--    <div id="response-message"></div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    // Hàm xử lý phản hồi từ VNPAY-->
+<!--    function handleVNPAYResponse(response) {-->
+<!--        let message;-->
+<!--        switch (response.RspCode) {-->
+<!--            case "00":-->
+<!--                message = "Xác nhận thanh toán thành công.";-->
+<!--                break;-->
+<!--            case "01":-->
+<!--                message = "Đơn hàng không tồn tại.";-->
+<!--                break;-->
+<!--            case "02":-->
+<!--                message = "Đơn hàng đã được xác nhận.";-->
+<!--                break;-->
+<!--            case "04":-->
+<!--                message = "Số tiền không hợp lệ.";-->
+<!--                break;-->
+<!--            case "97":-->
+<!--                message = "Sai checksum.";-->
+<!--                break;-->
+<!--            default:-->
+<!--                message = "Có lỗi xảy ra.";-->
+<!--        }-->
+<!--        document.getElementById('response-message').innerHTML = message;-->
+<!--    }-->
+
+<!--    // Giả lập phản hồi từ VNPAY-->
+<!--    const mockResponse = {-->
+<!--        RspCode: "00", // Thay đổi giá trị này để kiểm tra các trường hợp khác-->
+<!--        Message: "Confirm Success"-->
+<!--    };-->
+
+<!--    // Gọi hàm xử lý với phản hồi giả lập-->
+<!--    handleVNPAYResponse(mockResponse);-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
 

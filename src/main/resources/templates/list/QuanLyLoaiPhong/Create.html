@@ -207,7 +207,32 @@
         const sucChua = document.getElementById("sucChua").value.trim();
         const tangSelect = document.getElementById("tang");
         const tangValue = tangSelect.value;
+        async function checkTangTrung(tangId) {
+            try {
+                const response = await fetch(`/loaiphongs/check-tang/${tangId}`, {
+                    method: "GET",
+                });
 
+                if (!response.ok) {
+                    throw new Error("Không thể kiểm tra tầng. Vui lòng thử lại!");
+                }
+
+                const data = await response.json();
+                return data.exists; // API trả về { exists: true/false }
+            } catch (error) {
+                console.error("Lỗi kiểm tra tầng:", error);
+                alert("Lỗi khi kiểm tra tầng!");
+                return false;
+            }
+        }
+
+
+
+        const existsTang = await checkTangTrung(tangValue);
+        if (existsTang) {
+            alert("Tầng này đã được sử dụng cho loại phòng khác!");
+            return false;
+        }
         // Kiểm tra "Tên Loại Phòng" không được để trống
         if (tenLoaiPhong === "") {
             alert("Tên Loại Phòng không được để trống!");
@@ -291,6 +316,28 @@
             return true;  // Nếu có lỗi, giả định tên đã tồn tại (để tránh gửi form)
         }
     }
+
+
+    async function checkTangTrung(tangId) {
+        try {
+            const response = await fetch(`/loaiphongs/check-tang/${tangId}`, {
+                method: "GET",
+            });
+
+            if (!response.ok) {
+                throw new Error("Không thể kiểm tra tầng. Vui lòng thử lại!");
+            }
+
+            const data = await response.json();
+            return data.exists; // API trả về { exists: true/false }
+        } catch (error) {
+            console.error("Lỗi kiểm tra tầng:", error);
+            alert("Lỗi khi kiểm tra tầng!");
+            return false;
+        }
+    }
+
+
 
 </script>
 

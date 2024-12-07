@@ -178,7 +178,7 @@ public class KhuyenMaiService {
         }
 
         // Nếu có từ khóa và trạng thái
-        return khuyenMaiRepository.findByMaKhuyenMaiContainingOrTenKhuyenMaiContainingAndTrangThai(
+        return khuyenMaiRepository.findByTenKhuyenMaiContainingOrTenKhuyenMaiContainingAndTrangThai(
                 keyword, keyword, trangThai, pageable);
     }
 

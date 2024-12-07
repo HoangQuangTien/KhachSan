@@ -1471,6 +1471,30 @@
         return true;
     }
 
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tenPhong = document.getElementById('tenPhong');
+        tenPhong.addEventListener('input', function () {
+            const cursorPosition = tenPhong.selectionStart;
+            let sanitizedValue = tenPhong.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            tenPhong.value = sanitizedValue;
+
+            tenPhong.setSelectionRange(cursorPosition, cursorPosition);
+        });
+        const moTa = document.getElementById('moTa');
+        moTa.addEventListener('input', function () {
+            const cursorPosition = moTa.selectionStart;
+            let sanitizedValue = moTa.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            moTa.value = sanitizedValue;
+
+            moTa.setSelectionRange(cursorPosition, cursorPosition);
+        });
+    });
+
 </script>
 
 </body>

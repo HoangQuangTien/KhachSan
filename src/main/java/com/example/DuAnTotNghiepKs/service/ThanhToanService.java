@@ -28,4 +28,6 @@ public interface ThanhToanService {
     List<ThanhToanDTO> search(String query, Date ngayThanhToan);
 
     ThanhToanDTO getThanhToanById(Integer id);
+
+    void sendEmail(String to, String subject, String text);
 }

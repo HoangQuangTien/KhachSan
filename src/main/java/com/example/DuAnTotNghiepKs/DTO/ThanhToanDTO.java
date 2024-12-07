@@ -45,4 +45,9 @@ public class ThanhToanDTO {
     private Integer idNhanVien;
     private String hoTen;
 
+    private String email;
+
+
+    private Integer idKhuyenMai;
+
 }

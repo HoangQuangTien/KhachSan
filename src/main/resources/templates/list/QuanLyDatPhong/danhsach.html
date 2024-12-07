@@ -69,6 +69,11 @@
         .a:hover {
             background-color: #ff0000;
         }
+
+        .processing {
+            pointer-events: none; /* Vô hiệu hóa sự kiện click */
+            opacity: 0.6; /* Làm mờ nút */
+        }
     </style>
     <head th:include="fragment/head :: head"></head>
 </head>
@@ -112,7 +117,7 @@
                 <td th:text="${datPhong.cccd}"></td>
                 <td th:text="${datPhong.ngayNhan}"></td>
                 <td th:text="${datPhong.ngayTra}"></td>
-                <td th:text="${datPhong.loaiPhong.soNguoiToiDa}"></td>
+                <td th:text="${datPhong.phong.loaiPhong.soNguoiToiDa}"></td>
 
 
 <!--                <td th:text="${#dates.format(datPhong.ngayNhan, 'dd/MM/yyyy HH:mm')}"></td>-->
@@ -194,6 +199,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Nếu người dùng đồng ý, thực hiện check-in
+                            setProcessingState1(idDatPhong)
                             proceedCheckIn(idDatPhong);
                         }
                     });
@@ -293,6 +299,7 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
+                setProcessingState(idDatPhong); // Hiển thị trạng thái "Đang xử lý..."
                 cancelBooking(idDatPhong); // Gọi hàm hủy đặt phòng
             }
         });
@@ -300,6 +307,8 @@
 
     function cancelBooking(idDatPhong) {
         // Hiển thị thông báo yêu cầu lý do hủy
+
+
         Swal.fire({
             title: 'Nhập lý do hủy',
             input: 'text',
@@ -380,6 +389,7 @@
                     })
                     .catch(error => {
                         console.error('Có lỗi xảy ra:', error);
+                        resetProcessingState(idDatPhong); // Khôi phục nút khi lỗi
                         Swal.close();
                         // Hiển thị thông báo lỗi chung
                         Swal.fire({
@@ -392,9 +402,56 @@
                             }
                         });
                     });
+            }else if (result.isDismissed) {
+                resetProcessingState(idDatPhong); // Khôi phục lại trạng thái khi người dùng nhấn "Quay lại"
             }
         });
     }
+
+
+    // Hiển thị trạng thái "Đang xử lý..."
+    function setProcessingState1(idDatPhong) {
+        const button = document.querySelector(`button[onclick*="confirmCheckIn('${idDatPhong}')"]`);
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Đang xử lý...';
+        }
+
+
+    }
+
+
+    // Khôi phục trạng thái ban đầu của nút
+    function resetProcessingState1(idDatPhong) {
+        const button = document.querySelector(`button[onclick*="confirmCheckIn('${idDatPhong}')"]`);
+        if (button) {
+            button.disabled = false;
+            button.innerHTML =  '<i class="fa fa-check"></i> Check-in';
+        }
+    }
+
+
+    // Hiển thị trạng thái "Đang xử lý..."
+    function setProcessingState(idDatPhong) {
+        const button = document.querySelector(`button[onclick*="confirmCancelBooking('${idDatPhong}')"]`);
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Đang xử lý...';
+        }
+
+
+    }
+
+
+    // Khôi phục trạng thái ban đầu của nút
+    function resetProcessingState(idDatPhong) {
+        const button = document.querySelector(`button[onclick*="confirmCancelBooking('${idDatPhong}')"]`);
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = '<i class="fa fa-times"></i> Hủy Đặt';
+        }
+    }
+
 
     function searchChekin() {
         var keyword = document.getElementById('keyword').value.trim().toLowerCase(); // Loại bỏ khoảng trắng thừa

@@ -18,12 +18,12 @@ import java.util.Optional;
 
 @Repository
 public interface PhongRepo extends JpaRepository<Phong, Integer> {
-//    Optional<Phong> findById(Integer id);
+
     Page<Phong> findByLoaiPhong_IdLoaiPhongAndTinhTrang(Integer idLoaiPhong, Boolean tinhTrang, Pageable pageable);
     Page<Phong> findByLoaiPhong_IdLoaiPhong(Integer idLoaiPhong, Pageable pageable);
     Page<Phong> findByTinhTrang(Boolean tinhTrang, Pageable pageable);
     Page<Phong> findAll(Pageable pageable);
-
+    Optional<Phong> findById(Integer idPhong);
     // Thêm phương thức đếm số phòng đang hoạt động
     long countByTinhTrang(boolean tinhTrang);
 

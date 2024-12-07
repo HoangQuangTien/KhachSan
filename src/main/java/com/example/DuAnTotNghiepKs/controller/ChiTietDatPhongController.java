@@ -385,31 +385,41 @@ public class ChiTietDatPhongController {
             LocalDateTime endDate = datPhongOpt.get().getNgayTra();
 
             // Kiểm tra xem phòng mới có bị đặt trùng thời gian không
-            boolean isPhongMoiBooked = datPhongRepo.findByPhongAndThoiGian(phongMoi.getIdPhong(), startDate, endDate).size() > 0;
+            boolean isPhongMoiBooked = !datPhongRepo.findByPhongAndThoiGian(phongMoi.getIdPhong(), startDate, endDate).isEmpty();
 
             if (isPhongMoiBooked) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("success", false, "message", "Phòng mới đang được đặt. Không thể chuyển sang phòng này."));
             }
+
             if (datPhongOpt.isPresent()) {
                 DatPhong datPhong = datPhongOpt.get();
-                datPhong.setPhong(phongMoi);
-//                datPhong.setTongTien(phongMoi.getGia()); // Cập nhật giá phòng
-//
-//                // Tính toán tiền cọc
-//                float tienCoc = phongMoi.getGia() * 0.8f; // Tiền cọc bằng 80% giá phòng
-//                datPhong.setTienCoc(tienCoc); // Giả sử có phương thức setTienCoc trong DatPhong
-//
-//                // Tính tổng tiền
-//                float tongTien = phongMoi.getGia(); // Tổng tiền bằng giá phòng
-//                float tienConLai = tongTien - tienCoc; // Tiền còn lại
-//
-//                // Giả sử bạn có các phương thức để lưu tổng tiền và tiền còn lại
-//                datPhong.setTongTien(tongTien); // Giả sử có phương thức setTongTien trong DatPhong
-//                datPhong.setTienConLai(tienConLai); // Giả sử có phương thức setTienConLai trong DatPhong
+                datPhong.setPhong(phongMoi); // Cập nhật phòng mới
 
+                // Tính toán số ngày ở
+                long numberOfNights = java.time.Duration.between(datPhong.getNgayNhan(), datPhong.getNgayTra()).toDays();
+
+                // Tính giá phòng cho số ngày ở
+                double roomPricePerNight = phongMoi.getLoaiPhong().getGia(); // Giá phòng mỗi đêm
+                double totalRoomPrice = roomPricePerNight * numberOfNights; // Tổng tiền phòng cho số ngày ở
+
+                // Cập nhật tổng tiền phòng
+                datPhong.setTongTien((float) totalRoomPrice);
+
+                // Tính tiền cọc (80% tổng tiền)
+                float tienCoc = (float) (totalRoomPrice * 0.8); // Tiền cọc bằng 80% tổng tiền
+                datPhong.setTienCoc(tienCoc);
+
+                // Tính tiền còn lại
+                float tienConLai = (float) (totalRoomPrice - tienCoc);
+
+                // Cập nhật tiền còn lại
+                datPhong.setTienConLai(tienConLai);
+
+                // Lưu lại thông tin đã cập nhật
                 datPhongRepo.save(datPhong);
             }
+
             LichSuDatPhong lichSuDatPhong = new LichSuDatPhong();
             lichSuDatPhong.setDatPhong(datPhongOpt.get());
             lichSuDatPhong.setChiTietThayDoi("Đổi từ " + phongHienTai.getTenPhong() + " sang phòng " + phongMoi.getTenPhong() + ". Lý do: " + lyDoThayDoi);

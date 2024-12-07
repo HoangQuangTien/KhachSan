@@ -186,14 +186,19 @@ public class PhongController {
 
 
 
-            if (existingPhong != null) {
+            if (existingPhong != null ) {
 
 
-                // Kiểm tra nếu phòng đã được đặt (tinhTrang = true)
-                if (Boolean.TRUE.equals(existingPhong.getTinhTrang())) {
+                Boolean trangThai = existingPhong.getTrangThai();
+                System.out.println("Tình trạng phòng: " + trangThai); // Debug log
+
+                if (Boolean.FALSE.equals(trangThai)) {
+                    // Nếu phòng đang có người ở, không cho phép sửa
                     redirectAttributes.addFlashAttribute("errorMessage", "Không thể sửa phòng đang có người ở!");
                     return "redirect:/phongs";
                 }
+
+
 
                 // Giữ lại ảnh hiện tại nếu không có ảnh mới
                 if (phongDTO.getImg() == null || phongDTO.getImg().isEmpty()) {

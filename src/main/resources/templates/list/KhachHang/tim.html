@@ -278,22 +278,30 @@
 
         <!-- Login Button -->
         <div class="login-button-container position-absolute top-0 end-0 m-3">
-
-            <th:block th:if="${session.user == null}">
-                <a href="/khach-hang/login" class="btn btn-outline-light btnLogin">Đăng nhập</a>
+            <!--             Kiểm tra nếu session không có user (chưa đăng nhập) -->
+            <th:block th:if="${hoVaTen == null}">
+                <a href="/login" class="btn btn-outline-light btnLogin">Đăng nhập</a>
             </th:block>
-            <th:block th:if="${session.user != null}">
+            <!--             Kiểm tra nếu session có user (đã đăng nhập) -->
+            <th:block th:if="${hoVaTen != null}">
                 <div class="dropdown">
-                    <button th:text="${session.user.hoVaTen}" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                    <!-- Hiển thị tên người dùng và icon -->
+                    <button class="btn btn-secondary dropdown-toggle d-flex align-items-center gap-2"
+                            type="button" data-toggle="dropdown" aria-expanded="false">
+                        <span th:text="${hoVaTen}"></span>
+                        <i class="fas fa-user-circle"></i> <!-- Biểu tượng người dùng -->
                     </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/khach-hang/trang-ca-nhan">Trang cá nhân</a>
-                        <a class="dropdown-item" href="/khach-hang/logout">Đăng xuất</a>
+                    <div class="dropdown-menu shadow-sm">
+                        <a class="dropdown-item d-flex align-items-center gap-2" href="/khach-hang/trang-ca-nhan">
+                            <i class="fas fa-user"></i> Trang cá nhân
+                        </a>
+                        <a class="dropdown-item d-flex align-items-center gap-2" href="/khach-hang/logout">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a>
                     </div>
                 </div>
             </th:block>
         </div>
-
 
         <div class="Home-button-container d-flex align-items-center position-absolute top-0 end-0 m-3">
             <!-- Trang Chủ -->
@@ -363,7 +371,7 @@
                             <h5 class="card-title" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}"></h5>
                             <p class="card-text">
                                 <strong>Giá:</strong>
-                                <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
+                                <span th:text="${#numbers.formatCurrency(phong.loaiPhong.gia)}"></span> /đêm
                             </p>
                             <p class="card-text">
                                 <strong>Người tối đa:</strong>

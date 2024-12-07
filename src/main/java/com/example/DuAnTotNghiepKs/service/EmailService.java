@@ -3,6 +3,7 @@ package com.example.DuAnTotNghiepKs.service;
 import com.example.DuAnTotNghiepKs.entity.ChiTietDatPhong;
 import com.example.DuAnTotNghiepKs.entity.KhachHang;
 import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
+import com.example.DuAnTotNghiepKs.entity.Phong;
 import com.example.DuAnTotNghiepKs.repository.KhuyenMaiRepo;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -14,6 +15,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -280,5 +282,59 @@ public class EmailService {
         emailSender.send(message);
     }
 
-}
+
+
+
+    public void sendEmailHuyPhong(String to, String subject, KhachHang khachHang, Phong phong)
+            throws MessagingException, IOException {
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+
+        String htmlContent;
+        htmlContent = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "<style>\n" +
+                "body { font-family: 'Arial', sans-serif; background-color: #fff3cd; margin: 0; padding: 20px; }\n" +
+                ".container { max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }\n" +
+                ".header { background-color: #dc3545; color: white; padding: 15px; text-align: center; border-radius: 10px 10px 0 0; }\n" +
+                ".header h1 { margin: 0; font-size: 24px; }\n" +
+                "p { margin: 20px 0; color: #856404; }\n" +
+                ".details { margin: 20px 0; padding: 10px; background-color: #f8d7da; border-radius: 5px; color: #721c24; }\n" +
+                ".important-note { color: #721c24; font-weight: bold; margin: 20px 0; text-align: center; }\n" +
+                ".footer { text-align: center; color: #856404; margin-top: 20px; font-size: 14px; padding-top: 10px; border-top: 1px solid #ffeeba; }\n" +
+                "</style>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<div class='container'>\n" +
+                "<div class='header'>\n" +
+                "<h1>Thông báo hủy phòng thành công</h1>\n" +
+                "</div>\n" +
+                "<p>Kính gửi: <strong>" + khachHang.getHoVaTen() + "</strong>,</p>\n" +
+                "<p>Chúng tôi xác nhận rằng yêu cầu hủy phòng của bạn đã được xử lý thành công.</p>\n" +
+                "<div class='details'>\n" +
+                "<p><strong>Họ và tên:</strong> " + khachHang.getHoVaTen() + "</p>\n" +
+                "<p><strong>Phòng đã hủy:</strong> " + phong.getTenPhong() + " </p>\n" +
+                "<p><strong>Ngày hủy:</strong> " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()) + " </p>\n" +
+                "</div>\n" +
+                "<p class='important-note'>Xin nhắc lại theo quy tắc của chúng tôi, quý khách sẽ mất toàn bộ tiền cọc.</p>\n" +
+                "<p>Nếu bạn có bất kỳ câu hỏi hoặc yêu cầu nào khác, vui lòng liên hệ với chúng tôi.</p>\n" +
+                "<div class='footer'>\n" +
+                "Trân trọng, <br>\n" +
+                "DRAGONBALL HOTEL\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "</body>\n" +
+                "</html>\n";
+
+        helper.setText(htmlContent, true);
+
+// Send the email
+        emailSender.send(message);
+    }
+
+    }
 
