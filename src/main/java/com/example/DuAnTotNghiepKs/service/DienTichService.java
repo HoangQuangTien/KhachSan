@@ -12,4 +12,6 @@ public interface DienTichService {
     List<DienTich> getAllDienTichPhongs();
 
     DienTich saveDienTich(DienTich dienTich);
+
+    boolean isTenDienTichTrung(float tenDienTich);
 }

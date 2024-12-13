@@ -2,7 +2,6 @@ package com.example.DuAnTotNghiepKs.service.Imp;
 
 import com.example.DuAnTotNghiepKs.DTO.DatPhongDTO;
 import com.example.DuAnTotNghiepKs.DTO.IdleRoomDTO;
-import com.example.DuAnTotNghiepKs.entity.DanhGia;
 import com.example.DuAnTotNghiepKs.entity.DatPhong;
 import com.example.DuAnTotNghiepKs.entity.Phong;
 
@@ -521,5 +520,74 @@ public class DatPhongServiceImp implements DatPhongService {
         // Lưu tất cả thay đổi vào database
         datPhongRepository.saveAll(datPhongs);
     }
+
+
+
+
+
+    @Override
+    public boolean extendStay(Integer idDatPhong, LocalDateTime newEndDate) {
+        Optional<DatPhong> datPhongOpt = datPhongRepository.findById(idDatPhong);
+        if (datPhongOpt.isPresent()) {
+            DatPhong datPhong = datPhongOpt.get();
+
+            // Lấy ngày trả phòng hiện tại
+            LocalDateTime oldEndDate = datPhong.getNgayTra();
+
+            // Tính số ngày gia hạn
+            long daysExtended = ChronoUnit.DAYS.between(oldEndDate, newEndDate);
+            if (daysExtended <= 0) {
+                return false; // Không thể gia hạn nếu ngày gia hạn không hợp lệ
+            }
+
+            // Kiểm tra nếu phòng đã được đặt trong khoảng thời gian gia hạn
+            List<DatPhong> existingBookings = datPhongRepository.findByPhongAndThoiGian(
+                    datPhong.getPhong().getIdPhong(),  // Truyền ID phòng
+                    newEndDate,  // Ngày gia hạn
+                    newEndDate.plusDays(daysExtended)  // Ngày trả phòng mới
+            );
+
+// Nếu danh sách không trống, có nghĩa là phòng đã được đặt trong khoảng thời gian gia hạn
+            if (!existingBookings.isEmpty()) {
+                throw new IllegalStateException("Phòng đã được đặt trong khoảng thời gian gia hạn. Không thể gia hạn.");
+            }
+
+            // Lấy giá phòng mỗi ngày
+            float dailyRate = datPhong.getPhong().getLoaiPhong().getGia();
+
+            // Tính thêm tiền dựa trên số ngày gia hạn
+            float additionalCost = daysExtended * dailyRate;
+
+            // Cập nhật ngày trả phòng mới và tổng tiền
+            datPhong.setNgayTra(newEndDate);
+            datPhong.setTongTien(datPhong.getTongTien() + additionalCost); // Cập nhật tổng tiền
+            datPhong.setTienConLai(datPhong.getTongTien() - datPhong.getTienCoc());
+
+            // Lưu lại thay đổi vào cơ sở dữ liệu
+            datPhongRepository.save(datPhong);
+            return true;
+        }
+        return false;
+}
+
+    @Override
+    public Map<String, Object> getRevenueByDay() {
+        try {
+            // Lấy ngày hiện tại
+            LocalDate today = LocalDate.now();
+
+            // Chuyển đổi LocalDate thành LocalDateTime (bắt đầu từ 00:00:00)
+            LocalDateTime startOfDay = today.atStartOfDay(); // 00:00:00 hôm nay
+            LocalDateTime endOfDay = today.plusDays(1).atStartOfDay(); // 00:00:00 ngày hôm sau
+
+            // Gọi repository để lấy doanh thu cho ngày hôm nay
+            return datPhongRepository.findRevenueByDateRange1(startOfDay, endOfDay);
+        } catch (Exception e) {
+            // Ghi log chi tiết lỗi
+            e.printStackTrace();
+            throw new RuntimeException("Đã xảy ra lỗi khi truy vấn doanh thu ngày: " + LocalDate.now());
+        }
+    }
+
 
 }

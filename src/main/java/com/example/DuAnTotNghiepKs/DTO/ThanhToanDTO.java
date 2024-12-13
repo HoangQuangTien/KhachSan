@@ -50,4 +50,7 @@ public class ThanhToanDTO {
 
     private Integer idKhuyenMai;
 
+
+
+
 }

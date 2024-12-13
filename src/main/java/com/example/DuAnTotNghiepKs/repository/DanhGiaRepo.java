@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface DanhGiaRepo extends JpaRepository<DanhGia, Integer> {
     List<DanhGia> findByPhong_IdPhong(Integer idPhong);
+
+
 }

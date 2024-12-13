@@ -23,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -171,15 +172,15 @@ public class KhuyenMaiController {
             @RequestParam("giamGia") Float giamGia,
             @RequestParam("giamToiThieu") Float giamToiThieu,
             @RequestParam("giamToiDa") Float giamToiDa,
-            @RequestParam("ngayBatDau") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayBatDau,
-            @RequestParam("ngayKetThuc") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayKetThuc,
+            @RequestParam("ngayBatDau") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime ngayBatDau,
+            @RequestParam("ngayKetThuc") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime ngayKetThuc,
             ServletRequest servletRequest) {
 
         try {
             // Kiểm tra điều kiện
             if (maKhuyenMai.isEmpty() || tenKhuyenMai.isEmpty() || soLuong <= 0 || giamGia < 0 ||
                     giamToiThieu < 0 || giamToiDa < 0 || giamToiDa < giamToiThieu || moTa.isEmpty() ||
-                    ngayBatDau.after(ngayKetThuc)) {
+                    ngayBatDau.isAfter(ngayKetThuc)) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Thông tin không hợp lệ."));
             }
 
@@ -197,8 +198,8 @@ public class KhuyenMaiController {
             khuyenMai.setGiamGia(giamGia);
             khuyenMai.setGiamToiThieu(giamToiThieu);
             khuyenMai.setGiamToiDa(giamToiDa);
-            khuyenMai.setNgayBatDau(ngayBatDau);
-            khuyenMai.setNgayKetThuc(ngayKetThuc);
+            khuyenMai.setNgayBatDau(java.sql.Timestamp.valueOf(ngayBatDau));
+            khuyenMai.setNgayKetThuc(java.sql.Timestamp.valueOf(ngayKetThuc));
 
             // Xử lý loại giảm
             String loaiGiam = servletRequest.getParameter("loaiGiam");
@@ -209,21 +210,22 @@ public class KhuyenMaiController {
             }
 
             // Tự động thiết lập trạng thái khuyến mãi
-            Date today = new Date();
-            if (today.before(ngayBatDau)) {
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isBefore(ngayBatDau)) {
                 khuyenMai.setTrangThai("Sắp diễn ra");
-            } else if (today.after(ngayKetThuc)) {
+            } else if (now.isAfter(ngayKetThuc)) {
                 khuyenMai.setTrangThai("Hết hạn");
             } else {
                 khuyenMai.setTrangThai("Còn hạn");
             }
 
             // Lưu khuyến mãi
-            khuyenMaiService.updateKhuyenMai(id,khuyenMai);
+            khuyenMaiService.updateKhuyenMai(id, khuyenMai);
 
             return ResponseEntity.ok(Map.of("success", "Cập nhật khuyến mãi thành công!"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Đã có lỗi xảy ra: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Đã có lỗi xảy ra: " + e.getMessage()));
         }
     }
 //

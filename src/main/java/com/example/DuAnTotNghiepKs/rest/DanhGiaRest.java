@@ -63,6 +63,25 @@ public class DanhGiaRest {
         return ResponseEntity.badRequest().body(null);  // Trả về 400 nếu có lỗi
     }
 
+    // Lấy danh sách tất cả đánh giá
+    @GetMapping("/all")
+    public ResponseEntity<List<DanhGiaDTO>> getAllDanhGia() {
+        // Gọi dịch vụ để lấy tất cả các đánh giá
+        List<DanhGiaDTO> danhGiaList = danhGiaService.getAllDanhGia();
+        return ResponseEntity.ok(danhGiaList); // Trả về danh sách đánh giá
+    }
+
+
+    @DeleteMapping("/{idDanhGia}")
+    public ResponseEntity<Void> deleteDanhGia(@PathVariable Integer idDanhGia) {
+        boolean isDeleted = danhGiaService.deleteDanhGia(idDanhGia);
+
+        if (isDeleted) {
+            return ResponseEntity.noContent().build(); // Trả về HTTP 204 nếu xóa thành công
+        } else {
+            return ResponseEntity.notFound().build(); // Trả về HTTP 404 nếu không tìm thấy đánh giá
+        }
+    }
 
 }
 

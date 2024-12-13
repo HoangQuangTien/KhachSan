@@ -483,6 +483,21 @@
 
 
 
+        .center-form input,
+        .center-form button {
+            height: 38px;
+        }
+        .alert-card {
+            flex: 1; /* Để các thẻ chia đều không gian */
+            margin-right: 25px;
+        }
+
+
+
+
+
+
+
 
     </style>
 
@@ -508,27 +523,38 @@
 
     <main class="main-content" role="main">
 
-        <div class="container-fluid">
-
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-
+        <div class="container-fluid d-flex justify-content-between">
+            <!-- Tổng số phòng đang hoạt động -->
+            <div class="alert alert-warning alert-dismissible fade show mb-0 alert-card" role="alert">
                 <strong>Tổng số phòng đang hoạt động:</strong>
-
-                <span class="ml-2 font-weight-bold" th:text="${totalActivePhongs}"> 
-
-          </span>
-
+                <span class="ml-2 font-weight-bold" th:text="${totalActivePhongs}"></span>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-
                     <span aria-hidden="true">&times;</span>
-
                 </button>
-
             </div>
 
+            <!-- Tổng số phòng có người ở -->
+            <div class="alert alert-danger alert-dismissible fade show mb-0 alert-card" role="alert">
+                <strong>Tổng số phòng có người ở:</strong>
+                <span class="ml-2 font-weight-bold" th:text="${totalPhongsWithPeople}"></span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <!-- Tổng số phòng trống -->
+            <div class="alert alert-success alert-dismissible fade show mb-0 alert-card" role="alert">
+                <strong>Tổng số phòng trống:</strong>
+                <span class="ml-2 font-weight-bold" th:text="${totalPhongsEmpty}"></span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
 
 
-            <!-- Hiển thị thông báo lỗi -->
+
+        <!-- Hiển thị thông báo lỗi -->
 
             <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 
@@ -550,7 +576,7 @@
 
             <!-- Form thêm phòng -->
 
-            <div class="card mb-4 shadow-sm">
+            <div class="card mb-4 mt-3 shadow-sm">
 
                 <div class="card-body">
 
@@ -600,7 +626,22 @@
 
 
 
-
+                        <div class="center-form">
+                            <form method="get" action="/phongs" id="searchForm" class="form-inline">
+                                <div class="col-auto">
+                                    <label for="ngayNhan" class="form-label fw-bold">Ngày bắt đầu</label>
+                                    <input type="date" id="ngayNhan" name="ngayNhan"
+                                           value="${selectedNgayNhan}"
+                                           class="form-control form-control-sm">
+                                </div>
+                                <div class="col-auto">
+                                    <label for="ngayTra" class="form-label fw-bold">Ngày kết thúc</label>
+                                    <input type="date" id="ngayTra" name="ngayTra"
+                                           value="${selectedNgayTra}"
+                                           class="form-control form-control-sm" onchange="submitForm()">
+                                </div>
+                            </form>
+                        </div>
 
                         <div class="text-end">
 
@@ -638,7 +679,7 @@
 
                         <div class="form-row mb-2">
 
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
 
                                 <label for="filterLoaiPhong">Lọc theo loại phòng:</label>
 
@@ -662,7 +703,7 @@
 
                             </div>
 
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
 
                                 <label for="filterTinhTrang">Lọc theo tình trạng:</label>
 
@@ -684,6 +725,14 @@
 
                                 </select>
 
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="filterTrangThai">Lọc theo trạng thái:</label>
+                                <select id="filterTrangThai" name="trangThai" class="form-control form-control-sm" onchange="this.form.submit()">
+                                    <option value="">Tất cả</option>
+                                    <option value="true" th:selected="${selectedTrangThai == 'true'}">Phòng trống</option>
+                                    <option value="false" th:selected="${selectedTrangThai == 'false'}">Phòng có người ở</option>
+                                </select>
                             </div>
 
                         </div>
@@ -1495,6 +1544,10 @@
         });
     });
 
+
+    function submitForm() {
+        document.getElementById("searchForm").submit();
+    }
 </script>
 
 </body>

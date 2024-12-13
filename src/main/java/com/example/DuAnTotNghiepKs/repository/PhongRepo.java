@@ -19,9 +19,37 @@ import java.util.Optional;
 @Repository
 public interface PhongRepo extends JpaRepository<Phong, Integer> {
 
-    Page<Phong> findByLoaiPhong_IdLoaiPhongAndTinhTrang(Integer idLoaiPhong, Boolean tinhTrang, Pageable pageable);
     Page<Phong> findByLoaiPhong_IdLoaiPhong(Integer idLoaiPhong, Pageable pageable);
     Page<Phong> findByTinhTrang(Boolean tinhTrang, Pageable pageable);
+    Page<Phong> findByTrangThai(Boolean trangThai, Pageable pageable);
+    Page<Phong> findByLoaiPhong_IdLoaiPhongAndTinhTrangAndTrangThai(Integer loaiPhongId, Boolean tinhTrang, Boolean trangThai, Pageable pageable);
+    Page<Phong> findByTinhTrangAndTrangThai(Boolean tinhTrang, Boolean trangThai, Pageable pageable);
+    @Query("SELECT p FROM Phong p WHERE p.idPhong NOT IN (" +
+            "SELECT dp.phong.idPhong FROM DatPhong dp " +
+            "WHERE (:ngayNhan BETWEEN dp.ngayNhan AND dp.ngayTra " +
+            "   OR :ngayTra BETWEEN dp.ngayNhan AND dp.ngayTra " +
+            "   OR dp.ngayNhan BETWEEN :ngayNhan AND :ngayTra))")
+    Page<Phong> findAvailableRoomsByDate(@Param("ngayNhan") LocalDateTime ngayNhan,
+                                         @Param("ngayTra") LocalDateTime ngayTra,
+                                         Pageable pageable);
+    @Query("""
+    SELECT p FROM Phong p
+    WHERE (:loaiPhongId IS NULL OR p.loaiPhong.idLoaiPhong = :loaiPhongId)
+      AND (:tinhTrang IS NULL OR p.tinhTrang = :tinhTrang)
+      AND (:trangThai IS NULL OR p.trangThai = :trangThai)
+      AND NOT EXISTS (
+          SELECT dp FROM DatPhong dp
+          WHERE dp.phong = p
+            AND dp.ngayNhan < :ngayTra
+            AND dp.ngayTra > :ngayNhan
+      )
+""")
+    Page<Phong> findAvailableRooms(@Param("loaiPhongId") Integer loaiPhongId,
+                                   @Param("tinhTrang") Boolean tinhTrang,
+                                   @Param("trangThai") Boolean trangThai,
+                                   @Param("ngayNhan") LocalDateTime ngayNhan,
+                                   @Param("ngayTra") LocalDateTime ngayTra,
+                                   Pageable pageable);
     Page<Phong> findAll(Pageable pageable);
     Optional<Phong> findById(Integer idPhong);
     // Thêm phương thức đếm số phòng đang hoạt động
@@ -115,6 +143,7 @@ public interface PhongRepo extends JpaRepository<Phong, Integer> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
 
 
 

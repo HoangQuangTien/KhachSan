@@ -98,6 +98,11 @@ public interface DatPhongService {
 
 
 
+    boolean extendStay(Integer idDatPhong, LocalDateTime newEndDate);
+
+    Map<String, Object> getRevenueByDay();
+
+
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động
 //    long countActivePhongsFalse();
 

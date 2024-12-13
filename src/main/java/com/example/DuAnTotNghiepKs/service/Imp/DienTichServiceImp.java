@@ -32,5 +32,10 @@ public class DienTichServiceImp implements DienTichService {
     }
 
 
+    @Override
+    public boolean isTenDienTichTrung(float tenDienTich) {
+        return dienTichRepo.existsByTenDienTich(tenDienTich);  // Kiểm tra sự tồn tại của diện tích
+    }
+
 
 }

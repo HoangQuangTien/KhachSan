@@ -335,7 +335,7 @@
                 <div class="price-container text-center">
                     <p>
                         <span>Chỉ với</span>
-                        <span th:text="${phong.getGiaLoaiPhong()} + ' VNĐ'"></span>
+                        <span th:text="${#numbers.formatCurrency(phong.giaLoaiPhong)}"></span>
                         <span> cho 1 đêm</span>
                     </p>
                     <input type="hidden" class="pricePerNight" data-id="${phong.idPhong}" th:value="${phong.getGiaLoaiPhong()}"/>
@@ -391,11 +391,11 @@
             </div>
 
             <!-- Trường ẩn để gửi idPhong và idLoaiPhong -->
-            <input type="text" id="idPhong" name="idPhong" th:value="${idPhong}" />
-            <input type="text" id="idLoaiPhong" name="idLoaiPhong" th:value="${idLoaiPhong}" />
+            <input type="hidden" id="idPhong" name="idPhong" th:value="${idPhong}" />
+            <input type="hidden" id="idLoaiPhong" name="idLoaiPhong" th:value="${idLoaiPhong}"/>
 
             <!-- Hiển thị idKhachHang nếu có -->
-            <input type="text" id="idKhachHang" name="idKhachHang" th:value="${idKhachHang}"  />
+            <input type="hidden" id="idKhachHang" name="idKhachHang" th:value="${idKhachHang}"/>
 
             <button type="submit" class="btn btn-warning btn-block">ĐẶT TRƯỚC</button>
         </form>
@@ -416,7 +416,6 @@
                 <div class="map-container">
                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4337.097401206077!2d105.74389980195575!3d21.045412325554775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313455b3f6710da1%3A0x240105831b77a1a2!2zVHLGsOG7nW5nIENhbyDEkeG6s25nIEZQVCBQb2x5dGVjaG5pYw!5e0!3m2!1sen!2s!4v1728742407402!5m2!1sen!2s" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
-
             </div>
 
             <!-- Contact Info (Right) -->

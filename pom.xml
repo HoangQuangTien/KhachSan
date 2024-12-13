@@ -65,6 +65,12 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.4.1</version>
+		</dependency>
+
 
 
 		<!-- Spring Web for REST API -->

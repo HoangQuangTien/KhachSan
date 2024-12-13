@@ -14,6 +14,8 @@
     <!-- Thêm thư viện jsPDF từ CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
 
 
     <style>
@@ -283,9 +285,16 @@
 
             <!-- Cột bên phải: Form -->
             <div class="col-md-6">
+
                 <div class="py-4">
                     <form th:action="@{/thanhToan/add}" method="post" th:object="${thanhToanDTO}" id="formId" class="card p-4 shadow-sm"  onsubmit="return false;">
-                        <h4 style="color: black">Thông tin hóa đơn</h4>
+                        <h4 style="color: black" class="d-flex justify-content-between align-items-center">
+                            Thông tin hóa đơn
+                            <button type="reset" class="btn btn-danger btn-sm" onclick="restfrom()">
+                                <i class="fas fa-sync-alt"></i> Reset
+                            </button>
+                        </h4>
+
                         <hr>
                         <input type="hidden" id="idDatPhong" th:field="*{idDatPhong}">
                         <input type="hidden" id="idPhong" th:field="*{idPhong}">
@@ -340,15 +349,17 @@
                             </div>
 
                             <div class="col-6 mb-3">
-                                <label for="voucherId">Khuyen Mai </label>
+                                <label for="voucherId">Khuyến mại </label>
                                 <select class="form-control" id="voucherId" name="voucherId"  onchange="tinhTongTien()">
-                                    <option value="" disabled selected>-- Chọn Khuyen Mai --</option>
+                                    <option value="" disabled selected>-- Chọn khuyến mại --</option>
                                     <option th:each="voucher : ${activeVouchers}"
                                             th:if="${voucher.soLuong > 0}"
                                             th:value="${voucher.idKhuyenMai}"
                                             th:data-muc-giam="${voucher.giamGia}"
                                             th:data-so-luong="${voucher.soLuong}"
                                             th:data-loai-giam="${voucher.loaiGiam ? 'true' : 'false'}"
+                                            th:data-giam-toi-thieu="${voucher.giamToiThieu}"
+                                            th:data-giam-toi-da="${voucher.giamToiDa}"
                                             th:text="${voucher.maKhuyenMai} + ' - Giảm giá:' + ${#numbers.formatDecimal(voucher.giamGia, 0, '0')}+ (${voucher.loaiGiam ? '%' : 'VND'})"></option>
                                 </select>
                             </div>
@@ -400,7 +411,7 @@
                                 <label for="tienMat" class="form-check-label font-weight-bold">Tiền mặt</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false" class="form-check-input" onclick="handleVirtualTransfer()">
+                                <input type="radio" name="phuongThuc" id="chuyenKhoan" value="false" class="form-check-input" onclick="toggleTienMatFields(false)">
                                 <label for="chuyenKhoan" class="form-check-label font-weight-bold">Chuyển khoản</label>
                             </div>
                         </div>
@@ -881,6 +892,18 @@
     function showForm(idDatPhong, idPhong, idLoaiPhong, hoVaTen,
                       soDienThoai, tenPhong, thoiGian, thoiGianCheckIn,
                       giaPhong, tienCoc, tienConLai, tongTien, cardElement) {
+
+        if (selectedCard !== null) {
+            // Nếu có thẻ phòng cũ đã được chọn và khuyến mãi đã áp dụng, cần hủy bỏ hoặc cập nhật lại
+            if (isVoucherApplied) {
+                // Hủy bỏ khuyến mãi cũ
+                isVoucherApplied = false;
+                document.getElementById('voucherId').disabled = false; // Bật lại trường chọn voucher
+                document.getElementById('voucherId').value = ''; // Reset giá trị voucher đã chọn
+                // Reset các giá trị liên quan đến giảm giá
+                document.getElementById('tienConLai').value = tienConLai; // Cập nhật lại tổng tiền
+            }
+        }
         // Điền giá trị vào form
         document.getElementById('idDatPhong').value = idDatPhong;
         document.getElementById('idPhong').value = idPhong;
@@ -890,9 +913,12 @@
         document.getElementById("tenphong").value = tenPhong;
         document.getElementById("thoiGian").value = thoiGian;
         document.getElementById("ngayCheckIn").value = thoiGianCheckIn;
+        // Định dạng giá phòng, tiền cọc, tiền còn lại và tổng tiền thành tiền VNĐ
         document.getElementById("giaPhong").value = giaPhong;
         document.getElementById("tienCoc").value = tienCoc;
+
         document.getElementById("tongTien").value = tongTien;
+
         document.getElementById("tienConLai").value = tienConLai;
         // document.getElementById("soTien").value = tongTien;
         document.getElementById("datPhongId").value = idDatPhong;
@@ -921,6 +947,22 @@
 
     }
 
+    function restfrom( tienConLai){
+        // Hủy bỏ khuyến mãi cũ
+        isVoucherApplied = false;
+        document.getElementById('voucherId').disabled = false; // Bật lại trường chọn voucher
+        document.getElementById('voucherId').value = ''; // Reset giá trị voucher đã chọn
+        // Reset các giá trị liên quan đến giảm giá
+        document.getElementById('tienConLai').value = tienConLai; // Cập nhật lại tổng tiền
+        // Nếu có thẻ phòng cũ được chọn, xóa lớp 'bg-secondary'
+        if (selectedCard !== null) {
+            selectedCard.classList.remove('bg-secondary');  // Bỏ chọn thẻ cũ
+        }
+
+        // Reset selectedCard về null để không còn thẻ nào được chọn
+        selectedCard = null;
+    }
+
 
     // function formatCurrency(amount) {
     //     // Kiểm tra nếu amount không phải là kiểu float, chuyển đổi thành float
@@ -942,13 +984,33 @@
     }
 
     function toggleTienMatFields(isTienMat) {
-        var tienMatFields = document.getElementById("tienMatFields");
+        const tienMatFields = document.getElementById("tienMatFields");
+        const qrCodeDisplay = document.getElementById("qrCodeDisplay");
+        const tienConLai = document.getElementById("tienConLai");
+        const soTienKhachDua = document.getElementById("soTienKhachDua");
+
         if (isTienMat) {
-            tienMatFields.style.display = "block";
+            tienMatFields.style.display = "block"; // Hiển thị trường tiền mặt
+            qrCodeDisplay.innerHTML = ""; // Ẩn mã QR
+            soTienKhachDua.value="";
+
         } else {
-            tienMatFields.style.display = "none";
+            tienMatFields.style.display = "none"; // Ẩn trường tiền mặt
+
+
+            // Lấy số tiền còn lại và gán vào ô "Số tiền khách đưa"
+            soTienKhachDua.value = tienConLai.value;
+            // Lấy dữ liệu để tạo mã QR
+            const accountNumber = "123456789"; // Số tài khoản ngân hàng
+            const bankName = "BIDV"; // Tên ngân hàng (ở đây là BIDV)
+            const amount = parseFloat(document.getElementById("tienConLai").value) || 0; // Lấy số tiền còn lại
+            const note = "Thanh toán hóa đơn"; // Ghi chú giao dịch
+
+            // Hiển thị mã QR
+            displayQRCode(accountNumber, amount, note, bankName);
         }
     }
+
 
     function tinhTienThua() {
         // Lấy giá trị từ các ô input
@@ -1322,9 +1384,9 @@
     var isPhuPhiApplied = false; // Biến theo dõi phụ phí đã được áp dụng hay chưa
 
     function tinhTongTien() {
+        // Lấy giá trị từ form
         var tienPhuPhi = parseFloat(document.getElementById('tienPhuPhi').value) || 0; // Phụ phí
         var tienConLai = parseFloat(document.getElementById('tienConLai').value) || 0; // Số tiền còn lại
-
 
         if (tienConLai <= 0) {
             console.error("Số tiền gốc (tổng tiền còn lại) không hợp lệ!");
@@ -1337,14 +1399,32 @@
         var giamGia = 0; // Biến lưu giá trị giảm giá
 
         // Kiểm tra nếu có voucher được chọn và chưa áp dụng voucher trước đó
-        if (selectedOption && selectedOption.value && !isVoucherApplied) {
+        if (selectedOption && selectedOption.value) {
+            // Hủy voucher cũ nếu đã áp dụng
+            if (isVoucherApplied) {
+                isVoucherApplied = false; // Hủy áp dụng voucher cũ
+            }
+
+            // Kiểm tra voucher mới và tính giảm giá
             var mucGiam = parseFloat(selectedOption.getAttribute('data-muc-giam')) || 0;
             var loaiGiam = selectedOption.getAttribute('data-loai-giam') === "true"; // Phần trăm hay số tiền
+
+            // Giảm tối thiểu và tối đa
+            var giamToiThieu = parseFloat(selectedOption.getAttribute('data-giam-toi-thieu')) || 0;
+            var giamToiDa = parseFloat(selectedOption.getAttribute('data-giam-toi-da')) || Number.MAX_VALUE;
 
             if (loaiGiam) {
                 giamGia = (mucGiam / 100) * tienConLai; // Giảm giá theo phần trăm
             } else {
                 giamGia = mucGiam; // Giảm giá theo số tiền
+            }
+
+            // Kiểm tra giảm giá trong khoảng tối thiểu và tối đa
+            if (giamGia < giamToiThieu) {
+                giamGia = giamToiThieu; // Áp dụng giảm giá tối thiểu
+            }
+            if (giamGia > giamToiDa) {
+                giamGia = giamToiDa; // Áp dụng giảm giá tối đa
             }
 
             isVoucherApplied = true;  // Đánh dấu voucher đã được áp dụng
@@ -1355,14 +1435,16 @@
             isPhuPhiApplied = true; // Đánh dấu phụ phí đã được áp dụng
         }
 
+        // Tính tiền sau giảm giá
         var tongTienSauGiam = Math.max(0, tienConLai - giamGia); // Tính tiền sau giảm giá
 
         // Tính tổng tiền thanh toán
-        var tongTienThanhToan = isVoucherApplied ? tongTienSauGiam : tongTienSauGiam + (isPhuPhiApplied ? tienPhuPhi : 0);
+        var tongTienThanhToan = tongTienSauGiam + (isPhuPhiApplied ? tienPhuPhi : 0);
 
-        document.getElementById("tienConLai").value = tongTienThanhToan.toFixed(0);
+        // Cập nhật lại tổng tiền còn lại
+        document.getElementById("tienConLai").value = tongTienThanhToan.toFixed(0); // Hiển thị tiền còn lại trong form
 
-
+        // Cập nhật trạng thái các trường nhập liệu
         if (isVoucherApplied) {
             document.getElementById('tienPhuPhi').disabled = true; // Vô hiệu hóa trường nhập phụ phí khi voucher được chọn
         } else {
@@ -1376,6 +1458,8 @@
             document.getElementById('voucherId').disabled = false; // Nếu chưa chọn voucher, trường voucher vẫn có thể chọn
         }
     }
+
+
 
 
     // document.getElementById('confirmButton').addEventListener('click', function () {
@@ -1478,36 +1562,22 @@
     });
 
 
-    // Hàm để xóa mã QR nếu không cần tạo lại
-    function generateQR(create) {
-        if (!create) {
-            const qrCodeDisplay = document.getElementById("qrCodeDisplay");
-            qrCodeDisplay.innerHTML = ""; // Xóa mã QR
-        }
-    }
 
-    function handleVirtualTransfer() {
-        const accountNumber = "2141703920"; // Số tài khoản BIDV
-        const amount = "100000"; // Số tiền
-        const note = "Thanh toán dịch vụ"; // Nội dung chuyển khoản
-        const bankName = "BIDV"; // Tên ngân hàng
-
-        displayQRCode(accountNumber, amount, note, bankName);
-    }
 
     function displayQRCode(accountNumber, amount, note, bankName) {
-        // Định dạng thông tin cho mã QR của ngân hàng BIDV
-        const qrCodeData = `BIDV|${accountNumber}|${amount}|${note}`; // Định dạng với thông tin BIDV
+        // Định dạng thông tin cho mã QR
+        const qrCodeData = `${bankName}|${accountNumber}|${amount}|${note}`;
 
         // Tạo URL mã QR
         const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrCodeData)}&size=200x200`;
 
-        // Lấy phần tử để hiển thị mã QR
+        // Lấy phần tử hiển thị mã QR
         const qrCodeElement = document.getElementById("qrCodeDisplay");
 
         // Hiển thị mã QR lên giao diện
-        qrCodeElement.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code">`;
+        qrCodeElement.innerHTML = `<img src="${qrCodeUrl}" alt="QR Code" class="img-fluid">`;
     }
+
 
     function searchThanhToan() {
         const searchQuery = document.getElementById('search').value.trim(); // Lấy giá trị từ ô tìm kiếm

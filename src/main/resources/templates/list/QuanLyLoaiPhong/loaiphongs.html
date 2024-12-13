@@ -12,55 +12,177 @@
     <div th:include="fragment/navbar :: navbar"></div>
     <div th:include="fragment/sidebar :: sidebar"></div>
     <main role="main" class="main-content">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="keyword">Tìm kiếm:</label>
-                <input type="text" id="keyword" name="keyword" class="form-control"
-                       placeholder="Tìm kiếm tên hoặc mã..." oninput="searchDatPhong()">
+        <div class="container my-4">
+            <div class="row">
+                <!-- Tìm kiếm -->
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label for="keyword" class="form-label fw-bold text-primary">Tìm kiếm:</label>
+                        <input type="text" id="keyword" name="keyword" class="form-control border-primary shadow-sm"
+                               placeholder="Nhập tên hoặc mã..." oninput="searchDatPhong()">
+                    </div>
+                </div>
+
+                <!-- Form lọc -->
+                <div class="col-md-6">
+                    <form method="get" action="/loaiphongs" onsubmit="return validateGia()">
+                        <div class="row gy-3">
+                            <!-- Lọc theo tầng -->
+                            <div class="col-lg-4 col-md-6">
+                                <label for="loc" class="form-label fw-bold text-primary">Lọc theo tầng</label>
+                                <select id="loc" name="idTang" class="form-select border-primary shadow-sm" onchange="this.form.submit()">
+                                    <option value="">Tất cả</option>
+                                    <option th:each="tang : ${tangs}"
+                                            th:value="${tang.idTang}"
+                                            th:selected="${selectTang == tang.idTang}"
+                                            th:text="${tang.tenTang}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Khoảng giá -->
+                            <div class="col-lg-8 col-md-6">
+                                <label class="form-label fw-bold text-primary">Lọc theo khoảng giá</label>
+                                <div class="row gx-2">
+                                    <div class="col-6">
+                                        <input type="number" id="giaMin" name="giaMin" class="form-control border-primary shadow-sm"
+                                               min="0" step="1" th:value="${giaMin != null ? giaMin : ''}" placeholder="Giá nhỏ nhất">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" id="giaMax" name="giaMax" class="form-control border-primary shadow-sm"
+                                               min="0" step="1" th:value="${giaMax != null ? giaMax : ''}" placeholder="Giá lớn nhất">
+                                    </div>
+                                </div>
+                                <small id="errorGia" class="text-danger mt-1 d-none">Giá nhỏ nhất không được lớn hơn giá lớn nhất!</small>
+                            </div>
+                        </div>
+
+                        <!-- Nút lọc -->
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm">Lọc</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        <div class="mt-5" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-            <a href="/loaiphongs/create" >
-                <button type="button" ><i class="bi bi-plus-circle"></i> Thêm Loại Phòng</button>
+
+        <style>
+            .form-label {
+                font-size: 1rem;
+            }
+
+            .form-control::placeholder {
+                color: #6c757d;
+                opacity: 1;
+            }
+
+            .btn-primary {
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #0056b3;
+            }
+        </style>
+
+        <div class="mt-2" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a href="/loaiphongs/create" class="btn btn-primary shadow-sm d-inline-flex align-items-center">
+                <i class="bi bi-plus-circle me-2"></i> Thêm Loại Phòng
             </a>
         </div>
-        <table id="resultTable">
+
+        <table id="resultTable" class="table table-hover table-bordered align-middle mt-4 shadow-sm">
             <thead>
             <tr>
-                <th>Mã</th>
-                <th>Tên</th>
-                <th>Mô Tả</th>
-                <th>Số Giường</th>
-                <th>Số Người</th>
-                <th>Tâng</th>
-                <th>Dien Tích</th>
-                <th>Giá</th>
-                <th>Sức Chưa</th>
-                <th>Hành Động</th>
+                <th class="text-center">Mã</th>
+                <th class="text-center">Tên</th>
+                <th class="text-center">Số Giường</th>
+                <th class="text-center">Số Người</th>
+                <th class="text-center">Tầng</th>
+                <th class="text-center">Diện Tích</th>
+                <th class="text-center">Giá</th>
+                <th class="text-center">Sức Chứa</th>
+                <th class="text-center">Mô Tả</th>
+                <th class="text-center">Thao Tác</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="loaiPhong : ${loaiPhongPage.content}">
-                <td th:text="${loaiPhong.maLoaiPhong}"></td>
+                <td  th:text="${loaiPhong.maLoaiPhong}"></td>
                 <td th:text="${loaiPhong.tenLoaiPhong}"></td>
-                <td th:text="${loaiPhong.moTa}"></td>
                 <td th:text="${loaiPhong.soLuongGiuong}"></td>
-                <td th:text="${loaiPhong.soNguoiToiDa}"></td>
-                <td th:text="${loaiPhong.tang.tenTang}"></td>
-                <td th:text="${loaiPhong.dienTich.tenDienTich}"></td>
-                <td th:text="${#numbers.formatCurrency(loaiPhong.gia)}"></td>
-
-
-                <td th:text="${loaiPhong.sucChua}"></td>
-                <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a th:href="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" class="btn btn-warning btn-sm">
-                        <i class="bi bi-pen"></i> Sửa
+                <td  th:text="${loaiPhong.soNguoiToiDa}"></td>
+                <td  th:text="${loaiPhong.tang.tenTang}"></td>
+                <td  th:text="${loaiPhong.dienTich.tenDienTich}"></td>
+                <td  th:text="${#numbers.formatCurrency(loaiPhong.gia)}"></td>
+                <td  th:text="${loaiPhong.sucChua}"></td>
+                <td th:text="${loaiPhong.moTa}"></td>
+                <td class="text-center" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a th:href="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}"
+                       class="btn btn-warning btn-sm d-inline-flex align-items-center">
+                        <i class="bi bi-pen me-1"></i> Sửa
                     </a>
-                    <!--            <a th:href="@{/loai-phong/delete/{id}(id=${loaiPhong.idLoaiPhong})}">Xóa</a>-->
                 </td>
+            </tr>
+            <!-- Nếu không có dữ liệu -->
+            <tr th:if="${#lists.isEmpty(loaiPhongPage.content)}">
+                <td colspan="10" class="text-center text-danger fw-bold">Không có dữ liệu theo yêu cầu</td>
             </tr>
             </tbody>
         </table>
+
+        <style>
+            #resultTable {
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .table thead th {
+                font-weight: bold;
+                background-color: #000000;  /* Set background to black */
+                color: #ffffff;  /* Set text color to white */
+            }
+
+            .table td, .table th {
+                vertical-align: middle;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+            }
+
+            .btn-primary {
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #0056b3;
+            }
+
+            .btn-warning {
+                background-color: #ffc107;
+                border-color: #ffc107;
+            }
+
+            .btn-warning:hover {
+                background-color: #e0a800;
+                border-color: #d39e00;
+            }
+
+            #resultTable th {
+                white-space: nowrap; /* Prevent header text from wrapping */
+                text-align: center;  /* Center-align header text */
+            }
+
+            #resultTable td {
+                vertical-align: middle; /* Ensure vertical alignment of cell content */
+                text-align: center; /* Center-align cell content */
+            }
+        </style>
 
         <div class="pagination">
             <!-- Nút về trang đầu -->
@@ -142,29 +264,36 @@
         const tableBody = document.querySelector('table tbody');
         tableBody.innerHTML = ''; // Xóa dữ liệu cũ
 
-        if (loaiPhongs.length === 0) {
-            tableBody.innerHTML = "<tr><td colspan='7'>Không tìm thấy kết quả</td></tr>";
+        if (!loaiPhongs || loaiPhongs.length === 0) { // Kiểm tra nếu mảng null hoặc rỗng
+            tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center text-danger fw-bold">
+                    Không tìm thấy kết quả phù hợp
+                </td>
+            </tr>`;
         } else {
             loaiPhongs.forEach(loaiPhong => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${loaiPhong.maLoaiPhong}</td>
-                    <td>${loaiPhong.tenLoaiPhong}</td>
-                    <td>${loaiPhong.moTa}</td>
-                    <td>${loaiPhong.soLuongGiuong}</td>
-                    <td>${loaiPhong.soNguoiToiDa}</td>
-                    <td>${loaiPhong.gia}</td>
-                    <td>
-                        <a href="/loaiphongs/edit/${loaiPhong.idLoaiPhong}" class="btn btn-warning btn-sm">
-                            <i class="bi bi-pen"></i> Sửa
-                        </a>
-                    </td>
-                `;
+                <td>${loaiPhong.maLoaiPhong}</td>
+                <td>${loaiPhong.tenLoaiPhong}</td>
+                <td>${loaiPhong.soLuongGiuong}</td>
+                <td>${loaiPhong.soNguoiToiDa}</td>
+                <td>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(loaiPhong.gia)}</td>
+                <td>${loaiPhong.sucChua}</td>
+                <td>${loaiPhong.moTa}</td>
+                <td>
+                    <a href="/loaiphongs/edit/${loaiPhong.idLoaiPhong}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pen"></i> Sửa
+                    </a>
+                </td>`;
                 tableBody.appendChild(row); // Thêm hàng mới vào bảng
             });
         }
+    }
 
-        // Hiện hoặc ẩn bảng dựa trên có kết quả hay không
+
+    // Hiện hoặc ẩn bảng dựa trên có kết quả hay không
         const originalTableContainer = document.querySelector('.table-container');
         originalTableContainer.style.display = loaiPhongs.length > 0 ? 'block' : 'none';
     }

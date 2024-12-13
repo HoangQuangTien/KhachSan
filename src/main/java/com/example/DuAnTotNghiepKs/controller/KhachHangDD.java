@@ -237,6 +237,10 @@ public class KhachHangDD {
             model.addAttribute("idKhachHang", taiKhoanDTO.getKhachHangDTO().getId());
         }
 
+        if (taiKhoanDTO != null && taiKhoanDTO.getKhachHangDTO() != null && taiKhoanDTO.getKhachHangDTO().getHoVaTen() != null) {
+            model.addAttribute("hoVaTen", taiKhoanDTO.getKhachHangDTO().getHoVaTen());
+        }
+
         // Trường hợp chỉ có một phòng được chọn
         if (roomId != null) {
             try {
@@ -318,6 +322,8 @@ public class KhachHangDD {
 
         // Chuyển đổi chuỗi ID phòng thành danh sách
         List<String> idPhongStrList = Arrays.asList(idPhongStr.split(","));
+
+
 
         // Kiểm tra các tham số đầu vào để đảm bảo chúng không rỗng
         if (idLoaiPhongStrList == null || idLoaiPhongStrList.isEmpty() ||

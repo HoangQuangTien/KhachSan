@@ -34,15 +34,22 @@ public class PhongService {
     public Page<Phong> getPhongsByLoaiPhong(Integer loaiPhongId, Pageable pageable) {
         return phongRepository.findByLoaiPhong_IdLoaiPhong(loaiPhongId, pageable);
     }
-
-    public Page<Phong> getPhongsByLoaiPhongAndTinhTrang(Integer loaiPhongId, Boolean tinhTrang, Pageable pageable) {
-        return phongRepository.findByLoaiPhong_IdLoaiPhongAndTinhTrang(loaiPhongId, tinhTrang, pageable);
+    public Page<Phong> getPhongsByTrangThai(Boolean trangThai, Pageable pageable) {
+        return phongRepository.findByTrangThai(trangThai, pageable);
+    }
+    public Page<Phong> getPhongsByDateRangeAndFilters(Integer loaiPhongId, Boolean tinhTrang, Boolean trangThai, LocalDateTime ngayNhan, LocalDateTime ngayTra, Pageable pageable) {
+        return phongRepository.findAvailableRooms(loaiPhongId, tinhTrang, trangThai, ngayNhan, ngayTra, pageable);
     }
 
+    public Page<Phong> getPhongsByLoaiPhongTinhTrangTrangThai(Integer loaiPhongId, Boolean tinhTrang, Boolean trangThai, Pageable pageable) {
+        return phongRepository.findByLoaiPhong_IdLoaiPhongAndTinhTrangAndTrangThai(loaiPhongId, tinhTrang, trangThai, pageable);
+    }
+    public Page<Phong> getPhongsByTinhTrangAndTrangThai(Boolean tinhTrang, Boolean trangThai, Pageable pageable) {
+        return phongRepository.findByTinhTrangAndTrangThai(tinhTrang, trangThai, pageable);
+    }
     public Page<Phong> getPhongsByTinhTrang(Boolean tinhTrang, Pageable pageable) {
         return phongRepository.findByTinhTrang(tinhTrang, pageable);
     }
-
     public Phong findById(Integer id) {
         return phongRepository.findById(id).orElse(null);
     }
@@ -270,6 +277,15 @@ public class PhongService {
         }
 
         return filteredRooms;
+    }
+
+
+    public Long getTotalPhongsWithPeople() {
+        return phongRepository.countByTrangThai(false);
+    }
+
+    public Long getTotalPhongsEmpty() {
+        return phongRepository.countByTrangThai(true);
     }
 
 }

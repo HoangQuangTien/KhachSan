@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -184,4 +185,8 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
 
     List<DatPhong> findByKhachHang_IdAndTinhTrang(Integer idKhachHang, String tinhTrang);
 
+
+    @Query("SELECT SUM(dp.tienCoc) AS revenue FROM DatPhong dp WHERE dp.ngayDat >= :startDate AND dp.ngayDat < :endDate")
+    Map<String, Object> findRevenueByDateRange1(@Param("startDate") LocalDateTime startDate,
+                                                @Param("endDate") LocalDateTime endDate);
 }

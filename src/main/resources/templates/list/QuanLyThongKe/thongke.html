@@ -370,6 +370,38 @@
             justify-content: center;
         }
 
+
+        .revenue-display1 {
+            width: 220px;
+            height: 200px;
+            background: linear-gradient(135deg, #FFD700, #FFD700);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #FFD700;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .revenue-icon {
+            font-size: 30px; /* Icon size */
+        }
+
+        .revenue-text {
+            font-size: 16px; /* Text size */
+            margin: 5px 0;
+        }
+
+        .revenue-amount {
+            font-size: 28px; /* Amount size */
+            font-weight: bold;
+        }
+
+
     </style>
     <head th:include="fragment/head :: head"></head>
 </head>
@@ -400,6 +432,9 @@
             <div id="CancelledCountDisplay" class="CancelledCountDisplay1">
 
             </div>
+
+
+            <div id="todayRevenue" class="revenue-display1"></div>
         </div>
 
 
@@ -477,7 +512,7 @@
         </div>
 
         <div class="section-header">
-            <h3> Phòng Có Thời Gian Nhàn Rỗi </h3>
+            <h3> Phòng có thời gian chờ </h3>
         </div>
 
         <div class="row mt-3">
@@ -775,6 +810,49 @@
             }
         }
     });
+
+
+    window.onload = function() {
+        fetchTodayRevenue(); // Tự động hiển thị doanh thu hôm nay khi trang được tải
+    };
+
+
+    function fetchTodayRevenue() {
+        const url = '/datphongs/day'; // Gọi API lấy doanh thu hôm nay
+
+        // Gửi yêu cầu đến API
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Không thể lấy dữ liệu doanh thu hôm nay.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data || Object.keys(data).length === 0) {
+                    document.getElementById('todayRevenue').innerHTML = 'Không có doanh thu hôm nay';
+                    return;
+                }
+                // Hiển thị doanh thu hôm nay
+                document.getElementById('todayRevenue').innerHTML =  `
+  <span class="revenue-icon">💰</span>
+  <span class="revenue-text">Doanh thu hôm nay:</span>
+  <span class="revenue-amount">${formatCurrency(data.revenue)}</span>
+`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('todayRevenue').innerHTML = 'Không thể lấy dữ liệu doanh thu hôm nay.';
+            });
+    }
+
+    // Hàm định dạng tiền tệ
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount);
+    }
 </script>
 </body>
 <script th:include="fragment/script :: script"></script>

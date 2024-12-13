@@ -89,4 +89,14 @@ public class LoaiPhongService {
         return loaiPhongRepository.existsByTang_IdTang(idTang);
     }
 
+
+    public Page<LoaiPhong> findByTangAndKhoangGia(Integer idTang,Float gia1, Float gia2,Pageable pageable){
+        return loaiPhongRepository.findByTang_IdTangAndGiaBetween(idTang,gia1,gia2,pageable);
+    }
+    public Page<LoaiPhong> fingByKhoangGia(Float gia1,Float gia2,Pageable pageable){
+        return loaiPhongRepository.findByGiaBetween(gia1,gia2,pageable);
+    }
+    public Page<LoaiPhong> findByTang(Integer idTang,Pageable pageable){
+        return loaiPhongRepository.findByTang_IdTang(idTang,pageable);
+    }
 }

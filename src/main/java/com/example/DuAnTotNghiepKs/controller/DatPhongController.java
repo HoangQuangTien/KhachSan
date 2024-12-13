@@ -256,7 +256,9 @@ public class DatPhongController {
             }
 
             // Chuyển đổi giá trị 'giaTri' từ chuỗi sang kiểu long
-            long thoiGianChoPhepMillis = TimeUnit.MINUTES.toMillis(Long.parseLong(thoiGianChoPhepStr));
+            // Chuyển đổi giá trị 'giaTri' từ chuỗi sang kiểu long và từ phút sang milliseconds
+            long thoiGianChoPhepMinutes = Long.parseLong(thoiGianChoPhepStr); // Thời gian cho phép tính bằng phút
+            long thoiGianChoPhepMillis = TimeUnit.MINUTES.toMillis(thoiGianChoPhepMinutes); // Chuyển đổi thành milliseconds
 
             // Lưu danh sách các đối tượng DatPhong
             List<DatPhong> datPhongList = new ArrayList<>();
@@ -285,13 +287,15 @@ public class DatPhongController {
 
                 // Kiểm tra khoảng thời gian giữa các lần đặt phòng
                 for (DatPhong existingBooking : existingBookings) {
-                    // Kiểm tra nếu trạng thái của đặt phòng không phải "Đã Hủy"
+                    // Kiểm tra nếu trạng thái của đặt phòng không phải "Đã Hủy" và trạng thái là chưa hoàn tất
                     if (!existingBooking.getTinhTrang().equals("Đã Hủy") && !existingBooking.getTrangThai()) {
                         LocalDateTime existingNgayTra = existingBooking.getNgayTra();
+
+                        // Chuyển ngày trả của người đặt trước và ngày nhận của người đặt sau thành milliseconds
                         long existingNgayTraMillis = existingNgayTra.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
                         long ngayNhanMillis = ngayNhan.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-                        // Kiểm tra khoảng thời gian giữa các lần đặt phòng
+                        // Kiểm tra nếu khoảng thời gian giữa ngày nhận và ngày trả nhỏ hơn thời gian cho phép
                         if (ngayNhanMillis - existingNgayTraMillis < thoiGianChoPhepMillis) {
                             return ResponseEntity.badRequest().body(Map.of("error", "Thời gian đặt của bạn không hợp lệ, trùng với người đặt trước."));
                         }
@@ -319,6 +323,7 @@ public class DatPhongController {
                 datPhong.setTienCoc(tongTienPhongPhong * 0.8f);
                 float tienConLai = datPhong.getTongTien() - datPhong.getTienCoc(); // Tính tiền còn lại
                 datPhong.setTienConLai(tienConLai);
+                datPhong.setNgayDat(LocalDateTime.now());
                 datPhong.setLoaiPhong(loaiPhong);
                 datPhong.setKhachHang(khachHang);
                 datPhong.setTinhTrang("Chưa Checkin");
@@ -603,6 +608,70 @@ public ResponseEntity<?> getTop3PhongDuocDatNhieuNhat() {
 
         Map<String, Object> revenueData = datPhongService.getRevenueByQuarter(year, startMonth, endMonth);
         return ResponseEntity.ok(revenueData);
+    }
+
+
+    @PostMapping("/gia-han-ngay/{idDatPhong}")
+    public ResponseEntity<?> extendStay(@PathVariable Integer idDatPhong, @RequestBody Map<String, LocalDateTime> request) {
+        try {
+            // Lấy giá trị newEndDate từ request
+            LocalDateTime newEndDate = request.get("newEndDate");
+            if (newEndDate == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "Ngày gia hạn không được để trống."));
+            }
+
+            // Tìm thông tin đặt phòng
+            DatPhong datPhong = datPhongService.findById(idDatPhong);
+            if (datPhong == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("success", false, "message", "Đặt phòng không tồn tại."));
+            }
+
+            LocalDateTime oldStartDate = datPhong.getNgayNhan(); // Ngày nhận phòng cũ
+
+            // Kiểm tra nếu ngày gia hạn không lớn hơn hoặc bằng ngày nhận phòng cũ
+            if (newEndDate.isBefore(oldStartDate) || newEndDate.isEqual(oldStartDate)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "Ngày gia hạn phải lớn hơn ngày nhận phòng cũ."));
+            }
+
+
+
+            // Thực hiện gia hạn ngày trả phòng
+            boolean success = datPhongService.extendStay(idDatPhong, newEndDate);
+            if (success) {
+                return ResponseEntity.ok(Map.of("success", true));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("success", false, "message", "Không thể gia hạn, vui lòng thử lại."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Đã xảy ra lỗi: " + e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/day")
+    public ResponseEntity<Map<String, Object>> getRevenueByDay() {
+        try {
+            // Gọi service để lấy doanh thu cho ngày hôm nay
+            Map<String, Object> revenueData = datPhongService.getRevenueByDay();
+
+            // Nếu không có dữ liệu, trả về trạng thái No Content
+            if (revenueData == null || revenueData.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body(Map.of("message", "Không có dữ liệu doanh thu cho ngày hôm nay"));
+            }
+
+            // Trả về doanh thu cho ngày hiện tại
+            return ResponseEntity.ok(revenueData);
+        } catch (Exception e) {
+            // Xử lý lỗi nếu có
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Đã xảy ra lỗi khi lấy dữ liệu doanh thu. Chi tiết: " + e.getMessage()));
+        }
     }
 
 

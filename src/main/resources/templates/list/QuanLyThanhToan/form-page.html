@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin tài khoản</title>
+</head>
+<body>
+<h2>Thông tin tài khoản</h2>
+<form id="accountForm">
+    <label for="bankName">Tên ngân hàng:</label>
+    <input type="text" id="bankName" readonly><br>
+
+    <label for="accountNumber">Số tài khoản:</label>
+    <input type="text" id="accountNumber" readonly><br>
+
+    <label for="amount">Số tiền:</label>
+    <input type="text" id="amount" readonly><br>
+
+    <label for="note">Ghi chú:</label>
+    <input type="text" id="note" readonly><br>
+</form>
+
+<script>
+    // Lấy dữ liệu từ URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const qrCodeData = decodeURIComponent(urlParams.get('data'));
+
+    // Tách dữ liệu từ mã QR
+    const dataParts = qrCodeData.split('|');
+    const bankName = dataParts[0];
+    const accountNumber = dataParts[1];
+    const amount = dataParts[2];
+    const note = dataParts[3];
+
+    // Điền thông tin vào form
+    document.getElementById('bankName').value = bankName;
+    document.getElementById('accountNumber').value = accountNumber;
+    document.getElementById('amount').value = amount;
+    document.getElementById('note').value = note;
+</script>
+</body>
+</html>

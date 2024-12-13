@@ -9,6 +9,7 @@ import com.example.DuAnTotNghiepKs.entity.Phong;
 import com.example.DuAnTotNghiepKs.entity.Tang;
 import com.example.DuAnTotNghiepKs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -55,25 +57,50 @@ public class PhongController {
     public String listPhong(@RequestParam(defaultValue = "0") int page,
                             @RequestParam(required = false) Integer loaiPhongId,
                             @RequestParam(required = false) Boolean tinhTrang,
+                            @RequestParam(required = false) Boolean trangThai,
+                            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate ngayNhan,
+                            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate ngayTra,
                             Model model) {
         int pageSize = 6; // Số lượng phòng trên mỗi trang
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by("idPhong").ascending());
         Page<Phong> phongPage;
 
-        if (loaiPhongId != null && tinhTrang != null) {
-            phongPage = phongService.getPhongsByLoaiPhongAndTinhTrang(loaiPhongId, tinhTrang, pageable);
+        // Lọc theo các tham số
+        if (ngayNhan != null && ngayTra != null) {
+            // Lọc theo ngày nhận và ngày trả, kết hợp các điều kiện khác nếu cần
+            phongPage = phongService.getPhongsByDateRangeAndFilters(loaiPhongId, tinhTrang, trangThai, ngayNhan.atStartOfDay(), ngayTra.atTime(23, 59, 59), pageable);
+            model.addAttribute("selectedNgayNhan", ngayNhan);
+            model.addAttribute("selectedNgayTra", ngayTra);
+        } else if (loaiPhongId != null && tinhTrang != null && trangThai != null) {
+            phongPage = phongService.getPhongsByLoaiPhongTinhTrangTrangThai(loaiPhongId, tinhTrang, trangThai, pageable);
             model.addAttribute("selectedLoaiPhong", loaiPhongId);
             model.addAttribute("selectedTinhTrang", tinhTrang);
+            model.addAttribute("selectedTrangThai", trangThai);
+        } else if (loaiPhongId != null && trangThai != null) {
+            phongPage = phongService.getPhongsByLoaiPhongTinhTrangTrangThai(loaiPhongId, null, trangThai, pageable);
+            model.addAttribute("selectedLoaiPhong", loaiPhongId);
+            model.addAttribute("selectedTrangThai", trangThai);
         } else if (loaiPhongId != null) {
             phongPage = phongService.getPhongsByLoaiPhong(loaiPhongId, pageable);
             model.addAttribute("selectedLoaiPhong", loaiPhongId);
+        } else if (tinhTrang != null && trangThai != null) {
+            phongPage = phongService.getPhongsByTinhTrangAndTrangThai(tinhTrang, trangThai, pageable);
+            model.addAttribute("selectedTinhTrang", tinhTrang);
+            model.addAttribute("selectedTrangThai", trangThai);
         } else if (tinhTrang != null) {
             phongPage = phongService.getPhongsByTinhTrang(tinhTrang, pageable);
             model.addAttribute("selectedTinhTrang", tinhTrang);
+        } else if (trangThai != null) {
+            phongPage = phongService.getPhongsByTrangThai(trangThai, pageable);
+            model.addAttribute("selectedTrangThai", trangThai);
         } else {
             phongPage = phongService.getAllPhongs(pageable);
         }
+        Long totalPhongsWithPeople = phongService.getTotalPhongsWithPeople();
+        Long totalPhongsEmpty = phongService.getTotalPhongsEmpty();
+        model.addAttribute("totalPhongsEmpty", totalPhongsEmpty);
 
+        model.addAttribute("totalPhongsWithPeople", totalPhongsWithPeople);
 
         List<LoaiPhong> loaiPhongs = loaiPhongService.getAllLoaiPhongs();
         List<Tang> tangs = tangService.getAllTangs(); // Lấy danh sách tầng
@@ -291,6 +318,6 @@ public class PhongController {
 
 
 
-}
+    }
 
 

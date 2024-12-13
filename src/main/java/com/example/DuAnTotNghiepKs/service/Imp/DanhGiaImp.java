@@ -9,7 +9,6 @@ import com.example.DuAnTotNghiepKs.service.DanhGiaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +33,8 @@ public class DanhGiaImp implements DanhGiaService {
                         danhGia.getTenKhachHang(),
                         danhGia.getSoSao(),
                         danhGia.getNoiDung(),
-                        danhGia.getNgayDanhGia()
+                        danhGia.getNgayDanhGia(),
+                        danhGia.getPhong().getTenPhong()
                 ))
                 .collect(Collectors.toList());
     }
@@ -69,8 +69,31 @@ public class DanhGiaImp implements DanhGiaService {
                 savedDanhGia.getTenKhachHang(),
                 savedDanhGia.getSoSao(),
                 savedDanhGia.getNoiDung(),
-                savedDanhGia.getNgayDanhGia()
+                savedDanhGia.getNgayDanhGia(),
+                savedDanhGia.getPhong().getTenPhong()
         );
+    }
+
+
+    @Override
+    // Lấy tất cả đánh giá
+    public List<DanhGiaDTO> getAllDanhGia() {
+        List<DanhGia> danhGiaList = danhGiaRepo.findAll(); // Lấy tất cả đánh giá từ cơ sở dữ liệu
+        return danhGiaList.stream()
+                .map(danhGia -> new DanhGiaDTO(danhGia))  // Chuyển đổi từ entity sang DTO
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean deleteDanhGia(Integer idDanhGia) {
+        // Kiểm tra xem đánh giá có tồn tại không
+        Optional<DanhGia> danhGiaOptional = danhGiaRepo.findById(idDanhGia);
+        if (danhGiaOptional.isPresent()) {
+            // Nếu đánh giá tồn tại, tiến hành xóa
+            danhGiaRepo.deleteById(idDanhGia);
+            return true; // Trả về true nếu xóa thành công
+        }
+        return false; // Trả về false nếu không tìm thấy đánh giá
     }
 
 }

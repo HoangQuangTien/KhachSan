@@ -250,7 +250,7 @@
                         <tr th:each="khuyenMai : ${khuyenMaiPage.content}">
                             <td th:text="${khuyenMai.maKhuyenMai}">Mã KM</td>
                             <td th:text="${khuyenMai.tenKhuyenMai}">Tên KM</td>
-                            <td th:text="${khuyenMai.giamGia}">Giảm Giá</td>
+                            <td th:text="${#numbers.formatDecimal(khuyenMai.giamGia, 0, 0)}">Giảm Giá</td>
                             <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
                             <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
                             <td class="format-number" th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
@@ -262,20 +262,19 @@
                                         th:data-maKhuyenMai="${khuyenMai.maKhuyenMai}"
                                         th:data-tenKhuyenMai="${khuyenMai.tenKhuyenMai}"
                                         th:data-moTa="${khuyenMai.moTa}"
-                                        th:data-giamGia="${khuyenMai.giamGia}"
+                                        th:data-giamGia="${#numbers.formatDecimal(khuyenMai.giamGia, 0, 0)}"
                                         th:data-soLuong="${khuyenMai.soLuong}"
-                                        th:data-giamToiThieu="${khuyenMai.giamToiThieu}"
-                                        th:data-giamToiDa="${khuyenMai.giamToiDa}"
+                                        th:data-giamToiThieu="${#numbers.formatDecimal(khuyenMai.giamToiThieu, 0, 0)}"
+                                        th:data-giamToiDa="${#numbers.formatDecimal(khuyenMai.giamToiDa, 0, 0)}"
                                         th:data-ngayBatDau="${#dates.format(khuyenMai.ngayBatDau,'yyyy-MM-dd')}"
                                         th:data-ngayKetThuc="${#dates.format(khuyenMai.ngayKetThuc,'yyyy-MM-dd')}"
-                                        th:data-loaiGiam="${khuyenMai.loaiGiam ? 'phanTram' : 'tienMat'}"
+                                        th:data-loaiGiam="${khuyenMai.loaiGiam ? 'true' : 'false'}"
                                         th:data-trangThai="${khuyenMai.trangThai == 'conHan' ? 'conHan' :
                                     (khuyenMai.trangThai == 'hetHan' ? 'hetHan' : 'sapDienRa')}"
 
                                         onclick="setModalData(this)">
                                     <i class="fas fa-edit"></i> Sửa
                                 </button>
-
                                 <br>
                                 <form th:action="@{/admin/quan-ly-khuyen-mai/delete/{id}(id=${khuyenMai.idKhuyenMai})}"
                                       method="post" style="display:inline;">
@@ -485,19 +484,20 @@
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <label for="editNgayBatDau" class="form-label">Ngày Bắt Đầu</label>
-                                            <input type="date" class="form-control" id="editNgayBatDau" name="ngayBatDau" required />
+                                            <input type="datetime-local" class="form-control" id="editNgayBatDau" name="ngayBatDau" required />
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <label for="editNgayKetThuc" class="form-label">Ngày Kết Thúc</label>
-                                            <input type="date" class="form-control" id="editNgayKetThuc" name="ngayKetThuc" required />
+                                            <input type="datetime-local" class="form-control" id="editNgayKetThuc" name="ngayKetThuc" required />
                                         </div>
                                     </div>
+
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="editLoaiGiam" class="form-label">Loại Giảm</label>
                                             <select class="form-select" id="editLoaiGiam" name="loaiGiam" required>
-                                                <option value="phanTram">Phần Trăm</option>
-                                                <option value="tienMat">Tiền Mặt</option>
+                                                <option value="true">Phần Trăm</option>
+                                                <option value="false">Tiền Mặt</option>
                                             </select>
                                         </div>
                                     </div>
@@ -536,55 +536,8 @@
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
-        const elements = document.querySelectorAll('.format-number');
-        elements.forEach(function (element) {
-            const rawNumber = parseFloat(element.textContent.trim());
-            if (!isNaN(rawNumber)) {
-                element.textContent = rawNumber.toLocaleString('vi-VN');
-            }
-        });
         const formElement = document.getElementById('form-add-promotion');
-        const tenKhuyenMaiInput = document.getElementById('tenKhuyenMai');
-        const moTaInput = document.getElementById('moTa');
-        const editTenKhuyenMaiInput = document.getElementById('editTenKhuyenMai');
-        const editMoTaInput = document.getElementById('editMoTa');
-        tenKhuyenMaiInput.addEventListener('input', function () {
-            const cursorPosition = tenKhuyenMaiInput.selectionStart;
-            let sanitizedValue = tenKhuyenMaiInput.value
-                .replace(/(\s)\s+/g, '$1')
-                .replace(/[^\p{L}\p{N}\s]/gu, '');
-            tenKhuyenMaiInput.value = sanitizedValue;
 
-            tenKhuyenMaiInput.setSelectionRange(cursorPosition, cursorPosition);
-        });
-        moTaInput.addEventListener('input', function () {
-            const cursorPosition = moTaInput.selectionStart;
-            let sanitizedValue = moTaInput.value
-                .replace(/(\s)\s+/g, '$1')
-                .replace(/[^\p{L}\p{N}\s]/gu, '');
-            moTaInput.value = sanitizedValue;
-
-            moTaInput.setSelectionRange(cursorPosition, cursorPosition);
-        });
-
-        editTenKhuyenMaiInput.addEventListener('input', function () {
-            const cursorPosition = editTenKhuyenMaiInput.selectionStart;
-            let sanitizedValue = editTenKhuyenMaiInput.value
-                .replace(/(\s)\s+/g, '$1')
-                .replace(/[^\p{L}\p{N}\s]/gu, '');
-            editTenKhuyenMaiInput.value = sanitizedValue;
-
-            editTenKhuyenMaiInput.setSelectionRange(cursorPosition, cursorPosition);
-        });
-        editMoTaInput.addEventListener('input', function () {
-            const cursorPosition = editMoTaInput.selectionStart;
-            let sanitizedValue = editMoTaInput.value
-                .replace(/(\s)\s+/g, '$1')
-                .replace(/[^\p{L}\p{N}\s]/gu, '');
-            editMoTaInput.value = sanitizedValue;
-
-            editMoTaInput.setSelectionRange(cursorPosition, cursorPosition);
-        });
         formElement.addEventListener('submit', async function (event) {
             event.preventDefault();
 
@@ -605,14 +558,11 @@
             // Log giá trị giamGia để kiểm tra
             console.log("Giảm giá:", fields.giamGia);
 
-            console.log("Giảm giá:", fields.loaiGiam);
-
             // Kiểm tra phần trăm giảm giá không vượt quá 100%
-            if (fields.loaiGiam === 'true' && fields.giamGia > 100) { // '0' là phần trăm
+            if (fields.loaiGiam === 'true' && fields.giamGia > 100) {
                 showErrorToast('Giảm giá phần trăm không thể vượt quá 100%.');
                 return; // Dừng thực hiện nếu có lỗi
             }
-
 
             // Kiểm tra đầu vào
             const today = new Date();
@@ -622,13 +572,18 @@
                 showErrorToast('Vui lòng điền đầy đủ thông tin.');
                 return;
             }
-
             const specialCharPattern = /[^\p{L}\p{N}\s]/u;
+            const whiteSpacePattern = /^\s*$/; // Kiểm tra chuỗi chỉ chứa khoảng trắng
+
             if (specialCharPattern.test(fields.tenKhuyenMai)) {
                 showErrorToast('Tên khuyến mãi không được chứa ký tự đặc biệt.');
                 return;
             }
 
+            if (whiteSpacePattern.test(fields.tenKhuyenMai)) {
+                showErrorToast('Tên khuyến mãi không được nhập toàn khoảng trắng.');
+                return;
+            }
             if (fields.soLuong <= 0) {
                 showErrorToast('Số lượng phải lớn hơn 0.');
                 return;
@@ -663,7 +618,9 @@
                     showSuccessToast('Thêm khuyến mãi thành công!');
                     $('#addKhuyenMaiModal').modal('hide');
                     formElement.reset();
-                    // updateTable(data); // Cập nhật bảng nếu cần
+                    setTimeout(() => {
+                        location.reload(); // Reload trang sau khi hiển thị thông báo thành công
+                    }, 1500);
                 } else if (data.error) {
                     showErrorToast(data.error);
                 }
@@ -671,6 +628,93 @@
                 showErrorToast('Đã có lỗi xảy ra: ' + error.message);
                 console.error(error.message);
             }
+        });
+
+        const formEdit = document.getElementById("editKhuyenMaiForm");
+        formEdit.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const fields = {
+                maKhuyenMai: formEdit.maKhuyenMai.value.trim(),
+                tenKhuyenMai: formEdit.tenKhuyenMai.value.trim(),
+                soLuong: parseInt(formEdit.soLuong.value, 10),
+                giamGia: parseFloat(formEdit.giamGia.value),
+                loaiGiam: formEdit.editLoaiGiam.value,
+                giamToiThieu: parseFloat(formEdit.giamToiThieu.value),
+                giamToiDa: parseFloat(formEdit.giamToiDa.value),
+                moTa: formEdit.moTa.value.trim(),
+                ngayBatDau: new Date(formEdit.ngayBatDau.value),
+                ngayKetThuc: new Date(formEdit.ngayKetThuc.value)
+            };
+
+            if (fields.loaiGiam === 'true' && fields.giamGia > 100) {
+                showErrorToast('Giảm giá phần trăm không thể vượt quá 100%.');
+                return; // Dừng thực hiện nếu có lỗi
+            }
+
+            // Kiểm tra đầu vào
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (Object.values(fields).some(value => !value && value !== 0)) {
+                showErrorToast('Vui lòng điền đầy đủ thông tin.');
+                return;
+            }
+            const specialCharPattern = /[^\p{L}\p{N}\s]/u;
+            const whiteSpacePattern = /^\s*$/; // Kiểm tra chuỗi chỉ chứa khoảng trắng
+
+            if (specialCharPattern.test(fields.tenKhuyenMai)) {
+                showErrorToast('Tên khuyến mãi không được chứa ký tự đặc biệt.');
+                return;
+            }
+
+            if (whiteSpacePattern.test(fields.tenKhuyenMai)) {
+                showErrorToast('Tên khuyến mãi không được nhập toàn khoảng trắng.');
+                return;
+            }
+            if (fields.soLuong <= 0) {
+                showErrorToast('Số lượng phải lớn hơn 0.');
+                return;
+            }
+            if (fields.giamGia < 0 || fields.giamToiThieu < 0) {
+                showErrorToast('Giảm giá và giá tối thiểu phải lớn hơn hoặc bằng 0.');
+                return;
+            }
+            if (fields.giamToiDa < fields.giamToiThieu) {
+                showErrorToast('Giá tối đa phải lớn hơn hoặc bằng giá tối thiểu.');
+                return;
+            }
+            if (isNaN(fields.ngayBatDau) || fields.ngayBatDau < today) {
+                showErrorToast('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.');
+                return;
+            }
+            if (isNaN(fields.ngayKetThuc) || fields.ngayKetThuc < fields.ngayBatDau) {
+                showErrorToast('Ngày kết thúc phải lớn hơn ngày bắt đầu.');
+                return;
+            }
+            const id = document.getElementById("editId").value;
+            const url = `/quan-ly-khuyen-mai/update/${id}`;
+            const formData = new FormData(formEdit);
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showSuccessToast("Cập nhật khuyến mãi thành công!");
+                        // Đóng modal và làm mới danh sách nếu cần
+                        $('#editKhuyenMaiModal').modal('hide');
+                        setTimeout(() => {
+                            location.reload(); // Reload trang sau khi hiển thị thông báo thành công
+                        }, 1500);
+                    } else {
+                        showErrorToast(data.error || "Đã có lỗi xảy ra");
+                    }
+                })
+                .catch(error => {
+                    alert("Lỗi kết nối: " + error.message);
+                });
         });
     });
 
@@ -767,33 +811,33 @@
     }
 
 
-    function updateKhuyenMai() {
-        const form = document.getElementById("editKhuyenMaiForm");
-        const formData = new FormData(form);
-
-        const id = document.getElementById("editId").value; // Lấy ID từ modal
-        const url = `/quan-ly-khuyen-mai/update/${id}`; // API path
-
-        fetch(url, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccessToast("Cập nhật khuyến mãi thành công!");
-                    // Đóng modal và làm mới danh sách nếu cần
-                    $('#editKhuyenMaiModal').modal('hide');
-                } else {
-                    showErrorToast(data.error || "Đã có lỗi xảy ra");
-                }
-            })
-            .catch(error => {
-                alert("Lỗi kết nối: " + error.message);
-            });
-
-        return false; // Ngừng hành động mặc định của form
-    }
+    // function updateKhuyenMai() {
+    //     const form = document.getElementById("editKhuyenMaiForm");
+    //     const formData = new FormData(form);
+    //
+    //     const id = document.getElementById("editId").value; // Lấy ID từ modal
+    //     const url = `/quan-ly-khuyen-mai/update/${id}`; // API path
+    //
+    //     fetch(url, {
+    //         method: 'POST',
+    //         body: formData
+    //     })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.success) {
+    //                 showSuccessToast("Cập nhật khuyến mãi thành công!");
+    //                 // Đóng modal và làm mới danh sách nếu cần
+    //                 $('#editKhuyenMaiModal').modal('hide');
+    //             } else {
+    //                 showErrorToast(data.error || "Đã có lỗi xảy ra");
+    //             }
+    //         })
+    //         .catch(error => {
+    //             alert("Lỗi kết nối: " + error.message);
+    //         });
+    //
+    //     return false; // Ngừng hành động mặc định của form
+    // }
 
 
     function toggleSelectAll() {

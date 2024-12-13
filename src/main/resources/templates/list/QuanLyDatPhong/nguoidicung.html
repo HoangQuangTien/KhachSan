@@ -88,10 +88,10 @@
                 <th>Ngày Nhận</th>
                 <th>Ngày Trả</th>
                 <th>Hành Động</th>
+                <th>Gia Hạn Ngày</th> <!-- Cột gia hạn thêm ngày -->
             </tr>
             </thead>
             <tbody>
-            <!-- Duyệt qua danh sách đặt phòng và hiển thị -->
             <tr th:each="datPhong : ${datPhongs}" th:id="'datPhong-' + ${datPhong.idDatPhong}">
                 <td th:text="${datPhong.maDatPhong}"></td>
                 <td th:text="${datPhong.khachHang.hoVaTen}"></td>
@@ -100,19 +100,113 @@
                 <td th:text="${datPhong.ngayNhan}"></td>
                 <td th:text="${datPhong.ngayTra}"></td>
                 <td>
-                            <a th:href="@{/hien-thi-khach-di-cung(id=${datPhong.idDatPhong})}" class="btn btn-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                    <a th:href="@{/hien-thi-khach-di-cung(id=${datPhong.idDatPhong})}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i>
+                    </a>
                 </td>
-
-
+                <td>
+                    <!-- Sửa cú pháp onclick -->
+                    <button class="btn btn-success" th:onclick="'extendStay(' + ${datPhong.idDatPhong} + ')'" >
+                        Gia Hạn
+                    </button>
+                </td>
             </tr>
             </tbody>
+
+
         </table>
     </div>
 </main>
 <div th:include="fragment/modal :: modal"></div>
 
+<script>
+    function extendStay(idDatPhong) {
+        // Lấy ngày trả phòng hiện tại từ bảng dữ liệu
+        const currentEndDateElement = document.querySelector(`#datPhong-${idDatPhong} td:nth-child(6)`);
+        if (!currentEndDateElement) {
+            Swal.fire('Lỗi!', 'Không thể tìm thấy ngày trả phòng hiện tại.', 'error');
+            return;
+        }
+
+        const currentEndDate = currentEndDateElement.innerText; // Ngày trả phòng hiện tại (chuỗi)
+        const currentEndDateTime = new Date(currentEndDate); // Chuyển đổi sang đối tượng Date
+
+        Swal.fire({
+            title: 'Nhập ngày gia hạn',
+            input: 'datetime-local',
+            inputAttributes: {
+                'aria-label': 'Chọn ngày gia hạn mới'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Gia hạn',
+            cancelButtonText: 'Hủy',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Vui lòng chọn ngày gia hạn';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const newEndDate = result.value;
+                const newEndDateTime = new Date(newEndDate); // Chuyển đổi sang đối tượng Date
+
+                // Kiểm tra nếu ngày gia hạn nhỏ hơn hoặc bằng ngày trả phòng hiện tại
+                if (newEndDateTime <= currentEndDateTime) {
+                    Swal.fire('Lỗi!', 'Ngày gia hạn phải lớn hơn ngày trả phòng hiện tại.', 'error');
+                    return;
+                }
+
+                // Kiểm tra nếu ngày gia hạn không cách ngày trả phòng ít nhất 24 giờ
+                const timeDifference = newEndDateTime - currentEndDateTime; // Chênh lệch thời gian (ms)
+                const hoursDifference = timeDifference / (1000 * 60 * 60); // Chuyển đổi sang giờ
+
+                if (hoursDifference < 24) {
+                    Swal.fire('Lỗi!', 'Ngày gia hạn phải cách ngày trả phòng ít nhất 24 giờ.', 'error');
+                    return;
+                }
+
+                // // Tính toán số ngày gia hạn và tổng tiền gia hạn
+                // const daysDifference = Math.ceil(hoursDifference / 24); // Chuyển đổi sang số ngày (làm tròn lên)
+                // const totalExtensionPrice = daysDifference * roomPrice; // Tính tổng giá gia hạn
+                //
+
+                // Thêm bước xác nhận lại trước khi gia hạn
+                Swal.fire({
+                    title: 'Xác nhận gia hạn',
+                    text: `Bạn chắc chắn muốn gia hạn ngày trả phòng đến ${newEndDate.replace('T', ' ')} không?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy'
+                }).then((confirmResult) => {
+                    if (confirmResult.isConfirmed) {
+                        // Gửi yêu cầu gia hạn đến server
+                        fetch(`/datphongs/gia-han-ngay/${idDatPhong}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ newEndDate: newEndDate })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Thành công!', 'Ngày gia hạn đã được cập nhật.', 'success');
+                                    // Cập nhật lại ngày trả phòng trong bảng
+                                    currentEndDateElement.innerText = newEndDate.replace('T', ' '); // Hiển thị định dạng đẹp hơn
+                                } else {
+                                    Swal.fire('Thất bại!', data.message || 'Không thể gia hạn ngày, vui lòng thử lại.', 'error');
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire('Lỗi!', 'Có lỗi khi gửi yêu cầu.', 'error');
+                            });
+                    }
+                });
+            }
+        });
+    }
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DienTichRepo extends JpaRepository<DienTich, Integer> {
+    boolean existsByTenDienTich(float tenDienTich);
 }

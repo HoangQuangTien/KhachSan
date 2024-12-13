@@ -14,6 +14,9 @@ import com.example.DuAnTotNghiepKs.service.TangService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -45,33 +48,41 @@ public class LoaiPhongController {
     @GetMapping
     public String listLoaiPhong(@RequestParam(value = "page", defaultValue = "0") int page,
                                 @RequestParam(value = "size", defaultValue = "5") int size,
+                                @RequestParam(required = false) Integer idTang,
+                                @RequestParam( required = false) Float giaMin,
+                                @RequestParam( required = false) Float giaMax,
                                 Model model) {
-        Page<LoaiPhong> loaiPhongPage=loaiPhongService.getLoaiPhongPage(page,size);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("idLoaiPhong"));
+
+        Page<LoaiPhong> loaiPhongPage;
+
+        // Kiểm tra điều kiện lọc và gọi dịch vụ tương ứng
+        if (idTang != null && giaMin != null && giaMax != null) {
+            loaiPhongPage = loaiPhongService.findByTangAndKhoangGia(idTang, giaMin, giaMax, pageable);
+            model.addAttribute("selectTang",idTang);
+
+        } else if (giaMin != null && giaMax != null) {
+            loaiPhongPage = loaiPhongService.fingByKhoangGia(giaMin, giaMax, pageable);
+        } else if (idTang != null) {
+            loaiPhongPage = loaiPhongService.findByTang(idTang, pageable);
+            model.addAttribute("selectTang",idTang);
+        } else {
+            loaiPhongPage = loaiPhongService.getLoaiPhongPage(page, size); // Lấy tất cả loại phòng nếu không có bộ lọc
+        }
+
         model.addAttribute("loaiPhongPage", loaiPhongPage);
 
-        //lấy id nhân viên
-        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        List<Tang> tangs = tangService.getAllTangs();
+        model.addAttribute("tangs",tangs);
+        // Lấy thông tin tài khoản từ session
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
         if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
             model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
-            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg()); // Đảm bảo rằng bạn có trường img trong NhanVienDTO
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg());
         }
 
         return "list/QuanLyLoaiPhong/loaiphongs";
-    }
-
-    @GetMapping("/create")
-    public String createLoaiPhongForm(Model model) {
-        model.addAttribute("loaiPhong", new LoaiPhong());
-
-        // Lấy danh sách tầng và diện tích từ cơ sở dữ liệu
-        List<Tang> tangs = tangRepo.findAll();
-        List<DienTich> dienTichs = dienTichRepo.findAll();
-
-        // Thêm danh sách tầng và diện tích vào model
-        model.addAttribute("tangs", tangs);
-        model.addAttribute("dienTichs", dienTichs);
-
-        return "list/QuanLyLoaiPhong/Create";
     }
 
 
@@ -240,6 +251,29 @@ public class LoaiPhongController {
     public ResponseEntity<?> checkTang(@PathVariable Integer idTang) {
         boolean exists = loaiPhongService.existsByTangId(idTang);
         return ResponseEntity.ok(Collections.singletonMap("exists", exists));
+    }
+
+    @GetMapping("/checkTenDienTich")
+    @ResponseBody
+    public Map<String, Boolean> checkTenDienTich(@RequestParam float tenDienTich) {
+        boolean exists = dienTichService.isTenDienTichTrung(tenDienTich);
+        return Collections.singletonMap("exists", exists);  // Trả về kết quả kiểm tra
+    }
+
+
+    @GetMapping("/create")
+    public String createLoaiPhongForm(Model model) {
+        model.addAttribute("loaiPhong", new LoaiPhong());
+
+        // Lấy danh sách tầng và diện tích từ cơ sở dữ liệu
+        List<Tang> tangs = tangRepo.findAll();
+        List<DienTich> dienTichs = dienTichRepo.findAll();
+
+        // Thêm danh sách tầng và diện tích vào model
+        model.addAttribute("tangs", tangs);
+        model.addAttribute("dienTichs", dienTichs);
+
+        return "list/QuanLyLoaiPhong/Create";
     }
 
 }

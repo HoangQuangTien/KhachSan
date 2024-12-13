@@ -25,5 +25,11 @@ public interface LoaiPhongRepo extends JpaRepository<LoaiPhong, Integer> {
     boolean existsByTenLoaiPhong(String tenLoaiPhong);
 
     boolean existsByTang_IdTang(Integer idTang);
+
+    Page<LoaiPhong> findByTang_IdTangAndGiaBetween(Integer idTang,Float giaMin, Float giaMax,Pageable pageable);
+    Page<LoaiPhong> findByGiaBetween(Float giaMin, Float giaMax, Pageable pageable);
+    Page<LoaiPhong> findByTang_IdTang(Integer idTang,Pageable pageable);
+
+
 }
 

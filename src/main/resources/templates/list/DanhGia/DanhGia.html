@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Thêm SweetAlert2 vào head của trang -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<head>
+    <style>
+        /* CSS để cải tiến giao diện */
+        .danhgia-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+            width: 31%; /* Chiều rộng của mỗi phần tử đánh giá (3 phần tử trên 1 dòng) */
+            margin-bottom: 20px; /* Khoảng cách giữa các dòng */
+        }
+
+        .danhgia-item:hover {
+            transform: scale(1.05); /* Hiệu ứng hover */
+        }
+
+        .danhgia-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between; /* Căn đều các phần tử */
+        }
+
+        .danhgia-item p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .danhgia-item button {
+            margin-top: 10px;
+        }
+
+        .danhgia-item p strong {
+            color: #007bff;
+        }
+
+        /* Responsive: Khi màn hình nhỏ, sẽ hiển thị 2 phần tử mỗi dòng */
+        @media (max-width: 768px) {
+            .danhgia-item {
+                width: 48%;
+            }
+        }
+
+        /* Responsive: Khi màn hình rất nhỏ, sẽ hiển thị 1 phần tử mỗi dòng */
+        @media (max-width: 480px) {
+            .danhgia-item {
+                width: 100%;
+            }
+        }
+
+        /* Cải thiện giao diện button */
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+
+    </style>
+    <head th:include="fragment/head :: head"></head>
+</head>
+
+<body class="vertical light">
+<div class="wrapper">
+    <div th:include="fragment/navbar :: navbar"></div>
+    <div th:include="fragment/sidebar :: sidebar"></div>
+    <main role="main" class="main-content">
+        <h2>Danh Sách Đánh Giá</h2>
+
+        <div id="danhGiaList" class="danhgia-container">
+            <!-- Các đánh giá sẽ được hiển thị ở đây -->
+        </div>
+    </main>
+    <div th:include="fragment/modal :: modal"></div>
+</div>
+
+<script>
+    // Fetch all danh gia from the backend API
+    async function getAllDanhGia() {
+        try {
+            const response = await fetch('/api/danhgia/all'); // Đảm bảo URL này đúng với backend của bạn
+            if (response.ok) {
+                const danhGiaList = await response.json();
+
+                // Clear previous list
+                const danhGiaContainer = document.getElementById('danhGiaList');
+                danhGiaContainer.innerHTML = '';
+
+                // Loop through each evaluation and add to the list
+                danhGiaList.forEach(danhGia => {
+                    const danhGiaDiv = document.createElement('div');
+                    danhGiaDiv.classList.add('danhgia-item');
+                    danhGiaDiv.id = `danhGia-${danhGia.idDanhGia}`;
+
+                    danhGiaDiv.innerHTML = `
+                        <p><strong>Khách hàng:</strong> ${danhGia.tenKhachHang}</p>
+                        <p><strong>Điểm đánh giá:</strong> ${danhGia.soSao}</p>
+                        <p><strong>Nội dung:</strong> ${danhGia.noiDung}</p>
+                        <p><strong>Ngày đánh giá:</strong> ${new Date(danhGia.ngayDanhGia).toLocaleString()}</p>
+                        <!-- Hiển thị thông tin phòng được đánh giá -->
+                        <p><strong>Phòng:</strong> ${danhGia.tenPhong}</p> <!-- Thêm tên phòng -->
+                        <hr>
+                        <button onclick="deleteDanhGia(${danhGia.idDanhGia})" class="btn btn-danger">Xóa</button>
+
+                    `;
+
+                    danhGiaContainer.appendChild(danhGiaDiv);
+                });
+            } else {
+                alert('Không thể lấy danh sách đánh giá.');
+            }
+        } catch (error) {
+            console.error('Lỗi:', error);
+            alert('Đã xảy ra lỗi khi lấy dữ liệu.');
+        }
+    }
+
+    // Gọi API để xóa đánh giá
+    async function deleteDanhGia(idDanhGia) {
+        // Hiển thị thông báo xác nhận với SweetAlert2
+        const { isConfirmed } = await Swal.fire({
+            title: 'Bạn chắc chắn muốn xóa đánh giá này?',
+            text: "Hành động này không thể hoàn tác!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (isConfirmed) {
+            try {
+                const response = await fetch(`/api/danhgia/${idDanhGia}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    // Xóa phần tử đánh giá khỏi giao diện
+                    const danhGiaDiv = document.getElementById(`danhGia-${idDanhGia}`);
+                    danhGiaDiv.remove();
+
+                    // Hiển thị thông báo thành công theo kiểu toast
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Đánh giá đã được xóa!',
+                        toast: true,
+                        position: 'top-right',  // Vị trí thông báo
+                        showConfirmButton: false,  // Không có nút xác nhận
+                        timer: 1500,  // Thời gian hiển thị (1.5 giây)
+                        timerProgressBar: true,  // Hiển thị thanh tiến trình
+                        width: '300px',  // Chiều rộng của thông báo (giảm lại cho nhỏ)
+                        padding: '10px',  // Khoảng cách bên trong
+                        background: '#28a745',  // Màu nền
+                        color: '#fff',  // Màu chữ
+                        iconColor: '#fff'  // Màu của biểu tượng
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Không thể xóa đánh giá.',
+                    });
+                }
+            } catch (error) {
+                console.error('Lỗi:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Đã xảy ra lỗi',
+                    text: 'Không thể xóa đánh giá.',
+                });
+            }
+        } else {
+            console.log('Hành động xóa đã bị hủy');
+        }
+    }
+
+    // Gọi hàm khi trang được tải
+    window.onload = getAllDanhGia;
+</script>
+</body>
+
+<script th:include="fragment/script :: script"></script>
+</html>

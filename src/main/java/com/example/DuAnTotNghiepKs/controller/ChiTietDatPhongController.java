@@ -407,14 +407,24 @@ public class ChiTietDatPhongController {
                 datPhong.setTongTien((float) totalRoomPrice);
 
                 // Tính tiền cọc (80% tổng tiền)
-                float tienCoc = (float) (totalRoomPrice * 0.8); // Tiền cọc bằng 80% tổng tiền
-                datPhong.setTienCoc(tienCoc);
+                float tienCocMoi = (float) (totalRoomPrice * 0.8); // Tiền cọc bằng 80% tổng tiền
+
+                // Cập nhật tiền cọc mới
+                datPhong.setTienCoc(tienCocMoi);
 
                 // Tính tiền còn lại
-                float tienConLai = (float) (totalRoomPrice - tienCoc);
+                float tienConLai = (float) (totalRoomPrice - tienCocMoi);
 
                 // Cập nhật tiền còn lại
                 datPhong.setTienConLai(tienConLai);
+
+                // Tính tiền cọc chênh lệch nếu giá phòng thay đổi
+                float tienCocChenhLech = tienCocMoi - datPhong.getTienCoc();
+
+                // Cập nhật lại tiền cọc chênh lệch vào thông tin đặt phòng (nếu có)
+                if (tienCocChenhLech > 0) {
+                    datPhong.setTienConLai(datPhong.getTienConLai() + tienCocChenhLech);
+                }
 
                 // Lưu lại thông tin đã cập nhật
                 datPhongRepo.save(datPhong);
@@ -437,6 +447,7 @@ public class ChiTietDatPhongController {
                     .body(Map.of("success", false, "message", "Đã xảy ra lỗi không mong muốn: " + e.getMessage()));
         }
     }
+
 
 
 }
