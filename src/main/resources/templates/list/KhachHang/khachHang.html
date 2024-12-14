@@ -26,13 +26,12 @@
 
         /* Thêm phần tiêu đề cho Top 3 phòng nổi bật */
         .top-phong-title {
-            text-align: center;
-            font-size: 2.5em;
+            font-size: 2.5rem;
             font-weight: bold;
-            color: #333;
-            margin-bottom: 30px;
-            padding-top: 20px;
-            text-transform: uppercase;
+            color: #E91E63;  /* Pink color */
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: 'Playfair Display', serif;  /* New font for the title */
         }
 
         /* Container Flexbox để các mục phòng hiển thị trên cùng một hàng */
@@ -421,7 +420,7 @@
 <div class="tab-content p-3">
     <div class="tab-pane fade show active" id="Trangchu" role="tabpanel" aria-labelledby="tab-trangchu">
         <div class="eco-garden-description">
-            <h2>Đánh thức mọi giác quan của bạn tại DragonBall Hotel</h2>
+            <h2  >Đánh thức mọi giác quan của bạn tại DragonBall Hotel</h2>
             <p style="font-size: 1rem; color: #555; line-height: 1.6; white-space: normal; text-align: center;">
                 Khách sạn Dragon Ball Hotel với các phòng ngủ được xây dựng theo phong cách hiện đại phương tây. <br>
                 mỗi phòng được bố trí đón ánh sáng và gió biển thổi vào rất thoáng mát<br>
@@ -439,15 +438,159 @@
 
         <!--Vùng để load phòng-->
         <div id="top-phong" class="top-phong">
-            <h1 class="top-phong-title">Phòng nổi bật</h1>
+            <h1 class="top-phong-title ">Phòng nổi bật</h1>
             <div id="loadPhongCustermoContainer" class="phong-list">
                 <!-- Các phòng sẽ được load vào đây bởi JavaScript -->
             </div>
         </div>
 
+        <div class="mt-5">
+            <h2 class="room-title">Phòng và hạng phòng</h2>
+            <h4 class="room-description">
+                Tại DragonBall Hotel, chúng tôi cung cấp nhiều loại phòng phù hợp với nhu cầu của mỗi khách hàng.
+            </h4>
+
+            <div class="row">
+                <div class="col-md-3 room-item">
+                    <img src="/img/standar.jfif" alt="" class="room-img">
+                    <h3 class="room-name">Standard</h3>
+                    <p class="room-text">Phòng Standard được thiết kế đơn giản, đầy đủ tiện nghi, thích hợp cho những ai yêu thích sự tiện lợi và thoải mái với mức giá phải chăng.</p>
+                </div>
+
+                <div class="col-md-3 room-item">
+                    <img src="/img/superoid.jfif" alt="" class="room-img">
+                    <h3 class="room-name">Superior</h3>
+                    <p class="room-text">Phòng Superior rộng rãi, sang trọng, cung cấp các tiện nghi cao cấp như giường đôi lớn và view đẹp, phù hợp cho những ai yêu cầu sự thoải mái.</p>
+                </div>
+
+                <div class="col-md-3 room-item">
+                    <img src="/img/family.jfif" alt="" class="room-img">
+                    <h3 class="room-name">Family</h3>
+                    <p class="room-text">Phòng Family rộng rãi, có không gian thoải mái cho các gia đình, với nhiều giường và các tiện nghi đầy đủ cho mọi thành viên.</p>
+                </div>
+
+                <div class="col-md-3 room-item">
+                    <img src="/img/deluxe.jfif" alt="" class="room-img">
+                    <h3 class="room-name">Deluxe</h3>
+                    <p class="room-text">Phòng Deluxe mang đến sự sang trọng tuyệt đối với nội thất hiện đại, view đẹp và các dịch vụ cao cấp cho trải nghiệm nghỉ dưỡng hoàn hảo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google Fonts for custom font -->
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+        <!-- CSS for styling -->
+        <style>
+            /* Style for the main title */
+            .room-title {
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: #E91E63;  /* Pink color */
+                text-align: center;
+                margin-bottom: 20px;
+                font-family: 'Playfair Display', serif;  /* New font for the title */
+            }
+
+            /* Style for the description */
+            .room-description {
+                font-size: 1.2rem;
+                color: #F48FB1;  /* Light pink color */
+                text-align: center;
+                margin-bottom: 40px;
+                line-height: 1.6;
+            }
+
+            /* Style for each room item */
+            .room-item {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            /* Style for the images of the rooms */
+            .room-img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin-bottom: 15px;
+            }
+
+            /* Style for the name of the rooms */
+            .room-name {
+                font-size: 1.5rem;
+                color: #E91E63;  /* Pink color */
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            /* Style for the room description text */
+            .room-text {
+                font-size: 1rem;
+                color: #333; /* Dark pink color */
+                line-height: 1.6;
+            }
+            /* Đặt hiệu ứng chuyển động cho phần tử khi vào màn hình */
+            /* Đặt hiệu ứng chuyển động cho phần tử khi vào màn hình */
+            .room-item {
+                opacity: 0;  /* Ban đầu phần tử sẽ ẩn */
+                transform: translateY(30px); /* Đặt phần tử xuống dưới một chút */
+                transition: opacity 0.6s ease-out, transform 0.6s ease-out; /* Thời gian hiệu ứng */
+            }
+
+            /* Khi phần tử có lớp "in-view", phần tử sẽ trở về vị trí ban đầu và hiển thị */
+            .room-item.in-view {
+                opacity: 1;
+                transform: translateY(0); /* Quay lại vị trí ban đầu */
+            }
+
+            /* Hiệu ứng hover cho phần tử phòng */
+            .room-item:hover {
+                transform: translateY(-10px); /* Di chuyển lên một chút khi hover */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ để tạo hiệu ứng nổi bật */
+                cursor: pointer; /* Thay đổi con trỏ thành hình bàn tay khi hover */
+                transition: transform 0.3s ease, box-shadow 0.3s ease; /* Thêm thời gian chuyển động cho hiệu ứng */
+            }
+
+            /* Thay đổi màu nền khi hover */
+            .room-item:hover .room-img {
+                opacity: 0.8;  /* Làm mờ hình ảnh khi hover */
+            }
+
+            /* Thay đổi màu chữ khi hover */
+            .room-item:hover .room-name {
+                color: #D81B60;  /* Thay đổi màu sắc chữ thành hồng đậm */
+            }
+
+            /* Thay đổi màu chữ mô tả khi hover */
+            .room-item:hover .room-text {
+                color: #E91E63;  /* Thay đổi màu chữ mô tả khi hover */
+            }
+
+        </style>
+        <script>
+            // Khởi tạo Intersection Observer để theo dõi khi các phần tử vào màn hình
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Khi phần tử vào màn hình, thêm lớp "in-view"
+                        entry.target.classList.add('in-view');
+                    } else {
+                        // Khi phần tử ra khỏi màn hình, xóa lớp "in-view" để tái hiện hiệu ứng khi vào lại
+                        entry.target.classList.remove('in-view');
+                    }
+                });
+            }, {
+                threshold: 0.5  // Phần tử phải vào ít nhất 50% mới được tính là "đã vào"
+            });
+
+            // Quan sát tất cả các phần tử có class "room-item"
+            document.querySelectorAll('.room-item').forEach(item => {
+                observer.observe(item);
+            });
+        </script>
+
+
     </div>
-
-
 
     <div class="tab-pane fade" id="hethongphong" role="tabpanel" aria-labelledby="tab-hethongphong">
         <h3>Hệ Thống Phòng</h3>
@@ -1047,64 +1190,64 @@
 </div>
 
 
-<!--VÙng để chèn phòng đã tìm-->
-<div class="row room-list d-flex flex-wrap mt-4"  style="margin-top: 30px;"  >
-    <div th:if="${message}">-->
-        <p th:text="${message}" style="color: red;"></p>
-    </div>
-    <div class="row justify-content-center">
-        <div th:each="phong : ${availableRooms}" class="col-lg-3 col-md-4 col-sm-6 mb-4">
-            <div class="card shadow h-100" th:classappend="${phong.trangThai} ? 'border-success' : 'border-danger'">
-                <!-- Image Section -->
-                <div class="card-img-top position-relative">
-    <span th:text="${phong.trangThai == true ? 'Còn trống' : 'Đã đặt'}" class="status-text position-absolute top-0 start-0 p-2 text-white bg-success">
-        Còn trống
-    </span>
-                    <img th:src="${phong.img}" class="card-img" alt="Ảnh phòng của ${phong.tenPhong}" style="object-fit: cover; height: 200px;">
-                </div>
+<!--&lt;!&ndash;VÙng để chèn phòng đã tìm&ndash;&gt;-->
+<!--<div class="row room-list d-flex flex-wrap mt-4"  style="margin-top: 30px;"  >-->
+<!--    <div th:if="${message}">&ndash;&gt;-->
+<!--        <p th:text="${message}" style="color: red;"></p>-->
+<!--    </div>-->
+<!--    <div class="row justify-content-center">-->
+<!--        <div th:each="phong : ${availableRooms}" class="col-lg-3 col-md-4 col-sm-6 mb-4">-->
+<!--            <div class="card shadow h-100" th:classappend="${phong.trangThai} ? 'border-success' : 'border-danger'">-->
+<!--                &lt;!&ndash; Image Section &ndash;&gt;-->
+<!--                <div class="card-img-top position-relative">-->
+<!--    <span th:text="${phong.trangThai == true ? 'Còn trống' : 'Đã đặt'}" class="status-text position-absolute top-0 start-0 p-2 text-white bg-success">-->
+<!--        Còn trống-->
+<!--    </span>-->
+<!--                    <img th:src="${phong.img}" class="card-img" alt="Ảnh phòng của ${phong.tenPhong}" style="object-fit: cover; height: 200px;">-->
+<!--                </div>-->
 
 
-                <!-- Information Section -->
-                <div class="card-body p-4 text-dark bg-white shadow-sm rounded-lg">
-                    <!-- Tên phòng -->
-                    <h5 class="card-title text-truncate" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}" style="font-size: 1.3rem; font-weight: 600; color: #333;"></h5>
+<!--                &lt;!&ndash; Information Section &ndash;&gt;-->
+<!--                <div class="card-body p-4 text-dark bg-white shadow-sm rounded-lg">-->
+<!--                    &lt;!&ndash; Tên phòng &ndash;&gt;-->
+<!--                    <h5 class="card-title text-truncate" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}" style="font-size: 1.3rem; font-weight: 600; color: #333;"></h5>-->
 
-                    <!-- Giá -->
-                    <p class="card-text mb-2" style="font-size: 1.1rem; color: #444;">
-                        <strong class="text-primary">Giá:</strong>
-                        <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm
-                    </p>
+<!--                    &lt;!&ndash; Giá &ndash;&gt;-->
+<!--                    <p class="card-text mb-2" style="font-size: 1.1rem; color: #444;">-->
+<!--                        <strong class="text-primary">Giá:</strong>-->
+<!--                        <span th:text="${#numbers.formatDecimal(phong.loaiPhong.gia, 0, '0')}"></span> vnđ/đêm-->
+<!--                    </p>-->
 
-                    <!-- Số giường và số người tối đa -->
-                    <p class="card-text mb-2" style="font-size: 1.1rem; color: #444;">
-                        <i class="fas fa-users"></i>
-                        <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span> người
-                    </p>
+<!--                    &lt;!&ndash; Số giường và số người tối đa &ndash;&gt;-->
+<!--                    <p class="card-text mb-2" style="font-size: 1.1rem; color: #444;">-->
+<!--                        <i class="fas fa-users"></i>-->
+<!--                        <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span> người-->
+<!--                    </p>-->
 
-                    <!-- Mô tả phòng -->
-                    <p class="card-text mb-2" style="font-size: 1rem; color: #555;">
-                        <strong><i class="fas fa-info-circle"></i> Mô Tả:</strong>
-                        <span th:text="${phong.moTa}"></span>
-                    </p>
+<!--                    &lt;!&ndash; Mô tả phòng &ndash;&gt;-->
+<!--                    <p class="card-text mb-2" style="font-size: 1rem; color: #555;">-->
+<!--                        <strong><i class="fas fa-info-circle"></i> Mô Tả:</strong>-->
+<!--                        <span th:text="${phong.moTa}"></span>-->
+<!--                    </p>-->
 
-                    <!-- Nút Đặt phòng -->
-                    <div class="d-flex justify-content-start mt-4">
-                        <a th:href="@{/view-dat-phong(roomId=${phong.idPhong})}">
-                            <button class="btn btn-success d-flex align-items-center px-4 py-2 shadow-sm hover-shadow">
-                                <i class="fas fa-bed mr-2"></i>
-                                <span class="font-weight-bold">Đặt phòng</span>
-                            </button>
-                        </a>
-                    </div>
-                </div>
-
-
+<!--                    &lt;!&ndash; Nút Đặt phòng &ndash;&gt;-->
+<!--                    <div class="d-flex justify-content-start mt-4">-->
+<!--                        <a th:href="@{/view-dat-phong(roomId=${phong.idPhong})}">-->
+<!--                            <button class="btn btn-success d-flex align-items-center px-4 py-2 shadow-sm hover-shadow">-->
+<!--                                <i class="fas fa-bed mr-2"></i>-->
+<!--                                <span class="font-weight-bold">Đặt phòng</span>-->
+<!--                            </button>-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                </div>-->
 
 
-            </div>
-        </div>
-    </div>
-</div>
+
+
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 
 
