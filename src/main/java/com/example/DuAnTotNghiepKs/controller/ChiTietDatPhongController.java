@@ -1,6 +1,7 @@
 package com.example.DuAnTotNghiepKs.controller;
 
 import com.example.DuAnTotNghiepKs.DTO.CustomerDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.*;
 import com.example.DuAnTotNghiepKs.repository.*;
 import com.example.DuAnTotNghiepKs.service.*;
@@ -67,6 +68,9 @@ public class ChiTietDatPhongController {
     private EmailService emailService;
     @Autowired
     private NhanVienRepo nhanVienRepo;
+
+    @Autowired
+    private TaiKhoanService taiKhoanService;
 
     @GetMapping("/danhsachdatphong")
     public String index(
@@ -152,6 +156,13 @@ public class ChiTietDatPhongController {
         model.addAttribute("tinhTrang", tinhTrangStr);
         model.addAttribute("keyword", keyword);
         model.addAttribute("errorMessage", errorMessage);
+
+        // Lấy thông tin tài khoản từ session
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg());
+        }
 
         return "list/QuanLyDatPhong/danhsachdatphong"; // Trả về view chính
     }

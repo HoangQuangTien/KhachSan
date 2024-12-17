@@ -10,10 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -31,7 +34,28 @@ public class EmailRest{
         String MaVC = emailService.layvoucher(Integer.parseInt(voucherId)).getMaKhuyenMai();
         String Mota = emailService.layvoucher(Integer.parseInt(voucherId)).getMoTa();
         String MG = String.valueOf(emailService.layvoucher(Integer.parseInt(voucherId)).getGiamGia());
-        Boolean Loai = Boolean.valueOf(emailService.layvoucher(Integer.parseInt(voucherId)).getTrangThai());
+        Boolean Loai = null;
+        if (emailService.layvoucher(Integer.parseInt(voucherId)).getLoaiGiam() != null) {
+            Loai = Boolean.valueOf(emailService.layvoucher(Integer.parseInt(voucherId)).getLoaiGiam());
+        } else {
+            Loai = false; // giá trị mặc định nếu `LoaiGiam` là null
+        }
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+
+
+        // Chuyển đổi MG từ String sang Double
+        double mgValue = Double.parseDouble(MG);
+        // Kiểm tra nếu MG là số nguyên
+        String formattedMG = (mgValue % 1 == 0)
+                ? (Boolean.TRUE.equals(Loai)
+                ? String.valueOf((int) mgValue)
+                : currencyFormatter.format((int) mgValue))
+                : (Boolean.TRUE.equals(Loai)
+                ? String.valueOf(mgValue)
+                : currencyFormatter.format(mgValue));
+
+
+//        Boolean Loai = Boolean.valueOf(emailService.layvoucher(Integer.parseInt(voucherId)).getLoaiGiam();
         Date NBD = emailService.layvoucher(Integer.parseInt(voucherId)).getNgayBatDau();
         Date NKT = emailService.layvoucher(Integer.parseInt(voucherId)).getNgayKetThuc();
         String body = "<!DOCTYPE html>\n" +
@@ -110,16 +134,8 @@ public class EmailRest{
                 "        <h2>Dưới đây là mã giảm giá đặc biệt dành cho bạn</h2>\n" +
                 "        <div class=\"captcha-code\">\n" +
                 MaVC +
-                "        </div>\n" +
-                "<div class=\"noidung\">\n" +
-                "        <b>Mức giảm: </b>\n" + MG + "" +  (Loai ? " %" : " VND")  +
-                "</div>"+
-                "<div class=\"noidung\">\n" +
-                "        <b>Mô tả voucher: </b>\n" + Mota +""+
-                "</div>"+
-                "<div class=\"noidung\">\n" +
-                "        <b>Từ ngày:</b>\n"  + NBD +
-                "    </div>\n" +
+                "       <div class=\"noidung\">\n" +
+                "        <b>Mức giảm: </b>\n" + formattedMG + (Boolean.TRUE.equals(Loai) ? " %" : "") +
                 "</div>"+
                 "<div class=\"noidung\">\n" +
                 "        <b>Mô tả voucher: </b>\n" + Mota +""+
@@ -130,7 +146,15 @@ public class EmailRest{
                 "<div class=\"noidung\">\n" +
                 "        <b>Đến ngày:</b>\n"  + new SimpleDateFormat("dd-MM-yyyy hh:mm").format(NKT) +
                 "        <p>Vui lòng nhập mã Voucher này để nhận ưu đãi.</p>\n" +
-                "    </div>\n" ;
+                "    </div>\n" +
+                "</div>"+
+                "    <div class=\"footer\">\n" +
+                "        <p>Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.</p>\n" +
+                "    </div>\n" +
+                "</div>\n" +
+                "</body>\n" +
+                "</html>\n";
+
         // Gửi email cho từng khách hàng trong danh sách
         for (KhachHang customer : customers) {
             try {
@@ -140,7 +164,8 @@ public class EmailRest{
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Gửi email thất bại cho: " + customer.getEmail());
             }
         }
-        return ResponseEntity.ok("{ \"message\": \"Mã giảm giá đã được gửi thành công!\" }");
+//        return ResponseEntity.ok("{ \"message\": \"Mã giảm giá đã được gửi thành công!\" }");
+        return ResponseEntity.ok(Map.of("message","Mã giảm giá đã được gửi thành công!").toString());
 
     }
 }

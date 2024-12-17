@@ -176,67 +176,95 @@
 
     function submitDienTichForm() {
         const newDienTich = document.getElementById("newTenDienTich").value;
-        if (newDienTich) {
-            // Sử dụng SweetAlert2 để xác nhận
-            Swal.fire({
-                title: 'Bạn có chắc chắn muốn thêm diện tích này?',
-                text: "Bạn sẽ không thể hoàn tác thao tác này.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Đồng ý',
-                cancelButtonText: 'Hủy'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Gửi dữ liệu nếu người dùng xác nhận
-                    fetch("/loaiphongs/save-dien-tich", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ tenDienTich: newDienTich })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            // Thêm diện tích mới vào dropdown (hoặc làm gì đó với dữ liệu trả về)
-                            const dienTichSelect = document.getElementById("dienTich");
-                            const newOption = document.createElement("option");
-                            newOption.value = data.idDienTich;
-                            newOption.textContent = data.tenDienTich;
-                            dienTichSelect.appendChild(newOption);
-                            dienTichSelect.value = data.idDienTich;
 
-                            // Hiển thị thông báo thành công
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Thêm diện tích thành công!',
-                                text: 'Diện tích mới đã được thêm vào.',
-                                confirmButtonText: 'OK'
-                            });
-                        })
-                        .catch(error => {
-                            console.error("Error:", error);
-                            // Hiển thị thông báo lỗi
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi',
-                                text: 'Không thể thêm diện tích mới.',
-                                confirmButtonText: 'OK'
-                            });
+        if (newDienTich) {
+            // Kiểm tra diện tích đã tồn tại hay chưa
+            fetch(`/loaiphongs/checkTenDienTich?tenDienTich=${newDienTich}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        // Thông báo diện tích đã tồn tại
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Diện tích đã tồn tại',
+                            text: 'Vui lòng chọn diện tích khác.',
+                            confirmButtonText: 'OK'
                         });
-                } else {
-                    // Nếu người dùng hủy bỏ, hiển thị thông báo
+                    } else {
+                        // Nếu diện tích chưa tồn tại, yêu cầu người dùng xác nhận
+                        Swal.fire({
+                            title: 'Xác nhận thêm diện tích',
+                            text: 'Bạn có chắc chắn muốn thêm diện tích này?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Thêm',
+                            cancelButtonText: 'Hủy'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                // Gửi yêu cầu thêm diện tích mới
+                                fetch("/loaiphongs/save-dien-tich", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({ tenDienTich: newDienTich })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const dienTichSelect = document.getElementById("dienTich");
+                                        const newOption = document.createElement("option");
+                                        newOption.value = data.idDienTich;
+                                        newOption.textContent = data.tenDienTich;
+                                        dienTichSelect.appendChild(newOption);
+                                        dienTichSelect.value = data.idDienTich;
+
+                                        // Thông báo thêm thành công
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Thành công',
+                                            text: 'Diện tích mới đã được thêm thành công!',
+                                            confirmButtonText: 'OK'
+                                        });
+                                        hideDienTichModal();
+                                    })
+                                    .catch(error => {
+                                        console.error("Error:", error);
+                                        // Thông báo lỗi khi thêm diện tích
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Lỗi',
+                                            text: 'Không thể thêm diện tích mới.',
+                                            confirmButtonText: 'OK'
+                                        });
+                                    });
+                            } else {
+                                // Thông báo hủy thêm diện tích
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Đã hủy',
+                                    text: 'Thêm diện tích bị hủy.',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    // Thông báo lỗi khi kiểm tra diện tích
                     Swal.fire({
-                        icon: 'info',
-                        title: 'Thêm diện tích bị hủy.',
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Có lỗi xảy ra khi kiểm tra diện tích.',
                         confirmButtonText: 'OK'
                     });
-                }
-            });
+                });
         } else {
-            // Nếu trường tên diện tích trống, yêu cầu người dùng nhập tên
+            // Thông báo nhập tên diện tích
             Swal.fire({
                 icon: 'warning',
-                title: 'Vui lòng nhập tên diện tích.',
+                title: 'Thiếu thông tin',
+                text: 'Vui lòng nhập tên diện tích.',
                 confirmButtonText: 'OK'
             });
         }
@@ -293,7 +321,7 @@
         }
 
         // Kiểm tra "Tên Loại Phòng" không được chứa ký tự đặc biệt
-        const regexSpecialChars = /[^a-zA-Z0-9\s]/;  // Kiểm tra ký tự đặc biệt
+        const regexSpecialChars = /[^a-zA-Z0-9\s\u00C0-\u1EF9]/; // Chấp nhận ký tự tiếng Việt
         if (regexSpecialChars.test(tenLoaiPhong)) {
             showErrorToast("Tên Loại Phòng không được chứa ký tự đặc biệt!");
             return false;

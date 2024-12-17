@@ -663,6 +663,13 @@ public class KhachHangDD {
                               @RequestParam("soPhong") Integer soPhong,
                               @RequestParam("soNguoi") Integer soNguoi,
                               Model model) {
+
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession(); // Lấy thông tin tài khoản từ session
+        System.out.println("TaiKhoanDTO: " + taiKhoanDTO); // In giá trị TaiKhoanDTO để kiểm tra
+
+        if (taiKhoanDTO != null && taiKhoanDTO.getKhachHangDTO() != null && taiKhoanDTO.getKhachHangDTO().getHoVaTen() != null) {
+            model.addAttribute("hoVaTen", taiKhoanDTO.getKhachHangDTO().getHoVaTen());
+        }
         // Chuyển đổi chuỗi sang LocalDateTime
         LocalDateTime startDate = LocalDateTime.parse(ngayNhan);
         LocalDateTime endDate = LocalDateTime.parse(ngayTra);

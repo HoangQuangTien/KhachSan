@@ -312,6 +312,7 @@
 			<scope>test</scope>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
@@ -323,7 +324,14 @@
         </dependency>
 
 
-    </dependencies>
+		<dependency>
+			<groupId>io.zipkin.java</groupId>
+			<artifactId>centralsync-maven-plugin</artifactId>
+			<version>0.18.3</version>
+		</dependency>
+
+
+	</dependencies>
 
 	<build>
 		<plugins>

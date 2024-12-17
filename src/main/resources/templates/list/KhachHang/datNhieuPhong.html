@@ -283,8 +283,31 @@
 
         <!-- Login Button -->
         <div class="login-button-container position-absolute top-0 end-0 m-3">
-            <a href="/login" class="btn btn-outline-light">Đăng Nhập</a>
+            <!--             Kiểm tra nếu session không có user (chưa đăng nhập) -->
+            <th:block th:if="${hoVaTen == null}">
+                <a href="/login" class="btn btn-outline-light btnLogin">Đăng nhập</a>
+            </th:block>
+            <!--             Kiểm tra nếu session có user (đã đăng nhập) -->
+            <th:block th:if="${hoVaTen != null}">
+                <div class="dropdown">
+                    <!-- Hiển thị tên người dùng và icon -->
+                    <button class="btn btn-secondary dropdown-toggle d-flex align-items-center gap-2"
+                            type="button" data-toggle="dropdown" aria-expanded="false">
+                        <span th:text="${hoVaTen}"></span>
+                        <i class="fas fa-user-circle"></i> <!-- Biểu tượng người dùng -->
+                    </button>
+                    <div class="dropdown-menu shadow-sm">
+                        <a class="dropdown-item d-flex align-items-center gap-2" href="/khach-hang/trang-ca-nhan">
+                            <i class="fas fa-user"></i> Trang cá nhân
+                        </a>
+                        <a class="dropdown-item d-flex align-items-center gap-2" href="/khach-hang/logout">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a>
+                    </div>
+                </div>
+            </th:block>
         </div>
+
 
         <div class="Home-button-container d-flex align-items-center position-absolute top-0 end-0 m-3">
             <!-- Trang Chủ -->

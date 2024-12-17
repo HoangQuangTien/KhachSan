@@ -3,10 +3,12 @@ package com.example.DuAnTotNghiepKs.controller;
 import com.example.DuAnTotNghiepKs.DTO.CaLamViecDTO;
 import com.example.DuAnTotNghiepKs.DTO.LichLamViecDTO;
 import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.NhanVien;
 import com.example.DuAnTotNghiepKs.service.CaLamViecService;
 import com.example.DuAnTotNghiepKs.service.LichLamViecService;
 import com.example.DuAnTotNghiepKs.service.NhanVienService;
+import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,6 +36,9 @@ public class LichLamController {
     @Autowired
     private CaLamViecService caLamViecService;
 
+    @Autowired
+    private TaiKhoanService taiKhoanService;
+
     @GetMapping
     public String loadAll(Model model) {
 //        List<LichLamViecDTO> lichLamViecDTOS = lichLamViecService.getAll();
@@ -42,6 +47,12 @@ public class LichLamController {
         model.addAttribute("nhanVienList", nhanVienList);
         model.addAttribute("caLamViecList", caLamViecList);
 
+        // Lấy thông tin tài khoản từ session
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg());
+        }
         return "list/QuanLyLichLamViec/lichLamViec";
     }
 

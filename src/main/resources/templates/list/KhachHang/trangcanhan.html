@@ -591,7 +591,6 @@
             return;
         }
 
-        // Gửi thông tin đánh giá đến server (API) bằng Fetch
         fetch('/api/danhgia', {
             method: 'POST',
             headers: {
@@ -611,40 +610,57 @@
             })
             .then(data => {
                 if (data) {
-                    alert('Cảm ơn bạn đã gửi đánh giá!');
-                    // Đóng modal
-                    $('#feedbackModal').modal('hide');
+                    Swal.fire({
+                        title: 'Đánh giá thành công!',
+                        text: 'Cảm ơn bạn đã gửi đánh giá. Chúng tôi rất trân trọng ý kiến của bạn!',
+                        icon: 'success',
+                        confirmButtonText: 'Đóng'
+                    }).then(() => {
+                        // Đóng modal sau khi người dùng bấm "Đóng"
+                        $('#feedbackModal').modal('hide');
+                    });
                 } else {
-                    alert('Có lỗi xảy ra, vui lòng thử lại.');
+                    Swal.fire({
+                        title: 'Có lỗi xảy ra',
+                        text: 'Vui lòng thử lại sau.',
+                        icon: 'error',
+                        confirmButtonText: 'Đóng'
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra, vui lòng thử lại.');
+                Swal.fire({
+                    title: 'Lỗi kết nối',
+                    text: 'Không thể gửi đánh giá, vui lòng kiểm tra kết nối mạng của bạn.',
+                    icon: 'error',
+                    confirmButtonText: 'Đóng'
+                });
             });
 
 
 
-        // Biểu thức regex để phát hiện ký tự đặc biệt
-        const specialCharRegex = /[^a-zA-Z0-9\s.,!?]/;
 
-        // Kiểm tra xem có thiếu trường nào không
-        if (!rating || !feedback || !roomId) {
-            alert('Vui lòng điền đầy đủ thông tin!');
-            return;
-        }
-
-        // Kiểm tra nếu nội dung chỉ toàn khoảng trắng
-        if (feedback === '') {
-            alert('Nội dung không được để trống hoặc chỉ toàn khoảng trắng!');
-            return;
-        }
-
-        // Kiểm tra nếu nội dung chứa ký tự đặc biệt
-        if (specialCharRegex.test(feedback)) {
-            alert('Nội dung không được chứa ký tự đặc biệt!');
-            return;
-        }
+        // // Biểu thức regex để phát hiện ký tự đặc biệt
+        // const specialCharRegex = /[^a-zA-Z0-9\s.,!?]/;
+        //
+        // // Kiểm tra xem có thiếu trường nào không
+        // if (!rating || !feedback || !roomId) {
+        //     alert('Vui lòng điền đầy đủ thông tin!');
+        //     return;
+        // }
+        //
+        // // Kiểm tra nếu nội dung chỉ toàn khoảng trắng
+        // if (feedback === '') {
+        //     alert('Nội dung không được để trống hoặc chỉ toàn khoảng trắng!');
+        //     return;
+        // }
+        //
+        // // Kiểm tra nếu nội dung chứa ký tự đặc biệt
+        // if (specialCharRegex.test(feedback)) {
+        //     alert('Nội dung không được chứa ký tự đặc biệt!');
+        //     return;
+        // }
 
 
 

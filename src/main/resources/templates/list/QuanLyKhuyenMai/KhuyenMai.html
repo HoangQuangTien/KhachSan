@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -8,6 +9,8 @@
     <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
 
 
@@ -178,6 +181,82 @@
 
     </style>
 
+    <style>
+        /* Thiết lập màu nền và hiệu ứng cho modal */
+        .modal-content {
+            border-radius: 10px; /* Làm tròn góc modal */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08); /* Thêm bóng đổ */
+            background-color: #ffffff;
+            border: none;
+        }
+
+        /* Header modal */
+        .modal-header {
+            background-color: #f0f8ff; /* Màu nền nhẹ cho header */
+            color: #333333;
+            border-bottom: 2px solid #dcdcdc;
+            padding: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        /* Icon của modal */
+        #modalIcon {
+            color: #28a745; /* Màu xanh lá cho biểu tượng */
+            font-size: 1.5rem;
+        }
+
+        /* Nội dung modal */
+        .modal-body {
+            font-size: 1rem;
+            color: #555555;
+            padding: 15px;
+        }
+
+        /* Button "OK" */
+        .modal-footer {
+            background-color: #f9f9f9;
+            padding: 15px;
+        }
+
+        #modalOkBtn {
+            font-size: 1rem;
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        #modalOkBtn:hover {
+            background-color: #0056b3;
+            cursor: pointer;
+        }
+
+        #modalOkBtn:focus {
+            outline: none;
+        }
+
+        /* Cải thiện sự hiển thị khi có hiệu ứng loading hoặc animation */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal-dialog-centered {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+
+    </style>
+
+
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -250,7 +329,7 @@
                         <tr th:each="khuyenMai : ${khuyenMaiPage.content}">
                             <td th:text="${khuyenMai.maKhuyenMai}">Mã KM</td>
                             <td th:text="${khuyenMai.tenKhuyenMai}">Tên KM</td>
-                            <td th:text="${#numbers.formatDecimal(khuyenMai.giamGia, 0, 0)}">Giảm Giá</td>
+                            <td class="format-number" th:text="${#numbers.formatDecimal(khuyenMai.giamGia, 0, 0)}">Giảm Giá</td>
                             <td th:text="${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}">Loại Giảm</td>
                             <td th:text="${khuyenMai.soLuong}">Số Lượng</td>
                             <td class="format-number" th:text="${khuyenMai.giamToiThieu}">Giảm Tối Thiểu</td>
@@ -382,6 +461,7 @@
                 </div>
 
 
+
                 <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-scrollable  modal-lg">
                         <div class="modal-content">
@@ -392,6 +472,30 @@
                                 </h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
+                            <!--                            <div id="notification" style="display: none; margin-top: 10px;"></div>-->
+
+
+                            <!--                             Modal Thông Báo -->
+                            <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header" id="modalHeader" style="border-bottom: none;">
+                                            <h5 class="modal-title d-flex align-items-center" id="modalTitle">
+                                                <i id="modalIcon" class="fas fa-check-circle me-2"></i> <!-- Thêm lớp 'fas' hoặc 'fa' -->
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" id="modalBody">
+                                            <p id="modalMessage" class="mb-0"></p>
+                                        </div>
+                                        <div class="modal-footer justify-content-center">
+                                            <button type="button" class="btn btn-outline-primary" id="modalOkBtn" data-bs-dismiss="modal">OK</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <div class="modal-body">
                                 <button id="selectAllBtn" class="btn btn-primary" onclick="toggleSelectAll()">Chọn tất cả</button>
                                 <div class="search-container">
@@ -429,6 +533,7 @@
                                     </tbody>
                                 </table>
                             </div>
+
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Hủy</button>
                                 <button type="button" class="btn btn-primary" id="sendEmailBtn">Gửi</button>
@@ -436,6 +541,9 @@
                         </div>
                     </div>
                 </div>
+
+
+
 
                 <!-- Modal sửa khuyến mãi -->
                 <div class="modal fade editModal" id="editKhuyenMaiModal" tabindex="-1" aria-labelledby="editKhuyenMaiModalLabel" aria-hidden="true">
@@ -447,7 +555,7 @@
                             </div>
                             <div class="modal-body">
                                 <!-- Form cập nhật khuyến mãi -->
-                                <form id="editKhuyenMaiForm" onsubmit="return updateKhuyenMai()">
+                                <form id="editKhuyenMaiForm" novalidate>
                                     <input type="hidden" id="editId" name="id" />
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
@@ -491,7 +599,6 @@
                                             <input type="datetime-local" class="form-control" id="editNgayKetThuc" name="ngayKetThuc" required />
                                         </div>
                                     </div>
-
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="editLoaiGiam" class="form-label">Loại Giảm</label>
@@ -507,7 +614,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Phân trang -->
 
                 <div class="pagination">
@@ -535,7 +641,9 @@
 
 <script>
 
+
     document.addEventListener('DOMContentLoaded', function () {
+
         const elements = document.querySelectorAll('.format-number');
         elements.forEach(function (element) {
             const rawNumber = parseFloat(element.textContent.trim());
@@ -544,6 +652,87 @@
             }
         });
         const formElement = document.getElementById('form-add-promotion');
+        const tenKhuyenMaiInput = document.getElementById('tenKhuyenMai');
+        const moTaInput = document.getElementById('moTa');
+        const editTenKhuyenMaiInput = document.getElementById('editTenKhuyenMai');
+        const editMoTaInput = document.getElementById('editMoTa');
+
+        tenKhuyenMaiInput.addEventListener('input', function () {
+            const cursorPosition = tenKhuyenMaiInput.selectionStart;
+            let sanitizedValue = tenKhuyenMaiInput.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            // Kiểm tra nếu chuỗi là toàn số
+            // if (/^\d+$/.test(sanitizedValue)) {
+            //     // Nếu là toàn số, không cho phép nhập và hiển thị thông báo
+            //     showErrorToast('Tên khuyến mãi không được nhập toàn số.');
+            //     sanitizedValue = ''; // Xóa nội dung
+            // }
+            // Gửi yêu cầu kiểm tra trùng tên qua backend
+            // if (sanitizedValue.length > 0) {
+            //     fetch(`/quan-ly-khuyen-mai/check-ten?ten=${encodeURIComponent(sanitizedValue)}`)
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             if (data.exists) {
+            //                 // Hiển thị thông báo nếu tên bị trùng
+            //                 showErrorToast('Tên khuyến mãi đã tồn tại, vui lòng nhập tên khác.');
+            //                 tenKhuyenMaiInput.value = ''; // Xóa nội dung
+            //             }
+            //         })
+            //         .catch(error => console.error('Lỗi kiểm tra tên khuyến mãi:', error));
+            // }
+
+            tenKhuyenMaiInput.value = sanitizedValue;
+            tenKhuyenMaiInput.setSelectionRange(cursorPosition, cursorPosition);
+        });
+        moTaInput.addEventListener('input', function () {
+            const cursorPosition = moTaInput.selectionStart;
+            let sanitizedValue = moTaInput.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            // Kiểm tra nếu chuỗi là toàn số
+            // if (/^\d+$/.test(sanitizedValue)) {
+            //     // Nếu là toàn số, không cho phép nhập và hiển thị thông báo
+            //     showErrorToast('Mô tả không được nhập toàn số.');
+            //     sanitizedValue = ''; // Xóa nội dung
+            // }
+            moTaInput.value = sanitizedValue;
+
+            moTaInput.setSelectionRange(cursorPosition, cursorPosition);
+        });
+
+
+        editTenKhuyenMaiInput.addEventListener('input', function () {
+            const cursorPosition = editTenKhuyenMaiInput.selectionStart;
+            let sanitizedValue = editTenKhuyenMaiInput.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+
+            // Kiểm tra nếu chuỗi là toàn số
+            // if (/^\d+$/.test(sanitizedValue)) {
+            //     // Nếu là toàn số, không cho phép nhập và hiển thị thông báo
+            //     showErrorToast('Tên khuyến mãi không được nhập toàn số.');
+            //     sanitizedValue = ''; // Xóa nội dung
+            // }
+            editTenKhuyenMaiInput.value = sanitizedValue;
+
+            editTenKhuyenMaiInput.setSelectionRange(cursorPosition, cursorPosition);
+        });
+        editMoTaInput.addEventListener('input', function () {
+            const cursorPosition = editMoTaInput.selectionStart;
+            let sanitizedValue = editMoTaInput.value
+                .replace(/(\s)\s+/g, '$1')
+                .replace(/[^\p{L}\p{N}\s]/gu, '');
+            // Kiểm tra nếu chuỗi là toàn số
+            // if (/^\d+$/.test(sanitizedValue)) {
+            //     // Nếu là toàn số, không cho phép nhập và hiển thị thông báo
+            //     showErrorToast('Mô tả không được nhập toàn số.');
+            //     sanitizedValue = ''; // Xóa nội dung
+            // }
+            editMoTaInput.value = sanitizedValue;
+
+            editMoTaInput.setSelectionRange(cursorPosition, cursorPosition);
+        });
 
         formElement.addEventListener('submit', async function (event) {
             event.preventDefault();
@@ -586,7 +775,6 @@
                 showErrorToast('Tên khuyến mãi không được chứa ký tự đặc biệt.');
                 return;
             }
-
             if (whiteSpacePattern.test(fields.tenKhuyenMai)) {
                 showErrorToast('Tên khuyến mãi không được nhập toàn khoảng trắng.');
                 return;
@@ -603,6 +791,10 @@
                 showErrorToast('Giá tối đa phải lớn hơn hoặc bằng giá tối thiểu.');
                 return;
             }
+            if (fields.giamToiDa > 120000) {
+                showErrorToast('Giảm giá tối đa không được vượt quá 120,000 VND.');
+                return;
+            }
             if (isNaN(fields.ngayBatDau) || fields.ngayBatDau < today) {
                 showErrorToast('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.');
                 return;
@@ -611,6 +803,8 @@
                 showErrorToast('Ngày kết thúc phải lớn hơn ngày bắt đầu.');
                 return;
             }
+
+
 
             // Gửi dữ liệu nếu hợp lệ
             try {
@@ -646,7 +840,7 @@
                 tenKhuyenMai: formEdit.tenKhuyenMai.value.trim(),
                 soLuong: parseInt(formEdit.soLuong.value, 10),
                 giamGia: parseFloat(formEdit.giamGia.value),
-                loaiGiam: formEdit.editLoaiGiam.value,
+                loaiGiam:formEdit.editLoaiGiam.value,
                 giamToiThieu: parseFloat(formEdit.giamToiThieu.value),
                 giamToiDa: parseFloat(formEdit.giamToiDa.value),
                 moTa: formEdit.moTa.value.trim(),
@@ -691,6 +885,10 @@
                 showErrorToast('Giá tối đa phải lớn hơn hoặc bằng giá tối thiểu.');
                 return;
             }
+            if (fields.giamToiDa > 120000) {
+                showErrorToast('Giảm giá tối đa không được vượt quá 120,000 VND.');
+                return;
+            }
             if (isNaN(fields.ngayBatDau) || fields.ngayBatDau < today) {
                 showErrorToast('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.');
                 return;
@@ -713,8 +911,9 @@
                         // Đóng modal và làm mới danh sách nếu cần
                         $('#editKhuyenMaiModal').modal('hide');
                         setTimeout(() => {
-                            location.reload(); // Reload trang sau khi hiển thị thông báo thành công
+                            location.reload();
                         }, 1500);
+                        // window.location.href = '/quan-ly-khuyen-mai';
                     } else {
                         showErrorToast(data.error || "Đã có lỗi xảy ra");
                     }
@@ -724,6 +923,7 @@
                 });
         });
     });
+
 
     function showSuccessToast(message) {
         Toastify({
@@ -884,6 +1084,11 @@
         const selectedKhachHangList = []; // Danh sách khách hàng đã chọn
         const checkboxes = document.querySelectorAll('.form-check-input:checked'); // Tìm tất cả checkbox đã được chọn
 
+        const modalHeader = document.querySelector('.modal-header');
+        const modalIcon = document.getElementById('modalIcon'); // Đảm bảo bạn có phần tử này trong HTML
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+
         // Lặp qua từng checkbox đã chọn
         checkboxes.forEach(checkbox => {
             const row = checkbox.closest('tr'); // Lấy hàng tương ứng với checkbox
@@ -902,7 +1107,8 @@
             showErrorToast("Vui lòng chọn ít nhất một khách hàng và một mã voucher.");
             return; // Dừng thực thi nếu không đủ điều kiện
         }
-
+        sendEmailBtn.disabled = true;
+        sendEmailBtn.innerText = 'Đang xử lý...';
         // Gửi dữ liệu qua API
         fetch('/api/sendemails', {
             method: 'POST',
@@ -924,12 +1130,17 @@
                 }
             })
             .then(data => {
-                if (typeof data === 'string') {
-                    alert(data); // Hiển thị thông báo khi dữ liệu trả về là chuỗi văn bản
-                } else {
-                    showSuccessToast('Email đã được gửi thành công'); // Hiển thị thông báo gửi email thành công
-                }
-                $('#add').modal('hide'); // Đóng modal
+                // showSuccessToast('Email đã được gửi thành công'); // Hiển thị thông báo gửi email thành công
+                // // setTimeout(() => {
+                // //     location.reload();
+                // // }, 1000);
+                // $('#add').modal('hide'); // Đóng modal
+
+                modalHeader.className = 'modal-header modal-success';
+                modalIcon.className = 'fas fa-check-circle'; // Thêm lớp biểu tượng
+                modalTitle.innerText = 'Thành Công!';
+                modalMessage.innerText = 'Thông tin khuyến mãi đã được gửi tới khách hàng thành công!';
+                new bootstrap.Modal(document.getElementById('notificationModal')).show();
 
                 // Reset các trường và bỏ chọn checkbox
                 document.getElementById('voucherId').value = ''; // Reset dropdown voucher
@@ -937,13 +1148,22 @@
                 document.getElementById('modalSearchInput').value = ''; // Xóa nội dung tìm kiếm
                 const rows = document.querySelectorAll('.modal-body table tr');
                 rows.forEach(row => row.style.display = ''); // Hiển thị lại tất cả các hàng trong bảng
-
+                // sendButton.disabled = false; // Kích hoạt lại nút
+                // Reset nút gửi
+                sendEmailBtn.disabled = false;
+                sendEmailBtn.innerText = 'Gửi';
             })
             .catch(error => {
                 alert('Lỗi: ' + error.message); // Hiển thị thông báo lỗi nếu có
                 console.error('Error:', error); // In lỗi ra console
+                // Reset nút gửi (khi xảy ra lỗi)
+                sendEmailBtn.disabled = false;
+                sendEmailBtn.innerText = 'Gửi';
             });
     });
+
+
+
     function searchKhuyenMai() {
         const keyword = document.getElementById('searchInput').value.trim().toLowerCase(); // Từ khóa tìm kiếm
         const selectedTrangThai = document.getElementById('trangThai').value; // Trạng thái đã chọn
@@ -967,7 +1187,7 @@
             row.innerHTML = `
             <td>${khuyenMai.maKhuyenMai}</td>
             <td>${khuyenMai.tenKhuyenMai}</td>
-            <td>${khuyenMai.giamGia}</td>
+            <td class="format-number">${khuyenMai.giamGia}</td>
             <td>${khuyenMai.loaiGiam ? 'Phần Trăm' : 'Tiền Mặt'}</td>
             <td>${khuyenMai.soLuong}</td>
             <td class="format-number">${khuyenMai.giamToiThieu}</td>

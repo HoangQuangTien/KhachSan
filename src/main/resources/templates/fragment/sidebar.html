@@ -147,7 +147,7 @@
 
 
 
-            <ul class="navbar-nav flex-fill w-100 mb-3">
+            <ul class="navbar-nav flex-fill w-100 mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                 <li class="nav-item">
                     <a class="nav-link pl-3 " th:href="@{/danh-gia}">
                         <i class="fas fa-star"></i> <!-- Icon sao -->

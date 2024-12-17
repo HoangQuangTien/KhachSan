@@ -70,6 +70,15 @@ public class NhanVienController {
         model.addAttribute("currentPage", page); // Truyền thêm thông tin trang hiện tại
         model.addAttribute("totalPages", nhanVienDTOS.getTotalPages()); // Tổng số trang
         model.addAttribute("size", size); // Số mục trên mỗi trang
+
+
+        // Lấy thông tin tài khoản từ session
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg());
+        }
+
         return "list/QuanLyNhanVien/home";
     }
 

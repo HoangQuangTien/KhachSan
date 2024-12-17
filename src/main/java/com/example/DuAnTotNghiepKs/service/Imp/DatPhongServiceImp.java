@@ -414,8 +414,8 @@ public class DatPhongServiceImp implements DatPhongService {
 
     @Override
     public List<DatPhongDTO> findByKhachHang_Id(Integer id) {
-        // Lấy danh sách entity từ repository
-        List<DatPhong> listDatPhongs = datPhongRepository.findByKhachHang_IdAndTinhTrang(id,"Đã Checkin");
+        // Lấy danh sách entity từ repository với điều kiện trangThai = true
+        List<DatPhong> listDatPhongs = datPhongRepository.findByKhachHang_IdAndTinhTrangAndTrangThai(id, "Đã Checkin", true);
 
         if (listDatPhongs.isEmpty()) {
             return new ArrayList<>();

@@ -304,6 +304,44 @@
             border-color: #ff69b4; /* Đường viền màu hồng */
         }
 
+        .control {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Khoảng cách giữa các phần tử */
+            margin-bottom: 10px;
+        }
+
+        .control label {
+            min-width: 80px; /* Đảm bảo độ rộng của nhãn nhất quán */
+            text-align: right;
+        }
+
+        .control-button {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            text-align: center;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .control-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .control-span {
+            width: 30px;
+            text-align: center;
+            font-size: 16px;
+            line-height: 30px; /* Căn giữa theo chiều dọc */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+
     </style>
 
 </head>
@@ -369,13 +407,14 @@
                         <button type="button" onclick="changeRoom(1)">+</button>
                     </div>
                     <div class="control">
-                        <label>Người</label>
+                        <label>Người/Phòng</label>
                         <button type="button" onclick="changeGuest(-1)">-</button>
                         <span id="guest-count">1</span>
                         <button type="button" onclick="changeGuest(1)">+</button>
                     </div>
                 </div>
             </div>
+
 
             <!-- Ẩn các input để truyền số phòng và số người -->
             <input type="hidden" id="soPhong" name="soPhong" value="1">
@@ -1849,6 +1888,7 @@
         guestCount += change;
 
         if (guestCount < 1) guestCount = 1;  // Đảm bảo số người không nhỏ hơn 1
+        if (guestCount > 6) guestCount = 6;
 
         // Cập nhật giao diện
         document.getElementById('guest-count').innerText = guestCount;

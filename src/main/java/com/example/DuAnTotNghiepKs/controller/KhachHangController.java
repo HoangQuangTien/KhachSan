@@ -69,6 +69,13 @@ public class KhachHangController {
         model.addAttribute("page", khachHangDTOS);
         model.addAttribute("khachHangDTO", new KhachHangDTO());
         model.addAttribute("diaChiDTO", new DiaChiKhachHangDTO());
+
+        // Lấy thông tin tài khoản từ session
+        TaiKhoanDTO taiKhoanDTO = taiKhoanService.getTaiKhoanTuSession();
+        if (taiKhoanDTO != null && taiKhoanDTO.getNhanVienDTO().getHoTen() != null) {
+            model.addAttribute("hoTen", taiKhoanDTO.getNhanVienDTO().getHoTen());
+            model.addAttribute("img", taiKhoanDTO.getNhanVienDTO().getImg());
+        }
         return "list/quan-ly-khach-hang2";
     }
 

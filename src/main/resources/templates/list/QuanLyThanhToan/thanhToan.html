@@ -1384,9 +1384,9 @@
     var isPhuPhiApplied = false; // Biến theo dõi phụ phí đã được áp dụng hay chưa
 
     function tinhTongTien() {
-        // Lấy giá trị từ form
         var tienPhuPhi = parseFloat(document.getElementById('tienPhuPhi').value) || 0; // Phụ phí
         var tienConLai = parseFloat(document.getElementById('tienConLai').value) || 0; // Số tiền còn lại
+
 
         if (tienConLai <= 0) {
             console.error("Số tiền gốc (tổng tiền còn lại) không hợp lệ!");
@@ -1399,17 +1399,11 @@
         var giamGia = 0; // Biến lưu giá trị giảm giá
 
         // Kiểm tra nếu có voucher được chọn và chưa áp dụng voucher trước đó
-        if (selectedOption && selectedOption.value) {
-            // Hủy voucher cũ nếu đã áp dụng
-            if (isVoucherApplied) {
-                isVoucherApplied = false; // Hủy áp dụng voucher cũ
-            }
-
-            // Kiểm tra voucher mới và tính giảm giá
+        if (selectedOption && selectedOption.value && !isVoucherApplied) {
             var mucGiam = parseFloat(selectedOption.getAttribute('data-muc-giam')) || 0;
             var loaiGiam = selectedOption.getAttribute('data-loai-giam') === "true"; // Phần trăm hay số tiền
 
-            // Giảm tối thiểu và tối đa
+// Giảm tối thiểu và tối đa
             var giamToiThieu = parseFloat(selectedOption.getAttribute('data-giam-toi-thieu')) || 0;
             var giamToiDa = parseFloat(selectedOption.getAttribute('data-giam-toi-da')) || Number.MAX_VALUE;
 
@@ -1427,6 +1421,7 @@
                 giamGia = giamToiDa; // Áp dụng giảm giá tối đa
             }
 
+
             isVoucherApplied = true;  // Đánh dấu voucher đã được áp dụng
         }
 
@@ -1435,16 +1430,14 @@
             isPhuPhiApplied = true; // Đánh dấu phụ phí đã được áp dụng
         }
 
-        // Tính tiền sau giảm giá
         var tongTienSauGiam = Math.max(0, tienConLai - giamGia); // Tính tiền sau giảm giá
 
         // Tính tổng tiền thanh toán
-        var tongTienThanhToan = tongTienSauGiam + (isPhuPhiApplied ? tienPhuPhi : 0);
+        var tongTienThanhToan = isVoucherApplied ? tongTienSauGiam : tongTienSauGiam + (isPhuPhiApplied ? tienPhuPhi : 0);
 
-        // Cập nhật lại tổng tiền còn lại
-        document.getElementById("tienConLai").value = tongTienThanhToan.toFixed(0); // Hiển thị tiền còn lại trong form
+        document.getElementById("tienConLai").value = tongTienThanhToan.toFixed(0);
 
-        // Cập nhật trạng thái các trường nhập liệu
+
         if (isVoucherApplied) {
             document.getElementById('tienPhuPhi').disabled = true; // Vô hiệu hóa trường nhập phụ phí khi voucher được chọn
         } else {

@@ -11,12 +11,6 @@
 
     <style>
 
-
-        th {
-            white-space: nowrap;
-            text-align: center;
-        }
-
         #form-add-employee .form-control {
             border-radius: 5px;
             padding: 10px;
@@ -66,7 +60,7 @@
                               style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                             <!-- Search -->
                             <div class="form-group" style="flex-grow: 1; display: flex; align-items: center;">
-<!--                                <label class="mr-2" for="keyword">Tìm kiếm</label>-->
+                                <!--                                <label class="mr-2" for="keyword">Tìm kiếm</label>-->
                                 <input class="form-control" id="keyword" placeholder="Tìm kiếm theo mã hoặc tên"
                                        style="flex-grow: 1;" type="text" name="keyword"
                                        oninput="searchNhanVien(this.value)">
@@ -115,86 +109,96 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
+                            <!-- Logo -->
                             <div class="text-center mb-4">
                                 <img src="/img/logo.jpg" alt="Logo" width="100" height="100">
                             </div>
 
+                            <!-- Form -->
                             <form id="form-add-employee" enctype="multipart/form-data" th:action="@{/quan-ly-nhan-vien/add}" method="post" class="p-4 bg-light rounded shadow">
+                                <!-- Hidden fields -->
                                 <input type="hidden" name="maNhanVien">
                                 <input type="hidden" name="trangThai" value="true">
-                                <div class="row g-3">
-                                    <!-- Hàng 1: Tài khoản, Mật khẩu, Họ tên -->
-                                    <input type="hidden" name="tenDangNhap" id="tenDangNhap" class="form-control">
-                                    <input type="hidden" name="matKhau" id="matKhau" class="form-control">
+                                <input type="hidden" name="tenDangNhap" id="tenDangNhap" class="form-control">
+                                <input type="hidden" name="matKhau" id="matKhau" class="form-control">
 
-                                    <div class="form-group col-md-4">
+                                <div class="row">
+                                    <!-- Hàng 1: Họ tên, Số điện thoại, Email, Ngày sinh -->
+                                    <div class="form-group col-md-3">
                                         <label for="hoTen" class="form-label"><i class="bi bi-person"></i> Họ tên</label>
-                                        <input type="text" name="hoTen" id="hoTen" class="form-control" placeholder="Nhập họ tên">
+                                        <input type="text" name="hoTen" id="hoTen" class="form-control" placeholder="Nhập họ tên" required>
                                     </div>
 
-                                    <!-- Hàng 2: Số điện thoại, Email, Ngày sinh -->
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-3">
                                         <label for="soDienThoai" class="form-label"><i class="bi bi-telephone"></i> Số điện thoại</label>
-                                        <input type="text" name="soDienThoai" id="soDienThoai" class="form-control" placeholder="Nhập số điện thoại">
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="email" class="form-label"><i class="bi bi-envelope"></i> Email</label>
-                                        <input type="email" name="email" id="email" class="form-control" placeholder="Nhập email">
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="ngaySinh" class="form-label"><i class="bi bi-calendar"></i> Ngày sinh</label>
-                                        <input type="date" name="ngaySinh" id="ngaySinh" class="form-control">
+                                        <input type="text" name="soDienThoai" id="soDienThoai" class="form-control" placeholder="Nhập số điện thoại" required>
                                     </div>
 
-                                    <!-- Hàng 3: Tỉnh thành, Quận huyện, Phường xã -->
+                                    <div class="form-group col-md-3">
+                                        <label for="email" class="form-label"><i class="bi bi-envelope"></i> Email</label>
+                                        <input type="email" name="email" id="email" class="form-control" placeholder="Nhập email" required>
+                                    </div>
+
+                                    <div class="form-group col-md-3">
+                                        <label for="ngaySinh" class="form-label"><i class="bi bi-calendar"></i> Ngày sinh</label>
+                                        <input type="date" name="ngaySinh" id="ngaySinh" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!-- Hàng 2: Tỉnh thành, Quận huyện, Phường xã -->
                                     <div class="form-group col-md-4">
-                                        <label for="thanhPho" class="form-label"><i class="bi bi-map"></i> Tỉnh thành</label>
-                                        <select id="thanhPho" class="form-control" name="thanhPho" required>
+                                        <label for="thanhPho" class="form-label fw-bold"><i class="bi bi-map"></i> Tỉnh thành</label>
+                                        <select style="height: 40px" id="thanhPho" name="thanhPho" class="form-control" required>
                                             <option value="" selected disabled>Chọn tỉnh thành</option>
-                                            <!-- Các option của tỉnh thành -->
                                         </select>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="quanHuyen" class="form-label"><i class="bi bi-house"></i> Quận huyện</label>
-                                        <select name="quanHuyen" id="quanHuyen" class="form-control district-select">
+                                        <label for="quanHuyen" class="form-label fw-bold"><i class="bi bi-house"></i> Quận huyện</label>
+                                        <select style="height: 40px" id="quanHuyen" name="quanHuyen" class="form-control">
                                             <option value="" selected disabled>Chọn quận huyện</option>
                                         </select>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="phuongXa" class="form-label"><i class="bi bi-house-fill"></i> Phường xã</label>
-                                        <select name="phuongXa" id="phuongXa" class="form-control ward-select">
+                                        <label for="phuongXa" class="form-label fw-bold"><i class="bi bi-house-fill"></i> Phường xã</label>
+                                        <select style="height: 40px" id="phuongXa" name="phuongXa" class="form-control">
                                             <option value="" selected disabled>Chọn phường xã</option>
                                         </select>
                                     </div>
+                                </div>
 
-                                    <!-- Hàng 4: Giới tính -->
-                                    <div class="col-md-4">
+                                <!-- Hàng 3: Giới tính, Ảnh đại diện -->
+                                <div class="row">
+                                    <div class="form-group col-md-4">
                                         <label class="form-label">Giới tính</label>
                                         <div>
-                                            <input type="radio" name="gioiTinh" class="form-check-input" value="true" id="gioiTinhNam" checked>
-                                            <label for="gioiTinhNam">Nam</label>
-                                            <input type="radio" name="gioiTinh" class="form-check-input" value="false" id="gioiTinhNu">
-                                            <label for="gioiTinhNu">Nữ</label>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" name="gioiTinh" class="form-check-input" value="true" id="gioiTinhNam" checked>
+                                                <label for="gioiTinhNam" class="form-check-label">Nam</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" name="gioiTinh" class="form-check-input" value="false" id="gioiTinhNu">
+                                                <label for="gioiTinhNu" class="form-check-label">Nữ</label>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- Hàng 5: Ảnh đại diện -->
                                     <div class="form-group col-md-4">
                                         <label for="img" class="form-label"><i class="bi bi-image"></i> Ảnh đại diện</label>
                                         <input type="file" name="img" id="img" class="form-control" accept="image/*" onchange="previewImage(event)">
-                                        <div class="preview mt-3">
-                                            <img id="imgPreview" src="#" alt="Ảnh xem trước" style="display: none; max-width: 100%; height: auto;">
+                                        <div class="preview mt-3 text-center">
+                                            <img id="imgPreview" src="#" alt="Xem trước ảnh" style="display: none; max-width: 100%; height: auto;">
                                             <div id="defaultImage" class="mt-2">
                                                 <i class="bi bi-image" style="font-size: 50px; color: #6c757d;"></i>
-                                                <p>Chưa có ảnh đại diện</p>
+                                                <p class="text-muted">Chưa có ảnh đại diện</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
+                                <!-- Buttons -->
                                 <div class="text-end mt-4">
-                                    <button type="submit" class="btn btn-primary">Thêm nhân viên</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary" id="idButtonAdd"><i class="bi bi-plus-circle"></i> Thêm nhân viên</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Đóng</button>
                                 </div>
                             </form>
 
@@ -339,7 +343,7 @@
         <div class="container py-4">
             <div>
                 <table class="table table-hover table-bordered">
-                    <thead >
+                    <thead>
                     <tr>
                         <th class="text-center">#</th>
                         <th class="text-center">Ảnh</th>
@@ -352,26 +356,24 @@
                         <th class="text-center">Trạng thái</th>
                     </tr>
                     </thead>
-
-                    </thead>
                     <tbody id="employeeTableBody" >
-                    <tr     th:each="nhanVien, i : ${nhanViens}"
-                            data-bs-toggle="modal" data-bs-target="#formUpdate"
-                            th:data-id="${nhanVien.idNhanVien}"
-                            th:data-ma="${nhanVien.maNhanVien}"
-                            th:data-img="${nhanVien.img}"
-                            th:data-hoten="${nhanVien.hoTen}"
-                            th:data-ngaysinh="${#dates.format(nhanVien.ngaySinh,'yyyy-MM-dd')}"
-                            th:data-gioitinh="${nhanVien.gioiTinh}"
-                            th:data-sodienthoai="${nhanVien.soDienThoai}"
-                            th:data-email="${nhanVien.email}"
-                            th:data-trangthai="${nhanVien.trangThai}"
-                            th:data-thanhpho="${nhanVien.thanhPho}"
-                            th:data-quanhuyen="${nhanVien.quanHuyen}"
-                            th:data-phuongxa="${nhanVien.phuongXa}"
-                            th:data-tendangnhap="${nhanVien.taiKhoanDTO != null ? nhanVien.taiKhoanDTO.tenDangNhap : 'Chưa có tài khoản'}"
-                            th:data-matkhau="${nhanVien.taiKhoanDTO != null ? nhanVien.taiKhoanDTO.matKhau : 'Chưa có tài khoản'}"
-                            onclick="showUpdate(this.getAttribute('data-id'),this.getAttribute('data-ma'),this.getAttribute('data-img'),this.getAttribute('data-hoten'),
+                    <tr th:each="nhanVien, i : ${nhanViens}"
+                        data-bs-toggle="modal" data-bs-target="#formUpdate"
+                        th:data-id="${nhanVien.idNhanVien}"
+                        th:data-ma="${nhanVien.maNhanVien}"
+                        th:data-img="${nhanVien.img}"
+                        th:data-hoten="${nhanVien.hoTen}"
+                        th:data-ngaysinh="${#dates.format(nhanVien.ngaySinh,'yyyy-MM-dd')}"
+                        th:data-gioitinh="${nhanVien.gioiTinh}"
+                        th:data-sodienthoai="${nhanVien.soDienThoai}"
+                        th:data-email="${nhanVien.email}"
+                        th:data-trangthai="${nhanVien.trangThai}"
+                        th:data-thanhpho="${nhanVien.thanhPho}"
+                        th:data-quanhuyen="${nhanVien.quanHuyen}"
+                        th:data-phuongxa="${nhanVien.phuongXa}"
+                        th:data-tendangnhap="${nhanVien.taiKhoanDTO != null ? nhanVien.taiKhoanDTO.tenDangNhap : 'Chưa có tài khoản'}"
+                        th:data-matkhau="${nhanVien.taiKhoanDTO != null ? nhanVien.taiKhoanDTO.matKhau : 'Chưa có tài khoản'}"
+                        onclick="showUpdate(this.getAttribute('data-id'),this.getAttribute('data-ma'),this.getAttribute('data-img'),this.getAttribute('data-hoten'),
     this.getAttribute('data-ngaysinh'),this.getAttribute('data-gioitinh'),this.getAttribute('data-sodienthoai'),
     this.getAttribute('data-email'),this.getAttribute('data-trangthai'),this.getAttribute('data-thanhpho'),
     this.getAttribute('data-quanhuyen'),this.getAttribute('data-phuongxa'), this.getAttribute('data-tendangnhap'), this.getAttribute('data-matkhau'))"
@@ -514,6 +516,7 @@
                 return;
             }
 
+            setProcessingState();
 
             const formElement = document.getElementById('form-add-employee');
             const form = new FormData(formElement);
@@ -531,21 +534,31 @@
                 .then(data => {
                     // Xử lý kết quả thành công
                     console.log(data.content);
+
                     if (data.success) {
-                        alert('Thêm nhân viên thành công!');
-                        // Có thể cập nhật giao diện, ví dụ như reset form hoặc chuyển trang
-                        $('#formAdd').modal('hide');
-                        formElement.reset();
-                        location.reload();
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Thêm thành công!',
+                            showConfirmButton: false,
+                            timer: 2500,
+                            toast: true
+                        });
+                        // Tải lại trang sau khi cập nhật thành công
+                        setTimeout(function() {
+                            location.reload(); // Tải lại toàn bộ trang sau khi thông báo đóng
+                        }, 1500); // Đợi 1 giây trước khi tải lại trang
                         // updateTable(data);
                     } else if (data.error) {
                         // Hiển thị thông báo lỗi từ backend
+                        resetProcessingState();
                         showErrorToast(data.error);
                     }
                 })
                 .catch(error => {
                     // Xử lý khi có lỗi xảy ra
                     showErrorToast('Đã có lỗi xảy ra: ' + error.message);
+                    resetProcessingState();
                     console.log(error.message);
                 });
         });
@@ -637,7 +650,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('form-update-employee').addEventListener('submit', function (event) {
             event.preventDefault(); // Ngăn chặn hành vi gửi biểu mẫu mặc định
-
             // Lấy các phần tử input từ form
             const tenDangNhapElement = document.getElementById('tenDangNhapDetail');
             const matKhauElement = document.getElementById('matKhauDetail');
@@ -755,28 +767,51 @@
 
 
     // Hàm để cập nhật danh sách nhân viên
+
     function updateTable(data) {
         const tableBody = document.getElementById('employeeTableBody');
         tableBody.innerHTML = ''; // Xóa nội dung cũ
 
         data.forEach(function (nhanVien, index) {
+            const ngaySinh = nhanVien.ngaySinh ? new Date(nhanVien.ngaySinh).toLocaleDateString('vi-VN') : 'Chưa có ngày sinh';
+            const diaChi = `${nhanVien.phuongXa || ''}${nhanVien.quanHuyen ? ', ' + nhanVien.quanHuyen : ''}${nhanVien.thanhPho ? ', ' + nhanVien.thanhPho : 'Chưa có địa chỉ'}`;
+            const gioiTinh = nhanVien.gioiTinh ? 'Nam' : 'Nữ';
+            const trangThai = nhanVien.trangThai ? 'Đang làm' : 'Đã nghỉ';
+
             const row = `
-            <tr>
-                <td class="text-center">${index + 1}</td>
-                <td class="text-center">
-                    <img src="${nhanVien.img}"
-                         alt="Ảnh đại diện"
-                         style="max-width: 100px; height: 80px; object-fit: cover; border-radius: 50%;">
-                </td>
-                <td class="text-center">${nhanVien.hoTen || 'Chưa có tên'}</td>
-                <td class="text-center">${nhanVien.ngaySinh ? new Date(nhanVien.ngaySinh).toLocaleDateString('vi-VN') : 'Chưa có ngày sinh'}</td>
-                <td class="text-center">${nhanVien.gioiTinh ? 'Nam' : 'Nữ'}</td>
-                <td class="text-center">${nhanVien.soDienThoai || 'Chưa có số điện thoại'}</td>
-                <td>${nhanVien.phuongXa ? nhanVien.phuongXa + ', ' : ''}${nhanVien.quanHuyen ? nhanVien.quanHuyen + ', ' : ''}${nhanVien.thanhPho || 'Chưa có địa chỉ'}</td>
-                <td class="text-center">${nhanVien.email || 'Chưa có email'}</td>
-                <td class="text-center">${nhanVien.trangThai ? 'Đang làm' : 'Đã nghỉ'}</td>
-            </tr>`;
-            tableBody.innerHTML += row; // Thêm hàng vào bảng
+        <tr data-id1="${nhanVien.idNhanVien}"
+            data-ma1="${nhanVien.maNhanVien}"
+            data-img1="${nhanVien.img}"
+            data-hoten1="${nhanVien.hoTen}"
+            data-ngaysinh1="${nhanVien.ngaySinh}"
+            data-gioitinh1="${nhanVien.gioiTinh}"
+            data-sodienthoai1="${nhanVien.soDienThoai}"
+            data-email1="${nhanVien.email}"
+            data-trangthai1="${nhanVien.trangThai}"
+            data-thanhpho1="${nhanVien.thanhPho}"
+            data-quanhuyen1="${nhanVien.quanHuyen}"
+            data-phuongxa1="${nhanVien.phuongXa}"
+            data-tendangnhap1="${nhanVien.taiKhoanDTO?.tenDangNhap || 'Chưa có tài khoản'}"
+            data-matkhau1="${nhanVien.taiKhoanDTO?.matKhau || 'Chưa có tài khoản'}"
+            onclick="showUpdate(this.getAttribute('data-id1'), this.getAttribute('data-ma1'), this.getAttribute('data-img1'), this.getAttribute('data-hoten1'),
+            this.getAttribute('data-ngaysinh1'), this.getAttribute('data-gioitinh1'), this.getAttribute('data-sodienthoai1'),
+            this.getAttribute('data-email1'), this.getAttribute('data-trangthai1'), this.getAttribute('data-thanhpho1'),
+            this.getAttribute('data-quanhuyen1'), this.getAttribute('data-phuongxa1'), this.getAttribute('data-tendangnhap1'), this.getAttribute('data-matkhau1'))">
+            <td class="text-center">${index + 1}</td>
+            <td class="text-center">
+                <img src="${nhanVien.img || 'default-avatar.png'}"
+                     alt="Ảnh đại diện"
+                     style="max-width: 100px; height: 80px; object-fit: cover; border-radius: 50%;">
+            </td>
+            <td class="text-center">${nhanVien.hoTen || 'Chưa có tên'}</td>
+            <td class="text-center">${ngaySinh}</td>
+            <td class="text-center">${gioiTinh}</td>
+            <td class="text-center">${nhanVien.soDienThoai || 'Chưa có số điện thoại'}</td>
+            <td>${diaChi}</td>
+            <td class="text-center">${nhanVien.email || 'Chưa có email'}</td>
+            <td class="text-center">${trangThai}</td>
+        </tr>`;
+            tableBody.innerHTML += row;
         });
     }
 
@@ -933,6 +968,25 @@
             stopOnFocus: true
         }).showToast();
     }
+
+    function setProcessingState() {
+        const button = document.getElementById('idButtonAdd');
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+        }
+    }
+
+    // Khôi phục trạng thái ban đầu của nút
+    function resetProcessingState() {
+        const button = document.getElementById('idButtonAdd');
+        if (button) {
+            button.disabled = false;
+            button.innerHTML =  '<i class="bi bi-plus-circle"></i> Thêm nhân viên';
+        }
+    }
+
+
 
 
     // map địa chỉ

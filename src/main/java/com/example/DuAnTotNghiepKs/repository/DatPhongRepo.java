@@ -22,7 +22,7 @@ public interface DatPhongRepo extends JpaRepository<DatPhong,Integer> {
     List<DatPhong> findByTinhTrang(String tinhTrang);
 
     List<DatPhong> findByTinhTrangAndTrangThaiOrTinhTrangAndTrangThai(String tinhTrang1, boolean trangThai1, String tinhTrang2, boolean trangThai2);
-
+    List<DatPhong> findByKhachHang_IdAndTinhTrangAndTrangThai(Integer idKhachHang, String tinhTrang, Boolean trangThai);
 
 
     @Query("SELECT SUM(dp.tongTien) FROM DatPhong dp WHERE MONTH(dp.ngayNhan) = :month AND YEAR(dp.ngayNhan) = :year")
