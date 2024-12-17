@@ -23,10 +23,13 @@ public interface NhanVienRepo extends JpaRepository<NhanVien, Integer> {
     Optional<NhanVien> findByemail(String email);
 
     // Trong repository
-    @Query("SELECT n FROM NhanVien n WHERE n.soDienThoai LIKE %:keyword% OR n.hoTen LIKE %:keyword% OR n.email LIKE %:keyword% ")
+    @Query("SELECT n FROM NhanVien n JOIN n.taiKhoan tk " +
+            "            JOIN tk.chiTietVaiTros ctvt " +
+            " WHERE (n.soDienThoai LIKE %:keyword% OR n.hoTen LIKE %:keyword% OR n.email LIKE %:keyword%) and ctvt.vaiTro.idVaiTro != 1 ")
     Page<NhanVien> searchEmployees(@Param("keyword") String keyword,Pageable pageable);
 
-    @Query("SELECT n FROM NhanVien n WHERE n.trangThai = :trangThai")
+    @Query("SELECT n FROM NhanVien n JOIN n.taiKhoan tk " +
+            "            JOIN tk.chiTietVaiTros ctvt  WHERE n.trangThai = :trangThai AND ctvt.vaiTro.idVaiTro != 1")
     Page<NhanVien> filterTrangThai(@Param("trangThai") Boolean trangThai, Pageable pageable);
 
 
@@ -34,6 +37,11 @@ public interface NhanVienRepo extends JpaRepository<NhanVien, Integer> {
             + "(n.soDienThoai LIKE %:keyword% OR n.hoTen LIKE %:keyword%) AND n.trangThai = :trangThai")
     Page<NhanVien> findByKeywordAndTrangThai(@Param("keyword") String keyword, @Param("trangThai") boolean trangThai, Pageable pageable);
 
+    @Query(value = "SELECT n FROM NhanVien n " +
+            "JOIN n.taiKhoan tk " +
+            "JOIN tk.chiTietVaiTros ctvt " +
+            "WHERE n.trangThai = true AND ctvt.vaiTro.idVaiTro != 1")
+    Page<NhanVien> getAll(Pageable pageable);
 
     NhanVien getOne(Integer id);
 

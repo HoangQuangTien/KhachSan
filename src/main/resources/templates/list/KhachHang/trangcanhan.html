@@ -35,14 +35,32 @@
             rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <style>
+        .list-group-item.active {
+            background-color: #ffe6f0 !important; /* Màu hồng nhạt */
+            color: #d63384 !important; /* Màu chữ hồng đậm */
+            border-color: #d63384 !important; /* Màu viền hồng */
+        }
+
+        .list-group-item:focus {
+            outline: none;
+        }
+
+        .list-group-item:hover:not(.active) {
+            background-color: #f8d7da; /* Màu hồng nhạt hơn khi hover */
+            color: #d63384;
+        }
+
+    </style>
 
 </head>
 <body>
 <div class="container my-5">
     <div class="my-3">
-        <a href="/khach-hang" class="btn btn-dark">
+        <a href="/khach-hang" class="btn" style="background-color: #f8c4d9; color: white;">
             <i class="fas fa-arrow-left me-2"></i> Quay Lại
         </a>
+
     </div>
 
     <!-- Login Button -->
@@ -123,6 +141,7 @@
                         <div class="card-header bg-dark text-white text-center">
                             <h5>Cập nhật thông tin cá nhân</h5>
                         </div>
+
                         <div class="card-body">
                             <form id="idForm">
                                 <!-- Nội dung form -->
@@ -212,6 +231,7 @@
                                 </div>
 
                                 <div class="d-grid">
+
                                     <button type="submit" class="btn btn-dark">Cập
                                         nhật thông tin</button>
                                 </div>

@@ -221,4 +221,67 @@ public class TaiKhoanService {
     }
 
 
+    public TaiKhoanDTO findByEmail(String email) {
+        TaiKhoan taiKhoan = null;
+        taiKhoan = taiKhoanRepo.findByKhachHang_Email(email);
+        if (taiKhoan == null) {
+            taiKhoan = taiKhoanRepo.findByNhanVien_Email(email);
+        }
+        System.out.println("Tìm kiếm tài khoản với email: " + email); // Debug
+
+        if (taiKhoan != null) {
+            System.out.println("Tài khoản tồn tại: " + taiKhoan.getTenDangNhap());
+
+            // Chuyển đổi thông tin nhân viên sang DTO nếu có
+            NhanVien nhanVien = taiKhoan.getNhanVien();
+            NhanVienDTO nhanVienDTO = nhanVien != null ? convertToDTO(nhanVien) : null;
+            if (nhanVienDTO != null) {
+                System.out.println("Ảnh nhân viên: " + nhanVienDTO.getImg());
+                System.out.println("Họ tên nhân viên: " + nhanVienDTO.getHoTen());
+            } else {
+                System.out.println("Không tìm thấy nhân viên cho tài khoản: " + taiKhoan.getTenDangNhap());
+            }
+
+            // Chuyển đổi thông tin khách hàng sang DTO nếu có
+            KhachHang khachHang = taiKhoan.getKhachHang();
+            KhachHangDTO khachHangDTO = khachHang != null ? convertToKhachHangDTO(khachHang) : null;
+            if (khachHangDTO != null) {
+                System.out.println("Họ tên khách hàng: " + khachHangDTO.getHoVaTen());
+                System.out.println("Số điện thoại khách hàng: " + khachHangDTO.getSoDienThoai());
+            } else {
+                System.out.println("Không tìm thấy khách hàng cho tài khoản: " + taiKhoan.getTenDangNhap());
+            }
+
+            // Kiểm tra trạng thái
+            if (nhanVienDTO == null && khachHangDTO == null) {
+                throw new DisabledException("Tài khoản không hoạt động");
+            }
+
+            if (nhanVienDTO != null && !nhanVienDTO.getTrangThai()) {
+                throw new DisabledException("Nhân viên không hoạt động");
+            }
+
+            if (khachHangDTO != null) {
+                System.out.println("Trạng thái khách hàng: " + khachHangDTO.getDeletedAt());
+                if (khachHangDTO.getDeletedAt()) {
+                    throw new DisabledException("Khách hàng không hoạt động");
+                }
+            }
+
+            // Tạo TaiKhoanDTO với thông tin nhân viên và khách hàng (nếu có)
+            return new TaiKhoanDTO(taiKhoan.getTenDangNhap(), taiKhoan.getMatKhau(), nhanVienDTO, // Bao gồm thông tin
+                    // nhân viên
+                    khachHangDTO, // Bao gồm thông tin khách hàng
+                    taiKhoan.getChiTietVaiTros().stream().map(chiTietVaiTro -> new ChiTietVaiTroDTO(
+                                    chiTietVaiTro.getIdChiTietVaiTro(), chiTietVaiTro.getMaChoTietVaiTro(),
+                                    new VaiTroDTO(chiTietVaiTro.getVaiTro().getIdVaiTro(),
+                                            chiTietVaiTro.getVaiTro().getMaVaiTro(), chiTietVaiTro.getVaiTro().getTenVaiTro())))
+                            .collect(Collectors.toSet()));
+        } else {
+            System.out.println("Không tìm thấy tài khoản với email: " + email);
+            throw new UsernameNotFoundException("Email không tồn tại: " + email);
+        }
+    }
+
+
 }

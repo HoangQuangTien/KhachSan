@@ -1,5 +1,6 @@
 package com.example.DuAnTotNghiepKs.service;
 
+import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
 import com.example.DuAnTotNghiepKs.entity.ChiTietDatPhong;
 import com.example.DuAnTotNghiepKs.entity.KhachHang;
 import com.example.DuAnTotNghiepKs.entity.KhuyenMai;
@@ -336,5 +337,59 @@ public class EmailService {
         emailSender.send(message);
     }
 
+    public void sendEmailForgotPassword(String to, String subject, TaiKhoanDTO taiKhoanDTO, String token)
+            throws MessagingException, IOException {
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+
+        // Nội dung HTML cho email quên mật khẩu
+        String htmlContent = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "<style>\n" +
+                "body { font-family: 'Arial', sans-serif; background-color: #f9f9f9; margin: 0; padding: 20px; }\n" +
+                ".container { max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }\n" +
+                ".header { background-color: #007bff; color: white; padding: 15px; text-align: center; border-radius: 10px 10px 0 0; }\n" +
+                ".header h1 { margin: 0; font-size: 24px; }\n" +
+                "p { margin: 15px 0; color: #333333; }\n" +
+                ".important-note { color: #dc3545; font-weight: bold; margin: 20px 0; text-align: center; }\n" +
+                ".footer { text-align: center; color: #6c757d; margin-top: 20px; font-size: 14px; padding-top: 10px; border-top: 1px solid #e9ecef; }\n" +
+                ".btn { display: inline-block; padding: 10px 20px; margin: 20px 0; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }\n" +
+                ".btn:hover { background-color: #0056b3; }\n" +
+                "</style>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<div class='container'>\n" +
+                "<div class='header'>\n" +
+                "<h1>Khôi phục mật khẩu</h1>\n" +
+                "</div>\n" +
+                "<p>Kính chào tài khoản <strong>" + taiKhoanDTO.getTenDangNhap() + "</strong>,</p>\n" +
+                "<p>Bạn đã yêu cầu khôi phục mật khẩu cho tài khoản của mình. Vui lòng nhấn vào nút bên dưới để đặt lại mật khẩu:</p>\n" +
+                "<div style='text-align: center;'>\n" +
+                "<a href='http://localhost:8080/reset-password?token=" + token + "' class='btn'>Đặt lại mật khẩu</a>\n" +
+                "</div>\n" +
+                "<p class='important-note'>Lưu ý: Liên kết này sẽ hết hạn sau 24 giờ. Nếu bạn không yêu cầu khôi phục mật khẩu, hãy bỏ qua email này.</p>\n" +
+                "<p>Nếu bạn cần hỗ trợ, vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại hỗ trợ.</p>\n" +
+                "<div class='footer'>\n" +
+                "Trân trọng, <br>\n" +
+                "Đội ngũ hỗ trợ DRAGONBALL HOTEL\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "</body>\n" +
+                "</html>\n";
+
+        helper.setText(htmlContent, true);
+
+        // Gửi email
+        emailSender.send(message);
     }
+
+
+
+}
+
+
 

@@ -4,6 +4,8 @@ import com.example.DuAnTotNghiepKs.DTO.ChiTietVaiTroDTO;
 import com.example.DuAnTotNghiepKs.DTO.KhachHangDTO;
 import com.example.DuAnTotNghiepKs.DTO.NhanVienDTO;
 import com.example.DuAnTotNghiepKs.DTO.TaiKhoanDTO;
+import com.example.DuAnTotNghiepKs.service.EmailService;
+import com.example.DuAnTotNghiepKs.service.JWTService;
 import com.example.DuAnTotNghiepKs.service.TaiKhoanService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -29,6 +31,13 @@ public class LoginController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+
+    @Autowired
+    private JWTService jwtService;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/login")
     public String login() {
@@ -79,6 +88,69 @@ public class LoginController {
 
 
 
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        return "list/QuenMatKhau/forgotPassword";
+    }
+
+    @GetMapping("/reset-password")
+    public String resetPassword(@RequestParam(required = true) String token) {
+        try {
+            jwtService.extractUsername(token);
+        } catch (Exception e) {
+            return "redirect:/forgot-password?error=false";
+        }
+        return "list/QuenMatKhau/resetPassword";
+    }
+
+
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam(required = true) String token, @RequestParam String password) {
+        try {
+            String tenDangNhap = jwtService.extractUsername(token);
+            TaiKhoanDTO foundTaiKhoan = taiKhoanService.findByTenDangNhap(tenDangNhap);
+            if (foundTaiKhoan != null) {
+                foundTaiKhoan.setMatKhau(passwordEncoder.encode(password));
+                foundTaiKhoan.setKhachHangDTO(null);
+                foundTaiKhoan.setNhanVienDTO(null);
+                foundTaiKhoan.setChiTietVaiTros(null);
+                System.out.println(foundTaiKhoan);
+                taiKhoanService.saveTk(foundTaiKhoan);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Đã có lỗi xảy ra"));
+        }
+        return ResponseEntity.ok(Map.of("message", "Thay đổi mật khẩu thành công"));
+    }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @ModelAttribute KhachHangDTO khachHangDTO, Model model,
+                                            HttpSession session) {
+        String email = khachHangDTO.getEmail();
+        TaiKhoanDTO foundTaiKhoan = taiKhoanService.findByEmail(email);
+        if (foundTaiKhoan == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email không tồn tại"));
+        }
+        if (foundTaiKhoan.getNhanVienDTO() != null) {
+            try {
+                emailService.sendEmailForgotPassword(foundTaiKhoan.getNhanVienDTO().getEmail(),
+                        "Thiết Lại Mật Khẩu Đăng Nhập", foundTaiKhoan, jwtService.generateTokenNV(foundTaiKhoan));
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Đã có lỗi xảy ra trong quá trình gửi mail"));
+            }
+        } else {
+            try {
+                emailService.sendEmailForgotPassword(foundTaiKhoan.getKhachHangDTO().getEmail(),
+                        "Thiết Lại Mật Khẩu Đăng Nhập", foundTaiKhoan, jwtService.generateTokenKH(foundTaiKhoan));
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Đã có lỗi xảy ra trong quá trình gửi mail"));
+            }
+        }
+        // Tìm tài khoản
+        return ResponseEntity.ok(Map.of("message", " Mã xác minh đã được gửi đến địa chỉ email.\nVui lòng xác minh!"));
+    }
 
 
 }

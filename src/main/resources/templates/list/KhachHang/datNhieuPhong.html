@@ -319,6 +319,33 @@
         </div>
     </div>
 </div>
+
+<div id="customerInfoForm" th:if="${not #authorization.expression('hasRole(''CUSTOMER'')')}" class=" shadow" style=" max-width: 1000px ; flex: 1">
+    <div class="card shadow-sm border-0 text-start">
+        <div class="card-body">
+            <h4 class="mb-3 text-center">Thông Tin Khách Hàng</h4>
+            <form id="customerForm">
+
+                <input type="hidden"  id="maKhachHang" name="maKhachHang">
+                <div class="mb-3">
+                    <label for="hoVaTen" class="form-label">Họ và Tên:</label>
+                    <input type="text" class="form-control form-control-sm" id="hoVaTen" name="hoVaTen" placeholder="Họ và tên" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="soDienThoai" class="form-label">Số Điện Thoại:</label>
+                    <input type="text" class="form-control form-control-sm" id="soDienThoai" name="soDienThoai" placeholder="Số điện thoại" required>
+                </div>
+
+                <button type="button" id="confirmCustomerBtn" class="btn btn-dark w-100">Xác Nhận Thông Tin</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="room-detail-container d-flex justify-content-center">
     <div class="room-details">
         <div class="room-info d-flex justify-content-center align-items-center">
@@ -643,6 +670,155 @@
     //     });
     // });
 
+    function setKhachHangId(id) {
+        const idKhachHangInput = document.getElementById('idKhachHang');
+        if (id && !isNaN(id)) {
+            idKhachHangInput.value = id;
+            console.log('ID khách hàng đã được thiết lập:', id); // Kiểm tra giá trị ID
+        }
+    }
+
+    document.getElementById('confirmCustomerBtn').addEventListener('click', function () {
+        const hoVaTen = document.getElementById('hoVaTen').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const soDienThoai = document.getElementById('soDienThoai').value.trim();
+
+        // Biểu thức chính quy cho tên hợp lệ
+        const nameRegex = /^[a-zA-ZÀ-Ỵà-ỳ\s]+$/;
+        // Kiểm tra tính hợp lệ của họ và tên
+        if (!nameRegex.test(hoVaTen) || hoVaTen.length < 2 || hoVaTen.length > 50) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Tên không hợp lệ',
+                text: 'Tên phải chứa các ký tự tiếng Việt hợp lệ, có ít nhất 2 ký tự và không quá 50 ký tự.',
+                confirmButtonText: 'OK',
+                timer: 3000,
+                timerProgressBar: true
+            });
+            return; // Ngừng xử lý nếu tên không hợp lệ
+        }
+
+        // Kiểm tra các trường bắt buộc có bị để trống không
+        if (!hoVaTen || !email || !soDienThoai) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Thiếu thông tin',
+                text: 'Vui lòng điền đầy đủ thông tin vào các trường bắt buộc.',
+                confirmButtonText: 'OK',
+                timer: 3000,
+                timerProgressBar: true
+            });
+            return; // Ngừng xử lý nếu có trường bị để trống
+        }
+
+        // Biểu thức chính quy để kiểm tra định dạng email
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        // Biểu thức chính quy để kiểm tra định dạng số điện thoại
+        const phonePattern = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+
+        // Kiểm tra tính hợp lệ của email
+        if (!emailPattern.test(email)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi định dạng',
+                text: 'Email không đúng định dạng. Vui lòng nhập lại.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Kiểm tra tính hợp lệ của số điện thoại
+        if (!phonePattern.test(soDienThoai)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi định dạng',
+                text: 'Số điện thoại không đúng định dạng. Vui lòng nhập lại.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Gọi API kiểm tra email và số điện thoại
+        fetch(`/khach-hang/check?email=${encodeURIComponent(email)}&soDienThoai=${encodeURIComponent(soDienThoai)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.emailExists || data.phoneExists) {
+                    // Hiển thị thông báo nếu email hoặc số điện thoại đã tồn tại
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Thông tin khách hàng đã tồn tại',
+                        text: `Là Bạn Khách Hàng ${data.khachHang.hoVaTen},với Số điện thoại: ${data.khachHang.soDienThoai} phải không ạ`,
+                        showCancelButton: true,
+                        confirmButtonText: 'Đúng',
+                        cancelButtonText: 'Không Phải'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Nếu người dùng nhấn OK, lưu ID khách hàng vào form đặt phòng
+                            setKhachHangId(data.khachHang.id); // Gọi hàm để thiết lập ID khách hàng
+                            document.getElementById('idKhachHang').value = data.khachHang.id; // Đặt giá trị ID khách hàng vào form
+
+
+                        }
+                    });
+                } else {
+                    // Nếu không có trùng lặp, tiếp tục gửi thông tin khách hàng để lưu
+                    const customerData = new FormData(document.getElementById('customerForm'));
+
+                    fetch('/datphongs/xacnhan', {
+                        method: 'POST',
+                        body: customerData
+                    })
+                        .then(response => response.json())
+
+                        .then(result => {
+                            console.log('Server response:', result); // Kiểm tra phản hồi từ server
+
+                            if (result.success) {
+                                const khachHangId = result.khachHang.id; // Lấy ID khách hàng từ phản hồi
+                                if (khachHangId) {
+                                    setKhachHangId(khachHangId); // Gọi hàm để thiết lập ID khách hàng
+                                } else {
+                                    console.error('Không có ID khách hàng trong phản hồi.');
+                                }
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thông Tin Khách Hàng Được Lưu!',
+                                    text: 'Thông tin khách hàng đã được lưu thành công.',
+                                    showConfirmButton: true
+                                }).then(() => {
+                                    document.getElementById('customerInfoForm').style.display = 'none'; // Ẩn form thông tin khách hàng
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi!',
+                                    text: 'Đã xảy ra lỗi khi lưu thông tin khách hàng. Vui lòng thử lại sau.',
+                                    showConfirmButton: true
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi gửi thông tin khách hàng:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: 'Đã xảy ra lỗi khi gửi thông tin khách hàng. Vui lòng thử lại sau.',
+                                showConfirmButton: true
+                            });
+                        });
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi kiểm tra thông tin khách hàng:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi hệ thống',
+                    text: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',
+                    confirmButtonText: 'OK'
+                });
+            });
+    });
 
 </script>
 </body>

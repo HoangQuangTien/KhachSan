@@ -80,10 +80,16 @@ public class NhanVienController {
     public ResponseEntity<Page<NhanVienDTO>> searchEmployee(
             @RequestParam(value = "page",defaultValue = "0") int page,
             @RequestParam(value = "size",defaultValue = "5") int size,
-            @RequestParam(value = "keyword",required = false) String keyword) {
+            @RequestParam(required = false) String keyword) {
 
-        Pageable pageable = PageRequest.of(page,size);
-        Page<NhanVienDTO> nhanVienDTOS = nhanVienSerVice.searchEmployees(keyword,pageable);
+        Pageable pageable = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"idNhanVien"));
+        Page<NhanVienDTO> nhanVienDTOS;
+
+        if (keyword != null){
+            nhanVienDTOS = nhanVienSerVice.searchEmployees(keyword,pageable);
+        }else{
+            nhanVienDTOS = nhanVienSerVice.getAll(pageable);
+        }
 
         return ResponseEntity.ok(nhanVienDTOS); // Trả về danh sách nhân viên phân trang
     }

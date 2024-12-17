@@ -11,6 +11,12 @@
 
     <style>
 
+
+        th {
+            white-space: nowrap;
+            text-align: center;
+        }
+
         #form-add-employee .form-control {
             border-radius: 5px;
             padding: 10px;
@@ -333,7 +339,7 @@
         <div class="container py-4">
             <div>
                 <table class="table table-hover table-bordered">
-                    <thead>
+                    <thead >
                     <tr>
                         <th class="text-center">#</th>
                         <th class="text-center">Ảnh</th>
@@ -346,8 +352,10 @@
                         <th class="text-center">Trạng thái</th>
                     </tr>
                     </thead>
-                    <tbody id="employeeTableBody" th:each="nhanVien, i : ${nhanViens}">
-                    <tr
+
+                    </thead>
+                    <tbody id="employeeTableBody" >
+                    <tr     th:each="nhanVien, i : ${nhanViens}"
                             data-bs-toggle="modal" data-bs-target="#formUpdate"
                             th:data-id="${nhanVien.idNhanVien}"
                             th:data-ma="${nhanVien.maNhanVien}"

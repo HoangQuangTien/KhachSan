@@ -260,6 +260,49 @@
         }
 
 
+        /* Áp dụng phong cách cho tiêu đề */
+        .custom-title {
+            color: #ffb6c1; /* Màu hồng nhạt */
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* Phông chữ mềm mại trẻ trung */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Áp dụng phong cách cho phụ đề */
+        .custom-subtitle {
+            color: #ffb6c1; /* Màu hồng nhạt */
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* Đồng nhất với tiêu đề */
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em; /* Tăng kích thước chữ một chút */
+        }
+
+        /* Nền toàn màn hình cho hiệu ứng đẹp hơn */
+        body {
+            background-color: #fff0f5; /* Nền hồng rất nhẹ */
+        }
+
+
+        /* Tùy chỉnh cho các tab */
+        .custom-tabs .custom-tab {
+            color: #ff69b4; /* Màu hồng */
+            font-family: 'Poppins', sans-serif; /* Kiểu chữ mềm mại, trẻ trung */
+            font-size: 1rem; /* Kích thước chữ vừa phải */
+            text-transform: capitalize; /* Chỉ viết hoa chữ cái đầu */
+
+        }
+
+        /* Hiệu ứng hover */
+        .custom-tabs .custom-tab:hover {
+            color: #ff1493; /* Màu hồng đậm hơn khi hover */
+            text-decoration: underline; /* Gạch chân khi hover */
+        }
+
+        /* Tab đang active */
+        .custom-tabs .custom-tab.active {
+            color: #e75480; /* Màu hồng dịu cho tab active */
+            border-color: #ff69b4; /* Đường viền màu hồng */
+        }
 
     </style>
 
@@ -290,10 +333,11 @@
          style="background: rgba(0, 0, 0, 0.5);">
 
         <!-- Title -->
-        <h1 class="text-white mb-3 text-center" >Chào Mừng Đến Với DragonBall HOTEL</h1>
+        <h1 class="custom-title">Chào Mừng Đến Với DragonBall HOTEL</h1>
 
         <!-- Subtitle -->
-        <p class="text-white mb-4 text-center">Tìm kiếm để so sánh giá cả và khám phá ưu đãi tuyệt vời</p>
+        <p class="custom-subtitle">Tìm kiếm để so sánh giá cả và khám phá ưu đãi tuyệt vời</p>
+
 
 
         <!-- Search Bar -->
@@ -371,23 +415,23 @@
             <!-- Tab Navigation -->
             <ul class="nav nav-tabs custom-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active text-uppercase fw-bold " id="tab-trangchu" data-bs-toggle="tab" href="#Trangchu">
+                    <a class="nav-link active text-uppercase fw-bold custom-tab" id="tab-trangchu" data-bs-toggle="tab" href="#Trangchu">
                         <i class="fas fa-home me-2"></i>Trang Chủ
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase fw-bold" id="tab-hethongphong" data-bs-toggle="tab" href="#hethongphong">
+                    <a class="nav-link text-uppercase fw-bold custom-tab" id="tab-hethongphong" data-bs-toggle="tab" href="#hethongphong">
                         <i class="fas fa-bed me-2"></i>Hệ Thống Phòng
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase fw-bold" id="tab-gioithieu" data-bs-toggle="tab" href="#gioiThieu">
+                    <a class="nav-link text-uppercase fw-bold custom-tab" id="tab-gioithieu" data-bs-toggle="tab" href="#gioiThieu">
                         <i class="fas fa-info-circle me-2"></i>Giới Thiệu
                     </a>
                 </li>
                 <!-- New "Quy tắc" Tab -->
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase fw-bold" id="tab-quytac" data-bs-toggle="tab" href="#quyTac">
+                    <a class="nav-link text-uppercase fw-bold custom-tab" id="tab-quytac" data-bs-toggle="tab" href="#quyTac">
                         <i class="fas fa-gavel me-2"></i>Quy Tắc
                     </a>
                 </li>
@@ -435,6 +479,9 @@
             </div>
         </div>
 
+        <div>
+            <img src="/img/anh1-removebg-preview.png" alt="" class="room-img">
+        </div>
 
         <!--Vùng để load phòng-->
         <div id="top-phong" class="top-phong">
@@ -444,6 +491,9 @@
             </div>
         </div>
 
+        <div>
+            <img src="/img/anh1-removebg-preview.png" alt="" class="room-img">
+        </div>
         <div class="mt-5">
             <h2 class="room-title">Phòng và hạng phòng</h2>
             <h4 class="room-description">
@@ -476,6 +526,77 @@
                 </div>
             </div>
         </div>
+
+        <div>
+            <img src="/img/anh1-removebg-preview.png" alt="" class="room-img">
+        </div>
+
+
+        <div class="d-flex align-items-center justify-content-between p-4">
+            <!-- Đoạn giới thiệu khách sạn -->
+            <div class="intro-text w-50 pe-4 room-item">
+                <h2 class="text-uppercase fw-bold" style="color: #ff69b4; font-family: 'Playfair Display', serif; font-size: 2rem;">
+                    Dragon Ball Hotel
+                </h2>
+                <p style="font-size: 1.2rem; line-height: 1.8; color: #555;">
+                    Chào mừng đến với Dragon Ball Hotel - nơi bạn sẽ được trải nghiệm không gian nghỉ dưỡng đẳng cấp,
+                    hiện đại và tiện nghi. Tận hưởng kỳ nghỉ đáng nhớ cùng gia đình và bạn bè với hệ thống phòng sang trọng,
+                    dịch vụ chuyên nghiệp và phong cách thiết kế độc đáo.
+                </p>
+
+            </div>
+
+            <!-- Hình ảnh khách sạn -->
+            <div class="image-container w-50 room-item">
+                <img src="/img/dragon.jpg" alt="Hình ảnh khách sạn Dragon Ball" class="room-img img-fluid rounded" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            </div>
+        </div>
+
+
+        <!-- Thêm CSS -->
+        <style>
+            .intro-text {
+                font-family: 'Playfair Display', serif; /* Font chữ mới */
+                font-size: 1.2rem; /* Kích thước chữ lớn hơn */
+                line-height: 1.8; /* Dòng chữ cao để dễ đọc */
+                color: #555;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                height: 100%; /* Đảm bảo chiều cao bằng với ảnh */
+            }
+
+            .intro-text h2 {
+                margin-bottom: 1rem;
+            }
+
+            .intro-text p {
+                margin-bottom: 0;
+            }
+
+            .room-img {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .image-container {
+                display: flex;
+                align-items: center;
+            }
+
+            .hidden {
+                opacity: 0;
+                transform: translateX(-100px); /* Hoặc dịch ngang */
+                transition: all 1s ease-in-out;
+            }
+
+            .show {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+        </style>
+
 
         <!-- Google Fonts for custom font -->
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -568,6 +689,8 @@
 
         </style>
         <script>
+
+
             // Khởi tạo Intersection Observer để theo dõi khi các phần tử vào màn hình
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -593,28 +716,34 @@
     </div>
 
     <div class="tab-pane fade" id="hethongphong" role="tabpanel" aria-labelledby="tab-hethongphong">
-        <h3>Hệ Thống Phòng</h3>
-        <p>Thông tin về hệ thống phòng.</p>
+        <h3 class="text-center my-4" style="font-family: 'Poppins', sans-serif; font-size: 2.5rem; background: linear-gradient(to right, #ff6ec7, #f6a1d2); -webkit-background-clip: text; color: transparent; text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            Hệ Thống Phòng
+        </h3>
+        <p class="text-center" style="font-size: 1.2rem; color: #ff66b2; font-family: 'Lobster', cursive; text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
+            Thông tin về hệ thống phòng. Khám phá các lựa chọn phòng tuyệt vời tại khách sạn của chúng tôi!
+        </p>
+
         <div class="row mt-4 g-4">
             <div th:each="phong : ${phongTrong}" class="col-lg-3 col-md-4 col-sm-6">
-                <div class="card border-0 shadow h-100" th:classappend="${phong.trangThai ? 'border-success' : 'border-danger'}">
+                <div class="card border-0 shadow-lg h-100" th:classappend="${phong.trangThai ? 'border-success' : 'border-danger'}">
                     <!-- Image Section -->
                     <div class="position-relative overflow-hidden">
                 <span th:text="${phong.trangThai ? 'Còn trống' : 'Đã đặt'}"
                       class="badge position-absolute top-0 start-0 p-2 text-white"
                       th:classappend="${phong.trangThai ? 'bg-success' : 'bg-danger'}"></span>
                         <img th:src="${phong.img}" class="card-img-top" alt="Ảnh phòng của ${phong.tenPhong}"
-                             style="object-fit: cover; height: 200px;">
+                             style="object-fit: cover; height: 250px; border-bottom: 4px solid #ff69b4;">
                     </div>
+
                     <!-- Information Section -->
-                    <div class="card-body d-flex flex-column bg-white rounded">
+                    <div class="card-body d-flex flex-column bg-light rounded-3 p-3">
                         <h5 class="card-title text-truncate mb-2" th:text="${phong.tenPhong} + ' - ' + ${phong.loaiPhong.tenLoaiPhong}"
-                            style="font-size: 1.1rem; font-weight: bold; color: #333;"></h5>
-                        <p class="card-text mb-1 text-muted">
+                            style="font-size: 1.2rem; font-weight: bold; color: #333; font-family: 'Playfair Display', serif;"></h5>
+                        <p class="card-text mb-1 text-muted" style="font-size: 1rem;">
                             <strong>Giá: </strong>
                             <span th:text="${#numbers.formatCurrency(phong.loaiPhong.gia)}"></span> /đêm
                         </p>
-                        <p class="card-text mb-1 text-muted">
+                        <p class="card-text mb-1 text-muted" style="font-size: 1rem;">
                             <i class="fas fa-users me-2"></i>
                             <span th:text="${phong.loaiPhong.soNguoiToiDa}"></span> người
                         </p>
@@ -622,8 +751,10 @@
                             <i class="fas fa-info-circle me-2"></i>
                             <span th:text="${phong.moTa}"></span>
                         </p>
+
                         <div class="mt-auto">
-                            <a th:href="@{/view-dat-phong(roomId=${phong.idPhong})}" class="btn btn-success w-100 d-flex align-items-center justify-content-center shadow-sm">
+                            <a th:href="@{/view-dat-phong(roomId=${phong.idPhong})}" class="btn btn-danger w-100 d-flex align-items-center justify-content-center shadow-sm"
+                               style="font-family: 'Roboto', sans-serif; transition: all 0.3s ease;">
                                 <i class="fas fa-bed me-2"></i> Đặt phòng
                             </a>
                         </div>
@@ -631,8 +762,9 @@
                 </div>
             </div>
         </div>
-
-
+        <div>
+            <img src="/img/anh1-removebg-preview.png" alt="" class="room-img">
+        </div>
     </div>
     <div class="tab-pane fade" id="gioiThieu" role="tabpanel" aria-labelledby="tab-gioithieu">
 
@@ -1303,10 +1435,23 @@
                 <p id="footerEmail">Email: contact@dragonballhotel.com</p>
                 <p id="footerPhone">Phone: +84 397156204</p>
                 <ul class="list-inline">
-                    <li class="list-inline-item"><a href="#" class="text-white">Facebook</a></li>
-                    <li class="list-inline-item"><a href="#" class="text-white">Instagram</a></li>
-                    <li class="list-inline-item"><a href="#" class="text-white">Twitter</a></li>
+                    <li class="list-inline-item">
+                        <a href="#" class="text-white" target="_blank">
+                            <i class="fab fa-facebook-square" style="font-size: 1.5rem;"></i>
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="#" class="text-white" target="_blank">
+                            <i class="fab fa-instagram" style="font-size: 1.5rem;"></i>
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="#" class="text-white" target="_blank">
+                            <i class="fab fa-twitter" style="font-size: 1.5rem;"></i>
+                        </a>
+                    </li>
                 </ul>
+
             </div>
 
         </div>

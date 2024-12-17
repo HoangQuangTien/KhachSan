@@ -64,7 +64,7 @@ public class NhanVienService {
     }
 
     public Page<NhanVienDTO> getAll(Pageable pageable) {
-        Page<NhanVien> nhanViens = nhanVienRepo.findAll(pageable);
+        Page<NhanVien> nhanViens = nhanVienRepo.getAll(pageable);
         return nhanViens.map(nhanVien -> {
             NhanVienDTO dto = modelMapper.map(nhanVien, NhanVienDTO.class);
 

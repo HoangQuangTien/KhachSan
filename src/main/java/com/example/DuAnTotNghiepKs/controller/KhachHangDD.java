@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -170,7 +171,13 @@ public class KhachHangDD {
         // Truyền dữ liệu sang model để hiển thị trên view
         model.addAttribute("isValidSignature", isValidSignature);
         model.addAttribute("vnp_TxnRef", requestParams.get("vnp_TxnRef"));
-        model.addAttribute("vnp_Amount", requestParams.get("vnp_Amount"));
+        String amountString = requestParams.get("vnp_Amount");
+        float amount = (amountString != null) ? Float.parseFloat(amountString) / 100 : 0f;
+
+// Định dạng tiền Việt Nam
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        String formattedAmount = currencyFormat.format(amount);
+        model.addAttribute("vnp_Amount", formattedAmount);
         model.addAttribute("vnp_OrderInfo", requestParams.get("vnp_OrderInfo"));
         model.addAttribute("vnp_ResponseCode", requestParams.get("vnp_ResponseCode"));
         model.addAttribute("vnp_TransactionNo", requestParams.get("vnp_TransactionNo"));
