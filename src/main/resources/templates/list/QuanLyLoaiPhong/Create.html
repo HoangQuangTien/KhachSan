@@ -248,8 +248,8 @@
 
         // Kiểm tra "Tên Loại Phòng" không được chứa ký tự đặc biệt
         const regexSpecialChars = /[^a-zA-Z0-9\s]/;  // Kiểm tra ký tự đặc biệt
-        if (regexSpecialChars.test(tenLoaiPhong)) {
-            showErrorToast("Tên Loại Phòng không được chứa ký tự đặc biệt!");
+        if (!regexSpecialChars.test(tenLoaiPhong)) {
+            alert("Tên Loại Phòng không được chứa ký tự đặc biệt!");
             return false;
         }
 

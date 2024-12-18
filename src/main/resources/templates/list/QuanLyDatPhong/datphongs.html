@@ -181,11 +181,24 @@
                                 <input type="text" class="form-control" id="cccd" name="cccd" placeholder="CCCD" required>
                             </div>
 
+                            <!-- Phương thức thanh toán -->
+                            <div class="mb-3">
+                                <label class="form-label">Phương Thức Thanh Toán:</label>
+                                <div class="form-check">
+                                    <input type="radio" id="thanhToanCoc" name="thanhToan100" value="false" class="form-check-input" checked>
+                                    <label for="thanhToanCoc" class="form-check-label">Thanh toán 80% (tiền cọc)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" id="thanhToanFull" name="thanhToan100" value="true" class="form-check-input">
+                                    <label for="thanhToanFull" class="form-check-label">Thanh toán 100% (toàn bộ)</label>
+                                </div>
+                            </div>
                             <!-- Tiền cọc -->
                             <div class="mb-3">
                                 <label for="tienCoc" class="form-label">Tiền Cọc:</label>
                                 <input type="text" class="form-control" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
                             </div>
+
 
                             <!-- Button Đặt phòng -->
                             <button type="submit" id="submitDatPhongBtn" class="btn btn-dark w-100 py-2">Đặt Phòng</button>
@@ -375,45 +388,67 @@
 
         function updateTienCoc() {
             const selectedPhongIds = Array.from(document.querySelectorAll('#phongSelect .form-check-input:checked'))
-                .map(input => input.value);
-            let totalTienCoc = 0;
-            let totalTongTienPhong = 0;
-            let totalTienConLai = 0;
+                .map(input => input.value); // Lấy danh sách các phòng được chọn
+            let totalTienCoc = 0; // Tổng tiền cọc
+            let totalTongTienPhong = 0; // Tổng tiền phòng
+            let totalTienConLai = 0; // Tổng tiền còn lại
 
+            const isThanhToanFull = document.querySelector('#thanhToanFull').checked; // Kiểm tra nếu chọn thanh toán 100%
+
+            // Tính toán cho từng phòng được chọn
             selectedPhongIds.forEach(idPhong => {
-                const giaPhong =  giaPhongMap[idPhong];
+                const giaPhong = giaPhongMap[idPhong]; // Lấy giá phòng từ Map
                 if (giaPhong) {
-                    const ngayNhan = new Date(ngayNhanInput.value);
-                    const ngayTra = new Date(ngayTraInput.value);
+                    const ngayNhan = new Date(ngayNhanInput.value); // Ngày nhận phòng
+                    const ngayTra = new Date(ngayTraInput.value); // Ngày trả phòng
 
                     if (ngayNhan && ngayTra && ngayTra > ngayNhan) {
-                        // Tính số ngày khách ở
-                        const soNgayO = Math.ceil((ngayTra - ngayNhan) / (1000 * 60 * 60 * 24));
-                        const tongTienPhong = giaPhong * soNgayO;
-                        totalTongTienPhong += tongTienPhong; // Tổng tiền phòng
-                        totalTienCoc += tongTienPhong * 0.8; // Tiền cọc 80% tổng tiền phòng
+                        // Tính số ngày ở
+                        const soNgayO = Math.ceil((ngayTra - ngayNhan) / (1000 * 60 * 60 * 24)); // Chuyển từ ms sang ngày
+                        const tongTienPhong = giaPhong * soNgayO; // Tính tổng tiền phòng
+                        totalTongTienPhong += tongTienPhong;
+
+                        // Tính tiền cọc
+                        if (isThanhToanFull) {
+                            totalTienCoc += tongTienPhong; // Thanh toán 100%
+                        } else {
+                            totalTienCoc += tongTienPhong * 0.8; // Thanh toán 80%
+                        }
                     }
                 }
             });
 
             totalTienConLai = totalTongTienPhong - totalTienCoc; // Tính tiền còn lại
 
-            // Cập nhật các trường liên quan đến tiền cọc và tổng tiền phòng, áp dụng định dạng tiền tệ
+            // Định dạng tiền tệ theo chuẩn Việt Nam
             const formatTien = (tien) => {
                 return tien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
             };
 
-            // Cập nhật các trường liên quan đến tiền cọc và tổng tiền phòng
+            // Cập nhật các giá trị vào các input
             if (tienCocInput) {
-                tienCocInput.value = formatTien(totalTienCoc); // Hiển thị 2 chữ số thập phân
+                tienCocInput.value = formatTien(totalTienCoc); // Cập nhật tiền cọc
             }
             if (tongTienInput) {
-                tongTienInput.value = totalTongTienPhong.toFixed(2);
+                tongTienInput.value = formatTien(totalTongTienPhong); // Cập nhật tổng tiền phòng
             }
             if (tienConLaiInput) {
-                tienConLaiInput.value = totalTienConLai.toFixed(2); // Hiển thị 2 chữ số thập phân
+                tienConLaiInput.value = formatTien(totalTienConLai); // Cập nhật tiền còn lại
             }
         }
+
+// Thêm sự kiện lắng nghe thay đổi trạng thái radio button (thanh toán 80% hoặc 100%)
+        document.querySelectorAll('input[name="thanhToan100"]').forEach(radio => {
+            radio.addEventListener('change', updateTienCoc);
+        });
+
+// Lắng nghe sự thay đổi trên ngày nhận, ngày trả hoặc chọn phòng
+        ngayNhanInput.addEventListener('change', updateTienCoc);
+        ngayTraInput.addEventListener('change', updateTienCoc);
+        document.querySelectorAll('#phongSelect .form-check-input').forEach(input => {
+            input.addEventListener('change', updateTienCoc);
+        });
+
 
 
 

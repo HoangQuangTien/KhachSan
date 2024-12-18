@@ -199,7 +199,8 @@ public class DatPhongController {
             @RequestParam("ngayTra") String ngayTraStr,
             @RequestParam("cccd") String cccd,
             @RequestParam("maDatPhong") String maDatPhong,
-            @RequestParam("idKhachHang") String idKhachHangStr) {
+            @RequestParam("idKhachHang") String idKhachHangStr,
+            @RequestParam("thanhToan100") boolean thanhToan100) {
 
         // Chuyển đổi chuỗi ID phòng thành danh sách
         List<String> idPhongStrList = Arrays.asList(idPhongStr.split(","));
@@ -312,6 +313,16 @@ public class DatPhongController {
 //                tongTienPhong += tongTienPhongPhong;
 //                tienCoc += tienCocPhong;
 
+                // Kiểm tra trạng thái thanh toán 80% hoặc 100% từ tham số giao diện
+                float tienCocPhong;
+                if (thanhToan100) {
+                    // Nếu chọn thanh toán 100%
+                    tienCocPhong = tongTienPhongPhong;
+                } else {
+                    // Nếu chọn thanh toán 80%
+                    tienCocPhong = tongTienPhongPhong * 0.8f;
+                }
+
                 // Tạo đối tượng DatPhong cho từng phòng
                 DatPhong datPhong = new DatPhong();
                 datPhong.setMaDatPhong(generateMaDatPhong()+""+(i+1));
@@ -320,7 +331,7 @@ public class DatPhongController {
                 datPhong.setNgayTra(ngayTra);
                 datPhong.setCccd(cccd);
                 datPhong.setTongTien(tongTienPhongPhong);
-                datPhong.setTienCoc(tongTienPhongPhong * 0.8f);
+                datPhong.setTienCoc(tienCocPhong);
                 float tienConLai = datPhong.getTongTien() - datPhong.getTienCoc(); // Tính tiền còn lại
                 datPhong.setTienConLai(tienConLai);
                 datPhong.setNgayDat(LocalDateTime.now());
