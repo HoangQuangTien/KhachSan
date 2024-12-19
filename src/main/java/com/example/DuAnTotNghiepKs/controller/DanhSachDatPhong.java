@@ -521,7 +521,7 @@ public class DanhSachDatPhong {
 
 
 
-    @PostMapping("/cancel-booking1")
+    @PostMapping("/cancel-booking")
     public ResponseEntity<Map<String, Object>> cancelBooking(@RequestParam("idDatPhong") Integer idDatPhong,
                                                              @RequestParam("reason") String reason) { // Thêm tham số lý do hủy
         Map<String, Object> response = new HashMap<>();
@@ -556,7 +556,7 @@ public class DanhSachDatPhong {
         }
     }
 
-    @PostMapping("/cancel-booking")
+    @PostMapping("/cancel-booking1")
     public ResponseEntity<Map<String, Object>> cancelBooking(@RequestParam List<Integer> idDatPhongs,
                                                              @RequestParam("reason") String reason) { // Thêm tham số lý do hủy
         Map<String, Object> response = new HashMap<>();

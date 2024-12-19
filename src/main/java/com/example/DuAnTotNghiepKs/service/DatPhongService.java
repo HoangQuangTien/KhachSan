@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -28,6 +29,8 @@ public interface DatPhongService {
 
     List<DatPhong> getDatPhongChuaCheckIn();
 
+
+    List<DatPhong> getDatPhongChuaXacNhan();
 
     List<DatPhong> getDatPhongChuaVaDaCheckIn();
 
@@ -101,6 +104,8 @@ public interface DatPhongService {
     boolean extendStay(Integer idDatPhong, LocalDateTime newEndDate);
 
     Map<String, Object> getRevenueByDay();
+
+    void exportGuestReport(List<DatPhong> guests, String filePath) throws IOException;
 
 
 //    // Thêm phương thức tính tổng số phòng Ngung hoạt động

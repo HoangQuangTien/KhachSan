@@ -337,7 +337,7 @@ public class DatPhongController {
                 datPhong.setNgayDat(LocalDateTime.now());
                 datPhong.setLoaiPhong(loaiPhong);
                 datPhong.setKhachHang(khachHang);
-                datPhong.setTinhTrang("Chưa Checkin");
+                datPhong.setTinhTrang("Chưa xác nhận");
                 datPhong.setTrangThai(false);
 
                 // Thêm vào danh sách để lưu sau

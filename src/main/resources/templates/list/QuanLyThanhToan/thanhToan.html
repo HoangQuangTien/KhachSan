@@ -141,7 +141,7 @@
         </div>
 
         <div class="d-flex justify-content-center">
-            <h2 style="color: #0d4bdb">Danh Sách Hóa Dơn Cần Thanh Toán</h2>
+            <h2 style="color: #0d4bdb">Danh Sách Hóa Đơn Cần Thanh Toán</h2>
         </div>
 
         <div class="row">
@@ -248,7 +248,7 @@
                 </div>
                 <div class="">
                     <div class="card p-4 shadow-sm">
-                        <h4 class="d-flex justify-content-center" style="color:black;">Lịch Sử Thanh Toán</h4>
+                        <h4 class="d-flex justify-content-center" style="color:black;">Lịch Sử Chekout</h4>
                         <hr>
                         <!-- Bảng hiển thị lịch sử thanh toán -->
                         <table class="table table-bordered" id="dataTable-1">
@@ -347,25 +347,34 @@
                                     <span class="input-group-text form-control-sm" style="font-size: 0.875rem;">VND</span>
                                 </div>
                             </div>
-
                             <div class="col-6 mb-3">
-                                <label for="voucherId">Khuyến mại </label>
-                                <select class="form-control" id="voucherId" name="voucherId"  onchange="tinhTongTien()">
-                                    <option value="" disabled selected>-- Chọn khuyến mại --</option>
-                                    <option th:each="voucher : ${activeVouchers}"
-                                            th:if="${voucher.soLuong > 0}"
-                                            th:value="${voucher.idKhuyenMai}"
-                                            th:data-muc-giam="${voucher.giamGia}"
-                                            th:data-so-luong="${voucher.soLuong}"
-                                            th:data-loai-giam="${voucher.loaiGiam ? 'true' : 'false'}"
-                                            th:data-giam-toi-thieu="${voucher.giamToiThieu}"
-                                            th:data-giam-toi-da="${voucher.giamToiDa}"
-                                            th:text="${voucher.maKhuyenMai} + ' - Giảm giá:' + ${#numbers.formatDecimal(voucher.giamGia, 0, '0')}+ (${voucher.loaiGiam ? '%' : 'VND'})"></option>
-                                </select>
+                                <label for="phuPhiSelect" class="form-label font-weight-bold">Phụ phí</label>
+                                <div class="input-group">
+                                    <select onchange="phuPhiChange(this);tinhTongTien();" class="form-select form-control-sm" id="phuPhiSelect" name="phuPhi">
+                                        <option value="Không có phụ thu nào" disabled selected>Chọn phụ phí</option>
+                                        <option th:each="phuPhi : ${phuPhis}" th:value="${phuPhi.idPhuPhi}" th:text="${phuPhi.tenPhuPhi}" th:data-giaphuphi="${phuPhi.giaPhuPhi}">
+                                        </option>
+                                    </select>
+                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalPhuPhi" style="font-weight: bold;">+
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
-
+                        <div class="col-6 mb-3" style="display: none;">
+                            <label for="voucherId">Khuyến mại</label>
+                            <select class="form-control" id="voucherId" name="voucherId" onchange="tinhTongTien()">
+                                <option value="" disabled selected>-- Chọn khuyến mại --</option>
+                                <option th:each="voucher : ${activeVouchers}"
+                                        th:if="${voucher.soLuong > 0}"
+                                        th:value="${voucher.idKhuyenMai}"
+                                        th:data-muc-giam="${voucher.giamGia}"
+                                        th:data-so-luong="${voucher.soLuong}"
+                                        th:data-loai-giam="${voucher.loaiGiam ? 'true' : 'false'}"
+                                        th:data-giam-toi-thieu="${voucher.giamToiThieu}"
+                                        th:data-giam-toi-da="${voucher.giamToiDa}"
+                                        th:text="${voucher.maKhuyenMai} + ' - Giảm giá:' + ${#numbers.formatDecimal(voucher.giamGia, 0, '0')}+ (${voucher.loaiGiam ? '%' : 'VND'})"></option>
+                            </select>
+                        </div>
 
                         <div class="row border-bottom pb-2 mb-3">
                             <div class="col-6 mb-3">
@@ -391,19 +400,6 @@
                         <!-- Thông tin thanh toán -->
                         <h4 class="">Thanh toán</h4>
                         <hr>
-                        <div class="mb-3 pb-2 d-flex align-items-center border-bottom">
-                            <label for="phuPhiSelect" class="form-label me-2 font-weight-bold">Phụ phí</label>
-                            <div class="input-group col-8 ms-auto">
-                                <select onchange="phuPhiChange(this);tinhTongTien();" class="form-select form-control-sm" id="phuPhiSelect" name="phuPhi">
-                                    <option value="Không có phụ thu nào" disabled selected>Chọn phụ phí</option>
-                                    <option th:each="phuPhi : ${phuPhis}" th:value="${phuPhi.idPhuPhi}" th:text="${phuPhi.tenPhuPhi}" th:data-giaphuphi="${phuPhi.giaPhuPhi}">
-                                    </option>
-                                </select>
-                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalPhuPhi" style="font-weight: bold;">+
-                                </button>
-                            </div>
-                        </div>
-
                         <div class="mb-3 border-bottom">
                             <label class="form-label font-weight-bold">Phương thức: </label>
                             <div class="form-check form-check-inline">
@@ -453,7 +449,7 @@
                         <input type="hidden" name="tinhTrang" id="daThanhToan" value="true">
                         <div>
                             <button type="submit" class="btn btn-success" onclick="kiemTraThanhToan(document.getElementById('idDatPhong').value)">
-                                <i class="fas fa-dollar-sign"></i> Thanh toán
+                                <i class="fas fa-dollar-sign"></i> CheckOut
                             </button>
                         </div>
                     </form>
@@ -1076,7 +1072,7 @@
             Swal.fire({
                 icon: 'warning',
                 title: 'Chưa chọn phòng!',
-                text: 'Vui lòng chọn phòng trước khi thanh toán.',
+                text: 'Vui lòng chọn phòng trước khi Chekout',
                 confirmButtonText: 'OK'
             });
             return; // Ngăn không gửi form
@@ -1084,18 +1080,18 @@
 
         // Hiển thị thông báo xác nhận trước khi thực hiện thanh toán
         Swal.fire({
-            title: 'Bạn chắc chắn muốn thanh toán?',
+            title: 'Bạn chắc chắn muốn Chekout?',
             text: "Hãy kiểm tra lại thông tin trước khi tiếp tục.",
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Có, thanh toán!',
+            confirmButtonText: 'Có, Chekout',
             cancelButtonText: 'Hủy bỏ'
         }).then((result) => {
             if (result.isConfirmed) {
                 // Thực hiện các bước thanh toán
                 Swal.fire({
                     title: 'Thành công!',
-                    text: 'Thanh toán thành công!',
+                    text: 'Chekout thành công!',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(function () {

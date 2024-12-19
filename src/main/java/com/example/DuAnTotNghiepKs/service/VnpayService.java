@@ -44,7 +44,7 @@ public class VnpayService {
 
         // Proceed with the booking update if it exists
         DatPhong booking = datPhongOpt.get();
-        booking.setTinhTrang("Chưa Checkin");
+        booking.setTinhTrang("Chưa xác nhận");
         datPhongRepo.save(booking);
 
         return booking;
