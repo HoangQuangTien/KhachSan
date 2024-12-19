@@ -307,17 +307,18 @@
         </div>
     </div>
 
-    <!-- Các nút chọn ngôn ngữ -->
-    <div class="language-buttons d-flex top-0 end-0">
-        <div id="vi-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;" >
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" alt="Cờ Việt Nam" style="width: 20px; height: 15px; margin-right: 5px;">
-            Tiếng Việt
-        </div>
-        <div id="en-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;">
-            <img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="Cờ Anh" style="width: 20px; height: 15px; margin-right: 5px;">
-            English
-        </div>
-    </div>
+<!--    &lt;!&ndash; Các nút chọn ngôn ngữ &ndash;&gt;-->
+<!--    <div class="language-buttons d-flex top-0 end-0">-->
+<!--        <div id="vi-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;" >-->
+<!--            <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" alt="Cờ Việt Nam" style="width: 20px; height: 15px; margin-right: 5px;">-->
+<!--            Tiếng Việt-->
+<!--        </div>-->
+<!--        <div id="en-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;">-->
+<!--            <img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="Cờ Anh" style="width: 20px; height: 15px; margin-right: 5px;">-->
+<!--            English-->
+<!--        </div>-->
+<!--    </div>-->
+
 </div>
 
 <div id="customerInfoForm" th:if="${not #authorization.expression('hasRole(''CUSTOMER'')')}" class=" shadow" style=" max-width: 1000px ; flex: 1">
@@ -399,9 +400,18 @@
                 <input type="text" class="form-control" id="cccd" name="cccd" required pattern="\d{9}|\d{12}" title="Vui lòng nhập CCCD đúng định dạng (9 hoặc 12 chữ số)">
             </div>
             <div class="form-group">
-                <label for="deposit">Số tiền cọc (80%):</label>
+                <label for="deposit">Số tiền thanh toán:</label>
                 <input type="text" class="form-control" id="deposit" readonly>
                 <input type="hidden" id="rawDeposit" name="gia">
+                <input type="hidden" id="thanhToan100" name="thanhToan100">
+            </div>
+            <div class="form-check">
+                <input type="radio" id="thanhToanDeposit" name="thanhToan" value="deposit" class="form-check-input" checked>
+                <label for="thanhToanDeposit" class="form-check-label">Thanh toán 80% (tiền cọc)</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" id="thanhToanFull" name="thanhToan" value="full" class="form-check-input">
+                <label for="thanhToanFull" class="form-check-label">Thanh toán 100% (toàn bộ)</label>
             </div>
             <div class="form-group">
                 <label for="pay">Phương thức thanh toán</label> <br>
@@ -569,10 +579,16 @@
         const priceElements = document.querySelectorAll(".pricePerNight");
         const depositElement = document.getElementById("deposit");
         const rawDepositElement = document.getElementById("rawDeposit");
+        const thanhToan100Element = document.getElementById("thanhToan100");
 
         // Lắng nghe sự kiện thay đổi ngày nhận và ngày trả
         document.getElementById("checkinDate").addEventListener("change", calculateDeposit);
         document.getElementById("checkoutDate").addEventListener("change", calculateDeposit);
+
+        // Lắng nghe sự kiện thay đổi phương thức thanh toán
+        document.querySelectorAll('input[name="thanhToan"]').forEach((radio) => {
+            radio.addEventListener("change", calculateDeposit);
+        });
 
         function calculateDeposit() {
             const checkin = document.getElementById("checkinDate").value;
@@ -609,9 +625,18 @@
                         totalCost += diffDays * pricePerNight;
                     });
 
+                    // Tính tiền cọc 80%
                     const depositAmount = totalCost * 0.8;
-                    depositElement.value = depositAmount.toLocaleString('vi-VN') + ' VNĐ';
-                    rawDepositElement.value = depositAmount;
+                    const fullPaymentAmount = totalCost;
+                    if (document.getElementById("thanhToanDeposit").checked) {
+                        depositElement.value = depositAmount.toLocaleString('vi-VN') + ' VNĐ';
+                        rawDepositElement.value = depositAmount;
+                        thanhToan100Element.value = 'false';
+                    } else if (document.getElementById("thanhToanFull").checked) {
+                        depositElement.value = fullPaymentAmount.toLocaleString('vi-VN') + ' VNĐ';
+                        rawDepositElement.value = fullPaymentAmount;
+                        thanhToan100Element.value = 'true';
+                    }
                 } else {
                     depositElement.value = "";
                 }
@@ -620,6 +645,7 @@
             }
         }
     });
+
 
 
 

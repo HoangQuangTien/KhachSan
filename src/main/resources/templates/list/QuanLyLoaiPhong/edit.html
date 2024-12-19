@@ -4,8 +4,33 @@
 <head>
     <title>Chỉnh sửa Loại Phòng</title>
     <link rel="stylesheet" th:href="@{/css/edit.css}" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        function validateForm() {
+        function showSuccessToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#4CAF50",
+                stopOnFocus: true
+            }).showToast();
+        }
+
+        // Hàm hiển thị toast thông báo khi lỗi
+        function showErrorToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+                stopOnFocus: true
+            }).showToast();
+        }
+        async function validateForm(event) {
+            event.preventDefault();
             const tenLoaiPhong = document.getElementById("tenLoaiPhong").value.trim();
             const moTa = document.getElementById("moTa").value.trim();
             const soLuongGiuong = document.getElementById("soLuongGiuong").value.trim();
@@ -15,51 +40,62 @@
 
             // Kiểm tra "Tên Loại Phòng" không được để trống
             if (tenLoaiPhong === "") {
-                alert("Tên Loại Phòng không được để trống!");
+                showErrorToast("Tên Loại Phòng không được để trống!");
                 return false;
             }
 
             // Kiểm tra "Tên Loại Phòng" không được chứa số
             const regex = /\d/;
             if (regex.test(tenLoaiPhong)) {
-                alert("Tên Loại Phòng không được chứa số!");
+                showErrorToast("Tên Loại Phòng không được chứa số!");
                 return false;
             }
 
             // Kiểm tra "Mô Tả" không được để trống
             if (moTa === "") {
-                alert("Mô Tả không được để trống!");
+                showErrorToast("Mô Tả không được để trống!");
                 return false;
             }
 
-            // Kiểm tra "Số Lượng Giường" không được để trống và phải từ 1 đến 3
             if (soLuongGiuong === "" || isNaN(soLuongGiuong) || Number(soLuongGiuong) < 1 || Number(soLuongGiuong) > 3) {
-                alert("Số Lượng Giường phải là số nguyên từ 1 đến 3!");
+                showErrorToast("Số Lượng Giường phải từ 1 đến 3!");
                 return false;
             }
 
-            // Kiểm tra "Số Người Tối Đa" không được để trống và phải từ 1 đến 6
-            if (soNguoiToiDa === "" || isNaN(soNguoiToiDa) || Number(soNguoiToiDa) < 1 || Number(soNguoiToiDa) > 6) {
-                alert("Số Người Tối Đa phải là số nguyên từ 1 đến 6!");
+            if (soNguoiToiDa === "" || isNaN(soNguoiToiDa)) {
+                showErrorToast("Số Người Tối Đa phải là một số hợp lệ!");
+                return false;
+            }
+
+            // Ràng buộc số người tối đa dựa trên số lượng giường
+            const beds = Number(soLuongGiuong);
+            const maxGuestsAllowed = beds * 2;
+
+            if (Number(soNguoiToiDa) > maxGuestsAllowed) {
+                showErrorToast(`Với ${beds} giường, số người tối đa không được vượt quá ${maxGuestsAllowed}!`);
                 return false;
             }
 
             // Kiểm tra "Giá" không được để trống và phải lớn hơn 0
             if (gia === "" || isNaN(gia) || Number(gia) <= 0) {
-                alert("Giá phải là một số hợp lệ và lớn hơn 0!");
+                showErrorToast("Giá phải là một số hợp lệ và lớn hơn 0!");
                 return false;
             }
 
             // Kiểm tra "Sức Chứa" không được để trống và phải từ 1 đến 6
             if (sucChua === "" || isNaN(sucChua) || Number(sucChua) < 1 || Number(sucChua) > 6) {
-                alert("Sức Chứa phải là số nguyên từ 1 đến 6!");
+                showErrorToast("Sức Chứa phải là số nguyên từ 1 đến 6!");
                 return false;
             }
 
             // Nếu tất cả các kiểm tra đều hợp lệ, hiển thị thông báo thành công
-            alert("Sửa loại phòng mới thành công!");
-            return true; // Trả về true để form có thể gửi
+            showSuccessToast("Sửa loại phòng thành công!");
+            setTimeout(() => {
+                event.target.submit();
+            }, 1500); // Chờ 1.5 giây trước khi gửi form
+
         }
+
     </script>
 </head>
 <body class="vertical light">
@@ -68,7 +104,7 @@
 <!-- Hiển thị thông báo lỗi nếu có -->
 <div th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></div>
 
-<form th:action="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" th:object="${loaiPhong}" method="post" onsubmit="return validateForm()">
+<form th:action="@{/loaiphongs/edit/{id}(id=${loaiPhong.idLoaiPhong})}" th:object="${loaiPhong}" method="post" onsubmit="return validateForm(event)">
     <input type="hidden" th:field="*{maLoaiPhong}" />
 
     <label>Tên Loại Phòng:</label>

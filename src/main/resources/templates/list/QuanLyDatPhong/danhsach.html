@@ -83,67 +83,85 @@
 <main role="main" class="main-content">
     <div class="container-fluid">
         <h1>Danh sách đặt phòng chưa check-in</h1>
-        <table id="dataTable-1" class="table table-sm">
-            <thead>
-            <tr>
+        <div class="container">
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="keyword">Tìm kiếm:</label>
                         <input type="text" id="keyword" name="keyword" class="form-control"
-                               placeholder="Tìm kiếm SĐT, CCCD..." oninput="searchChekin()">
+                               placeholder="Tìm kiếm SĐT, CCCD..." oninput="searchCheckin()">
                     </div>
                 </div>
-                <div id="resultArea">
-                    <!-- Kết quả tìm kiếm sẽ được cập nhật ở đây -->
-                </div>
-<!--                <th>Mã Đặt Phòng</th>-->
-                <th>Khách Hàng</th>
-                <th>Số Điện Thoại</th>
-                <th>Phòng</th>
-                <th>CCCD</th>
-                <th>Ngày Nhận</th>
-                <th>Ngày Trả</th>
-                <th>Số Người</th>
-                <th>Hành Động</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- Duyệt qua danh sách đặt phòng và hiển thị -->
-            <tr th:each="datPhong : ${datPhongs}" th:id="'datPhong-' + ${datPhong.idDatPhong}">
-<!--                <td th:text="${datPhong.maDatPhong}"></td>-->
-                <td th:text="${datPhong.khachHang.hoVaTen}"></td>
-                <td th:text="${datPhong.khachHang.soDienThoai}"></td>
-                <td th:text="${datPhong.phong.tenPhong}"></td>
-                <td th:text="${datPhong.cccd}"></td>
-                <td th:text="${datPhong.ngayNhan}"></td>
-                <td th:text="${datPhong.ngayTra}"></td>
-                <td th:text="${datPhong.phong.loaiPhong.soNguoiToiDa}"></td>
-
-
-<!--                <td th:text="${#dates.format(datPhong.ngayNhan, 'dd/MM/yyyy HH:mm')}"></td>-->
-<!--                <td th:text="${#dates.format(datPhong.ngayTra, 'dd/MM/yyyy HH:mm')}"></td>-->
-                <td>
-                    <!-- Nút Check-in -->
-                    <button th:if="${datPhong.tinhTrang != 'Đã Checkin'}"
-                            th:onclick="|confirmCheckIn('${datPhong.idDatPhong}')|">
+                <!--                <div class="row">-->
+                <div class="col-md-6 text-right">
+                    <!-- Nút check-in hàng loạt -->
+                    <button id="bulkCheckinBtn" class="btn btn-success" onclick="bulkCheckin()">
                         <i class="fa fa-check"></i> Check-in
                     </button>
+                </div>
+                <!--                    <div class="col-md-6 text-left">-->
+                <!--                        &lt;!&ndash; Nút check-in hàng loạt &ndash;&gt;-->
+                <!--                        <button id="bulkCancelBtn" class="btn btn-danger" onclick="bulkCancel()">-->
+                <!--                            <i class="fa fa-times"></i> Hủy đặt-->
+                <!--                        </button>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
-                    <!-- Hiển thị thông báo đã check-in -->
-                    <span th:if="${datPhong.tinhTrang == 'Đã Checkin'}">Đã check-in</span>
+            </div>
 
-                    <button th:if="${datPhong.tinhTrang != 'Đã Hủy'}"
-                            th:onclick="|confirmCancelBooking('${datPhong.idDatPhong}')|" class="a" >
-                        <i class="fa fa-times"></i> Hủy Đặt
-                    </button>
-                    <span th:if="${datPhong.tinhTrang == 'Đã Hủy'}">Đã hủy</span>
+            <div id="resultArea" class="mb-3">
+                <!-- Kết quả tìm kiếm sẽ được cập nhật ở đây -->
+            </div>
 
-                </td>
+            <table id="dataTable-1" class="table table-hover table-sm">
+                <thead class="thead-light">
+                <tr>
+                    <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                    <th>Khách Hàng</th>
+                    <th>Số Điện Thoại</th>
+                    <th>Phòng</th>
+                    <th>CCCD</th>
+                    <th>Ngày Nhận</th>
+                    <th>Ngày Trả</th>
+                    <th>Số Người</th>
+                    <th>Hành Động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="datPhong : ${datPhongs}" th:id="'datPhong-' + ${datPhong.idDatPhong}">
+                    <td>
+                        <!-- Checkbox chọn từng đặt phòng -->
+                        <input type="checkbox" class="select-checkbox" th:value="${datPhong.idDatPhong}">
+                    </td>
+                    <td th:text="${datPhong.khachHang.hoVaTen}"></td>
+                    <td th:text="${datPhong.khachHang.soDienThoai}"></td>
+                    <td th:text="${datPhong.phong.tenPhong}"></td>
+                    <td th:text="${datPhong.cccd}"></td>
+                    <td th:text="${datPhong.ngayNhan}"></td>
+                    <td th:text="${datPhong.ngayTra}"></td>
+                    <td th:text="${datPhong.phong.loaiPhong.soNguoiToiDa}"></td>
+                    <td>
+                        <!-- Nút Check-in -->
+                        <!--                        <button th:if="${datPhong.tinhTrang != 'Đã Checkin'}"-->
+                        <!--                                th:onclick="|confirmCheckIn('${datPhong.idDatPhong}')|">-->
+                        <!--                            <i class="fa fa-check"></i> Check-in-->
+                        <!--                        </button>-->
 
+                        <!-- Hiển thị thông báo đã check-in -->
+                        <span th:if="${datPhong.tinhTrang == 'Đã Checkin'}">Đã check-in</span>
 
-            </tr>
-            </tbody>
-        </table>
+                        <button th:if="${datPhong.tinhTrang != 'Đã Hủy'}"
+                                th:onclick="|confirmCancelBooking('${datPhong.idDatPhong}')|" class="a" >
+                            <i class="fa fa-times"></i> Hủy Đặt
+                        </button>
+                        <span th:if="${datPhong.tinhTrang == 'Đã Hủy'}">Đã hủy</span>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </main>
 <div th:include="fragment/modal :: modal"></div>
@@ -151,6 +169,269 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+    // Hàm chọn/deselect tất cả checkbox
+    function toggleSelectAll(source) {
+        const checkboxes = document.querySelectorAll('.select-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+
+    // Hàm xử lý check-in hàng loạt
+    function bulkCheckin() {
+        const selectedIds = [];
+        // Lấy danh sách các checkbox được chọn
+        document.querySelectorAll('.select-checkbox:checked').forEach(checkbox => {
+            selectedIds.push(checkbox.value);
+        });
+
+        // Kiểm tra nếu không có phòng nào được chọn
+        if (selectedIds.length === 0) {
+            Swal.fire({
+                title: 'Thông báo',
+                text: 'Vui lòng chọn ít nhất một phòng để check-in!',
+                icon: 'warning',
+                confirmButtonText: 'Đóng',
+                customClass: {
+                    confirmButton: 'btn btn-warning',
+                }
+            });
+            return;
+        }
+
+        // Hiển thị hộp thoại xác nhận bằng SweetAlert2
+        Swal.fire({
+            title: 'Xác nhận check-in',
+            text: 'Bạn có chắc chắn muốn check-in?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true,
+            customClass: {
+                confirmButton: 'btn btn-warning',
+                cancelButton: 'btn btn-secondary'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                checkins(selectedIds); // Truyền danh sách ID được chọn vào hàm checkins
+            }
+        });
+    }
+
+    function checkins(){
+        const selectedIds = [];
+        document.querySelectorAll('.select-checkbox:checked').forEach(checkbox => {
+            selectedIds.push(checkbox.value);
+        });
+
+        if (selectedIds.length === 0) {
+            alert("Vui lòng chọn ít nhất một phòng để check-in!");
+            return;
+        }
+
+        const params = new URLSearchParams();
+        selectedIds.forEach(id => params.append('idDatPhongs', id));
+        fetch('/danhsach/check-in?' + params.toString(), {
+            method: 'POST',
+        }).then(response => response.json())
+            .then(data => {
+                // Kiểm tra nếu có cảnh báo
+                if (data.warning) {
+                    // Hiển thị cảnh báo cho người dùng và yêu cầu xác nhận
+                    Swal.fire({
+                        title: 'Cảnh báo!',
+                        text: data.warning,  // Thông báo từ backend
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Đồng ý check-in',
+                        cancelButtonText: 'Hủy',
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Nếu người dùng đồng ý, thực hiện check-in
+                            // setProcessingState1(params.toString())
+                            setProcessingState1()
+                            confirmCheckins();
+                        }
+                    });
+                } else if (data.success) {
+                    // Nếu không có cảnh báo và check-in thành công
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: data.success,  // Thông báo thành công
+                        icon: 'success',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            confirmButton: 'btn btn-success'
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra:', error);
+                Swal.fire({
+                    title: 'Có lỗi xảy ra!',
+                    text: 'Vui lòng thử lại sau.',
+                    icon: 'error',
+                    confirmButtonText: 'Đóng',
+                    customClass: {
+                        confirmButton: 'btn btn-danger'
+                    }
+                });
+            });
+    }
+    function confirmCheckins(){
+        const selectedIds = [];
+        document.querySelectorAll('.select-checkbox:checked').forEach(checkbox => {
+            selectedIds.push(checkbox.value);
+        });
+
+        if (selectedIds.length === 0) {
+            alert("Vui lòng chọn ít nhất một phòng để check-in!");
+            return;
+        }
+
+        const params = new URLSearchParams();
+        selectedIds.forEach(id => params.append('idDatPhongs', id));
+        fetch('/danhsach/confirm-check-in?' + params.toString(), {
+            method: 'POST',
+        }).then(response => response.json())
+            .then(data => {
+                // Kiểm tra kết quả sau khi check-in
+                if (data.success) {
+
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: data.success,  // Thông báo check-in thành công
+                        icon: 'success',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            confirmButton: 'btn btn-success'
+                        }
+                    }).then(() => {
+                        // Reload lại trang sau khi thông báo thành công
+                        location.reload();
+                    });
+                } else if (data.error) {
+                    Swal.fire({
+                        title: 'Có lỗi xảy ra!',
+                        text: data.error,  // Thông báo lỗi
+                        icon: 'error',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            confirmButton: 'btn btn-danger'
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra:', error);
+                Swal.fire({
+                    title: 'Có lỗi xảy ra!',
+                    text: 'Vui lòng thử lại sau.',
+                    icon: 'error',
+                    confirmButtonText: 'Đóng',
+                    customClass: {
+                        confirmButton: 'btn btn-danger'
+                    }
+                });
+            });
+    }
+
+    function bulkCancel() {
+        // Lấy tất cả các checkbox đã được chọn
+        const selectedCheckboxes = document.querySelectorAll('.select-checkbox:checked');
+        const selectedIds = [];
+
+        selectedCheckboxes.forEach(checkbox => {
+            selectedIds.push(checkbox.value); // Lấy idDatPhong từ value của checkbox
+        });
+
+        if (selectedIds.length === 0) {
+            Swal.fire({
+                title: 'Không có đặt phòng nào được chọn!',
+                text: 'Vui lòng chọn ít nhất một đặt phòng để hủy.',
+                icon: 'warning',
+                confirmButtonText: 'Đóng',
+                customClass: {
+                    confirmButton: 'btn btn-warning'
+                }
+            });
+            return;
+        }
+
+        // Xác nhận trước khi hủy các đặt phòng đã chọn
+        Swal.fire({
+            title: 'Xác nhận hủy đặt phòng',
+            text: 'Bạn có chắc chắn muốn hủy các đặt phòng đã chọn?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true,
+            customClass: {
+                confirmButton: 'btn btn-danger',
+                cancelButton: 'btn btn-secondary'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gọi API hủy đặt phòng cho tất cả các idDatPhong đã chọn
+                fetch(`/danhsach/cancel-booking?ids=${encodeURIComponent(selectedIds.join(','))}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Thành công!',
+                                text: 'Các đặt phòng đã được hủy.',
+                                icon: 'success',
+                                confirmButtonText: 'Đóng',
+                                customClass: {
+                                    confirmButton: 'btn btn-success'
+                                }
+                            });
+                            // Cập nhật lại giao diện (Ẩn các nút hoặc thay đổi trạng thái...)
+                        } else {
+                            Swal.fire({
+                                title: 'Có lỗi xảy ra!',
+                                text: data.error || 'Không thể hủy đặt phòng. Vui lòng thử lại.',
+                                icon: 'error',
+                                confirmButtonText: 'Đóng',
+                                customClass: {
+                                    confirmButton: 'btn btn-danger'
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi gọi API:', error);
+                        Swal.fire({
+                            title: 'Có lỗi xảy ra!',
+                            text: 'Vui lòng thử lại sau.',
+                            icon: 'error',
+                            confirmButtonText: 'Đóng',
+                            customClass: {
+                                confirmButton: 'btn btn-danger'
+                            }
+                        });
+                    });
+            }
+        });
+    }
+
+
+
+
+
     function confirmCheckIn(idDatPhong) {
         // Hiển thị hộp thoại xác nhận bằng SweetAlert2
         Swal.fire({
@@ -324,94 +605,55 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const reason = result.value;
-
-                // Gửi yêu cầu hủy đặt phòng với lý do
+                // Gửi yêu cầu hủy đặt phòng
                 fetch(`/danhsach/cancel-booking?idDatPhong=${encodeURIComponent(idDatPhong)}&reason=${encodeURIComponent(reason)}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     }
                 })
+                    // Xử lý phản hồi từ server
                     .then(response => response.json())
                     .then(data => {
-                        Swal.close(); // Đóng thông báo xử lý
                         if (data.success) {
-                            // Cập nhật trạng thái cho dòng đặt phòng
-                            const datPhongElement = document.getElementById(`datPhong-${idDatPhong}`);
-                            if (datPhongElement) {
-                                // Cập nhật ô trạng thái (có thể điều chỉnh theo vị trí thực tế)
-                                const statusCell = datPhongElement.querySelector('td:nth-child(7)'); // Chỉ định cột trạng thái
-                                const reasonCell = datPhongElement.querySelector('td:nth-child(8)'); // Chỉ định cột lý do hủy
-
-                                // Kiểm tra tồn tại của statusCell và reasonCell trước khi cập nhật
-                                if (statusCell) {
-                                    statusCell.textContent = 'Đã hủy'; // Cập nhật trạng thái
-                                } else {
-                                    console.warn('Không tìm thấy ô trạng thái.');
-                                }
-
-                                if (reasonCell) {
-                                    reasonCell.textContent = reason; // Cập nhật lý do hủy
-                                } else {
-                                    console.warn('Không tìm thấy ô lý do hủy.');
-                                }
-
-                                // Ẩn hoặc xóa các nút hành động
-                                const buttons = datPhongElement.querySelectorAll('button');
-                                buttons.forEach(button => button.style.display = 'none'); // Ẩn nút nếu cần
-                            } else {
-                                console.warn('Không tìm thấy phần tử với ID:', `datPhong-${idDatPhong}`);
-                            }
-
-                            // Hiển thị thông báo thành công
+                            // Cập nhật giao diện người dùng khi hủy thành công
                             Swal.fire({
                                 title: 'Thành công!',
                                 text: 'Đặt phòng đã được hủy. Lý do: ' + reason,
                                 icon: 'success',
                                 confirmButtonText: 'Đóng',
-                                customClass: {
-                                    confirmButton: 'btn btn-success'
-                                }
+                                customClass: { confirmButton: 'btn btn-success' }
                             });
                         } else {
-                            // Thông báo lỗi nếu không thành công
-                            console.error('Lỗi từ máy chủ:', data.error); // Ghi log thông tin lỗi
                             Swal.fire({
                                 title: 'Có lỗi xảy ra!',
                                 text: data.error || 'Không thể hủy đặt phòng. Vui lòng thử lại sau.',
                                 icon: 'error',
                                 confirmButtonText: 'Đóng',
-                                customClass: {
-                                    confirmButton: 'btn btn-danger'
-                                }
+                                customClass: { confirmButton: 'btn btn-danger' }
                             });
                         }
                     })
                     .catch(error => {
-                        console.error('Có lỗi xảy ra:', error);
-                        resetProcessingState(idDatPhong); // Khôi phục nút khi lỗi
-                        Swal.close();
-                        // Hiển thị thông báo lỗi chung
                         Swal.fire({
                             title: 'Có lỗi xảy ra!',
                             text: 'Vui lòng thử lại sau.',
                             icon: 'error',
                             confirmButtonText: 'Đóng',
-                            customClass: {
-                                confirmButton: 'btn btn-danger'
-                            }
+                            customClass: { confirmButton: 'btn btn-danger' }
                         });
                     });
-            }else if (result.isDismissed) {
-                resetProcessingState(idDatPhong); // Khôi phục lại trạng thái khi người dùng nhấn "Quay lại"
+            } else if (result.isDismissed) {
+                resetProcessingState(idDatPhong); // Khôi phục trạng thái khi người dùng nhấn "Quay lại"
             }
         });
+
     }
 
 
     // Hiển thị trạng thái "Đang xử lý..."
-    function setProcessingState1(idDatPhong) {
-        const button = document.querySelector(`button[onclick*="confirmCheckIn('${idDatPhong}')"]`);
+    function setProcessingState1() {
+        const button = document.querySelector(`button[onclick*="bulkCheckin()"]`);
         if (button) {
             button.disabled = true;
             button.textContent = 'Đang xử lý...';

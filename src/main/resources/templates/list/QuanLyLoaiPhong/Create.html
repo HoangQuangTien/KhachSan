@@ -8,10 +8,6 @@
 <body>
 <h2>Tạo Loại Phòng Mới</h2>
 
-<!-- Hiển thị thông báo nếu có -->
-<div th:if="${message}" th:class="${messageClass}">
-    <p th:text="${message}"></p>
-</div>
 
 <form th:action="@{/loaiphongs/save}" th:object="${loaiPhong}" method="post" onsubmit="return validateForm(event)">
     <input type="hidden" name="maLoaiPhong" id="maLoaiPhong">
@@ -90,9 +86,13 @@
         <button type="button" onclick="hideDienTichModal()">Đóng</button>
     </form>
 </div>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.min.js"></script>
 
 <script>
-    // Functions to handle showing and hiding modals
     function showTangModal() {
         document.getElementById("tangModal").style.display = "block";
     }
@@ -130,69 +130,115 @@
             stopOnFocus: true
         }).showToast();
     }
-    // Thêm xác nhận khi thêm Tầng
     function submitTangForm() {
-        const confirmAddTang = confirm("Bạn có chắc chắn muốn thêm tầng này?");
-        if (confirmAddTang) {
-            fetch("/loaiphongs/save-tang", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Cập nhật dropdown tầng với tầng mới
-                    const tangSelect = document.getElementById("tang");
-                    const newOption = document.createElement("option");
-                    newOption.value = data.idTang;
-                    newOption.textContent = data.tenTang;
-                    tangSelect.appendChild(newOption);
-                    tangSelect.value = data.idTang;
-                    alert("Tầng mới đã được thêm thành công.");
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("Không thể thêm tầng mới.");
-                });
-        } else {
-            alert("Thêm tầng bị hủy.");
-        }
-    }
-
-    // Thêm xác nhận khi thêm Diện Tích
-    function submitDienTichForm() {
-        const newDienTich = document.getElementById("newTenDienTich").value;
-        if (newDienTich) {
-            const confirmAddDienTich = confirm("Bạn có chắc chắn muốn thêm diện tích này?");
-            if (confirmAddDienTich) {
-                fetch("/loaiphongs/save-dien-tich", {
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn thêm tầng này?',
+            text: "Bạn sẽ không thể hoàn tác thao tác này.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("/loaiphongs/save-tang", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ tenDienTich: newDienTich })
+                    }
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status); // Kiểm tra mã trạng thái phản hồi
+                        if (!response.ok) {
+                            throw new Error('Lỗi khi gửi yêu cầu thêm tầng');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        const dienTichSelect = document.getElementById("dienTich");
+                        console.log('Data received:', data); // Kiểm tra dữ liệu trả về
+                        const tangSelect = document.getElementById("tang");
                         const newOption = document.createElement("option");
-                        newOption.value = data.idDienTich;
-                        newOption.textContent = data.tenDienTich;
-                        dienTichSelect.appendChild(newOption);
-                        dienTichSelect.value = data.idDienTich;
-                        alert("Diện tích mới đã được thêm thành công.");
-                        hideDienTichModal();
+                        newOption.value = data.idTang;
+                        newOption.textContent = data.tenTang;
+                        tangSelect.appendChild(newOption);
+                        tangSelect.value = data.idTang;
+                        showSuccessToast("Tầng mới đã được thêm thành công.");
                     })
                     .catch(error => {
                         console.error("Error:", error);
-                        alert("Không thể thêm diện tích mới.");
+                        showErrorToast("Không thể thêm tầng mới.");
                     });
             } else {
-                alert("Thêm diện tích bị hủy.");
+                showErrorToast("Thêm tầng bị hủy.");
             }
+        });
+    }
+
+
+    function submitDienTichForm() {
+        const newDienTich = document.getElementById("newTenDienTich").value;
+        if (newDienTich) {
+            // Sử dụng SweetAlert2 để xác nhận
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn thêm diện tích này?',
+                text: "Bạn sẽ không thể hoàn tác thao tác này.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Gửi dữ liệu nếu người dùng xác nhận
+                    fetch("/loaiphongs/save-dien-tich", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ tenDienTich: newDienTich })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Thêm diện tích mới vào dropdown (hoặc làm gì đó với dữ liệu trả về)
+                            const dienTichSelect = document.getElementById("dienTich");
+                            const newOption = document.createElement("option");
+                            newOption.value = data.idDienTich;
+                            newOption.textContent = data.tenDienTich;
+                            dienTichSelect.appendChild(newOption);
+                            dienTichSelect.value = data.idDienTich;
+
+                            // Hiển thị thông báo thành công
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thêm diện tích thành công!',
+                                text: 'Diện tích mới đã được thêm vào.',
+                                confirmButtonText: 'OK'
+                            });
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            // Hiển thị thông báo lỗi
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: 'Không thể thêm diện tích mới.',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                } else {
+                    // Nếu người dùng hủy bỏ, hiển thị thông báo
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Thêm diện tích bị hủy.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
         } else {
-            alert("Vui lòng nhập tên diện tích.");
+            // Nếu trường tên diện tích trống, yêu cầu người dùng nhập tên
+            Swal.fire({
+                icon: 'warning',
+                title: 'Vui lòng nhập tên diện tích.',
+                confirmButtonText: 'OK'
+            });
         }
     }
 
@@ -221,7 +267,7 @@
                 return data.exists; // API trả về { exists: true/false }
             } catch (error) {
                 console.error("Lỗi kiểm tra tầng:", error);
-                alert("Lỗi khi kiểm tra tầng!");
+                showErrorToast("Lỗi khi kiểm tra tầng!");
                 return false;
             }
         }
@@ -230,72 +276,81 @@
 
         const existsTang = await checkTangTrung(tangValue);
         if (existsTang) {
-            alert("Tầng này đã được sử dụng cho loại phòng khác!");
+            showErrorToast("Tầng này đã được sử dụng cho loại phòng khác!");
             return false;
         }
         // Kiểm tra "Tên Loại Phòng" không được để trống
         if (tenLoaiPhong === "") {
-            alert("Tên Loại Phòng không được để trống!");
+            showErrorToast("Tên Loại Phòng không được để trống!");
             return false;
         }
 
         // Kiểm tra "Tên Loại Phòng" không được chứa số
         const regexNumber = /\d/;
         if (regexNumber.test(tenLoaiPhong)) {
-            alert("Tên Loại Phòng không được chứa số!");
+            showErrorToast("Tên Loại Phòng không được chứa số!");
             return false;
         }
 
         // Kiểm tra "Tên Loại Phòng" không được chứa ký tự đặc biệt
         const regexSpecialChars = /[^a-zA-Z0-9\s]/;  // Kiểm tra ký tự đặc biệt
-        if (!regexSpecialChars.test(tenLoaiPhong)) {
-            alert("Tên Loại Phòng không được chứa ký tự đặc biệt!");
+        if (regexSpecialChars.test(tenLoaiPhong)) {
+            showErrorToast("Tên Loại Phòng không được chứa ký tự đặc biệt!");
             return false;
         }
 
         // Kiểm tra trùng tên loại phòng qua API
         const exists = await checkTenLoaiPhong(tenLoaiPhong);
         if (exists) {
-            alert("Tên Loại Phòng đã tồn tại!");
+            showErrorToast("Tên Loại Phòng đã tồn tại!");
             return false;  // Nếu tên loại phòng đã tồn tại, không gửi form
         }
 
         // Kiểm tra các trường còn lại
         if (moTa === "") {
-            alert("Mô Tả không được để trống!");
+            showErrorToast("Mô Tả không được để trống!");
             return false;
         }
 
         if (soLuongGiuong === "" || isNaN(soLuongGiuong) || Number(soLuongGiuong) < 1 || Number(soLuongGiuong) > 3) {
-            alert("Số Lượng Giường không được vượt quá 3!");
+            showErrorToast("Số Lượng Giường phải từ 1 đến 3!");
             return false;
         }
 
-        if (soNguoiToiDa === "" || isNaN(soNguoiToiDa) || Number(soNguoiToiDa) < 1 || Number(soNguoiToiDa) > 6) {
-            alert("Số Người Tối Đa không được vượt quá 6!");
+        if (soNguoiToiDa === "" || isNaN(soNguoiToiDa)) {
+            showErrorToast("Số Người Tối Đa phải là một số hợp lệ!");
+            return false;
+        }
+
+        // Ràng buộc số người tối đa dựa trên số lượng giường
+        const beds = Number(soLuongGiuong);
+        const maxGuestsAllowed = beds * 2;
+
+        if (Number(soNguoiToiDa) > maxGuestsAllowed) {
+            showErrorToast(`Với ${beds} giường, số người tối đa không được vượt quá ${maxGuestsAllowed}!`);
             return false;
         }
 
         if (gia === "" || isNaN(gia) || Number(gia) <= 0) {
-            alert("Giá phải là một số hợp lệ và lớn hơn 0!");
+            showErrorToast("Giá phải là một số hợp lệ và lớn hơn 0!");
             return false;
         }
 
         if (sucChua === "" || isNaN(sucChua) || Number(sucChua) < 1 || Number(sucChua) > 6) {
-            alert("Sức Chứa không được vượt quá 6!");
+            showErrorToast("Sức Chứa không được vượt quá 6!");
             return false;
         }
 
         if (!tangValue) {
-            alert("Vui lòng chọn một tầng!");
+            showErrorToast("Vui lòng chọn một tầng!");
             return false;
         }
 
         // Nếu tất cả các kiểm tra đều hợp lệ, cho phép gửi form
-        alert("Thêm loại phòng mới thành công");
-
-        // Tiến hành gửi form
-        event.target.submit();
+        showSuccessToast("Thêm loại phòng mới thành công");
+        setTimeout(() => {
+            event.target.submit();
+        }, 1500);
     }
 
     // Kiểm tra trùng tên loại phòng qua API
@@ -312,7 +367,7 @@
             return data.exists;  // Trả về true nếu tên đã tồn tại
         } catch (error) {
             console.error("Error checking room type name: ", error);
-            alert("Có lỗi xảy ra trong quá trình kiểm tra tên loại phòng.");
+            showErrorToast("Có lỗi xảy ra trong quá trình kiểm tra tên loại phòng.");
             return true;  // Nếu có lỗi, giả định tên đã tồn tại (để tránh gửi form)
         }
     }
@@ -332,7 +387,7 @@
             return data.exists; // API trả về { exists: true/false }
         } catch (error) {
             console.error("Lỗi kiểm tra tầng:", error);
-            alert("Lỗi khi kiểm tra tầng!");
+            showErrorToast("Lỗi khi kiểm tra tầng!");
             return false;
         }
     }

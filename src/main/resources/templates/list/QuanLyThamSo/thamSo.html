@@ -102,7 +102,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form th:action="@{/thamSo/add}" method="POST" onsubmit="return validateAddForm()">
+                        <form th:action="@{/thamSo/add}" method="POST" onsubmit="return validateAddForm(event)">
                             <div class="mb-3">
                                 <label for="tenThamSo" class="form-label">Tên Tham Số</label>
                                 <input type="text" class="form-control" id="tenThamSo" name="tenThamSo" placeholder="Nhập tên tham số" required>
@@ -131,7 +131,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="editForm" method="post" th:action="@{/thamSo/update}" onsubmit="return validateEditForm()">
+                        <form id="editForm" method="post" th:action="@{/thamSo/update}" onsubmit="return validateEditForm(event)">
 
                             <input type="hidden" id="editId" name="id"/>
                             <div class="mb-3">
@@ -155,10 +155,8 @@
 
     </main>
 </div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-
-<!-- Thêm link tới Toastify JS -->
-<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
     function showSuccessToast(message) {
         Toastify({
@@ -199,7 +197,6 @@
 
 
 
-    // Hàm kiểm tra trùng tên tham số
     function isDuplicate(tenThamSo, currentId = null) {
         const thamSoList = [...document.querySelectorAll('tbody tr')].map(row => {
             const id = row.querySelector('td:nth-child(1)').innerText.trim();
@@ -224,65 +221,73 @@
 
 
     function validateAddForm(id) {
+        event.preventDefault();
+
+        // Lấy giá trị từ các trường nhập liệu
         const tenThamSo = document.getElementById('tenThamSo').value.trim();
         const giaTri = document.getElementById('giaTri').value.trim();
         const moTa = document.getElementById('moTa').value.trim();
 
-        // Kiểm tra trường bắt buộc
+        // 1. Kiểm tra các trường bắt buộc
         if (!tenThamSo || !giaTri) {
-            showErrorToast("Vui lòng điền tất cả các trường yêu cầu.");
+            showErrorToast("Vui lòng điền đầy đủ các trường bắt buộc.");
             return false;
         }
 
-        // Kiểm tra ký tự đặc biệt
-        if (hasSpecialCharacters(tenThamSo) || hasSpecialCharacters(moTa)) {
-            showErrorToast("Tên Tham Số và Mô Tả không được chứa ký tự đặc biệt.");
+        // 2. Kiểm tra ký tự đặc biệt trong Tên Tham Số và Mô Tả
+        if (hasSpecialCharacters(tenThamSo)) {
+            showErrorToast("Tên Tham Số không được chứa ký tự đặc biệt.");
+            return false;
+        }
+        if (moTa && hasSpecialCharacters(moTa)) {
+            showErrorToast("Mô Tả không được chứa ký tự đặc biệt.");
             return false;
         }
 
-        // Kiểm tra Tên Tham Số không phải là số
+        // 3. Kiểm tra Tên Tham Số không phải là số
         if (isOnlyNumbers(tenThamSo)) {
-            showErrorToast("Tên Tham Số không được là số.");
+            showErrorToast("Tên Tham Số không được chỉ là số.");
             return false;
         }
 
-        // Kiểm tra Mô Tả không được là số hoặc chứa ký tự đặc biệt
-        if (isOnlyNumbers(moTa) || hasSpecialCharacters(moTa)) {
-            showErrorToast("Mô Tả không được là số hoặc chứa ký tự đặc biệt.");
+        // 4. Kiểm tra giá trị `giaTri` phải là số dương, có tối đa 2 chữ số thập phân
+        if (!/^\d+(\.\d{1,2})?$/.test(giaTri) || parseFloat(giaTri) <= 0) {
+            showErrorToast("Giá Trị phải là số dương và có tối đa 2 chữ số thập phân.");
             return false;
         }
 
-        // Kiểm tra giá trị giaTri phải là số dương và có tối đa 2 chữ số thập phân
-        if (parseFloat(giaTri) <= 0 || !/^(\d+(\.\d{1,2})?)?$/.test(giaTri)) {
-            showErrorToast("Giá trị phải là số dương và có tối đa 2 chữ số thập phân.");
+        // // 5. Kiểm tra logic riêng theo `id`
+        // if (id === 1 && parseFloat(giaTri) > 5) {
+        //     showErrorToast("Khi ID là 1, Giá Trị không được lớn hơn 5.");
+        //     return false;
+        // }
+        // if (id === 3 && parseFloat(giaTri) < 30) {
+        //     showErrorToast("Khi ID là 3, Giá Trị không được nhỏ hơn 30.");
+        //     return false;
+        // }
+
+        // 6. Kiểm tra nếu Mô Tả là số
+        if (moTa && isOnlyNumbers(moTa)) {
+            showErrorToast("Mô Tả không được chỉ là số.");
             return false;
         }
 
-        // Kiểm tra nếu id == 1 thì giá trị không được lớn hơn 5
-        if (id === 1 && parseFloat(giaTri) > 5) {
-            showErrorToast("Với ID là 1 thì giá trị không được lớn hơn 5.");
-            return false;
-        }
-
-        // Kiểm tra nếu id == 3 thì giá trị không được nhỏ hơn 30
-        if (id === 3 && parseFloat(giaTri) < 30) {
-            showErrorToast("Với ID là 3 thì giá trị không được nhỏ hơn 30.");
-            return false;
-        }
-
-        // Kiểm tra trùng tên tham số
+        // 7. Kiểm tra trùng lặp Tên Tham Số
         if (isDuplicate(tenThamSo)) {
-            showErrorToast("Tên Tham Số đã tồn tại. Vui lòng nhập tên khác.");
+            showErrorToast("Tên Tham Số đã tồn tại. Vui lòng chọn tên khác.");
             return false;
         }
 
-        // Hiển thị thông báo thành công
-        alert("Thêm tham số thành công!");
-
-        return true; // Dữ liệu hợp lệ
+        // Hiển thị thông báo thành công và gửi form sau 1.5 giây
+        showSuccessToast("Thêm tham số mới thành công!");
+        setTimeout(() => {
+            id.target.submit();
+        }, 1500);
     }
 
-    function validateEditForm() {
+
+    function validateEditForm(event) {
+        event.preventDefault();
         const editTenThamSo = document.getElementById('editTenThamSo').value.trim();
         const editGiaTri = document.getElementById('editGiaTri').value.trim();
         const editMoTa = document.getElementById('editMoTa').value.trim();
@@ -329,20 +334,21 @@
         //     return false;
         // }
 
-        if (editId === 2 && (parseFloat(editGiaTri) < 30 || parseFloat(editGiaTri) > 60)) {
-            showErrorToast("Với ID là 2 thì giá trị phải nằm trong khoảng từ 30 đến 60.");
-            return false;
-        }
+        // if (editId === 2 && (parseFloat(editGiaTri) < 30 || parseFloat(editGiaTri) > 60)) {
+        //     showErrorToast("Với ID là 2 thì giá trị phải nằm trong khoảng từ 30 đến 60.");
+        //     return false;
+        // }
 
 
-        if (editId === 3 && parseFloat(editGiaTri) < 30) {
-            showErrorToast("Với ID là 3 thì giá trị không được nhỏ hơn 30.");
-            return false;
-        }
+        // if (editId === 3 && parseFloat(editGiaTri) < 30) {
+        //     showErrorToast("Với ID là 3 thì giá trị không được nhỏ hơn 30.");
+        //     return false;
+        // }
 
-        alert("Sửa tham số thành công!");
-
-        return true;
+        showSuccessToast("Sửa tham số thành công");
+        setTimeout(() => {
+            event.target.submit();
+        }, 1500);
     }
 
 </script>

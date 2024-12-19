@@ -172,6 +172,7 @@ public class KhuyenMaiController {
             @RequestParam("giamGia") Float giamGia,
             @RequestParam("giamToiThieu") Float giamToiThieu,
             @RequestParam("giamToiDa") Float giamToiDa,
+            @RequestParam("loaiGiam") Boolean loaiGiam,
             @RequestParam("ngayBatDau") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime ngayBatDau,
             @RequestParam("ngayKetThuc") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime ngayKetThuc,
             ServletRequest servletRequest) {
@@ -198,14 +199,15 @@ public class KhuyenMaiController {
             khuyenMai.setGiamGia(giamGia);
             khuyenMai.setGiamToiThieu(giamToiThieu);
             khuyenMai.setGiamToiDa(giamToiDa);
+            khuyenMai.setLoaiGiam(loaiGiam);
             khuyenMai.setNgayBatDau(java.sql.Timestamp.valueOf(ngayBatDau));
             khuyenMai.setNgayKetThuc(java.sql.Timestamp.valueOf(ngayKetThuc));
 
             // Xử lý loại giảm
-            String loaiGiam = servletRequest.getParameter("loaiGiam");
-            if ("phanTram".equals(loaiGiam)) {
+            String loaiGiamm = servletRequest.getParameter("loaiGiam");
+            if ("phanTram".equals(loaiGiamm)) {
                 khuyenMai.setLoaiGiam(true);  // Phần trăm
-            } else if ("tienMat".equals(loaiGiam)) {
+            } else if ("tienMat".equals(loaiGiamm)) {
                 khuyenMai.setLoaiGiam(false); // Tiền mặt
             }
 

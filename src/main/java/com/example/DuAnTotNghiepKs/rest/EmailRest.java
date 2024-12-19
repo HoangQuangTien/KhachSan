@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -119,18 +120,17 @@ public class EmailRest{
                 "<div class=\"noidung\">\n" +
                 "        <b>Từ ngày:</b>\n"  + NBD +
                 "    </div>\n" +
-                "<div class=\"noidung\">\n" +
-                "        <b>Đến ngày:</b>\n"  + NKT +
-                "        <p>Vui lòng nhập mã Voucher này để nhận ưu đãi.</p>\n" +
-                "    </div>\n" +
                 "</div>"+
-                "    <div class=\"footer\">\n" +
-                "        <p>Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.</p>\n" +
+                "<div class=\"noidung\">\n" +
+                "        <b>Mô tả voucher: </b>\n" + Mota +""+
+                "</div>"+
+                "<div class=\"noidung\">\n" +
+                "        <b>Từ ngày:</b>\n"  + new SimpleDateFormat("dd-MM-yyyy hh:mm").format(NBD) +
                 "    </div>\n" +
-                "</div>\n" +
-                "</body>\n" +
-                "</html>\n";
-
+                "<div class=\"noidung\">\n" +
+                "        <b>Đến ngày:</b>\n"  + new SimpleDateFormat("dd-MM-yyyy hh:mm").format(NKT) +
+                "        <p>Vui lòng nhập mã Voucher này để nhận ưu đãi.</p>\n" +
+                "    </div>\n" ;
         // Gửi email cho từng khách hàng trong danh sách
         for (KhachHang customer : customers) {
             try {

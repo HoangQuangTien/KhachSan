@@ -266,8 +266,8 @@
                                         th:data-soLuong="${khuyenMai.soLuong}"
                                         th:data-giamToiThieu="${#numbers.formatDecimal(khuyenMai.giamToiThieu, 0, 0)}"
                                         th:data-giamToiDa="${#numbers.formatDecimal(khuyenMai.giamToiDa, 0, 0)}"
-                                        th:data-ngayBatDau="${#dates.format(khuyenMai.ngayBatDau,'yyyy-MM-dd')}"
-                                        th:data-ngayKetThuc="${#dates.format(khuyenMai.ngayKetThuc,'yyyy-MM-dd')}"
+                                        th:data-ngayBatDau="${#dates.format(khuyenMai.ngayBatDau,'yyyy-MM-dd hh:mm')}"
+                                        th:data-ngayKetThuc="${#dates.format(khuyenMai.ngayKetThuc,'yyyy-MM-dd hh:mm')}"
                                         th:data-loaiGiam="${khuyenMai.loaiGiam ? 'true' : 'false'}"
                                         th:data-trangThai="${khuyenMai.trangThai == 'conHan' ? 'conHan' :
                                     (khuyenMai.trangThai == 'hetHan' ? 'hetHan' : 'sapDienRa')}"
@@ -536,6 +536,13 @@
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
+        const elements = document.querySelectorAll('.format-number');
+        elements.forEach(function (element) {
+            const rawNumber = parseFloat(element.textContent.trim());
+            if (!isNaN(rawNumber)) {
+                element.textContent = rawNumber.toLocaleString('vi-VN');
+            }
+        });
         const formElement = document.getElementById('form-add-promotion');
 
         formElement.addEventListener('submit', async function (event) {

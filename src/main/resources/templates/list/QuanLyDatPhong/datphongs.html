@@ -192,8 +192,7 @@
                                     <input type="radio" id="thanhToanFull" name="thanhToan100" value="true" class="form-check-input">
                                     <label for="thanhToanFull" class="form-check-label">Thanh toán 100% (toàn bộ)</label>
                                 </div>
-                            </div>
-                            <!-- Tiền cọc -->
+                            </div>                            <!-- Tiền cọc -->
                             <div class="mb-3">
                                 <label for="tienCoc" class="form-label">Tiền Cọc:</label>
                                 <input type="text" class="form-control" id="tienCoc" name="tienCoc" placeholder="Tiền cọc" required readonly>
@@ -455,21 +454,34 @@
 
         function validateDates() {
             let isValid = true;
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            const ngayNhanValue = new Date(ngayNhanInput.value);
+            const ngayTraValue = new Date(ngayTraInput.value);
 
-            if (ngayNhanInput.value < today) {
-                alert('Ngày nhận phòng không thể trước ngày hiện tại.');
+            // Đảm bảo ngày nhận không thể trước ngày hiện tại
+            if (ngayNhanValue < today) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ngày nhận phòng không hợp lệ!',
+                    text: 'Ngày nhận phòng không thể trước ngày hiện tại.',
+                    showConfirmButton: true
+                });
                 isValid = false;
             }
 
-            if (ngayTraInput.value <= ngayNhanInput.value) {
-                alert('Ngày trả phòng phải sau ngày nhận phòng.');
+            // Đảm bảo ngày trả phải sau ngày nhận
+            if (ngayTraValue <= ngayNhanValue) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ngày trả phòng không hợp lệ!',
+                    text: 'Ngày trả phòng phải sau ngày nhận phòng.',
+                    showConfirmButton: true
+                });
                 isValid = false;
             }
 
             return isValid;
         }
-
 
 
         document.querySelector('#phongSelect').addEventListener('change', updateTienCoc);
@@ -663,9 +675,14 @@
                 .map(input => input.value)
                 .filter(id => id); // Lọc ra các ID không rỗng
 
-            if (selectedLoaiPhongIds.length === 0) {
-                alert("Vui lòng chọn ít nhất một loại phòng.");
-                event.preventDefault(); // Ngăn submit form
+            if (selectedPhongIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cảnh báo!',
+                    text: 'Vui lòng chọn ít nhất một phòng.',
+                    showConfirmButton: true
+                });
+                event.preventDefault(); // Ngăn submit form nếu không có phòng nào được chọn
                 return;
             }
 
@@ -676,7 +693,12 @@
 
             const idKhachHang = document.getElementById('idKhachHang').value;
             if (!idKhachHang || isNaN(idKhachHang)) {
-                alert("Vui lòng xác nhận thông tin khách hàng.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cảnh báo!',
+                    text: 'Vui lòng xác nhận thông tin khách hàng.',
+                    showConfirmButton: true
+                });
                 event.preventDefault(); // Ngăn submit form nếu chưa có ID khách hàng
                 return;
             }

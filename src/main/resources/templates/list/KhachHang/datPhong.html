@@ -590,41 +590,88 @@
         </div>
     </div>
 
-    <!-- Các nút chọn ngôn ngữ -->
-    <div class="language-buttons d-flex top-0 end-0">
-        <div id="vi-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;" >
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" alt="Cờ Việt Nam" style="width: 20px; height: 15px; margin-right: 5px;">
-            Tiếng Việt
-        </div>
-        <div id="en-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;">
-            <img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="Cờ Anh" style="width: 20px; height: 15px; margin-right: 5px;">
-            English
-        </div>
-    </div>
+<!--    &lt;!&ndash; Các nút chọn ngôn ngữ &ndash;&gt;-->
+<!--    <div class="language-buttons d-flex top-0 end-0">-->
+<!--        <div id="vi-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;" >-->
+<!--            <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" alt="Cờ Việt Nam" style="width: 20px; height: 15px; margin-right: 5px;">-->
+<!--            Tiếng Việt-->
+<!--        </div>-->
+<!--        <div id="en-btn" class="language-option p-2" style="display: flex; align-items: center; cursor: pointer;">-->
+<!--            <img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="Cờ Anh" style="width: 20px; height: 15px; margin-right: 5px;">-->
+<!--            English-->
+<!--        </div>-->
+<!--    </div>-->
+</div>
+<div class="d-flex justify-content-center align-items-center">
+    <img src="/img/anh1-removebg-preview.png" alt="Room Image" class="img-fluid">
 </div>
 
-<div id="customerInfoForm" th:if="${not #authorization.expression('hasRole(''CUSTOMER'')')}" class=" shadow" style=" max-width: 1000px ; flex: 1">
-    <div class="card shadow-sm border-0 text-start">
-        <div class="card-body">
-            <h4 class="mb-3 text-center">Thông Tin Khách Hàng</h4>
-            <form id="customerForm">
+<div class="d-flex justify-content-center align-items-center">
+    <div id="customerInfoForm" th:if="${not #authorization.expression('hasRole(''CUSTOMER'')')}" class="shadow" style="max-width: 600px;">
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+            <div class="card-body">
+                <h5 class="mb-3 text-center fw-bold text-uppercase">Thông Tin Khách Hàng</h5>
+                <form id="customerForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="maKhachHang" name="maKhachHang">
 
-                <input type="hidden"  id="maKhachHang" name="maKhachHang">
-                <div class="mb-3">
-                    <label for="hoVaTen" class="form-label">Họ và Tên:</label>
-                    <input type="text" class="form-control form-control-sm" id="hoVaTen" name="hoVaTen" placeholder="Họ và tên" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email:</label>
-                    <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="soDienThoai" class="form-label">Số Điện Thoại:</label>
-                    <input type="text" class="form-control form-control-sm" id="soDienThoai" name="soDienThoai" placeholder="Số điện thoại" required>
-                </div>
+                    <!-- Họ và Tên, Email trên 1 dòng -->
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="hoVaTen" class="form-label">Họ và Tên:</label>
+                            <input
+                                    type="text"
+                                    class="form-control form-control-sm rounded-pill"
+                                    id="hoVaTen"
+                                    name="hoVaTen"
+                                    placeholder="Nhập họ và tên"
+                                    required>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập họ và tên.
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label for="email" class="form-label">Email:</label>
+                            <input
+                                    type="email"
+                                    class="form-control form-control-sm rounded-pill"
+                                    id="email"
+                                    name="email"
+                                    placeholder="Nhập email"
+                                    required>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập email hợp lệ.
+                            </div>
+                        </div>
+                    </div>
 
-                <button type="button" id="confirmCustomerBtn" class="btn btn-dark w-100">Xác Nhận Thông Tin</button>
-            </form>
+                    <!-- Số Điện Thoại trên 1 dòng -->
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="soDienThoai" class="form-label">Số Điện Thoại:</label>
+                            <input
+                                    type="text"
+                                    class="form-control form-control-sm rounded-pill"
+                                    id="soDienThoai"
+                                    name="soDienThoai"
+                                    placeholder="Nhập số điện thoại"
+                                    required>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập số điện thoại.
+                            </div>
+                        </div>
+                        <!-- Thêm cột trống nếu cần -->
+                        <div class="col-6"></div>
+                    </div>
+
+                    <!-- Nút Xác Nhận -->
+                    <button
+                            type="button"
+                            id="confirmCustomerBtn"
+                            class="btn btn-dark w-100 rounded-pill">
+                        Xác Nhận Thông Tin
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -688,9 +735,18 @@
                 <input type="text" class="form-control" id="cccd" name="cccd" required pattern="\d{9}|\d{12}" title="Vui lòng nhập CCCD đúng định dạng (9 hoặc 12 chữ số)">
             </div>
             <div class="form-group">
-                <label for="deposit">Số tiền cọc (80%):</label>
+                <label for="deposit">Số tiền thanh toán:</label>
                 <input type="text" class="form-control" id="deposit" readonly>
                 <input type="hidden" id="rawDeposit" name="gia">
+                <input type="hidden" id="thanhToan100" name="thanhToan100">
+            </div>
+            <div class="form-check">
+                <input type="radio" id="thanhToanDeposit" name="thanhToan" value="deposit" class="form-check-input" checked>
+                <label for="thanhToanDeposit" class="form-check-label">Thanh toán 80% (tiền cọc)</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" id="thanhToanFull" name="thanhToan" value="full" class="form-check-input">
+                <label for="thanhToanFull" class="form-check-label">Thanh toán 100% (toàn bộ)</label>
             </div>
             <!--            <div class="form-group">-->
             <!--                <label for="amount">Số tiền đặt cọc:</label>-->
@@ -852,12 +908,18 @@
     });
 
     document.addEventListener("DOMContentLoaded", function () {
-        const pricePerNight = parseFloat(document.getElementById("pricePerNight").value);
+        const pricePerNight = parseFloat(document.getElementById("pricePerNight").value); // Giá mỗi đêm
 
-        document.getElementById("checkinDate").addEventListener("change", calculateDeposit);
-        document.getElementById("checkoutDate").addEventListener("change", calculateDeposit);
+        // Sự kiện tính toán lại khi thay đổi ngày nhận/trả hoặc loại thanh toán
+        document.getElementById("checkinDate").addEventListener("change", calculateCost);
+        document.getElementById("checkoutDate").addEventListener("change", calculateCost);
+        const paymentRadios = document.getElementsByName("thanhToan");
 
-        function calculateDeposit() {
+        paymentRadios.forEach(radio => {
+            radio.addEventListener("change", calculateCost);
+        });
+
+        function calculateCost() {
             const checkin = document.getElementById("checkinDate").value;
             const checkout = document.getElementById("checkoutDate").value;
 
@@ -877,11 +939,18 @@
                 if (diffDays > 0) {
                     const totalCost = diffDays * pricePerNight;
                     const depositAmount = totalCost * 0.8;
-                    // Gán giá trị hiển thị định dạng (VNĐ) vào input readonly (để người dùng xem)
-                    document.getElementById('deposit').value = depositAmount.toLocaleString('vi-VN') + ' VNĐ';
+                    const isFullPayment = document.getElementById("thanhToanFull").checked;
 
-// Thêm giá trị thô vào input ẩn để gửi về server
-                    document.getElementById('rawDeposit').value = depositAmount;
+                    const finalAmount = isFullPayment ? totalCost : depositAmount;
+
+                    // Gán giá trị hiển thị định dạng VNĐ vào input readonly
+                    document.getElementById("deposit").value = finalAmount.toLocaleString('vi-VN') + ' VNĐ';
+
+                    // Gán giá trị thô để gửi lên server
+                    document.getElementById("rawDeposit").value = finalAmount;
+
+                    // Cập nhật giá trị "thanhToan100" là true hoặc false
+                    document.getElementById("thanhToan100").value = isFullPayment ? "true" : "false";
                 } else {
                     document.getElementById("deposit").value = "";
                 }

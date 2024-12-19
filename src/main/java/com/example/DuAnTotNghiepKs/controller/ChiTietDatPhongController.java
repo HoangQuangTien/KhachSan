@@ -376,7 +376,7 @@ public class ChiTietDatPhongController {
             Phong phongMoi = phongService.getPhongById(tenPhongId)
                     .orElseThrow(() -> new RuntimeException("Phòng không tồn tại với ID: " + tenPhongId));
 
-            if (phongMoi.getGia() < phongHienTai.getGia()) {
+            if (phongMoi.getLoaiPhong().getGia() < phongHienTai.getLoaiPhong().getGia()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("success", false, "message", "Không thể đổi sang phòng có giá thấp hơn phòng hiện tại."));
             }

@@ -325,6 +325,7 @@ public class KhachHangDD {
             @RequestParam("ngayTra") String ngayTraStr,
             @RequestParam("cccd") String cccd,
             @RequestParam("idKhachHang") String idKhachHangStr,
+            @RequestParam("thanhToan100") boolean thanhToan100,
             HttpServletRequest req) {
 
         // Chuyển đổi chuỗi ID phòng thành danh sách
@@ -419,7 +420,17 @@ public class KhachHangDD {
                 long soNgayO = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
                 float giaPhong = selectedPhong.getLoaiPhong().getGia();
                 float tongTienPhongPhong = giaPhong * soNgayO;
-                float tienCocPhong = tongTienPhongPhong * 0.8f;
+//                float tienCocPhong = tongTienPhongPhong * 0.8f;
+
+
+                float tienCocPhong;
+                if (thanhToan100) {
+                    // Nếu chọn thanh toán 100%
+                    tienCocPhong = tongTienPhongPhong;
+                } else {
+                    // Nếu chọn thanh toán 80%
+                    tienCocPhong = tongTienPhongPhong * 0.8f;
+                }
 
 //                // Cập nhật tổng tiền phòng và tiền cọc
                 tongTienPhong += tongTienPhongPhong;
