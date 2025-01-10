@@ -141,7 +141,7 @@
         </div>
 
         <div class="d-flex justify-content-center">
-            <h2 style="color: #0d4bdb">Danh Sách Hóa Dơn Cần Thanh Toán</h2>
+            <h2 style="color: #0d4bdb">Danh Sách Hóa Dơn cần trả phòng</h2>
         </div>
 
         <div class="row">
@@ -1076,7 +1076,7 @@
             Swal.fire({
                 icon: 'warning',
                 title: 'Chưa chọn phòng!',
-                text: 'Vui lòng chọn phòng trước khi thanh toán.',
+                text: 'Vui lòng chọn hóa đơn trước khi thanh toán.',
                 confirmButtonText: 'OK'
             });
             return; // Ngăn không gửi form
@@ -1084,18 +1084,18 @@
 
         // Hiển thị thông báo xác nhận trước khi thực hiện thanh toán
         Swal.fire({
-            title: 'Bạn chắc chắn muốn thanh toán?',
+            title: 'Bạn chắc chắn muốn trả phòng?',
             text: "Hãy kiểm tra lại thông tin trước khi tiếp tục.",
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Có, thanh toán!',
+            confirmButtonText: 'Có,trả phòng!',
             cancelButtonText: 'Hủy bỏ'
         }).then((result) => {
             if (result.isConfirmed) {
                 // Thực hiện các bước thanh toán
                 Swal.fire({
                     title: 'Thành công!',
-                    text: 'Thanh toán thành công!',
+                    text: 'Trả phòng toán thành công!',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(function () {
