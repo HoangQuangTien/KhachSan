@@ -61,7 +61,7 @@ public class DatPhong {
     @JoinColumn(name = "id_phong",referencedColumnName ="id_phong")
     private Phong phong;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_khach_hang", referencedColumnName = "id_khach_hang")
     private KhachHang khachHang;
 

@@ -9,6 +9,10 @@ import com.example.DuAnTotNghiepKs.repository.*;
 import com.example.DuAnTotNghiepKs.service.DatPhongService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,8 +21,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -116,6 +123,25 @@ public class DatPhongServiceImp implements DatPhongService {
     @Override
     public List<DatPhong> getDatPhongChuaCheckIn() {
         return datPhongRepository.findByTinhTrang("Chưa Checkin");
+    }
+
+
+    public List<DatPhong> getDatPhongDaCheckInAndNgay(){
+        return datPhongRepository.findByTinhTrang("Đã Checkin");
+    }
+
+    public List<DatPhong> getDatPhongAndNganBeetwen() {
+        // Lấy ngày hiện tại
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // 00:00 hôm nay
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1); // 23:59 hôm nay
+
+        // Gọi repository với tình trạng "Đã Checkin"
+        return datPhongRepository.findByTinhTrangAndNgayNhanBetween("Đã Checkin", startOfDay, endOfDay);
+    }
+
+    @Override
+    public List<DatPhong> getDatPhongChuaXacNhan(){
+        return datPhongRepository.findByTinhTrang("Chưa xác nhận");
     }
 
     @Override
@@ -588,6 +614,44 @@ public class DatPhongServiceImp implements DatPhongService {
             throw new RuntimeException("Đã xảy ra lỗi khi truy vấn doanh thu ngày: " + LocalDate.now());
         }
     }
+
+
+    @Override
+    public void exportGuestReport(List<DatPhong> guests, String filePath) throws IOException {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Khách lưu trú");
+
+        // Header row
+        Row header = sheet.createRow(0);
+        String[] columns = {"STT", "Họ tên", "CMND/CCCD", "Quốc tịch", "Số phòng", "Ngày nhận phòng", "Ngày trả phòng"};
+        for (int i = 0; i < columns.length; i++) {
+            header.createCell(i).setCellValue(columns[i]);
+        }
+
+        // Data rows
+        int rowIdx = 1;
+        for (int i = 0; i < guests.size(); i++) {
+            DatPhong guest = guests.get(i);
+            Row row = sheet.createRow(rowIdx++);
+            row.createCell(0).setCellValue(i + 1);
+            row.createCell(1).setCellValue(guest.getKhachHang().getHoVaTen());
+            row.createCell(2).setCellValue(guest.getCccd());
+            row.createCell(3).setCellValue("Việt Nam");
+            row.createCell(4).setCellValue(guest.getPhong().getTenPhong());
+            row.createCell(5).setCellValue(guest.getNgayNhan().toString());
+            row.createCell(6).setCellValue(guest.getNgayTra().toString());
+        }
+
+        // Write to file
+        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+            workbook.write(outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error writing Excel file: " + filePath, e);
+        }
+    }
+
+
 
 
 }
